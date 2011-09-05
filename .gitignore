@@ -4,10 +4,15 @@
 *.la
 *.o
 *.so
+*.make
 
-.fuse*
 .directory
+.fuse*
 .svn
+
+bin/*
+intermediate
+Makefile
 
 sdks/vstsdk2.4/artwork
 sdks/vstsdk2.4/bin
