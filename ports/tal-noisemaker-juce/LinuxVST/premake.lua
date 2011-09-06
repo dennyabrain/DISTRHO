@@ -47,7 +47,7 @@ package.files = {
     matchfiles (
         "../src/*.cpp",
         "../src/Engine/*.cpp",
-        "../../../libs/juce-153/source/extras/audio plugins/wrapper/VST/juce_VST_Wrapper.cpp"
-        -- "../../../libs/juce-153/source/src/audio/plugin_client/VST/juce_VST_Wrapper.cpp"
+--         "../../../libs/juce-153/source/extras/audio plugins/wrapper/VST/juce_VST_Wrapper.cpp"
+        "../../../libs/juce-153/source/src/audio/plugin_client/VST/juce_VST_Wrapper.cpp"
     )
 }

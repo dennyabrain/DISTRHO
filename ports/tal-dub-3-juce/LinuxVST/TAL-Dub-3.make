@@ -41,6 +41,7 @@ endif
 OBJECTS := \
 	$(OBJDIR)/TalComponent.o \
 	$(OBJDIR)/TalCore.o \
+	$(OBJDIR)/juce_VST_Wrapper.o \
 
 MKDIR_TYPE := msdos
 CMD := $(subst \,\\,$(ComSpec)$(COMSPEC))
@@ -88,6 +89,11 @@ $(OBJDIR)/TalComponent.o: ../src/TalComponent.cpp
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
 $(OBJDIR)/TalCore.o: ../src/TalCore.cpp
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/juce_VST_Wrapper.o: ../../../libs/juce-153/source/src/audio/plugin_client/VST/juce_VST_Wrapper.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
