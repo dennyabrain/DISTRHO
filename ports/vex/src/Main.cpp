@@ -45,7 +45,7 @@ START_JUCE_APPLICATION (StandaloneFilterApplication)
 /** We are building a VST plugin so we need to include the main wrapper class
 */
 
-#include "src/audio/plugin_client/VST/juce_VST_Wrapper.cpp"
+#include "juce_VST_Wrapper.cpp"
 
 #endif
 

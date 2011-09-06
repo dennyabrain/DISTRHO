@@ -5,7 +5,7 @@ all: build
 
 build:
 	# Libs
-	$(MAKE) -C ../libs/juce-153
+	$(MAKE) -C ../libs/juce-152
 
 	# Plugins
 	$(MAKE) -C vex/LinuxVST
