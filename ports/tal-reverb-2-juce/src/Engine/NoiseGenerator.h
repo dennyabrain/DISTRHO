@@ -52,7 +52,7 @@ public:
 
 		getNextRandomPeriod(1.0f);
 
-        randSeed = 1;
+        randSeed = rand();
 	}
 
 	// returns a random value [0..1] 

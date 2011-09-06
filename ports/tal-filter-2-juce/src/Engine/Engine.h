@@ -115,8 +115,8 @@ public:
 
         if (this->filterType <= 7)
         {
-            this->filterHandlerL->setFiltertype(index);
-            this->filterHandlerR->setFiltertype(index);
+            this->filterHandlerL->setFiltertype((float)index);
+            this->filterHandlerR->setFiltertype((float)index);
         }
     }
 

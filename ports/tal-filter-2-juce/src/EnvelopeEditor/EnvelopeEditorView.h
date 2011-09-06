@@ -49,7 +49,7 @@ public:
         this->backgroundColor = Colour((const uint8)10, (const uint8)10, (const uint8)10, (const uint8)255);
         this->splineColor = Colour(Colour((const uint8)100, (const uint8)100, (const uint8)255, (const uint8)255));
         this->oldPhase = 0.0f;
-        startTimer(50);
+        startTimer(20);
 	}
 
     ~EnvelopeEditorView()
@@ -347,7 +347,7 @@ public:
         else
         {
             selectedPoint->setPosition(positionNormalized);
-            selectedPoint->setLinkedPointPosition(positionNormalized);
+            selectedPoint->setLinkedPointPosition(positionNormalized, !envelopeEditor->isOneShot());
             envelopeEditor->sort();
         }
     }

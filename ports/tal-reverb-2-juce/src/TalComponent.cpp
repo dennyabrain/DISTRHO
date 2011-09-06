@@ -30,7 +30,7 @@ TalComponent::TalComponent (TalCore* const ownerFilter)
     wetSlider->setBounds(519, 67, sliderKnob.getWidth(), 179);
 
 	// Version info
-	versionLabel = new Label("Version Info", "V 1.50");
+	versionLabel = new Label("Version Info", "V 1.61");
 	versionLabel->setBounds(4, 1, 100, 20);
 	versionLabel->setColour(Label::textColourId, Colour((juce::uint8)100, (juce::uint8)100, (juce::uint8)100, 0.8f));
 	addAndMakeVisible(versionLabel);

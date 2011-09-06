@@ -32,6 +32,7 @@ class EnvelopeEditor : Timer
 {
 private:
     static const int TIMER_INTERVALL = 1000;
+    static const int FIX_TEMPO = 120;
 
     Array<SplinePoint*> points;
     Array<float> splineDataBuffer;
@@ -50,6 +51,11 @@ private:
 
     bool dirty;
 
+    bool oneShot;
+    bool fixTempo;
+
+    bool isPlaying;
+
 public:
     EnvelopeEditor(float sampleRate)
     {
@@ -58,25 +64,17 @@ public:
         this->numerator = 4;
         this->dirty = true;
 
+        this->oneShot = false;
+        this->fixTempo = false;
+
         // default 120 bpm
         this->samplesPerBeat = sampleRate / 2.0f;
         this->speedFactor = 1.0f;
         this->actualPhase = 0.0f;
-        this->bpm = 120.0f;
+        this->bpm = FIX_TEMPO;
+        this->isPlaying = true;
 
-        SplinePoint *start = new SplinePoint(Point<float>(0.0f, 0.5f));
-        SplinePoint *end = new SplinePoint(Point<float>(1.0f, 0.5f));
-
-        start->setStartPoint(true);
-        end->setEndPoint(true);
-
-        start->setLinkedPoint(end);
-        end->setLinkedPoint(start);
-
-        points.add(start);
-        points.add(end);
-
-        this->sort();
+        this->initializePoints();
 
         startTimer(TIMER_INTERVALL);
     }
@@ -89,9 +87,10 @@ public:
     }
 
 private:
+
     float getBufferedValue(float x)
     {
-        float position = x * splineDataBuffer.size();
+        float position = x * (splineDataBuffer.size() - 1);
         int positionInt0 = (int)position;
         
         if (positionInt0 >= splineDataBuffer.size())
@@ -113,6 +112,8 @@ private:
         return f0 + (f1 - f0) * positionFraq;
     }
 
+    CriticalSection myCriticalSectionBuffer;
+
     float getEnvleopeValueCalculated(float x)
     {
         for (int i = 0; i < this->points.size() - 1; i++)
@@ -120,6 +121,13 @@ private:
             if (x >= points[i]->getX() && x <= points[i + 1]->getX())
             {
                 float deltaX = points[i + 1]->getX() - points[i]->getX();
+
+                // Havent a better solution for 0 values until now
+                if (deltaX == 0.0f)
+                {
+                    deltaX = 0.00000000001f;
+                }
+
                 float scaleX = (x - points[i]->getCenterPosition().getX()) * 1.0f / deltaX;
 
                 Point<float> result = su.PointOnCubicBezier(
@@ -157,6 +165,43 @@ private:
     }
 
 public:
+
+    void initializePoints()
+    {
+        //const ScopedLock myScopedLock (myCriticalSectionBuffer);
+        points.clear();
+
+        SplinePoint *start = new SplinePoint(Point<float>(0.0f, 0.5f));
+        SplinePoint *end = new SplinePoint(Point<float>(1.0f, 0.5f));
+
+        start->setStartPoint(true);
+        end->setEndPoint(true);
+
+        start->setLinkedPoint(end);
+        end->setLinkedPoint(start);
+
+        points.add(start);
+        points.add(end);
+
+        this->sort();
+    }
+
+    void setOneShot(bool value)
+    {
+        this->oneShot = value;
+    }
+
+    bool isOneShot()
+    {
+        return this->oneShot;
+    }
+
+    void setFixTempo(bool value)
+    {
+        this->fixTempo = value;
+        this->bpm = FIX_TEMPO;
+    }
+
     float getDenominator()
     {
         return this->denominator;
@@ -192,6 +237,7 @@ public:
     {
         if (this->dirty)
         {
+            const ScopedLock myScopedLock (myCriticalSectionBuffer);
             this->calculateBuffer();
         }
         
@@ -200,6 +246,7 @@ public:
 
     float getEnvelopeValue(float x)
     {
+        const ScopedLock myScopedLock (myCriticalSectionBuffer);
         if (this->dirty)
         {
             return this->getEnvleopeValueCalculated(x);
@@ -245,6 +292,7 @@ public:
     {
         if (splinePoints.size() > 0)
         {
+            const ScopedLock myScopedLock (myCriticalSectionBuffer);
             this->points.clear();
             this->points = splinePoints;
         }
@@ -307,10 +355,13 @@ public:
     // returns a float [0..1]
     float process()
     {
-        this->actualPhase += this->getPhaseDelta(); 
-        if (this->actualPhase >= 1.0f)
+        if (this->isPlaying)
         {
-            this->actualPhase -= 1.0f;
+            this->actualPhase += this->getPhaseDelta(); 
+            if (this->actualPhase >= 1.0f)
+            {
+                this->actualPhase -= 1.0f;
+            }
         }
 
         return this->getEnvelopeValue(this->actualPhase);
@@ -319,7 +370,6 @@ public:
     void sync(float bpm, AudioPlayHead::CurrentPositionInfo pos)
     {
         this->setTimeInformation(pos);
-
         this->actualPhase = speedFactor / this->numerator * ((float)pos.ppqPosition / this->denominator);
 
         // We need this to avoid drop outs
@@ -328,6 +378,8 @@ public:
 
     void setTimeInformation(AudioPlayHead::CurrentPositionInfo pos)
     {
+        this->isPlaying = pos.isPlaying;
+
         if (this->bpm != (float)pos.bpm
             || this->denominator != (float)pos.timeSigDenominator
             || this->numerator != (float)pos.timeSigNumerator)
@@ -335,6 +387,17 @@ public:
             this->setTimeInformation((float)pos.bpm);
             this->denominator = (float)pos.timeSigDenominator;
             this->numerator = (float)pos.timeSigNumerator;
+
+            if (this->denominator == 0.0f)
+            {
+                this->denominator = 4.0f;
+            }
+
+            if (this->numerator == 0.0f)
+            {
+                this->numerator = 4.0f;
+            }
+
             this->setDirty();
         }
     }
@@ -350,6 +413,11 @@ public:
 
     float getSamplesPerBeat(float bpm)
     {
+        if (this->fixTempo)
+        {
+            return 60.0f / FIX_TEMPO * sampleRate;
+        }
+
 	    return 60.0f / bpm * sampleRate;
     }
 

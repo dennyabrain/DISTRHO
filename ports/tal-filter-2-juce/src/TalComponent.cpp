@@ -49,7 +49,7 @@ TalComponent::TalComponent (TalCore* const ownerFilter) : AudioProcessorEditor (
     volumeOutKnob = addNormalKnob(576, height + 39, ownerFilter, knobImage, numberOfImages, VOLUMEOUT);
 
 	// Version info
-	versionLabel = new Label("Version Info", "V 1.10");
+	versionLabel = new Label("Version Info", "V 1.20");
 	versionLabel->setBounds(image.getWidth() - 68, image.getHeight() - 88, 100, 20);
 	versionLabel->setColour(Label::textColourId, Colour((juce::uint8)100, (juce::uint8)100, (juce::uint8)100, 0.9f));
     addAndMakeVisible(versionLabel);

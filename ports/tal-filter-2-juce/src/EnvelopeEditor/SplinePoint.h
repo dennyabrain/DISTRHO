@@ -180,9 +180,9 @@ public:
         this->controlPointRight = this->limitBoundaries(this->controlPointRight);
     }
 
-    void setLinkedPointPosition(Point<float> position)
+    void setLinkedPointPosition(Point<float> position, bool doLinkEndpoints)
     {
-        if (this->linkedPoint != NULL)
+        if (this->linkedPoint != NULL && doLinkEndpoints)
         {
             this->linkedPoint->setPosition(position);
         }

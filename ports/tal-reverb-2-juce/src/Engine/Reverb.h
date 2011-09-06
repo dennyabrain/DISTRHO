@@ -273,12 +273,12 @@ public:
 		}
 
 		// ----------------- Pre AllPass --------------------
-		outL += 0.5f * preAllPassFilterL->processInterpolated(revR, 0.6f + 0.4f * noiseGeneratorAllPassL[0]->tickFilteredNoise(), 0.99f, true);
-		outR += 0.5f * preAllPassFilterR->processInterpolated(revL, 0.6f + 0.4f * noiseGeneratorAllPassR[0]->tickFilteredNoise(), 0.99f, true);
+		outL += 0.5f * preAllPassFilterL->processInterpolated(revR, 0.8f + 0.2f * noiseGeneratorAllPassL[0]->tickFilteredNoise(), 0.69f, true);
+		outR += 0.5f * preAllPassFilterR->processInterpolated(revL, 0.8f + 0.2f * noiseGeneratorAllPassR[0]->tickFilteredNoise(), 0.69f, true);
 
 		//// ----------------- Post AllPass --------------------
-		outL += 0.45f * postAllPassFilterL->processInterpolated(revL, 0.8f + 0.2f * noiseGeneratorAllPassL[1]->tickFilteredNoise(), 0.7f, true);
-		outR += 0.45f * postAllPassFilterR->processInterpolated(revR, 0.8f + 0.2f * noiseGeneratorAllPassR[1]->tickFilteredNoise(), 0.7f, true);
+		outL += 0.45f * postAllPassFilterL->processInterpolated(revL, 0.8f + 0.2f * noiseGeneratorAllPassL[1]->tickFilteredNoise(), 0.69f, false);
+		outR += 0.45f * postAllPassFilterR->processInterpolated(revR, 0.8f + 0.2f * noiseGeneratorAllPassR[1]->tickFilteredNoise(), 0.69f, false);
 
 		// ----------------- AllPass Filter ------------------
 		for (int i = 0; i < DELAY_LINES_ALLPASS; i++)
