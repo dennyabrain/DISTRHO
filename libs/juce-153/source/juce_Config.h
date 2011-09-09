@@ -83,7 +83,7 @@
 /** JUCE_DIRECTSOUND: Enables DirectSound audio (MS Windows only).
 */
 #ifndef JUCE_DIRECTSOUND
-  #define JUCE_DIRECTSOUND 1
+  #define JUCE_DIRECTSOUND 0
 #endif
 
 /** JUCE_DIRECTSHOW: Enables DirectShow media-streaming architecture (MS Windows only).
@@ -105,7 +105,7 @@
 
 /** JUCE_ALSA: Enables ALSA audio devices (Linux only). */
 #ifndef JUCE_ALSA
-  #define JUCE_ALSA 1
+  #define JUCE_ALSA 0
 #endif
 
 /** JUCE_JACK: Enables JACK audio devices (Linux only). */
@@ -131,7 +131,7 @@
     If you're not using OpenGL, you might want to turn this off to reduce your binary's size.
 */
 #if ! (defined (JUCE_OPENGL) || JUCE_ANDROID)
-  #define JUCE_OPENGL 1
+  #define JUCE_OPENGL 0
 #endif
 
 /** JUCE_DIRECT2D: Enables the Windows 7 Direct2D renderer.
@@ -147,7 +147,7 @@
     reduce the size of your codebase and build time.
 */
 #ifndef JUCE_USE_FLAC
-  #define JUCE_USE_FLAC 1
+  #define JUCE_USE_FLAC 0
 #endif
 
 /** JUCE_USE_OGGVORBIS: Enables the Ogg-Vorbis audio codec classes (available on all platforms).
@@ -155,7 +155,7 @@
     reduce the size of your codebase and build time.
 */
 #ifndef JUCE_USE_OGGVORBIS
-  #define JUCE_USE_OGGVORBIS 1
+  #define JUCE_USE_OGGVORBIS 0
 #endif
 
 //=============================================================================
@@ -164,7 +164,7 @@
     reduce code size.
 */
 #if (! defined (JUCE_USE_CDBURNER)) && ! (JUCE_WINDOWS && ! JUCE_MSVC)
-  #define JUCE_USE_CDBURNER 1
+  #define JUCE_USE_CDBURNER 0
 #endif
 
 /** JUCE_USE_CDREADER: Enables the audio CD reader code (Mac and Windows only).
@@ -172,7 +172,7 @@
     reduce code size.
 */
 #ifndef JUCE_USE_CDREADER
-  #define JUCE_USE_CDREADER 1
+  #define JUCE_USE_CDREADER 0
 #endif
 
 //=============================================================================
@@ -251,7 +251,7 @@
     If you're not using any embedded web-pages, turning this off may reduce your code size.
 */
 #ifndef JUCE_WEB_BROWSER
-  #define JUCE_WEB_BROWSER 1
+  #define JUCE_WEB_BROWSER 0
 #endif
 
 
@@ -275,19 +275,19 @@
 #endif
 
 #ifndef JUCE_INCLUDE_FLAC_CODE
-  #define JUCE_INCLUDE_FLAC_CODE        1
+  #define JUCE_INCLUDE_FLAC_CODE        0
 #endif
 
 #ifndef JUCE_INCLUDE_OGGVORBIS_CODE
-  #define JUCE_INCLUDE_OGGVORBIS_CODE   1
+  #define JUCE_INCLUDE_OGGVORBIS_CODE   0
 #endif
 
 #ifndef JUCE_INCLUDE_PNGLIB_CODE
-  #define JUCE_INCLUDE_PNGLIB_CODE      1
+  #define JUCE_INCLUDE_PNGLIB_CODE      0
 #endif
 
 #ifndef JUCE_INCLUDE_JPEGLIB_CODE
-  #define JUCE_INCLUDE_JPEGLIB_CODE     1
+  #define JUCE_INCLUDE_JPEGLIB_CODE     0
 #endif
 
 //=============================================================================
