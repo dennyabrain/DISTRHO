@@ -131,7 +131,7 @@
     If you're not using OpenGL, you might want to turn this off to reduce your binary's size.
 */
 #if ! (defined (JUCE_OPENGL) || JUCE_ANDROID)
-  #define JUCE_OPENGL 0
+  #define JUCE_OPENGL 1
 #endif
 
 /** JUCE_DIRECT2D: Enables the Windows 7 Direct2D renderer.
@@ -283,11 +283,11 @@
 #endif
 
 #ifndef JUCE_INCLUDE_PNGLIB_CODE
-  #define JUCE_INCLUDE_PNGLIB_CODE      0
+  #define JUCE_INCLUDE_PNGLIB_CODE      1
 #endif
 
 #ifndef JUCE_INCLUDE_JPEGLIB_CODE
-  #define JUCE_INCLUDE_JPEGLIB_CODE     0
+  #define JUCE_INCLUDE_JPEGLIB_CODE     1
 #endif
 
 //=============================================================================

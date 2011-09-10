@@ -254,7 +254,7 @@
     but for normal apps, this option should be left alone.
 */
 #ifndef JUCE_INCLUDE_ZLIB_CODE
-  #define JUCE_INCLUDE_ZLIB_CODE        0
+  #define JUCE_INCLUDE_ZLIB_CODE        1
 #endif
 
 #ifndef JUCE_INCLUDE_FLAC_CODE
@@ -266,11 +266,11 @@
 #endif
 
 #ifndef JUCE_INCLUDE_PNGLIB_CODE
-  #define JUCE_INCLUDE_PNGLIB_CODE      0
+  #define JUCE_INCLUDE_PNGLIB_CODE      1
 #endif
 
 #ifndef JUCE_INCLUDE_JPEGLIB_CODE
-  #define JUCE_INCLUDE_JPEGLIB_CODE     0
+  #define JUCE_INCLUDE_JPEGLIB_CODE     1
 #endif
 
 //=============================================================================

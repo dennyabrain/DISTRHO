@@ -13,12 +13,12 @@ ifeq ($(CONFIG),Release)
   LIBDIR := ../../../bin/
   OBJDIR := intermediate/Release
   OUTDIR := ../../../bin/
-  CPPFLAGS := $(DEPFLAGS) -D "LINUX=1" -D "NDEBUG=1" -D "JUCE_ALSA=0" -D "JUCE_USE_VSTSDK_2_4=1" -I "../src" -I "../src/engine" -I "/usr/include" -I "/usr/include/freetype2" -I "../../../libs/juce-153/source" -I "../../../sdks/vstsdk2.4" -I "."
+  CPPFLAGS := $(DEPFLAGS) -D "LINUX=1" -D "NDEBUG=1" -D "JUCE_USE_VSTSDK_2_4=1" -I "../src" -I "../src/engine" -I "/usr/include" -I "/usr/include/freetype2" -I "../../../libs/juce-153/source" -I "../../../sdks/vstsdk2.4" -I "."
   CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -fPIC -O2 -O2 -s -fvisibility=hidden -msse -ffast-math -static
   CXXFLAGS += $(CFLAGS)
   LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -shared -s -L"/usr/X11R6/lib/" -L"/usr/lib/" -L"../../../libs/" -lfreetype -lpthread -lrt -lX11 -lGL -ljuce-153
   LDDEPS :=
-  RESFLAGS := -D "LINUX=1" -D "NDEBUG=1" -D "JUCE_ALSA=0" -D "JUCE_USE_VSTSDK_2_4=1" -I "../src" -I "../src/engine" -I "/usr/include" -I "/usr/include/freetype2" -I "../../../libs/juce-153/source" -I "../../../sdks/vstsdk2.4" -I "."
+  RESFLAGS := -D "LINUX=1" -D "NDEBUG=1" -D "JUCE_USE_VSTSDK_2_4=1" -I "../src" -I "../src/engine" -I "/usr/include" -I "/usr/include/freetype2" -I "../../../libs/juce-153/source" -I "../../../sdks/vstsdk2.4" -I "."
   TARGET := libTAL-Reverb.so
  BLDCMD = $(CXX) -o $(OUTDIR)/$(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(TARGET_ARCH)
 endif
@@ -28,12 +28,12 @@ ifeq ($(CONFIG),Debug)
   LIBDIR := ../../../bin/
   OBJDIR := intermediate/Debug
   OUTDIR := ../../../bin/
-  CPPFLAGS := $(DEPFLAGS) -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -D "JUCE_ALSA=0" -D "JUCE_USE_VSTSDK_2_4=1" -I "../src" -I "../src/engine" -I "/usr/include" -I "/usr/include/freetype2" -I "../../../libs/juce-153/source" -I "../../../sdks/vstsdk2.4" -I "."
+  CPPFLAGS := $(DEPFLAGS) -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -D "JUCE_USE_VSTSDK_2_4=1" -I "../src" -I "../src/engine" -I "/usr/include" -I "/usr/include/freetype2" -I "../../../libs/juce-153/source" -I "../../../sdks/vstsdk2.4" -I "."
   CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -fPIC -g -O0 -ggdb -static
   CXXFLAGS += $(CFLAGS)
   LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -shared -L"/usr/X11R6/lib/" -L"/usr/lib/" -L"../../../libs/" -lfreetype -lpthread -lrt -lX11 -lGL -ljuce-153_debug
   LDDEPS :=
-  RESFLAGS := -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -D "JUCE_ALSA=0" -D "JUCE_USE_VSTSDK_2_4=1" -I "../src" -I "../src/engine" -I "/usr/include" -I "/usr/include/freetype2" -I "../../../libs/juce-153/source" -I "../../../sdks/vstsdk2.4" -I "."
+  RESFLAGS := -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -D "JUCE_USE_VSTSDK_2_4=1" -I "../src" -I "../src/engine" -I "/usr/include" -I "/usr/include/freetype2" -I "../../../libs/juce-153/source" -I "../../../sdks/vstsdk2.4" -I "."
   TARGET := libTAL-Reverb_debug.so
  BLDCMD = $(CXX) -o $(OUTDIR)/$(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(TARGET_ARCH)
 endif
