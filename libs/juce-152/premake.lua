@@ -4,8 +4,6 @@ project.bindir = "."
 project.libdir = project.bindir .. "/.."
 project.configs = { "Release", "Debug" }
 
-target = "linux";
-
 package = newpackage()
 package.name = project.name
 package.target = project.name
@@ -19,7 +17,7 @@ package.linkflags = { "static-runtime" }
 
 package.config["Release"].target          = project.name
 package.config["Release"].objdir          = package.objdir .. "/" .. project.name .. "_Release"
-package.config["Release"].buildoptions    = { "-march=native -Os -fPIC" }
+package.config["Release"].buildoptions    = { "-O2 -march=native -msse -ffast-math -fPIC" }
 package.config["Release"].kind = "lib"
 
 package.config["Debug"].target            = project.name .. "_debug"
@@ -28,8 +26,8 @@ package.config["Debug"].buildoptions      = { "-march=native -ggdb -O0 -fPIC" }
 package.config["Debug"].kind = "lib"
 
 -- TODO - check for linux build
-package.config["Release"].defines         = { "LINUX=1", "NDEBUG=1", "JUCE_ALSA=0", "JUCE_USE_VSTSDK_2_4=1" }
-package.config["Debug"].defines           = { "LINUX=1", "DEBUG=1", "_DEBUG=1", "JUCE_ALSA=0", "JUCE_USE_VSTSDK_2_4=1" }
+package.config["Release"].defines         = { "LINUX=1", "NDEBUG=1", "JUCE_USE_VSTSDK_2_4=1" }
+package.config["Debug"].defines           = { "LINUX=1", "DEBUG=1", "_DEBUG=1", "JUCE_USE_VSTSDK_2_4=1" }
 
 package.files = { matchfiles (
     "source/src/application/*.cpp",
