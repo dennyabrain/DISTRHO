@@ -112,6 +112,15 @@ namespace
   #define JUCE_JACK_CLIENT_NAME "JuceJack"
 #endif
 
+static const char* getJackClientName()
+{
+    String jackClientName = JUCEApplication::getInstance()->getApplicationName();
+    if (jackClientName.isEmpty())
+      jackClientName = String(JUCE_JACK_CLIENT_NAME);
+    return jackClientName.toUTF8();
+}
+
+
 //==============================================================================
 class JackAudioIODevice   : public AudioIODevice
 {
@@ -130,7 +139,7 @@ public:
         jassert (deviceName.isNotEmpty());
 
         jack_status_t status;
-        client = JUCE_NAMESPACE::jack_client_open (JUCE_JACK_CLIENT_NAME, JackNoStartServer, &status);
+        client = JUCE_NAMESPACE::jack_client_open (getJackClientName(), JackNoStartServer, &status);
 
         if (client == 0)
         {
@@ -495,7 +504,7 @@ public:
                     String clientName (ports[j]);
                     clientName = clientName.upToFirstOccurrenceOf (":", false, false);
 
-                    if (clientName != String (JUCE_JACK_CLIENT_NAME)
+                    if (clientName != String (getJackClientName())
                          && ! inputNames.contains (clientName))
                     {
                         inputNames.add (clientName);
@@ -519,7 +528,7 @@ public:
                     String clientName (ports[j]);
                     clientName = clientName.upToFirstOccurrenceOf (":", false, false);
 
-                    if (clientName != String (JUCE_JACK_CLIENT_NAME)
+                    if (clientName != String (getJackClientName())
                          && ! outputNames.contains (clientName))
                     {
                         outputNames.add (clientName);
