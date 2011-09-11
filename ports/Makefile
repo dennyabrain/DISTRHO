@@ -9,7 +9,7 @@ build:
 
 	# Plugins
 	$(MAKE) -C vex/LinuxVST
-	$(MAKE) -C tal-dub-3-juce/LinuxVST
+	$(MAKE) -C tal-dub-3-juce/VST
 	$(MAKE) -C tal-filter-juce/LinuxVST
 	$(MAKE) -C tal-filter-2-juce/LinuxVST
 	$(MAKE) -C tal-noisemaker-juce/LinuxVST
@@ -21,7 +21,7 @@ build:
 clean:
 	# Plugins
 	$(MAKE) clean -C vex/LinuxVST
-	$(MAKE) clean -C tal-dub-3-juce/LinuxVST
+	$(MAKE) clean -C tal-dub-3-juce/VST
 	$(MAKE) clean -C tal-filter-juce/LinuxVST
 	$(MAKE) clean -C tal-filter-2-juce/LinuxVST
 	$(MAKE) clean -C tal-noisemaker-juce/LinuxVST

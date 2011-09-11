@@ -1,8 +1,10 @@
 
-project.name = "juce-152"
+project.name = "juce-153"
 project.bindir = "."
 project.libdir = project.bindir .. "/.."
 project.configs = { "Release", "Debug" }
+
+target = "linux";
 
 package = newpackage()
 package.name = project.name
@@ -12,18 +14,12 @@ package.language = "c++"
 package.objdir = project.bindir .. "/intermediate"
 package.includepaths = { "/usr/include", "/usr/include/freetype2", "../../vstsdk2.4" }
 package.libpaths = { "/usr/X11R6/lib/" }
-package.links = { "freetype", "pthread", "rt", "X11", "Xext" }
+package.links = { "freetype", "pthread", "rt", "X11" }
 package.linkflags = { "static-runtime" }
 
-<<<<<<< HEAD
-package.config["Release"].target          = project.name
-package.config["Release"].objdir          = package.objdir .. "/" .. project.name .. "_Release"
-package.config["Release"].buildoptions    = { "-O2 -march=native -msse -ffast-math -fPIC" }
-=======
 package.config["Release"].target        = project.name
 package.config["Release"].objdir        = package.objdir .. "/" .. project.name .. "_Release"
 package.config["Release"].buildoptions  = { "-march=native -O2 -fPIC -msse -ffast-math -static" }
->>>>>>> 4d4afa58fe0b82bd5ffab2fd96d3f04344fa71bb
 package.config["Release"].kind = "lib"
 
 package.config["Debug"].target          = project.name .. "_debug"
@@ -32,13 +28,8 @@ package.config["Debug"].buildoptions    = { "-march=native -ggdb -O0 -fPIC" }
 package.config["Debug"].kind = "lib"
 
 -- TODO - check for linux build
-<<<<<<< HEAD
-package.config["Release"].defines         = { "LINUX=1", "NDEBUG=1", "JUCE_USE_VSTSDK_2_4=1" }
-package.config["Debug"].defines           = { "LINUX=1", "DEBUG=1", "_DEBUG=1", "JUCE_USE_VSTSDK_2_4=1" }
-=======
 package.config["Release"].defines       = { "LINUX=1", "NDEBUG=1", "JUCE_USE_VSTSDK_2_4=1" }
 package.config["Debug"].defines         = { "LINUX=1", "DEBUG=1", "_DEBUG=1", "JUCE_USE_VSTSDK_2_4=1" }
->>>>>>> 4d4afa58fe0b82bd5ffab2fd96d3f04344fa71bb
 
 package.files = { matchfiles (
     "source/src/application/*.cpp",
@@ -48,8 +39,11 @@ package.files = { matchfiles (
     "source/src/audio/devices/*.cpp",
     "source/src/audio/dsp/*.cpp",
     "source/src/audio/midi/*.cpp",
-    "source/src/audio/plugins/*.cpp",
-    "source/src/audio/plugins/formats/*.cpp",
+    -- "source/src/audio/plugin_client/RTAS/*.cpp",
+    -- "source/src/audio/plugin_client/Standalone/*.cpp",
+    -- "source/src/audio/plugin_client/VST/*.cpp",
+    "source/src/audio/plugin_host/*.cpp",
+    "source/src/audio/plugin_host/formats/*.cpp",
     "source/src/audio/processors/*.cpp",
     "source/src/audio/synthesisers/*.cpp",
     "source/src/containers/*.cpp",
@@ -66,6 +60,7 @@ package.files = { matchfiles (
     "source/src/gui/components/lookandfeel/*.cpp",
     "source/src/gui/components/menus/*.cpp",
     "source/src/gui/components/mouse/*.cpp",
+    "source/src/gui/components/positioning/*.cpp",
     "source/src/gui/components/properties/*.cpp",
     "source/src/gui/components/special/*.cpp",
     "source/src/gui/components/windows/*.cpp",
@@ -82,8 +77,8 @@ package.files = { matchfiles (
     "source/src/io/streams/*.cpp",
     "source/src/maths/*.cpp",
     "source/src/memory/*.cpp",
-    "source/src/native/juce_linux_NativeCode.cpp",
-    -- "source/src/native/juce_win32_NativeCode.cpp",
+    "source/src/native/common/*.cpp",
+    -- "source/src/native/android/*.cpp",
     "source/src/native/linux/*.cpp",
     -- "source/src/native/mac/*.cpp",
     -- "source/src/native/windows/*.cpp",

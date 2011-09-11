@@ -10,31 +10,56 @@ DEPFLAGS := $(if $(word 2, $(TARGET_ARCH)), , -MMD)
 
 ifeq ($(CONFIG),Release)
   BINDIR := .
+<<<<<<< HEAD
   LIBDIR := ../..
   OBJDIR := ./intermediate/juce-standalone-153_Release
   OUTDIR := ../..
   CPPFLAGS := $(DEPFLAGS) -D "LINUX=1" -D "NDEBUG=1" -I "." -I "/usr/include" -I "/usr/include/freetype2"
   CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -O2 -O2 -march=native -msse -ffast-math -fPIC
+=======
+  LIBDIR := ..
+  OBJDIR := ./intermediate/juce-153_Release
+  OUTDIR := ..
+  CPPFLAGS := $(DEPFLAGS) -D "LINUX=1" -D "NDEBUG=1" -D "JUCE_USE_VSTSDK_2_4=1" -I "/usr/include" -I "/usr/include/freetype2" -I "../../vstsdk2.4"
+  CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -O2 -march=native -O2 -fPIC -msse -ffast-math -static
+>>>>>>> 4d4afa58fe0b82bd5ffab2fd96d3f04344fa71bb
   CXXFLAGS += $(CFLAGS)
   LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -s -L"/usr/X11R6/lib/" -lfreetype -lpthread -lasound -lrt -lX11 -lXext
   LDDEPS :=
+<<<<<<< HEAD
   RESFLAGS := -D "LINUX=1" -D "NDEBUG=1" -I "." -I "/usr/include" -I "/usr/include/freetype2"
   TARGET := libjuce-standalone-153.a
+=======
+  RESFLAGS := -D "LINUX=1" -D "NDEBUG=1" -D "JUCE_USE_VSTSDK_2_4=1" -I "/usr/include" -I "/usr/include/freetype2" -I "../../vstsdk2.4"
+  TARGET := libjuce-153.a
+>>>>>>> 4d4afa58fe0b82bd5ffab2fd96d3f04344fa71bb
  BLDCMD = ar -rcs $(OUTDIR)/$(TARGET) $(OBJECTS) $(TARGET_ARCH)
 endif
 
 ifeq ($(CONFIG),Debug)
   BINDIR := .
+<<<<<<< HEAD
   LIBDIR := ../..
   OBJDIR := ./intermediate/juce-standalone-153_Debug
   OUTDIR := ../..
   CPPFLAGS := $(DEPFLAGS) -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -I "." -I "/usr/include" -I "/usr/include/freetype2"
+=======
+  LIBDIR := ..
+  OBJDIR := ./intermediate/juce-153_Debug
+  OUTDIR := ..
+  CPPFLAGS := $(DEPFLAGS) -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -D "JUCE_USE_VSTSDK_2_4=1" -I "/usr/include" -I "/usr/include/freetype2" -I "../../vstsdk2.4"
+>>>>>>> 4d4afa58fe0b82bd5ffab2fd96d3f04344fa71bb
   CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -g -march=native -ggdb -O0 -fPIC
   CXXFLAGS += $(CFLAGS)
   LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -L"/usr/X11R6/lib/" -lfreetype -lpthread -lasound -lrt -lX11 -lXext
   LDDEPS :=
+<<<<<<< HEAD
   RESFLAGS := -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -I "." -I "/usr/include" -I "/usr/include/freetype2"
   TARGET := libjuce-standalone-153_debug.a
+=======
+  RESFLAGS := -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -D "JUCE_USE_VSTSDK_2_4=1" -I "/usr/include" -I "/usr/include/freetype2" -I "../../vstsdk2.4"
+  TARGET := libjuce-153_debug.a
+>>>>>>> 4d4afa58fe0b82bd5ffab2fd96d3f04344fa71bb
  BLDCMD = ar -rcs $(OUTDIR)/$(TARGET) $(OBJECTS) $(TARGET_ARCH)
 endif
 

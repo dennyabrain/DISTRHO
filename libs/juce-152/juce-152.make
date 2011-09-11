@@ -13,12 +13,21 @@ ifeq ($(CONFIG),Release)
   LIBDIR := ..
   OBJDIR := ./intermediate/juce-152_Release
   OUTDIR := ..
+<<<<<<< HEAD
   CPPFLAGS := $(DEPFLAGS) -D "LINUX=1" -D "NDEBUG=1" -D "JUCE_USE_VSTSDK_2_4=1" -I "/usr/include" -I "/usr/include/freetype2" -I "../../vstsdk2.4"
   CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -O2 -O2 -march=native -msse -ffast-math -fPIC
+=======
+  CPPFLAGS := $(DEPFLAGS) -D "LINUX=1" -D "NDEBUG=1" -I "/usr/include" -I "/usr/include/freetype2" -I "../../vstsdk2.4"
+  CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -O2 -march=native -O2 -fPIC -msse -ffast-math -static
+>>>>>>> 4d4afa58fe0b82bd5ffab2fd96d3f04344fa71bb
   CXXFLAGS += $(CFLAGS)
   LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -s -L"/usr/X11R6/lib/" -lfreetype -lpthread -lrt -lX11 -lXext
   LDDEPS :=
+<<<<<<< HEAD
   RESFLAGS := -D "LINUX=1" -D "NDEBUG=1" -D "JUCE_USE_VSTSDK_2_4=1" -I "/usr/include" -I "/usr/include/freetype2" -I "../../vstsdk2.4"
+=======
+  RESFLAGS := -D "LINUX=1" -D "NDEBUG=1" -I "/usr/include" -I "/usr/include/freetype2" -I "../../vstsdk2.4"
+>>>>>>> 4d4afa58fe0b82bd5ffab2fd96d3f04344fa71bb
   TARGET := libjuce-152.a
  BLDCMD = ar -rcs $(OUTDIR)/$(TARGET) $(OBJECTS) $(TARGET_ARCH)
 endif
@@ -28,12 +37,20 @@ ifeq ($(CONFIG),Debug)
   LIBDIR := ..
   OBJDIR := ./intermediate/juce-152_Debug
   OUTDIR := ..
+<<<<<<< HEAD
   CPPFLAGS := $(DEPFLAGS) -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -D "JUCE_USE_VSTSDK_2_4=1" -I "/usr/include" -I "/usr/include/freetype2" -I "../../vstsdk2.4"
+=======
+  CPPFLAGS := $(DEPFLAGS) -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -I "/usr/include" -I "/usr/include/freetype2" -I "../../vstsdk2.4"
+>>>>>>> 4d4afa58fe0b82bd5ffab2fd96d3f04344fa71bb
   CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -g -march=native -ggdb -O0 -fPIC
   CXXFLAGS += $(CFLAGS)
   LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -L"/usr/X11R6/lib/" -lfreetype -lpthread -lrt -lX11 -lXext
   LDDEPS :=
+<<<<<<< HEAD
   RESFLAGS := -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -D "JUCE_USE_VSTSDK_2_4=1" -I "/usr/include" -I "/usr/include/freetype2" -I "../../vstsdk2.4"
+=======
+  RESFLAGS := -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -I "/usr/include" -I "/usr/include/freetype2" -I "../../vstsdk2.4"
+>>>>>>> 4d4afa58fe0b82bd5ffab2fd96d3f04344fa71bb
   TARGET := libjuce-152_debug.a
  BLDCMD = ar -rcs $(OUTDIR)/$(TARGET) $(OBJECTS) $(TARGET_ARCH)
 endif
