@@ -9,17 +9,17 @@ endif
 
 export CONFIG
 
-.PHONY: all clean TAL-Dub-3
+.PHONY: all clean juce-standalone-153
 
-all: TAL-Dub-3
+all: juce-standalone-153
 
 Makefile: premake.lua
 	@echo ==== Regenerating Makefiles ====
 	@premake --file $^ --os linux --target gnu --cc gcc
 
-TAL-Dub-3:
-	@echo ==== Building TAL-Dub-3 ====
-	@$(MAKE) --no-print-directory -C . -f TAL-Dub-3.make
+juce-standalone-153:
+	@echo ==== Building juce-standalone-153 ====
+	@$(MAKE) --no-print-directory -C . -f juce-standalone-153.make
 
 clean:
-	@$(MAKE) --no-print-directory -C . -f TAL-Dub-3.make clean
+	@$(MAKE) --no-print-directory -C . -f juce-standalone-153.make clean

@@ -12,7 +12,7 @@ package.language = "c++"
 package.objdir = project.bindir .. "/intermediate"
 package.includepaths = { "/usr/include", "/usr/include/freetype2", "../../vstsdk2.4" }
 package.libpaths = { "/usr/X11R6/lib/" }
-package.links = { "freetype", "pthread", "rt", "X11" }
+package.links = { "freetype", "pthread", "rt", "X11", "Xext" }
 package.linkflags = { "static-runtime" }
 
 package.config["Release"].target          = project.name

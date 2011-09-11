@@ -16,7 +16,7 @@ ifeq ($(CONFIG),Release)
   CPPFLAGS := $(DEPFLAGS) -D "LINUX=1" -D "NDEBUG=1" -D "JUCE_USE_VSTSDK_2_4=1" -I "/usr/include" -I "/usr/include/freetype2" -I "../../vstsdk2.4"
   CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -O2 -O2 -march=native -msse -ffast-math -fPIC
   CXXFLAGS += $(CFLAGS)
-  LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -s -L"/usr/X11R6/lib/" -lfreetype -lpthread -lrt -lX11
+  LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -s -L"/usr/X11R6/lib/" -lfreetype -lpthread -lrt -lX11 -lXext
   LDDEPS :=
   RESFLAGS := -D "LINUX=1" -D "NDEBUG=1" -D "JUCE_USE_VSTSDK_2_4=1" -I "/usr/include" -I "/usr/include/freetype2" -I "../../vstsdk2.4"
   TARGET := libjuce-152.a
@@ -31,7 +31,7 @@ ifeq ($(CONFIG),Debug)
   CPPFLAGS := $(DEPFLAGS) -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -D "JUCE_USE_VSTSDK_2_4=1" -I "/usr/include" -I "/usr/include/freetype2" -I "../../vstsdk2.4"
   CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -g -march=native -ggdb -O0 -fPIC
   CXXFLAGS += $(CFLAGS)
-  LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -L"/usr/X11R6/lib/" -lfreetype -lpthread -lrt -lX11
+  LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -L"/usr/X11R6/lib/" -lfreetype -lpthread -lrt -lX11 -lXext
   LDDEPS :=
   RESFLAGS := -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -D "JUCE_USE_VSTSDK_2_4=1" -I "/usr/include" -I "/usr/include/freetype2" -I "../../vstsdk2.4"
   TARGET := libjuce-152_debug.a

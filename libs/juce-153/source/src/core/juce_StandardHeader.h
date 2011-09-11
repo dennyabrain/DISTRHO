@@ -49,7 +49,7 @@
 //==============================================================================
 #include "juce_TargetPlatform.h"  // (sets up the various JUCE_WINDOWS, JUCE_MAC, etc flags)
 
-#include "../../juce_Config.h"
+#include "juce_Config.h"
 
 //==============================================================================
 #ifdef JUCE_NAMESPACE

@@ -24,7 +24,7 @@
 */
 
 #include "../../../core/juce_TargetPlatform.h"
-#include "../../../../juce_Config.h"
+#include "juce_Config.h"
 
 #if JUCE_PLUGINHOST_VST && (JUCE_MAC_VST_INCLUDED || ! JUCE_MAC)
 
