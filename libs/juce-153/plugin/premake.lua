@@ -1,7 +1,7 @@
 
 project.name = "juce-plugin-153"
 project.bindir = "."
-project.libdir = project.bindir .. "/.."
+project.libdir = project.bindir .. "/../.."
 project.configs = { "Release", "Debug" }
 
 package = newpackage()

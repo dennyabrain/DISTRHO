@@ -83,7 +83,7 @@
 /** JUCE_DIRECTSOUND: Enables DirectSound audio (MS Windows only).
 */
 #ifndef JUCE_DIRECTSOUND
-  #define JUCE_DIRECTSOUND 0
+  #define JUCE_DIRECTSOUND 1
 #endif
 
 /** JUCE_DIRECTSHOW: Enables DirectShow media-streaming architecture (MS Windows only).
@@ -105,12 +105,13 @@
 
 /** JUCE_ALSA: Enables ALSA audio devices (Linux only). */
 #ifndef JUCE_ALSA
-  #define JUCE_ALSA 0
+  #define JUCE_ALSA 1
 #endif
 
 /** JUCE_JACK: Enables JACK audio devices (Linux only). */
 #ifndef JUCE_JACK
   #define JUCE_JACK 1
+  #define JUCE_JACK_CLIENT_NAME (JUCEApplication::getInstance()->getApplicationName().toUTF8())
 #endif
 
 //=============================================================================
