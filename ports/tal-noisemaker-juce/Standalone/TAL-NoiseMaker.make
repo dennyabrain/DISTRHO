@@ -100,12 +100,12 @@ $(OBJDIR)/Lfo.o: ../source/Engine/Lfo.cpp
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
-$(OBJDIR)/juce_StandaloneFilterWindow.o: ../../../libs/juce-153/source/src/audio/plugin_client/Standalone/juce_StandaloneFilterWindow.cpp
+$(OBJDIR)/juce_StandaloneFilterWindow.o: ../../../libs/juce-extended/Standalone/juce_StandaloneFilterWindow.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
-$(OBJDIR)/juce_StandaloneFilterApplication.o: ../../../libs/juce-extended/juce_StandaloneFilterApplication.cpp
+$(OBJDIR)/juce_StandaloneFilterApplication.o: ../../../libs/juce-extended/Standalone/juce_StandaloneFilterApplication.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"

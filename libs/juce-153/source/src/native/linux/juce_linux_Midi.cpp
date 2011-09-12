@@ -82,9 +82,9 @@ namespace
                                             {
                                                 if (forInput)
                                                 {
-                                                    snd_seq_set_client_name (seqHandle, "Juce Midi Input");
+                                                    snd_seq_set_client_name (seqHandle, JUCEApplication::getInstance()->getApplicationName().toUTF8());
 
-                                                    const int portId = snd_seq_create_simple_port (seqHandle, "Juce Midi In Port",
+                                                    const int portId = snd_seq_create_simple_port (seqHandle, "Midi In",
                                                                                                    SND_SEQ_PORT_CAP_WRITE | SND_SEQ_PORT_CAP_SUBS_WRITE,
                                                                                                    SND_SEQ_PORT_TYPE_MIDI_GENERIC);
 
@@ -92,9 +92,9 @@ namespace
                                                 }
                                                 else
                                                 {
-                                                    snd_seq_set_client_name (seqHandle, "Juce Midi Output");
+                                                    snd_seq_set_client_name (seqHandle, JUCEApplication::getInstance()->getApplicationName().toUTF8());
 
-                                                    const int portId = snd_seq_create_simple_port (seqHandle, "Juce Midi Out Port",
+                                                    const int portId = snd_seq_create_simple_port (seqHandle, "Midi Out",
                                                                                                    SND_SEQ_PORT_CAP_READ | SND_SEQ_PORT_CAP_SUBS_READ,
                                                                                                    SND_SEQ_PORT_TYPE_MIDI_GENERIC);
 

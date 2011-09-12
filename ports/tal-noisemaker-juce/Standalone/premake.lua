@@ -47,7 +47,6 @@ package.files = {
     matchfiles (
         "../source/*.cpp",
         "../source/Engine/*.cpp",
-        "../../../libs/juce-153/source/src/audio/plugin_client/Standalone/juce_StandaloneFilterWindow.cpp",
-        "../../../libs/juce-extended/juce_StandaloneFilterApplication.cpp"
+        "../../../libs/juce-extended/Standalone/*.cpp"
     )
 }
