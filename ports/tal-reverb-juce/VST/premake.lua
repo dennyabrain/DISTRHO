@@ -1,5 +1,5 @@
 
-project.name = "TAL-Dub-3"
+project.name = "TAL-Reverb"
 project.bindir = "../../../bin"
 project.libdir = project.bindir
 project.configs = { "Release", "Debug" }

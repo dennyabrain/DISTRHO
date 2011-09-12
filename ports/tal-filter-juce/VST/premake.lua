@@ -1,5 +1,5 @@
 
-project.name = "TAL-Dub-3"
+project.name = "TAL-Filter"
 project.bindir = "../../../bin"
 project.libdir = project.bindir
 project.configs = { "Release", "Debug" }
@@ -26,6 +26,7 @@ package.config["Debug"].defines        = { "LINUX=1", "DEBUG=1", "_DEBUG=1", "JU
 
 package.includepaths = {
     "../source",
+    "../source/Engine",
     "/usr/include",
     "/usr/include/freetype2",
     "../../../libs/juce-153/plugin",
@@ -43,6 +44,7 @@ package.libpaths = {
 package.files = {
     matchfiles (
         "../source/*.cpp",
+        "../source/Engine/*.cpp",
         "../../../libs/juce-153/source/src/audio/plugin_client/VST/juce_VST_Wrapper.cpp"
     )
 }

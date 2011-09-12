@@ -19,7 +19,7 @@ ifeq ($(CONFIG),Release)
   LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -shared -s -L"/usr/X11R6/lib" -L"/usr/lib" -L"../../../libs" -lfreetype -lpthread -lrt -lX11 -lXext -ljuce-plugin-153
   LDDEPS :=
   RESFLAGS := -D "LINUX=1" -D "NDEBUG=1" -D "JUCE_USE_VSTSDK_2_4=1" -I "../source" -I "/usr/include" -I "/usr/include/freetype2" -I "../../../libs/juce-153/plugin" -I "../../../libs/juce-153/source" -I "../../../sdks/vstsdk2.4" -I "."
-  TARGET := libTAL-Dub-3.so
+  TARGET := libTAL-Reverb.so
  BLDCMD = $(CXX) -o $(OUTDIR)/$(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(TARGET_ARCH)
 endif
 
@@ -34,12 +34,12 @@ ifeq ($(CONFIG),Debug)
   LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -shared -L"/usr/X11R6/lib" -L"/usr/lib" -L"../../../libs" -lfreetype -lpthread -lrt -lX11 -lXext -ljuce-plugin-153_debug
   LDDEPS :=
   RESFLAGS := -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -D "JUCE_USE_VSTSDK_2_4=1" -I "../source" -I "/usr/include" -I "/usr/include/freetype2" -I "../../../libs/juce-153/plugin" -I "../../../libs/juce-153/source" -I "../../../sdks/vstsdk2.4" -I "."
-  TARGET := libTAL-Dub-3_debug.so
+  TARGET := libTAL-Reverb_debug.so
  BLDCMD = $(CXX) -o $(OUTDIR)/$(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(TARGET_ARCH)
 endif
 
 OBJECTS := \
-	$(OBJDIR)/TalComponent.o \
+	$(OBJDIR)/ReverbComponent.o \
 	$(OBJDIR)/TalCore.o \
 	$(OBJDIR)/juce_VST_Wrapper.o \
 
@@ -66,14 +66,14 @@ endif
 .PHONY: clean
 
 $(OUTDIR)/$(TARGET): $(OBJECTS) $(LDDEPS) $(RESOURCES)
-	@echo Linking TAL-Dub-3
+	@echo Linking TAL-Reverb
 	-@$(CMD_MKBINDIR)
 	-@$(CMD_MKLIBDIR)
 	-@$(CMD_MKOUTDIR)
 	@$(BLDCMD)
 
 clean:
-	@echo Cleaning TAL-Dub-3
+	@echo Cleaning TAL-Reverb
 ifeq ($(MKDIR_TYPE),posix)
 	-@rm -f $(OUTDIR)/$(TARGET)
 	-@rm -rf $(OBJDIR)
@@ -83,7 +83,7 @@ else
 	-@if exist $(subst /,\,$(OBJDIR)) rmdir /s /q $(subst /,\,$(OBJDIR))
 endif
 
-$(OBJDIR)/TalComponent.o: ../source/TalComponent.cpp
+$(OBJDIR)/ReverbComponent.o: ../source/ReverbComponent.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
