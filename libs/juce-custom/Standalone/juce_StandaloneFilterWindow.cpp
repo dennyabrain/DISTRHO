@@ -149,7 +149,7 @@ StandaloneFilterWindow::~StandaloneFilterWindow()
 //==============================================================================
 const StringArray StandaloneFilterWindow::getMenuBarNames()
 {
-    const char* const names[] = { "File", "Options", 0 };
+    const char* const names[] = { "File", "Presets", "Options", 0 };
 
     return StringArray (names);
 }
@@ -169,6 +169,14 @@ const PopupMenu StandaloneFilterWindow::getMenuForIndex (int topLevelMenuIndex, 
     }
     else if (topLevelMenuIndex == 1)
     {
+	if (filter != nullptr && filter->getNumPrograms() > 0) {
+	  for (int i=0; i < filter->getNumPrograms(); i++)
+	    menu.addItem (11+i, filter->getProgramName(i));
+	} else
+	  menu.addItem (10, TRANS("(none)"), false);
+    }
+    else if (topLevelMenuIndex == 2)
+    {
         // "Plugins" menu
         menu.addItem (5, TRANS("Audio Settings..."));
         menu.addSeparator();
@@ -182,15 +190,20 @@ const PopupMenu StandaloneFilterWindow::getMenuForIndex (int topLevelMenuIndex, 
 
 void StandaloneFilterWindow::menuItemSelected (int menuItemID, int /*topLevelMenuIndex*/)
 {
-    switch (menuItemID)
-    {
-        case 1:  loadState(); break;
-        case 2:  saveState(); break;
-        case 3:  resetFilter(); break;
-        case 4:  JUCEApplication::quit(); break;
-        case 5:  showAudioSettingsDialog(); break;
-        case 6:  setUsingNativeTitleBar(!isUsingNativeTitleBar()); break;
-        default: break;
+    if (menuItemID== 1)
+      loadState();
+    else if (menuItemID== 2)
+      saveState();
+    else if (menuItemID== 3)
+      resetFilter();
+    else if (menuItemID== 4)
+      JUCEApplication::quit();
+    else if (menuItemID== 5)
+      showAudioSettingsDialog();
+    else if (menuItemID== 6)
+      setUsingNativeTitleBar(!isUsingNativeTitleBar());
+    else if (menuItemID > 10) {
+      filter->setCurrentProgram(menuItemID-11);
     }
 }
 

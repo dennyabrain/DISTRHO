@@ -47,6 +47,6 @@ package.files = {
     matchfiles (
         "../source/*.cpp",
         "../source/Engine/*.cpp",
-        "../../../libs/juce-extended/Standalone/*.cpp"
+        "../../../libs/juce-custom/Standalone/*.cpp"
     )
 }
