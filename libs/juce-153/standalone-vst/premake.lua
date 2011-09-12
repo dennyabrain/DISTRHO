@@ -1,5 +1,5 @@
 
-project.name = "juce-standalone-153"
+project.name = "juce-standalone-vst-153"
 project.bindir = "../.."
 project.libdir = project.bindir
 project.configs = { "Release", "Debug" }
@@ -21,13 +21,14 @@ package.config["Debug"].buildoptions   = { "-O0 -ggdb -fPIC" }
 package.config["Debug"].links          = { "freetype", "pthread", "asound", "rt", "X11", "Xext" }
 
 -- TODO: check for OS
-package.config["Release"].defines      = { "LINUX=1", "NDEBUG=1" }
-package.config["Debug"].defines        = { "LINUX=1", "DEBUG=1", "_DEBUG=1" }
+package.config["Release"].defines      = { "LINUX=1", "NDEBUG=1", "JUCE_USE_VSTSDK_2_4=1" }
+package.config["Debug"].defines        = { "LINUX=1", "DEBUG=1", "_DEBUG=1", "JUCE_USE_VSTSDK_2_4=1" }
 
 package.includepaths = {
     ".",
     "/usr/include",
-    "/usr/include/freetype2"
+    "/usr/include/freetype2",
+    "../../../vstsdk2.4"
 }
 
 package.libpaths = {
