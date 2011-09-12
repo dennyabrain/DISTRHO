@@ -1,5 +1,5 @@
 
-project.name = "TAL-Dub-3"
+project.name = "TAL-Reverb-2"
 project.bindir = "../../../bin"
 project.libdir = project.bindir
 project.configs = { "Release", "Debug" }
@@ -22,7 +22,7 @@ package.config["Debug"].links          = { "freetype", "pthread", "asound", "rt"
 
 -- TODO: Check for OS
 package.config["Release"].defines      = { "LINUX=1", "NDEBUG=1" };
-package.config["Debug"].defines        = { "LINUX=1", "DEBUG=1", "_DEBUG=1" };
+package.config["Debug"].defines        = { "LINUX=1", "DEBUG=1" };
 
 package.includepaths = {
     "../source",

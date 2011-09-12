@@ -1,5 +1,5 @@
 
-project.name = "TAL-Dub-3"
+project.name = "TAL-Filter-2"
 project.bindir = "../../../bin"
 project.libdir = project.bindir
 project.configs = { "Release", "Debug" }
@@ -30,6 +30,7 @@ package.includepaths = {
     "/usr/include/freetype2",
     "../../../libs/juce-153/standalone",
     "../../../libs/juce-153/source",
+    "../../../sdks/vstsdk2.4",
     "." --fake
 }
 

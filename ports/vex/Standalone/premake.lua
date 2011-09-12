@@ -1,5 +1,5 @@
 
-project.name = "TAL-Dub-3"
+project.name = "Vex"
 project.bindir = "../../../bin"
 project.libdir = project.bindir
 project.configs = { "Release", "Debug" }
@@ -26,6 +26,7 @@ package.config["Debug"].defines        = { "LINUX=1", "DEBUG=1", "_DEBUG=1" };
 
 package.includepaths = {
     "../source",
+    "../source/soundtouch",
     "/usr/include",
     "/usr/include/freetype2",
     "../../../libs/juce-153/standalone",
@@ -42,6 +43,11 @@ package.libpaths = {
 package.files = {
     matchfiles (
         "../source/*.cpp",
+        "../source/lookandfeel/*.cpp",
+        "../source/resources/*.cpp",
+        "../source/synth/*.cpp",
+        "../source/synth/freeverb/*.cpp",
+        "../source/waverom/*.cpp",
         "../../../libs/juce-custom/Standalone/*.cpp"
     )
 }

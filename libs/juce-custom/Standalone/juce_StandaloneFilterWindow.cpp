@@ -38,7 +38,8 @@ StandaloneFilterWindow::StandaloneFilterWindow (const String& title,
                                                 const Colour& backgroundColour)
     : DocumentWindow (title, backgroundColour,
                       DocumentWindow::minimiseButton
-                       | DocumentWindow::closeButton)
+                       | DocumentWindow::closeButton),
+      nativeTitleBarCheck(false)
 {
     setTitleBarButtonsRequired (DocumentWindow::minimiseButton | DocumentWindow::closeButton, false);
 
@@ -90,13 +91,13 @@ StandaloneFilterWindow::StandaloneFilterWindow (const String& title,
     setDropShadowEnabled(false);
     setUsingNativeTitleBar(getGlobalSettings()->getBoolValue("nativeTitleBar", true));
 
-    setContentOwned (filter->createEditorIfNeeded(), true);
-
 #if JUCE_MAC
     setMacMainMenu (this);
 #else
     setMenuBar (this);
 #endif
+
+    setContentOwned (filter->createEditorIfNeeded(), true);
 
     const int x = globalSettings->getIntValue ("windowX", -100);
     const int y = globalSettings->getIntValue ("windowY", -100);
@@ -134,8 +135,9 @@ StandaloneFilterWindow::~StandaloneFilterWindow()
 
         globalSettings->setValue ("filterState", data.toBase64Encoding());
     }
-    
-    globalSettings->setValue("nativeTitleBar", isUsingNativeTitleBar());
+
+    if (!nativeTitleBarCheck)
+      globalSettings->setValue("nativeTitleBar", isUsingNativeTitleBar());
 
 #if JUCE_MAC
     setMacMainMenu (0);
@@ -200,9 +202,11 @@ void StandaloneFilterWindow::menuItemSelected (int menuItemID, int /*topLevelMen
       JUCEApplication::quit();
     else if (menuItemID== 5)
       showAudioSettingsDialog();
-    else if (menuItemID== 6)
-      setUsingNativeTitleBar(!isUsingNativeTitleBar());
-    else if (menuItemID > 10) {
+    else if (menuItemID== 6) {
+      nativeTitleBarCheck = true;
+      getGlobalSettings()->setValue("nativeTitleBar", !isUsingNativeTitleBar());
+      AlertWindow::showMessageBoxAsync(AlertWindow::InfoIcon, "Need restart", "You need to restart this plugin to apply the changes", TRANS("Ok"), this);
+    } else if (menuItemID > 10) {
       filter->setCurrentProgram(menuItemID-11);
     }
 }

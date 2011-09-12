@@ -31,7 +31,6 @@ package.includepaths = {
     "/usr/include/freetype2",
     "../../../libs/juce-153/standalone",
     "../../../libs/juce-153/source",
-    "../../../sdks/vstsdk2.4",
     ".", --fake
     "./intermediate", --fake
     "./intermediate/Release" --fake

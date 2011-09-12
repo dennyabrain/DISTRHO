@@ -13,15 +13,15 @@ libs:
 	$(MAKE) -C ../libs/juce-153/plugin
 
 standalone:
-# 	$(MAKE) -C vex/Standalone
-# 	$(MAKE) -C tal-dub-3-juce/Standalone
-# 	$(MAKE) -C tal-filter-juce/Standalone
-# 	$(MAKE) -C tal-filter-2-juce/Standalone
-# 	$(MAKE) -C tal-noisemaker-juce/Standalone
-# 	$(MAKE) -C tal-reverb-juce/Standalone
-# 	$(MAKE) -C tal-reverb-2-juce/Standalone
-# 	$(MAKE) -C tal-reverb-3-juce/Standalone
-# 	$(MAKE) -C tal-vocoder-2-juce/Standalone
+	$(MAKE) -C vex/Standalone
+	$(MAKE) -C tal-dub-3-juce/Standalone
+	$(MAKE) -C tal-filter-juce/Standalone
+	$(MAKE) -C tal-filter-2-juce/Standalone
+	$(MAKE) -C tal-noisemaker-juce/Standalone
+	$(MAKE) -C tal-reverb-juce/Standalone
+	$(MAKE) -C tal-reverb-2-juce/Standalone
+	$(MAKE) -C tal-reverb-3-juce/Standalone
+	$(MAKE) -C tal-vocoder-2-juce/Standalone
 
 lv2:
 # 	$(MAKE) -C vex/LV2
@@ -47,15 +47,15 @@ vst:
 
 clean:
 	# Standalones
-# 	$(MAKE) clean -C vex/Standalone
-# 	$(MAKE) clean -C tal-dub-3-juce/Standalone
-# 	$(MAKE) clean -C tal-filter-juce/Standalone
-# 	$(MAKE) clean -C tal-filter-2-juce/Standalone
-# 	$(MAKE) clean -C tal-noisemaker-juce/Standalone
-# 	$(MAKE) clean -C tal-reverb-juce/Standalone
-# 	$(MAKE) clean -C tal-reverb-2-juce/Standalone
-# 	$(MAKE) clean -C tal-reverb-3-juce/Standalone
-# 	$(MAKE) clean -C tal-vocoder-2-juce/Standalone
+	$(MAKE) clean -C vex/Standalone
+	$(MAKE) clean -C tal-dub-3-juce/Standalone
+	$(MAKE) clean -C tal-filter-juce/Standalone
+	$(MAKE) clean -C tal-filter-2-juce/Standalone
+	$(MAKE) clean -C tal-noisemaker-juce/Standalone
+	$(MAKE) clean -C tal-reverb-juce/Standalone
+	$(MAKE) clean -C tal-reverb-2-juce/Standalone
+	$(MAKE) clean -C tal-reverb-3-juce/Standalone
+	$(MAKE) clean -C tal-vocoder-2-juce/Standalone
 
 	# LV2
 # 	$(MAKE) clean -C vex/LV2
