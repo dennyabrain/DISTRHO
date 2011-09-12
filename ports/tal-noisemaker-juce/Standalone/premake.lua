@@ -1,5 +1,5 @@
 
-project.name = "TAL-Dub-3"
+project.name = "TAL-NoiseMaker"
 project.bindir = "../../../bin"
 project.libdir = project.bindir
 project.configs = { "Release", "Debug" }
@@ -26,11 +26,15 @@ package.config["Debug"].defines        = { "LINUX=1", "DEBUG=1", "_DEBUG=1" };
 
 package.includepaths = {
     "../source",
+    "../source/Engine",
     "/usr/include",
     "/usr/include/freetype2",
     "../../../libs/juce-153/standalone",
     "../../../libs/juce-153/source",
-    "." --fake
+    "../../../sdks/vstsdk2.4",
+    ".", --fake
+    "./intermediate", --fake
+    "./intermediate/Release" --fake
 }
 
 package.libpaths = {
@@ -42,6 +46,7 @@ package.libpaths = {
 package.files = {
     matchfiles (
         "../source/*.cpp",
+        "../source/Engine/*.cpp",
         "../../../libs/juce-153/source/src/audio/plugin_client/Standalone/juce_StandaloneFilterWindow.cpp",
         "../../../libs/juce-extended/juce_StandaloneFilterApplication.cpp"
     )

@@ -90,10 +90,7 @@ void StandaloneFilterApplication::initialise (const String& commandLine)
     // create the window
     window = new StandaloneFilterWindow (pluginWindowName,
                                           Colour (32, 32, 32));
-    window->showAudioSettingsDialog();
-
     window->setTitleBarHeight(23);
-    window->setUsingNativeTitleBar(true);
 
     window->toFront (true);
     window->setVisible (true);
