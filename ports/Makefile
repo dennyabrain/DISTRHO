@@ -13,7 +13,7 @@ libs:
 	$(MAKE) -C ../libs/juce-153/plugin
 
 standalone:
-	$(MAKE) -C vex/Standalone
+# 	$(MAKE) -C vex/Standalone
 	$(MAKE) -C tal-dub-3-juce/Standalone
 	$(MAKE) -C tal-filter-juce/Standalone
 	$(MAKE) -C tal-filter-2-juce/Standalone
@@ -35,7 +35,7 @@ lv2:
 # 	$(MAKE) -C tal-vocoder-2-juce/LV2
 
 vst:
-	$(MAKE) -C vex/VST
+# 	$(MAKE) -C vex/VST
 	$(MAKE) -C tal-dub-3-juce/VST
 	$(MAKE) -C tal-filter-juce/VST
 	$(MAKE) -C tal-filter-2-juce/VST
@@ -47,7 +47,7 @@ vst:
 
 clean:
 	# Standalones
-	$(MAKE) clean -C vex/Standalone
+# 	$(MAKE) clean -C vex/Standalone
 	$(MAKE) clean -C tal-dub-3-juce/Standalone
 	$(MAKE) clean -C tal-filter-juce/Standalone
 	$(MAKE) clean -C tal-filter-2-juce/Standalone
@@ -69,7 +69,7 @@ clean:
 # 	$(MAKE) clean -C tal-vocoder-2-juce/LV2
 
 	# VST
-	$(MAKE) clean -C vex/VST
+# 	$(MAKE) clean -C vex/VST
 	$(MAKE) clean -C tal-dub-3-juce/VST
 	$(MAKE) clean -C tal-filter-juce/VST
 	$(MAKE) clean -C tal-filter-2-juce/VST
