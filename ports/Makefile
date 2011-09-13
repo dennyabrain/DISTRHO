@@ -13,7 +13,8 @@ libs:
 	$(MAKE) -C ../libs/juce-153/plugin
 
 standalone:
-# 	$(MAKE) -C vex/Standalone
+	$(MAKE) -C arctican-function/Standalone
+	$(MAKE) -C arctican-pilgrim/Standalone
 	$(MAKE) -C tal-dub-3-juce/Standalone
 	$(MAKE) -C tal-filter-juce/Standalone
 	$(MAKE) -C tal-filter-2-juce/Standalone
@@ -22,9 +23,11 @@ standalone:
 	$(MAKE) -C tal-reverb-2-juce/Standalone
 	$(MAKE) -C tal-reverb-3-juce/Standalone
 	$(MAKE) -C tal-vocoder-2-juce/Standalone
+# 	$(MAKE) -C vex/Standalone
 
 lv2:
-# 	$(MAKE) -C vex/LV2
+# 	$(MAKE) -C arctican-function/LV2
+# 	$(MAKE) -C arctican-pilgrim/LV2
 # 	$(MAKE) -C tal-dub-3-juce/LV2
 # 	$(MAKE) -C tal-filter-juce/LV2
 # 	$(MAKE) -C tal-filter-2-juce/LV2
@@ -33,9 +36,11 @@ lv2:
 # 	$(MAKE) -C tal-reverb-2-juce/LV2
 # 	$(MAKE) -C tal-reverb-3-juce/LV2
 # 	$(MAKE) -C tal-vocoder-2-juce/LV2
+# 	$(MAKE) -C vex/LV2
 
 vst:
-# 	$(MAKE) -C vex/VST
+	$(MAKE) -C arctican-function/VST
+	$(MAKE) -C arctican-pilgrim/VST
 	$(MAKE) -C tal-dub-3-juce/VST
 	$(MAKE) -C tal-filter-juce/VST
 	$(MAKE) -C tal-filter-2-juce/VST
@@ -44,10 +49,12 @@ vst:
 	$(MAKE) -C tal-reverb-2-juce/VST
 	$(MAKE) -C tal-reverb-3-juce/VST
 	$(MAKE) -C tal-vocoder-2-juce/VST
+# 	$(MAKE) -C vex/VST
 
 clean:
 	# Standalones
-# 	$(MAKE) clean -C vex/Standalone
+	$(MAKE) clean -C arctican-function/Standalone
+	$(MAKE) clean -C arctican-pilgrim/Standalone
 	$(MAKE) clean -C tal-dub-3-juce/Standalone
 	$(MAKE) clean -C tal-filter-juce/Standalone
 	$(MAKE) clean -C tal-filter-2-juce/Standalone
@@ -56,9 +63,11 @@ clean:
 	$(MAKE) clean -C tal-reverb-2-juce/Standalone
 	$(MAKE) clean -C tal-reverb-3-juce/Standalone
 	$(MAKE) clean -C tal-vocoder-2-juce/Standalone
+# 	$(MAKE) clean -C vex/Standalone
 
 	# LV2
-# 	$(MAKE) clean -C vex/LV2
+# 	$(MAKE) clean -C arctican-function/LV2
+# 	$(MAKE) clean -C arctican-pilgrim/LV2
 # 	$(MAKE) clean -C tal-dub-3-juce/LV2
 # 	$(MAKE) clean -C tal-filter-juce/LV2
 # 	$(MAKE) clean -C tal-filter-2-juce/LV2
@@ -67,9 +76,11 @@ clean:
 # 	$(MAKE) clean -C tal-reverb-2-juce/LV2
 # 	$(MAKE) clean -C tal-reverb-3-juce/LV2
 # 	$(MAKE) clean -C tal-vocoder-2-juce/LV2
+# 	$(MAKE) clean -C vex/LV2
 
 	# VST
-# 	$(MAKE) clean -C vex/VST
+	$(MAKE) clean -C arctican-function/VST
+	$(MAKE) clean -C arctican-pilgrim/VST
 	$(MAKE) clean -C tal-dub-3-juce/VST
 	$(MAKE) clean -C tal-filter-juce/VST
 	$(MAKE) clean -C tal-filter-2-juce/VST
@@ -78,3 +89,4 @@ clean:
 	$(MAKE) clean -C tal-reverb-2-juce/VST
 	$(MAKE) clean -C tal-reverb-3-juce/VST
 	$(MAKE) clean -C tal-vocoder-2-juce/VST
+# 	$(MAKE) clean -C vex/VST
