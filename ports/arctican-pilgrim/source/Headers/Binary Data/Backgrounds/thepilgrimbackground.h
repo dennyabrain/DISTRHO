@@ -6,7 +6,7 @@
 namespace thepilgrimbackground
 {
     extern const char*  thepilgrimgui_png;
-    const int           thepilgrimgui_pngSize = 21221;
+    const int           thepilgrimgui_pngSize = 11910;
 
 };
 
