@@ -17,7 +17,7 @@ package.config["Release"].links        = { "freetype", "pthread", "rt", "X11", "
 
 package.config["Debug"].target         = project.name .. "_debug"
 package.config["Debug"].objdir         = "intermediate/Debug"
-package.config["Debug"].buildoptions   = { "-O0 -ggdb -static" }
+package.config["Debug"].buildoptions   = { "-O0 -ggdb -static `pkg-config fftw3f --cflags`" }
 package.config["Debug"].links          = { "freetype", "pthread", "rt", "X11", "Xext", "gomp", "juce-plugin-153_debug" }
 
 package.linkoptions = {

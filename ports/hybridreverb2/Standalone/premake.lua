@@ -17,7 +17,7 @@ package.config["Release"].links        = { "freetype", "pthread", "asound", "rt"
 
 package.config["Debug"].target         = project.name .. "_debug"
 package.config["Debug"].objdir         = "intermediate/Debug"
-package.config["Debug"].buildoptions   = { "-O0 -ggdb -static" }
+package.config["Debug"].buildoptions   = { "-O0 -ggdb -static `pkg-config fftw3f --cflags`" }
 package.config["Debug"].links          = { "freetype", "pthread", "asound", "rt", "X11", "Xext", "gomp", "juce-standalone-153_debug" }
 
 package.linkoptions = {
@@ -33,8 +33,7 @@ package.includepaths = {
     "/usr/include",
     "/usr/include/freetype2",
     "../../../libs/juce-153/standalone",
-    "../../../libs/juce-153/source",
-    "." --fake
+    "../../../libs/juce-153/source"
 }
 
 package.libpaths = {
