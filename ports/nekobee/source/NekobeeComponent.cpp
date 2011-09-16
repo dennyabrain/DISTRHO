@@ -1,7 +1,7 @@
 /*
  ==============================================================================
 
- This file is part of the JUCETICE project - Copyright 2004 by Lucio Asnaghi.
+ This file is part of the JUCETICE project - Copyright 2008 by Lucio Asnaghi.
 
  JUCETICE is based around the JUCE library - "Jules' Utility Class Extensions"
  Copyright 2004 by Julian Storer.
@@ -31,70 +31,56 @@
  ==============================================================================
 */
 
-#include "XEQComponent.h"
+#include "NekobeeComponent.h"
+
 
 //==============================================================================
-XEQComponent::XEQComponent (XEQPlugin* const ownerFilter_)
-    : AudioProcessorEditor (ownerFilter_),
-      tabComponent (0)
+NekobeeComponent::NekobeeComponent (NekobeePlugin* const ownerFilter_)
+    : AudioProcessorEditor (ownerFilter_)
 {
-    DBG ("XEQComponent::XEQComponent");
-
     // register ourselves with the plugin - it will use its ChangeBroadcaster base
     // class to tell us when something has changed.
     getFilter()->addChangeListener (this);
 //    getFilter()->addListenerToParameters (this);
 
     // add the main component
-    addAndMakeVisible (tabComponent = new XEQTabPanel(getFilter()));
-    tabComponent->setTabBarDepth (26);
-    tabComponent->setCurrentTabIndex (0);
+    addAndMakeVisible (mainComponent = new NekobeeMain (getFilter(), this));
 
-    // set its size
-    setSize (520 + 26, 227);
+    setSize (mainComponent->getWidth(),
+             mainComponent->getHeight());
+
+    mainComponent->updateControls ();
 }
 
-XEQComponent::~XEQComponent()
+NekobeeComponent::~NekobeeComponent()
 {
-    DBG ("XEQComponent::~XEQComponent");
-
-    deleteAndZero (tabComponent);
+    deleteAndZero (mainComponent);
 
     getFilter()->removeChangeListener (this);
 //    getFilter()->removeListenerToParameters (this);
 }
 
 //==============================================================================
-void XEQComponent::resized()
+void NekobeeComponent::resized()
 {
-    DBG ("XEQComponent::resized");
-    
-    if (tabComponent)
-        tabComponent->setBounds (0, 0, getWidth(), getHeight());
+    mainComponent->setBounds (0, 0, getWidth(), getHeight());
 }
 
 //==============================================================================
-void XEQComponent::paint (Graphics& g)
+void NekobeeComponent::paint (Graphics& g)
 {
-    g.fillAll (Colour (64, 64, 64));
 }
 
 //==============================================================================
-void XEQComponent::changeListenerCallback (ChangeBroadcaster* source)
+void NekobeeComponent::changeListenerCallback (ChangeBroadcaster* source)
 {
-    DBG ("XEQComponent::changeListenerCallback");
-
     if (source == getFilter())
     {
-        // if it's the param manager telling us that it's changed
-        // we should update the correct control controls
-        if (tabComponent)
-            tabComponent->updateControls ();
+        mainComponent->updateControls ();
     }
 }
 
 //==============================================================================
-void XEQComponent::parameterChanged (AudioParameter* parameter, const int index)
+void NekobeeComponent::parameterChanged (AudioParameter* parameter, const int index)
 {
-//    DBG (T("PARAMETER ") + String (index) + T(" changed"));
 }
