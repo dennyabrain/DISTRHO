@@ -25,69 +25,67 @@
  ==============================================================================
 */
 
-#ifndef __JUCETICE_PARAMETERSLIDER_HEADER__
-#define __JUCETICE_PARAMETERSLIDER_HEADER__
+#ifndef __JUCETICE_IMAGESLIDER_HEADER__
+#define __JUCETICE_IMAGESLIDER_HEADER__
 
-#include "juce.h"
-// #include "../jucetice_AudioParameter.h"
-// #include "../../juce-153/source/src/gui/components/controls/juce_Slider.h"
+#include "jucetice_ParameterSlider.h"
 
 
 //==============================================================================
 /**
-     A parameter listener slider
+     An image based slider.
 */
-class ParameterSlider  : public Slider,
-                         public AudioParameterListener
+class ImageSlider : public ParameterSlider
 {
 public:
 
     //==============================================================================
-    ParameterSlider (const String& sliderName)
-        : Slider (sliderName),
-          parameter (0)
+    enum SliderOrientation
     {
-    }
+        LinearHorizontal = 0,
+        LinearVertical   = 1
+    };
 
     //==============================================================================
-    virtual ~ParameterSlider()
-    {
-    }
+    /** Constructor */
+    ImageSlider (const String& sliderName);
+
+    /** Destructor */
+    ~ImageSlider();
 
     //==============================================================================
-    void parameterChanged (AudioParameter* newParameter, const int index)
-    {
-        setValue (newParameter->getValueMapped (), false);
-    }
-
-    void attachedToParameter (AudioParameter* newParameter, const int index)
-    {
-        parameter = newParameter;
-    }
-
-    void detachedFromParameter (AudioParameter* newParameter, const int index)
-    {
-        if (newParameter == parameter)
-            parameter = 0;
-    }
+    void setOrientation (const SliderOrientation isVertical);
 
     //==============================================================================
-    void mouseDown (const MouseEvent& e)
-    {
-        if (parameter && e.mods.isRightButtonDown ())
-        {
-            parameter->handleMidiPopupMenu (e);
+    void setThumbImage (Image newImage);
+    void setThumbOffsetInImage (const int newMinOffset, const int newMaxOffset);
 
-            return;
-        }
-        
-        Slider::mouseDown (e);
-    }
+    //==============================================================================
+    /** Set the default value */
+    void setDefaultValue (const float newDefault);
 
-protected:
+    //==============================================================================
+    /** @internal */
+    void paint (Graphics& g);
 
-    AudioParameter* parameter;
+    //==============================================================================
+    juce_UseDebuggingNewOperator
+
+private:
+
+    //==============================================================================
+    /** Image handle resources */
+    static const char*  fader_horizontal;
+    static const int    fader_horizontal_size;
+    static const char*  fader_vertical;
+    static const int    fader_vertical_size;
+
+
+    float defaultValue;
+    int minOffset, maxOffset;
+    Image thumbImage;
 };
 
 
-#endif // __JUCETICE_PARAMETERSLIDER_HEADER__
+#endif // __JUCETICE_IMAGESLIDER_HEADER__
+

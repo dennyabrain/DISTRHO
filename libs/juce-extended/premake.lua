@@ -6,19 +6,19 @@ project.configs = { "Release", "Debug" }
 
 package = newpackage()
 package.name = project.name
-package.kind = "lib"
+package.kind = "dll"
 package.language = "c++"
 package.linkflags = { "static-runtime" }
 
 package.config["Release"].target       = project.name
 package.config["Release"].objdir       = "intermediate/Release"
 package.config["Release"].buildoptions = { "-O2 -march=native -msse -ffast-math -fPIC" }
--- package.config["Release"].links        = { "freetype", "pthread", "asound", "rt", "X11", "Xext" }
+package.config["Release"].links        = { "freetype", "pthread", "asound", "rt", "X11", "Xext", "juce-standalone-153" }
 
 package.config["Debug"].target         = project.name .. "_debug"
 package.config["Debug"].objdir         = "intermediate/Debug"
 package.config["Debug"].buildoptions   = { "-O0 -ggdb -fPIC" }
--- package.config["Debug"].links          = { "freetype", "pthread", "asound", "rt", "X11", "Xext" }
+package.config["Debug"].links          = { "freetype", "pthread", "asound", "rt", "X11", "Xext", "juce-standalone-153" }
 
 -- TODO: check for OS
 package.config["Release"].defines      = { "LINUX=1", "NDEBUG=1" }

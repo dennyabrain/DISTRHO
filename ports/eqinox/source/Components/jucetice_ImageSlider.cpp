@@ -25,14 +25,7 @@
  ==============================================================================
 */
 
-// #include "../../juce-153/source/src/core/juce_StandardHeader.h"
-
-// BEGIN_JUCE_NAMESPACE
-
 #include "jucetice_ImageSlider.h"
-// #include "../../juce-153/source/src/gui/graphics/imaging/juce_Image.h"
-// #include "../../juce-153/source/src/gui/graphics/imaging/juce_ImageCache.h"
-
 
 //==============================================================================
 ImageSlider::ImageSlider (const String& sliderName)

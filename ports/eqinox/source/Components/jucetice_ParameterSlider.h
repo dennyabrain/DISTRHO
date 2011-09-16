@@ -28,10 +28,10 @@
 #ifndef __JUCETICE_PARAMETERSLIDER_HEADER__
 #define __JUCETICE_PARAMETERSLIDER_HEADER__
 
-#include "juce.h"
-// #include "../jucetice_AudioParameter.h"
-// #include "../../juce-153/source/src/gui/components/controls/juce_Slider.h"
+#include "StandardHeader.h"
+#include "JucePluginCharacteristics.h"
 
+#include "../jucetice_AudioParameter.h"
 
 //==============================================================================
 /**

@@ -28,17 +28,13 @@
 #ifndef __JUCETICE_AUDIOPLUGIN_HEADER__
 #define __JUCETICE_AUDIOPLUGIN_HEADER__
 
+#include "StandardHeader.h"
+#include "JucePluginCharacteristics.h"
+
 #include "jucetice_AudioParameter.h"
 #include "jucetice_AudioProgram.h"
-
-// #include "src/text/juce_XmlDocument.h"
-// #include "src/threads/juce_Thread.h"
-// #include "src/io/files/juce_DirectoryIterator.h"
-// #include "src/events/juce_ChangeBroadcaster.h"
-// #include "src/audio/midi/juce_MidiKeyboardState.h"
-// #include "src/audio/processors/juce_AudioProcessor.h"
-// #include "containers/jucetice_LockFreeFifo.h"
-
+#include "jucetice_MathConstants.h"
+#include "jucetice_LockFreeFifo.h"
 
 //==============================================================================
 /**
