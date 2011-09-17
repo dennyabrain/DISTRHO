@@ -12,6 +12,7 @@
 
 bin/*
 intermediate
+juce_lv2_ttl_generator
 
 sdks/vstsdk2.4/artwork
 sdks/vstsdk2.4/bin
