@@ -21,8 +21,8 @@ package.config["Debug"].buildoptions   = { "-O0 -ggdb -static" }
 package.config["Debug"].links          = { "freetype", "pthread", "asound", "rt", "X11", "Xext", "juce-standalone-153_debug" }
 
 -- TODO: Check for OS
-package.config["Release"].defines      = { "LINUX=1", "NDEBUG=1" };
-package.config["Debug"].defines        = { "LINUX=1", "DEBUG=1", "_DEBUG=1" };
+package.config["Release"].defines      = { "LINUX=1", "NDEBUG=1", "JucePlugin_Build_VST=0", "JucePlugin_Build_AU=0", "JucePlugin_Build_RTAS=0", "JucePlugin_Build_Standalone=1" };
+package.config["Debug"].defines        = { "LINUX=1", "DEBUG=1", "_DEBUG=1", "JucePlugin_Build_VST=0", "JucePlugin_Build_AU=0", "JucePlugin_Build_RTAS=0", "JucePlugin_Build_Standalone=1" };
 
 package.includepaths = {
     "../source",

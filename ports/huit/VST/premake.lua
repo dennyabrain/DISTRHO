@@ -27,7 +27,7 @@ package.config["Debug"].defines        = { "LINUX=1", "DEBUG=1", "_DEBUG=1" };
 package.includepaths = {
     "../source",
     "/usr/include",
-    "../../../sdks/vstsdk2.4",
+    "../../../sdks/vstsdk2.4"
 }
 
 package.libpaths = {

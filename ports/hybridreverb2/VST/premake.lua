@@ -25,8 +25,8 @@ package.linkoptions = {
 }
 
 -- TODO: Check for OS
-package.config["Release"].defines      = { "LINUX=1", "NDEBUG=1", "JUCE_USE_VSTSDK_2_4=1", "HYBRIDREVERB2_VST_PLUGIN=1"};
-package.config["Debug"].defines        = { "LINUX=1", "DEBUG=1", "_DEBUG=1", "JUCE_USE_VSTSDK_2_4=1", "HYBRIDREVERB2_VST_PLUGIN=1" };
+package.config["Release"].defines      = { "LINUX=1", "NDEBUG=1", "JUCE_USE_VSTSDK_2_4=1", "JucePlugin_Build_VST=1", "JucePlugin_Build_AU=0", "JucePlugin_Build_RTAS=0", "JucePlugin_Build_Standalone=0" };
+package.config["Debug"].defines        = { "LINUX=1", "DEBUG=1", "_DEBUG=1", "JUCE_USE_VSTSDK_2_4=1", "JucePlugin_Build_VST=1", "JucePlugin_Build_AU=0", "JucePlugin_Build_RTAS=0", "JucePlugin_Build_Standalone=0" };
 
 package.includepaths = {
     "../source",

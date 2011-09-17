@@ -11,10 +11,6 @@
 #ifndef __PLUGINCHARACTERISTICS_D4EFFF1A__
 #define __PLUGINCHARACTERISTICS_D4EFFF1A__
 
-#define JucePlugin_Build_VST    1  // (If you change this value, you'll also need to re-export the projects using the Jucer)
-#define JucePlugin_Build_AU     1  // (If you change this value, you'll also need to re-export the projects using the Jucer)
-#define JucePlugin_Build_RTAS   0  // (If you change this value, you'll also need to re-export the projects using the Jucer)
-
 #define JucePlugin_Name                 "The Function"
 #define JucePlugin_Desc                 "The Function"
 #define JucePlugin_Manufacturer         "Artican"
@@ -43,6 +39,5 @@
 #define JucePlugin_RTASCategory         ePlugInCategory_None
 #define JucePlugin_RTASManufacturerCode JucePlugin_ManufacturerCode
 #define JucePlugin_RTASProductId        JucePlugin_PluginCode
-#define JUCE_USE_VSTSDK_2_4             1
 
 #endif   // __PLUGINCHARACTERISTICS_D4EFFF1A__

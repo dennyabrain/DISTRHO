@@ -30,28 +30,6 @@
     set-up before trying to do a build.
 */
 
-//==============================================================================
-/*                              Generic settings                              */
-
-
-#ifdef HYBRIDREVERB2_VST_PLUGIN
-  #define JucePlugin_Build_Standalone     0
-  #define JucePlugin_Build_VST            1
-  #define JucePlugin_Build_RTAS           0
-  #define JucePlugin_Build_AU             0
-#elif HYBRIDREVERB2_AU_PLUGIN
-  #define JucePlugin_Build_Standalone     0
-  #define JucePlugin_Build_VST            0
-  #define JucePlugin_Build_RTAS           0
-  #define JucePlugin_Build_AU             1
-#else
-  #define JucePlugin_Build_Standalone     1
-  #define JucePlugin_Build_VST            0
-  #define JucePlugin_Build_RTAS           0
-  #define JucePlugin_Build_AU             0
-#endif
-
-
 /** The name of your plugin. (Try to keep this as short as possible)
 */
 #define JucePlugin_Name                     "HybridReverb2"
@@ -274,7 +252,7 @@
 #define JucePlugin_RTASProductId            JucePlugin_PluginCode
 
 // ...whatever!
-#define JUCE_ObjCExtraSuffix 3
+#define JUCE_ObjCExtraSuffix hybridreverb2_juce
 #define JucePlugin_TailLengthSeconds 0
 
 
