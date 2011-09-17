@@ -3,7 +3,7 @@
 
   This is an automatically generated file created by the Jucer!
 
-  Creation date:  6 Nov 2008 9:28:00 am
+  Creation date:  26 Nov 2008 12:21:51 am
 
   Be careful when adding custom code to these files, as only the code within
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
@@ -41,7 +41,7 @@ sDelayEditorComponent::sDelayEditorComponent (DemoJuceFilter* const ownerFilter)
       label4 (0)
 {
     addAndMakeVisible (slider = new Slider (T("new slider")));
-    slider->setRange (0, 1000, 1);
+    slider->setRange (0, 3000, 1);
     slider->setSliderStyle (Slider::RotaryVerticalDrag);
     slider->setTextBoxStyle (Slider::TextBoxBelow, false, 30, 20);
     slider->addListener (this);
@@ -96,10 +96,16 @@ sDelayEditorComponent::sDelayEditorComponent (DemoJuceFilter* const ownerFilter)
 
 
     //[UserPreSize]
-
-	slider->setValue(ownerFilter->getParameter (0), false);
-	feedSlider->setValue(ownerFilter->getParameter (1), false);
-	gainSlider->setValue(ownerFilter->getParameter (2), false);
+	
+	slider->setValue(remap(ownerFilter->getParameter (0), 0.0, 1.0,
+														(float)slider->getMinimum(),
+														(float)slider->getMaximum()), false);
+	feedSlider->setValue(remap(ownerFilter->getParameter (1), 0.0, 1.0,
+														(float)feedSlider->getMinimum(),
+														(float)feedSlider->getMaximum()), false);
+	gainSlider->setValue(remap(ownerFilter->getParameter (2), 0.0, 1.0,
+														(float)gainSlider->getMinimum(),
+														(float)gainSlider->getMaximum()), false);
 
     //[/UserPreSize]
 
@@ -107,7 +113,8 @@ sDelayEditorComponent::sDelayEditorComponent (DemoJuceFilter* const ownerFilter)
 
     //[Constructor] You can add your own custom stuff here..
 
-	 ownerFilter->addChangeListener (this);
+	ownerFilter->addChangeListener (this);
+
 
     //[/Constructor]
 }
@@ -167,24 +174,27 @@ void sDelayEditorComponent::sliderValueChanged (Slider* sliderThatWasMoved)
     {
         //[UserSliderCode_slider] -- add your slider handling code here..
 
-		 getFilter()->setParameterNotifyingHost (0, (float)slider->getValue());
-
+		getFilter()->setParameterNotifyingHost (0, remap((float)slider->getValue(),
+														  (float)slider->getMinimum(),
+														  (float)slider->getMaximum(),0.0,1.0));
         //[/UserSliderCode_slider]
     }
     else if (sliderThatWasMoved == feedSlider)
     {
         //[UserSliderCode_feedSlider] -- add your slider handling code here..
 
-		 getFilter()->setParameterNotifyingHost (1, (float)feedSlider->getValue());
-
+		getFilter()->setParameterNotifyingHost (1, remap((float)feedSlider->getValue(),
+														 (float)feedSlider->getMinimum(),
+														 (float)feedSlider->getMaximum(),0.0,1.0));
         //[/UserSliderCode_feedSlider]
     }
     else if (sliderThatWasMoved == gainSlider)
     {
         //[UserSliderCode_gainSlider] -- add your slider handling code here..
 
-         getFilter()->setParameterNotifyingHost (2, (float)gainSlider->getValue());
-
+		getFilter()->setParameterNotifyingHost (2, remap((float)gainSlider->getValue(),
+														 (float)gainSlider->getMinimum(),
+														 (float)gainSlider->getMaximum(),0.0,1.0));
         //[/UserSliderCode_gainSlider]
     }
 
@@ -195,6 +205,12 @@ void sDelayEditorComponent::sliderValueChanged (Slider* sliderThatWasMoved)
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
+
+// This function remaps any value from the range [startIn, endIn] to the range [startOut, endOut]
+float sDelayEditorComponent::remap(float val, float startIn, float endIn, float startOut, float endOut)
+{
+	return startOut + ((endOut - startOut) * ((val - startIn)/(endIn - startIn)));
+}
 
 void sDelayEditorComponent::changeListenerCallback (ChangeBroadcaster* source)
 {
@@ -226,10 +242,18 @@ void sDelayEditorComponent::updateParametersFromFilter()
        (note that it's important here to tell the slider not to send a change
        message, because that would cause it to call the filter with a parameter
        change message again, and the values would drift out.
-    */
-   slider->setValue (newDelay, false);
-   feedSlider->setValue (newFeed, false);
-   gainSlider->setValue (newGain, false);
+	*/
+	
+	slider->setValue (remap(newDelay, 0.0, 1.0,
+							(float)slider->getMinimum(),
+							(float)slider->getMaximum()), false);
+	feedSlider->setValue (remap(newFeed, 0.0, 1.0,
+								(float)feedSlider->getMinimum(),
+								(float)feedSlider->getMaximum()), false);
+
+	gainSlider->setValue (remap(newGain, 0.0, 1.0,
+								(float)gainSlider->getMinimum(),
+								(float)gainSlider->getMaximum()), false);
 }
 
 
@@ -251,7 +275,7 @@ BEGIN_JUCER_METADATA
                  fixedSize="0" initialWidth="150" initialHeight="110">
   <BACKGROUND backgroundColour="ff000000"/>
   <SLIDER name="new slider" id="251e506958de0745" memberName="slider" virtualName=""
-          explicitFocusOrder="0" pos="8 24 40 48" min="0" max="1000" int="1"
+          explicitFocusOrder="0" pos="8 24 40 48" min="0" max="3000" int="1"
           style="RotaryVerticalDrag" textBoxPos="TextBoxBelow" textBoxEditable="1"
           textBoxWidth="30" textBoxHeight="20" skewFactor="1"/>
   <SLIDER name="feedback slider" id="4f54cafbf297871c" memberName="feedSlider"

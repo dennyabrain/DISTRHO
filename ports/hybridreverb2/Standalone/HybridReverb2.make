@@ -13,12 +13,12 @@ ifeq ($(CONFIG),Release)
   LIBDIR := ../../../bin
   OBJDIR := intermediate/Release
   OUTDIR := ../../../bin
-  CPPFLAGS := $(DEPFLAGS) -D "LINUX=1" -D "NDEBUG=1" -I "../source" -I "/usr/include" -I "/usr/include/freetype2" -I "../../../libs/juce-153/standalone" -I "../../../libs/juce-153/source" -I "."
+  CPPFLAGS := $(DEPFLAGS) -D "LINUX=1" -D "NDEBUG=1" -I "../source" -I "/usr/include" -I "/usr/include/freetype2" -I "../../../libs/juce-153/standalone" -I "../../../libs/juce-153/source"
   CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -O2 -O2 -march=native -msse -ffast-math -fomit-frame-pointer -funroll-loops -fopenmp -fvisibility=hidden -static `pkg-config fftw3f --cflags`
   CXXFLAGS += $(CFLAGS)
   LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -s `pkg-config fftw3f --libs` -L"/usr/X11R6/lib" -L"/usr/lib" -L"../../../libs" -lfreetype -lpthread -lasound -lrt -lX11 -lXext -lgomp -ljuce-standalone-153
   LDDEPS :=
-  RESFLAGS := -D "LINUX=1" -D "NDEBUG=1" -I "../source" -I "/usr/include" -I "/usr/include/freetype2" -I "../../../libs/juce-153/standalone" -I "../../../libs/juce-153/source" -I "."
+  RESFLAGS := -D "LINUX=1" -D "NDEBUG=1" -I "../source" -I "/usr/include" -I "/usr/include/freetype2" -I "../../../libs/juce-153/standalone" -I "../../../libs/juce-153/source"
   TARGET := HybridReverb2
  BLDCMD = $(CXX) -o $(OUTDIR)/$(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(TARGET_ARCH)
 endif
@@ -28,12 +28,12 @@ ifeq ($(CONFIG),Debug)
   LIBDIR := ../../../bin
   OBJDIR := intermediate/Debug
   OUTDIR := ../../../bin
-  CPPFLAGS := $(DEPFLAGS) -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -I "../source" -I "/usr/include" -I "/usr/include/freetype2" -I "../../../libs/juce-153/standalone" -I "../../../libs/juce-153/source" -I "."
-  CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -g -O0 -ggdb -static
+  CPPFLAGS := $(DEPFLAGS) -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -I "../source" -I "/usr/include" -I "/usr/include/freetype2" -I "../../../libs/juce-153/standalone" -I "../../../libs/juce-153/source"
+  CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -g -O0 -ggdb -static `pkg-config fftw3f --cflags`
   CXXFLAGS += $(CFLAGS)
   LDFLAGS += -L$(BINDIR) -L$(LIBDIR) `pkg-config fftw3f --libs` -L"/usr/X11R6/lib" -L"/usr/lib" -L"../../../libs" -lfreetype -lpthread -lasound -lrt -lX11 -lXext -lgomp -ljuce-standalone-153_debug
   LDDEPS :=
-  RESFLAGS := -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -I "../source" -I "/usr/include" -I "/usr/include/freetype2" -I "../../../libs/juce-153/standalone" -I "../../../libs/juce-153/source" -I "."
+  RESFLAGS := -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -I "../source" -I "/usr/include" -I "/usr/include/freetype2" -I "../../../libs/juce-153/standalone" -I "../../../libs/juce-153/source"
   TARGET := HybridReverb2_debug
  BLDCMD = $(CXX) -o $(OUTDIR)/$(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(TARGET_ARCH)
 endif

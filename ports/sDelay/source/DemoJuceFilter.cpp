@@ -48,12 +48,12 @@ AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 DemoJuceFilter::DemoJuceFilter()
 {
     samplingRate = 44100;
-	maxDelayTime = 1000;			// (ms) Max delay time, must equal max value of slider
-	delayTime = 500;				// (ms) Starting delay time
-	feedback = 50;
-	gain = 100;
+	maxDelayTime = 3000;			// (ms) Max delay time, must equal max value of slider on GUI
+	delayTime = 0.5;				// Starting delay time, % of maxDelayTime, must be between 0 and 1 for host
+	feedback = 0.5;					// Feedback level, 0-100%, must be between 0 and 1 for host
+	gain = 0.5;						// Gain level, 0-100%, must be between 0 and 1 for host
 	
-	delayLineLength = (int)(maxDelayTime*samplingRate/1000);
+	delayLineLength = (int)((maxDelayTime/1000) * samplingRate);	//over 1000 because maxDelayTime in milliseconds
 	delayLine = new float[delayLineLength];
 	
 	endPtr = delayLine + delayLineLength;
@@ -71,7 +71,7 @@ DemoJuceFilter::~DemoJuceFilter()
 void DemoJuceFilter::setDelay(float delay)
 {
 	delayTime = delay;
-	delayLineLength = (int)(delayTime*samplingRate/1000);
+	delayLineLength = (int)(((delayTime*maxDelayTime)/1000) * samplingRate);	//over 1000 because maxDelayTime in milliseconds
 	endPtr = delayLine + delayLineLength;
 }
 
@@ -125,7 +125,7 @@ const String DemoJuceFilter::getParameterName (int index)
 {
     switch (index) 
 	{ 
-		case kDelay :		return T("Delay (ms)"); 
+		case kDelay :		return T("Delay (0-3sec)"); 
 							break; 
 		case kFeedback :	return T("Feedback");
 							break; 
@@ -208,10 +208,10 @@ void DemoJuceFilter::processBlock (AudioSampleBuffer& buffer,
 			delayLineOutput = *rwPtr;
 			
 			//write the input sample and any feedback to delayline
-			*rwPtr = *input + ((feedback/100) * delayLineOutput);
+			*rwPtr = *input + (feedback * delayLineOutput);
 			
 			//add the delayed sample and the current input to create the output, scale by gain
-			*output = (gain/100) * (*input + delayLineOutput);
+			*output = gain * (*input + delayLineOutput);
 				
 			//write to output if stereo
 			if(getNumOutputChannels() > 1){

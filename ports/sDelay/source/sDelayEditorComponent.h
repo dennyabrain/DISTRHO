@@ -3,7 +3,7 @@
 
   This is an automatically generated file created by the Jucer!
 
-  Creation date:  6 Nov 2008 9:28:00 am
+  Creation date:  26 Nov 2008 12:21:51 am
 
   Be careful when adding custom code to these files, as only the code within
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
@@ -19,8 +19,8 @@
   ==============================================================================
 */
 
-#ifndef __JUCER_HEADER_SDELAYEDITORCOMPONENT_SDELAYEDITORCOMPONENT_4929704F__
-#define __JUCER_HEADER_SDELAYEDITORCOMPONENT_SDELAYEDITORCOMPONENT_4929704F__
+#ifndef __JUCER_HEADER_SDELAYEDITORCOMPONENT_SDELAYEDITORCOMPONENT_7244FD78__
+#define __JUCER_HEADER_SDELAYEDITORCOMPONENT_SDELAYEDITORCOMPONENT_7244FD78__
 
 //[Headers]     -- You can add your own extra header files here --
 #include "DemoJuceFilter.h"
@@ -62,7 +62,9 @@ private:
     //[UserVariables]   -- You can add your own custom variables in this section.
 
 	void updateParametersFromFilter();
+	float remap(float val, float startIn, float endIn, float startOut, float endOut);
 
+	float test1, test2, test3;
 	// handy wrapper method to avoid having to cast the filter to a DemoJuceFilter
     // every time we need it..
     DemoJuceFilter* getFilter() const throw()       { return (DemoJuceFilter*) getAudioProcessor(); }
@@ -85,4 +87,4 @@ private:
 };
 
 
-#endif   // __JUCER_HEADER_SDELAYEDITORCOMPONENT_SDELAYEDITORCOMPONENT_4929704F__
+#endif   // __JUCER_HEADER_SDELAYEDITORCOMPONENT_SDELAYEDITORCOMPONENT_7244FD78__
