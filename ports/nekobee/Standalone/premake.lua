@@ -26,6 +26,7 @@ package.config["Debug"].defines        = { "LINUX=1", "DEBUG=1", "_DEBUG=1", "Ju
 
 package.includepaths = {
     "../source",
+    "../source/Nekobee",
     "/usr/include",
     "/usr/include/freetype2",
     "../../../libs/juce-153/standalone",
