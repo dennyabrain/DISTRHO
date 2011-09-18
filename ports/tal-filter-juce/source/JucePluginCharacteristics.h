@@ -41,6 +41,33 @@
 #ifndef JucePlugin_Build_Standalone
  #define JUCE_ObjCExtraSuffix           tal_filter
 #endif
+//==============================================================================
+/*                              Generic settings                              */
+
+/** The name of your plugin. (Try to keep this as short as possible)
+*/
+#define JucePlugin_Name                     "TAL Filter Plugin"
+
+/** A longer decription of your plugin.
+*/
+#define JucePlugin_Desc                     "TAL-Filter"
+
+/** The name of your company. (Try to keep this as short as possible)
+*/
+#define JucePlugin_Manufacturer             "TAL-Togu Audio Line"
+
+/** A four-character code for your company.
+    Use single quotes - this isn't a string!
+*/
+#define JucePlugin_ManufacturerCode         'TOGU'
+
+/** A unique four-character code for your plugin.
+    Use single quotes - this isn't a string!
+
+    Note that for AU compatibility, this must contain at least one
+    upper-case letter.
+*/
+#define JucePlugin_PluginCode               '597o'
 
 //==============================================================================
 /** The maximum number of channels of audio input that the plugin can handle.
