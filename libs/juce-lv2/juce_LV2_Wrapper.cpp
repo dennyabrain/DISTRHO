@@ -360,8 +360,6 @@ public:
             midi_uri_id (0),
             port_count (0)
     {
-        printf("JuceLV2Wrapper()\n");
-
         JUCE_AUTORELEASEPOOL;
         initialiseJuce_GUI();
 
@@ -781,76 +779,85 @@ private:
 
 //==============================================================================
 // Create a new JUCE External UI
-class JuceLv2ExternalUI  : public lv2_external_ui,
-                           public DocumentWindow
+class JuceLv2ExternalUI : public lv2_external_ui
+                          //public Button::Listener
 {
 public:
-    JuceLv2ExternalUI (JuceLV2Wrapper* const wrapper_, AudioProcessorEditor* const editor_, lv2_external_ui_host* external_ui_host_, LV2UI_Controller controller_) :
-        DocumentWindow(String::empty, Colours::white, DocumentWindow::minimiseButton | DocumentWindow::closeButton, true),
-            wrapper(wrapper_),
+    JuceLv2ExternalUI (AudioProcessor* filter_, AudioProcessorEditor* const editor_, lv2_external_ui_host* external_ui_host_, LV2UI_Controller controller_) :
+            filter(filter_),
             editor(editor_),
+            window(nullptr),
             external_ui_host(external_ui_host_),
             controller(controller_)
     {
-        lv2_external_ui::run = do_run;
-        lv2_external_ui::show = do_show;
-        lv2_external_ui::hide = do_hide;
+        run = do_ui_run;
+        show = do_ui_show;
+        hide = do_ui_hide;
 
-        //setOpaque (true);
-        //editor->setOpaque (true);
-
-        //String title = external_ui_host->plugin_human_id != nullptr ? String(external_ui_host->plugin_human_id) : wrapper->getFilter()->getName();
-        //setName(title);
-
-        //setTitleBarHeight (0);
-        //setDropShadowEnabled(false);
-        //setUsingNativeTitleBar(true);
-
-        //setContentNonOwned(editor, true);
+        const MessageManagerLock mmLock;
+        String title = external_ui_host->plugin_human_id != nullptr ? String(external_ui_host->plugin_human_id) : filter->getName();
+        window = new DocumentWindow(title, Colours::white, DocumentWindow::minimiseButton | DocumentWindow::closeButton, true);
+        //window->setOpaque(true);
+        window->setAlwaysOnTop(true);
+        window->setDropShadowEnabled(false);
+        window->setUsingNativeTitleBar(true);
+        window->setContentNonOwned(editor, true);
+        window->setVisible(false);
     }
 
     ~JuceLv2ExternalUI()
     {
+        if (window)
+          delete window;
+        if (external_ui_host)
+          external_ui_host->ui_closed(controller);
     }
 
-    static void do_run(lv2_external_ui * _this_)
+    static void do_ui_run(lv2_external_ui * _this_)
     {
-      std::cout << "run" << std::endl;
-        //editor->repaint();
-        //repaint();
+        const MessageManagerLock mmLock;
+        JuceLv2ExternalUI* externalUI = (JuceLv2ExternalUI*)_this_;
+        externalUI->window->repaint();
     }
 
-    static void do_show(lv2_external_ui * _this_)
+    static void do_ui_show(lv2_external_ui * _this_)
     {
-      std::cout << "show" << std::endl;
-        //setVisible(true);
+        const MessageManagerLock mmLock;
+        JuceLv2ExternalUI* externalUI = (JuceLv2ExternalUI*)_this_;
+        externalUI->window->setVisible(true);
+        //if (!externalUI->window->isOnDesktop())
+        //  externalUI->window->addToDesktop();
     }
 
-    static void do_hide(lv2_external_ui * _this_)
+    static void do_ui_hide(lv2_external_ui * _this_)
     {
-      std::cout << "hide" << std::endl;
-        //setVisible(false);
+        const MessageManagerLock mmLock;
+        JuceLv2ExternalUI* externalUI = (JuceLv2ExternalUI*)_this_;
+        externalUI->window->setVisible(false);
     }
 
-    AudioProcessorEditor* getEditorComp() const
+    void buttonClicked(Button* button)
     {
-        return dynamic_cast <AudioProcessorEditor*> (getContentComponent());
+      std::cerr << "button clicked" << std::endl;
+      if (button == window->getCloseButton())
+      {
+        std::cerr << "HERE!" << std::endl;
+        //delete externalUI;
+        //externalUI = nullptr;
+      } 
     }
+    
+    void buttonStateChanged(Button*) {}
 
-    void closeButtonPressed()
+    Button* getCloseButton()
     {
-        //delete this;
-        external_ui_host->ui_closed(controller);
-    }
-
-    LV2UI_Widget getLv2Widget()
-    {
-        return nullptr; //&external_ui;
+       return window->getCloseButton();
     }
 
 private:
-    JuceLV2Wrapper* wrapper;
+    AudioProcessor* filter;
     AudioProcessorEditor* editor;
+    DocumentWindow* window;
 
     lv2_external_ui external_ui;
     lv2_external_ui_host* external_ui_host;
@@ -864,22 +871,19 @@ private:
 class JuceLv2Editor : public AudioProcessorListener
 {
 public:
-    JuceLv2Editor (JuceLV2Wrapper* const wrapper_, const LV2UI_Descriptor* ui_descriptor_, LV2UI_Write_Function write_function_, LV2UI_Controller controller_, LV2UI_Widget* widget, const LV2_Feature* const* features, bool isExternalUI) :
-            wrapper(wrapper_),
-            externalUI(nullptr),
+    JuceLv2Editor (AudioProcessor* filter_, const LV2UI_Descriptor* ui_descriptor_, LV2UI_Write_Function write_function_, LV2UI_Controller controller_, LV2UI_Widget* widget, const LV2_Feature* const* features, bool isExternalUI) :
+            filter(filter_),
             ui_descriptor(ui_descriptor_),
             write_function(write_function_),
             controller(controller_),
-            editor(nullptr)
+            editor(nullptr),
+            externalUI(nullptr)
     {
-        filter = wrapper->getFilter();
         filter->addListener(this);
 
-        if (filter->hasEditor() && false)
+        if (filter->hasEditor())
         {
-            printf("TEST - Before\n");
             editor = filter->createEditorIfNeeded();
-            printf("TEST - After\n");
         }
 
         if (editor != nullptr)
@@ -900,27 +904,28 @@ public:
 
                 if (external_ui_host)
                 {
-                    externalUI = new JuceLv2ExternalUI(wrapper, editor, external_ui_host, controller);
-                    *widget = nullptr; //externalUI;
+                    externalUI = new JuceLv2ExternalUI(filter, editor, external_ui_host, controller);
+                    //externalUI->getCloseButton()->addListener(this);
+                    *widget = externalUI;
                 }
                 else
                 {
                     *widget = nullptr;
-                    std::cerr << "Failed to init external UI" << std::endl;
+                    std::cerr << "Failed to init external UI host" << std::endl;
                 }
             }
             else
             {
                 // JUCE UI
-                editor->setOpaque (true);
-                editor->setVisible (true);
+                //editor->setOpaque (true);
+                //editor->setVisible (true);
                 *widget = editor;
             }
         }
         else
         {
-            widget = nullptr;
-            std::cerr << "Failed to init UI" << std::endl;
+            *widget = nullptr;
+            std::cerr << "Plugin has no UI" << std::endl;
         }
 
         // Padding for control ports
@@ -941,9 +946,9 @@ public:
         PopupMenu::dismissAllActiveMenus();
 
         filter->removeListener(this);
-        filter->editorBeingDeleted (editor);
+        filter->editorBeingDeleted(editor);
 
-        if (externalUI != nullptr)
+        if (externalUI)
             delete externalUI;
 
         //if (editor != nullptr)
@@ -977,10 +982,9 @@ public:
     void audioProcessorChanged (AudioProcessor*) {}
 
 private:
-    JuceLV2Wrapper* wrapper;
-    JuceLv2ExternalUI* externalUI;
     AudioProcessor* filter;
     AudioProcessorEditor* editor;
+    JuceLv2ExternalUI* externalUI;
 
     const LV2UI_Descriptor* ui_descriptor;
     LV2UI_Write_Function write_function;
@@ -1046,7 +1050,7 @@ LV2UI_Handle juce_lv2ui_instantiate(const LV2UI_Descriptor* descriptor, LV2UI_Wr
         if (strcmp(features[i]->URI, LV2_INSTANCE_ACCESS_URI) == 0 && features[i]->data != nullptr)
         {
             JuceLV2Wrapper* wrapper = (JuceLV2Wrapper*)features[i]->data;
-            JuceLv2Editor* editor = new JuceLv2Editor(wrapper, descriptor, write_function, controller, widget, features, isExternalUI);
+            JuceLv2Editor* editor = new JuceLv2Editor(wrapper->getFilter(), descriptor, write_function, controller, widget, features, isExternalUI);
             return editor;
         }
     }
