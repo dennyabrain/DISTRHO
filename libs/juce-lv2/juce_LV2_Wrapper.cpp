@@ -680,8 +680,6 @@ public:
 
     void do_cleanup()
     {
-        stopTimer();
-
 #if 0
         if (descriptor)
         {
@@ -796,9 +794,9 @@ public:
 
         const MessageManagerLock mmLock;
         String title = external_ui_host->plugin_human_id != nullptr ? String(external_ui_host->plugin_human_id) : filter->getName();
-        window = new DocumentWindow(title, Colours::white, DocumentWindow::minimiseButton | DocumentWindow::closeButton, true);
+        window = new DocumentWindow(title, Colours::white, DocumentWindow::minimiseButton | DocumentWindow::closeButton, false);
         //window->setOpaque(true);
-        window->setAlwaysOnTop(true);
+        //window->setAlwaysOnTop(true);
         window->setDropShadowEnabled(false);
         window->setUsingNativeTitleBar(true);
         window->setContentNonOwned(editor, true);
@@ -817,25 +815,29 @@ public:
     {
         const MessageManagerLock mmLock;
         JuceLv2ExternalUI* externalUI = (JuceLv2ExternalUI*)_this_;
-        externalUI->window->repaint();
+        if (externalUI->window)
+          externalUI->window->repaint();
     }
 
     static void do_ui_show(lv2_external_ui * _this_)
     {
         const MessageManagerLock mmLock;
         JuceLv2ExternalUI* externalUI = (JuceLv2ExternalUI*)_this_;
-        externalUI->window->setVisible(true);
-        //if (!externalUI->window->isOnDesktop())
-        //  externalUI->window->addToDesktop();
+        if (!externalUI->window->isOnDesktop())
+         externalUI->window->addToDesktop();
+        if (externalUI->window)
+          externalUI->window->setVisible(true);
     }
 
     static void do_ui_hide(lv2_external_ui * _this_)
     {
         const MessageManagerLock mmLock;
         JuceLv2ExternalUI* externalUI = (JuceLv2ExternalUI*)_this_;
-        externalUI->window->setVisible(false);
+        if (externalUI->window)
+          externalUI->window->setVisible(false);
     }
 
+#if 0
     void buttonClicked(Button* button)
     {
       std::cerr << "button clicked" << std::endl;
@@ -846,13 +848,14 @@ public:
         //externalUI = nullptr;
       } 
     }
-    
+
     void buttonStateChanged(Button*) {}
 
     Button* getCloseButton()
     {
        return window->getCloseButton();
     }
+#endif
 
 private:
     AudioProcessor* filter;
@@ -883,10 +886,10 @@ public:
 
         if (filter->hasEditor())
         {
-            editor = filter->createEditorIfNeeded();
+            editor = filter->createEditor();
         }
 
-        if (editor != nullptr)
+        if (editor)
         {
             if (isExternalUI)
             {
@@ -895,7 +898,7 @@ public:
 
                 for (uint16_t j = 0; features[j]; j++)
                 {
-                    if (strcmp(features[j]->URI, LV2_EXTERNAL_UI_URI) == 0 && features[j]->data != nullptr)
+                    if (strcmp(features[j]->URI, LV2_EXTERNAL_UI_URI) == 0 && features[j]->data)
                     {
                         external_ui_host = (lv2_external_ui_host*)features[j]->data;
                         break;
@@ -946,13 +949,15 @@ public:
         PopupMenu::dismissAllActiveMenus();
 
         filter->removeListener(this);
-        filter->editorBeingDeleted(editor);
 
         if (externalUI)
             delete externalUI;
 
-        //if (editor != nullptr)
-        //    deleteAndZero (editor);
+        if (editor)
+        {
+          //filter->editorBeingDeleted(editor);
+          delete editor;
+        }
     }
 
     void do_port_event(uint32_t port_index, float value)
@@ -1047,7 +1052,7 @@ LV2UI_Handle juce_lv2ui_instantiate(const LV2UI_Descriptor* descriptor, LV2UI_Wr
 
     for (uint16_t i = 0; features[i]; i++)
     {
-        if (strcmp(features[i]->URI, LV2_INSTANCE_ACCESS_URI) == 0 && features[i]->data != nullptr)
+        if (strcmp(features[i]->URI, LV2_INSTANCE_ACCESS_URI) == 0 && features[i]->data)
         {
             JuceLV2Wrapper* wrapper = (JuceLV2Wrapper*)features[i]->data;
             JuceLv2Editor* editor = new JuceLv2Editor(wrapper->getFilter(), descriptor, write_function, controller, widget, features, isExternalUI);

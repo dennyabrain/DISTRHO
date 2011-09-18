@@ -1,7 +1,5 @@
 
-#include "src/audio/plugin_client/juce_PluginHeaders.h"
-// #include "juce_AudioFilterStreamer.h"
-#include "src/audio/plugin_client/Standalone/juce_StandaloneFilterWindow.h"
+#include "juce_StandaloneFilterWindow.h"
 
 namespace {
 const char* juce_getApplicationNameForJack()
