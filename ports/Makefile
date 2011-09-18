@@ -33,7 +33,7 @@ standalone:
 lv2:
 # 	$(MAKE) -C arctican-function/LV2
 # 	$(MAKE) -C arctican-pilgrim/LV2
-	$(MAKE) -C eqinox/LV2
+# 	$(MAKE) -C eqinox/LV2
 #	$(MAKE) -C hybridreverb2/LV2
 # 	$(MAKE) -C nekobee/LV2
 # 	$(MAKE) -C sDelay/LV2
@@ -88,7 +88,7 @@ clean:
 	# LV2
 # 	$(MAKE) clean -C arctican-function/LV2
 # 	$(MAKE) clean -C arctican-pilgrim/LV2
-	$(MAKE) clean -C eqinox/LV2
+# 	$(MAKE) clean -C eqinox/LV2
 #	$(MAKE) clean -C hybridreverb2/LV2
 # 	$(MAKE) clean -C nekobee/LV2
 # 	$(MAKE) clean -C sDelay/LV2
