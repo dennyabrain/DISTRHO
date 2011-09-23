@@ -1,5 +1,5 @@
 
-project.name = "Wolpertinger"
+project.name = "Wolpertinger004"
 project.bindir = "../../../bin"
 project.libdir = project.bindir
 project.configs = { "Release", "Debug" }
