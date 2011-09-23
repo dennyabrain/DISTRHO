@@ -16,9 +16,7 @@ libs:
 standalone:
 	$(MAKE) -C arctican-function/Standalone
 	$(MAKE) -C arctican-pilgrim/Standalone
-	$(MAKE) -C eqinox/Standalone
 	$(MAKE) -C hybridreverb2/Standalone
-	$(MAKE) -C nekobee/Standalone
 	$(MAKE) -C sDelay/Standalone
 	$(MAKE) -C tal-dub-3-juce/Standalone
 	$(MAKE) -C tal-filter-juce/Standalone
@@ -52,10 +50,8 @@ lv2:
 vst:
 	$(MAKE) -C arctican-function/VST
 	$(MAKE) -C arctican-pilgrim/VST
-	$(MAKE) -C eqinox/VST
 	$(MAKE) -C huit/VST
 	$(MAKE) -C hybridreverb2/VST
-	$(MAKE) -C nekobee/VST
 	$(MAKE) -C sDelay/VST
 	$(MAKE) -C tal-dub-3-juce/VST
 	$(MAKE) -C tal-filter-juce/VST
@@ -71,9 +67,7 @@ clean:
 	# Standalone
 	$(MAKE) clean -C arctican-function/Standalone
 	$(MAKE) clean -C arctican-pilgrim/Standalone
-	$(MAKE) clean -C eqinox/Standalone
 	$(MAKE) clean -C hybridreverb2/Standalone
-	$(MAKE) clean -C nekobee/Standalone
 	$(MAKE) clean -C sDelay/Standalone
 	$(MAKE) clean -C tal-dub-3-juce/Standalone
 	$(MAKE) clean -C tal-filter-juce/Standalone
@@ -105,10 +99,8 @@ clean:
 	# VST
 	$(MAKE) clean -C arctican-function/VST
 	$(MAKE) clean -C arctican-pilgrim/VST
-	$(MAKE) clean -C eqinox/VST
 	$(MAKE) clean -C huit/VST
 	$(MAKE) clean -C hybridreverb2/VST
-	$(MAKE) clean -C nekobee/VST
 	$(MAKE) clean -C sDelay/VST
 	$(MAKE) clean -C tal-dub-3-juce/VST
 	$(MAKE) clean -C tal-filter-juce/VST
