@@ -13,12 +13,12 @@ ifeq ($(CONFIG),Release)
   LIBDIR := ../../../bin
   OBJDIR := intermediate/Release
   OUTDIR := ../../../bin
-  CPPFLAGS := $(DEPFLAGS) -D "CONFIGURATION="Release"" -D "CONFIG_STANDALONE" -D "BINTYPE="Linux-Standalone"" -D "DATE="`date +%F`"" -D "VERSION="004"" -D "VERSIONSTRING="0.4"" -D "LINUX=1" -D "NDEBUG=1" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_Standalone=1" -I "../source" -I "/usr/include" -I "/usr/include/freetype2" -I "../../../libs/juce-153/standalone" -I "../../../libs/juce-153/source" -I "."
+  CPPFLAGS := $(DEPFLAGS) -D "CONFIGURATION="Release"" -D "CONFIG_STANDALONE" -D "BINTYPE="Linux-Standalone"" -D "BUILDDATE="`date +%F`"" -D "WOLPVERSION="0041"" -D "WOLPVERSIONSTRING="0.4.1"" -D "LINUX=1" -D "NDEBUG=1" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_Standalone=1" -I "../source" -I "/usr/include" -I "/usr/include/freetype2" -I "../../../libs/juce-153/standalone" -I "../../../libs/juce-153/source" -I "."
   CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -O2 -O2 -march=native -msse -ffast-math -fvisibility=hidden -static
   CXXFLAGS += $(CFLAGS)
   LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -s -L"/usr/X11R6/lib" -L"/usr/lib" -L"../../../libs" -lfreetype -lpthread -lasound -lrt -lX11 -lXext -ljuce-standalone-153
   LDDEPS :=
-  RESFLAGS := -D "CONFIGURATION="Release"" -D "CONFIG_STANDALONE" -D "BINTYPE="Linux-Standalone"" -D "DATE="`date +%F`"" -D "VERSION="004"" -D "VERSIONSTRING="0.4"" -D "LINUX=1" -D "NDEBUG=1" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_Standalone=1" -I "../source" -I "/usr/include" -I "/usr/include/freetype2" -I "../../../libs/juce-153/standalone" -I "../../../libs/juce-153/source" -I "."
+  RESFLAGS := -D "CONFIGURATION="Release"" -D "CONFIG_STANDALONE" -D "BINTYPE="Linux-Standalone"" -D "BUILDDATE="`date +%F`"" -D "WOLPVERSION="0041"" -D "WOLPVERSIONSTRING="0.4.1"" -D "LINUX=1" -D "NDEBUG=1" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_Standalone=1" -I "../source" -I "/usr/include" -I "/usr/include/freetype2" -I "../../../libs/juce-153/standalone" -I "../../../libs/juce-153/source" -I "."
   TARGET := Wolpertinger
  BLDCMD = $(CXX) -o $(OUTDIR)/$(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(TARGET_ARCH)
 endif
@@ -28,12 +28,12 @@ ifeq ($(CONFIG),Debug)
   LIBDIR := ../../../bin
   OBJDIR := intermediate/Debug
   OUTDIR := ../../../bin
-  CPPFLAGS := $(DEPFLAGS) -D "CONFIGURATION="Debug"" -D "CONFIG_STANDALONE" -D "BINTYPE="Linux-Standalone"" -D "DATE="`date +%F`"" -D "VERSION="004"" -D "VERSIONSTRING="0.4"" -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_Standalone=1" -I "../source" -I "/usr/include" -I "/usr/include/freetype2" -I "../../../libs/juce-153/standalone" -I "../../../libs/juce-153/source" -I "."
+  CPPFLAGS := $(DEPFLAGS) -D "CONFIGURATION="Debug"" -D "CONFIG_STANDALONE" -D "BINTYPE="Linux-Standalone"" -D "BUILDDATE="`date +%F`"" -D "WOLPVERSION="0041"" -D "WOLPVERSIONSTRING="0.4.1"" -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_Standalone=1" -I "../source" -I "/usr/include" -I "/usr/include/freetype2" -I "../../../libs/juce-153/standalone" -I "../../../libs/juce-153/source" -I "."
   CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -g -O0 -ggdb -static
   CXXFLAGS += $(CFLAGS)
   LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -L"/usr/X11R6/lib" -L"/usr/lib" -L"../../../libs" -lfreetype -lpthread -lasound -lrt -lX11 -lXext -ljuce-standalone-153_debug
   LDDEPS :=
-  RESFLAGS := -D "CONFIGURATION="Debug"" -D "CONFIG_STANDALONE" -D "BINTYPE="Linux-Standalone"" -D "DATE="`date +%F`"" -D "VERSION="004"" -D "VERSIONSTRING="0.4"" -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_Standalone=1" -I "../source" -I "/usr/include" -I "/usr/include/freetype2" -I "../../../libs/juce-153/standalone" -I "../../../libs/juce-153/source" -I "."
+  RESFLAGS := -D "CONFIGURATION="Debug"" -D "CONFIG_STANDALONE" -D "BINTYPE="Linux-Standalone"" -D "BUILDDATE="`date +%F`"" -D "WOLPVERSION="0041"" -D "WOLPVERSIONSTRING="0.4.1"" -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_Standalone=1" -I "../source" -I "/usr/include" -I "/usr/include/freetype2" -I "../../../libs/juce-153/standalone" -I "../../../libs/juce-153/source" -I "."
   TARGET := Wolpertinger_debug
  BLDCMD = $(CXX) -o $(OUTDIR)/$(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(TARGET_ARCH)
 endif

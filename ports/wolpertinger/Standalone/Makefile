@@ -15,7 +15,7 @@ all: Wolpertinger
 
 Makefile: premake.lua
 	@echo ==== Regenerating Makefiles ====
-	@premake --file $^ --os linux --target gnu --cc gcc
+	@premake --file $^ --os linux --cc gcc --target gnu
 
 Wolpertinger:
 	@echo ==== Building Wolpertinger ====

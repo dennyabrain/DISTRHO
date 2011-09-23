@@ -724,7 +724,7 @@ editor::~editor()
     deleteAndZero (label23);
     deleteAndZero (oversmplComboBox);
     deleteAndZero (label25);
-    //ImageCache::release (cachedImage_scratches_png);
+//    ImageCache::release (cachedImage_scratches_png);
 
     //[Destructor]. You can add your own custom destruction code here..
     //[/Destructor]
@@ -870,7 +870,7 @@ void editor::resized()
     slfilterlimits->setMinValue(synth->getParameter(wolp::filtermin)*(synth->paraminfos[wolp::filtermin].max-synth->paraminfos[wolp::filtermin].min));
     #undef initslider
 
-	changeListenerCallback((ChangeBroadcaster*)wolp::oversampling);
+	changeListenerCallback((ChangeBroadcaster *)wolp::oversampling);    // XXX
 #endif
     //[/UserResized]
 }
@@ -1043,7 +1043,7 @@ void editor::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
 
 void editor::changeListenerCallback(ChangeBroadcaster *objectThatHasChanged)
 {
-    intptr_t idx= (intptr_t)objectThatHasChanged;
+//    intptr_t idx= (intptr_t)objectThatHasChanged;
 	wolp *synth= (wolp*)getAudioProcessor();
 #define updateslider(name, slidername)		\
 		case wolp::name:	\
@@ -1051,49 +1051,55 @@ void editor::changeListenerCallback(ChangeBroadcaster *objectThatHasChanged)
 								  (synth->paraminfos[idx].max-synth->paraminfos[idx].min), false );	\
 			break;
 
-	switch(idx)
-	{
-		updateslider (gain, slgain);
-		updateslider (clip, slclip);
-		updateslider (gsaw, slsaw);
-		updateslider (grect, slrect);
-		updateslider (gtri, sltri);
-		updateslider (tune, sltune);
-		updateslider (cutoff, slcutoff);
-		updateslider (resonance, slreso);
-		updateslider (bandwidth, slbandwidth);
-		updateslider (velocity, slvelocity);
-		updateslider (inertia, slinertia);
-		updateslider (nfilters, slpasses);
-//		updateslider (curcutoff, slcurcutoff);
-		updateslider (attack, knobAttack);
-		updateslider (decay, knobDecay);
-		updateslider (sustain, knobSustain);
-		updateslider (release, knobRelease);
-		case wolp::curcutoff:
-			slcurcutoff->setValue( synth->params[wolp::curcutoff] *
-								  (synth->paraminfos[idx].max-synth->paraminfos[idx].min), false );
-			break;
-		case wolp::filtermin:
-			slfilterlimits->setMinValue( synth->params[wolp::filtermin] *
-						(synth->paraminfos[idx].max-synth->paraminfos[idx].min), false );
-			break;
-		case wolp::filtermax:
-			slfilterlimits->setMaxValue( synth->params[wolp::filtermax] *
-						(synth->paraminfos[idx].max-synth->paraminfos[idx].min), false );
-			break;
+    for(int idx= 0; idx<wolp::param_size; idx++)
+        if(synth->paraminfos[idx].dirty)
+        {
+            synth->paraminfos[idx].dirty= false;
 
-		case wolp::oversampling:
-		{
-			int idx= int(synth->getParameter(wolp::oversampling)*2);
-			oversmplComboBox->setSelectedItemIndex( idx, true );
-			break;
-		}
+            switch(idx)
+            {
+                updateslider (gain, slgain);
+                updateslider (clip, slclip);
+                updateslider (gsaw, slsaw);
+                updateslider (grect, slrect);
+                updateslider (gtri, sltri);
+                updateslider (tune, sltune);
+                updateslider (cutoff, slcutoff);
+                updateslider (resonance, slreso);
+                updateslider (bandwidth, slbandwidth);
+                updateslider (velocity, slvelocity);
+                updateslider (inertia, slinertia);
+                updateslider (nfilters, slpasses);
+        //		updateslider (curcutoff, slcurcutoff);
+                updateslider (attack, knobAttack);
+                updateslider (decay, knobDecay);
+                updateslider (sustain, knobSustain);
+                updateslider (release, knobRelease);
+                case wolp::curcutoff:
+                    slcurcutoff->setValue( synth->params[wolp::curcutoff] *
+                                          (synth->paraminfos[idx].max-synth->paraminfos[idx].min), false );
+                    break;
+                case wolp::filtermin:
+                    slfilterlimits->setMinValue( synth->params[wolp::filtermin] *
+                                (synth->paraminfos[idx].max-synth->paraminfos[idx].min), false );
+                    break;
+                case wolp::filtermax:
+                    slfilterlimits->setMaxValue( synth->params[wolp::filtermax] *
+                                (synth->paraminfos[idx].max-synth->paraminfos[idx].min), false );
+                    break;
 
-		default:
-			//printf("Object Changed: %ld\n", (long)idx);
-			break;
-	}
+                case wolp::oversampling:
+                {
+                    int idx= int(synth->getParameter(wolp::oversampling)*2);
+                    oversmplComboBox->setSelectedItemIndex( idx, true );
+                    break;
+                }
+
+                default:
+                    printf("Unknown Object Changed: %zu\n", idx);
+                    break;
+            }
+        }
 #undef updateslider
 }
 

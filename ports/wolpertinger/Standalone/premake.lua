@@ -1,5 +1,5 @@
 
-project.name = "Wolpertinger004"
+project.name = "Wolpertinger"
 project.bindir = "../../../bin"
 project.libdir = project.bindir
 project.configs = { "Release", "Debug" }
@@ -21,8 +21,8 @@ package.config["Debug"].buildoptions   = { "-O0 -ggdb -static" }
 package.config["Debug"].links          = { "freetype", "pthread", "asound", "rt", "X11", "Xext", "juce-standalone-153_debug" }
 
 -- TODO: Check for OS
-package.config["Release"].defines      = { "CONFIGURATION=\"Release\"", "CONFIG_STANDALONE", "BINTYPE=\"Linux-Standalone\"", "DATE=\"`date +%F`\"", "VERSION=\"004\"", "VERSIONSTRING=\"0.4\"", "LINUX=1", "NDEBUG=1", "JucePlugin_Build_VST=0", "JucePlugin_Build_AU=0", "JucePlugin_Build_RTAS=0", "JucePlugin_Build_Standalone=1" };
-package.config["Debug"].defines        = { "CONFIGURATION=\"Debug\"", "CONFIG_STANDALONE", "BINTYPE=\"Linux-Standalone\"", "DATE=\"`date +%F`\"", "VERSION=\"004\"", "VERSIONSTRING=\"0.4\"", "LINUX=1", "DEBUG=1", "_DEBUG=1", "JucePlugin_Build_VST=0", "JucePlugin_Build_AU=0", "JucePlugin_Build_RTAS=0", "JucePlugin_Build_Standalone=1" };
+package.config["Release"].defines      = { "CONFIGURATION=\"Release\"", "CONFIG_STANDALONE", "BINTYPE=\"Linux-Standalone\"", "BUILDDATE=\"`date +%F`\"", "WOLPVERSION=\"0041\"", "WOLPVERSIONSTRING=\"0.4.1\"", "LINUX=1", "NDEBUG=1", "JucePlugin_Build_VST=0", "JucePlugin_Build_AU=0", "JucePlugin_Build_RTAS=0", "JucePlugin_Build_Standalone=1" };
+package.config["Debug"].defines        = { "CONFIGURATION=\"Debug\"", "CONFIG_STANDALONE", "BINTYPE=\"Linux-Standalone\"", "BUILDDATE=\"`date +%F`\"", "WOLPVERSION=\"0041\"", "WOLPVERSIONSTRING=\"0.4.1\"", "LINUX=1", "DEBUG=1", "_DEBUG=1", "JucePlugin_Build_VST=0", "JucePlugin_Build_AU=0", "JucePlugin_Build_RTAS=0", "JucePlugin_Build_Standalone=1" };
 
 package.includepaths = {
     "../source",
