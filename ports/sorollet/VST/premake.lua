@@ -8,21 +8,29 @@ package = newpackage()
 package.name = project.name
 package.kind = "dll"
 package.language = "c++"
-package.linkflags = { "static-runtime" }
+package.targetprefix = ""
+
+package.linkflags  = { "no-symbols", "static-runtime" }
 
 package.config["Release"].target       = project.name
 package.config["Release"].objdir       = "intermediate/Release"
-package.config["Release"].buildoptions = { "-O2 -march=native -msse -ffast-math -fvisibility=hidden -fPIC -static" }
-package.config["Release"].links        = { }
+package.config["Release"].defines      = { "NDEBUG=1" };
+package.config["Release"].buildoptions = { "-O2 -mtune=generic -ffast-math -fomit-frame-pointer -fvisibility=hidden -fPIC" }
+package.config["Release"].buildflags   = { "no-symbols", "optimize-speed" }
+package.config["Release"].linkoptions  = { "-Wl,-O1 -Wl,--as-needed" }
 
 package.config["Debug"].target         = project.name .. "_debug"
 package.config["Debug"].objdir         = "intermediate/Debug"
-package.config["Debug"].buildoptions   = { "-O0 -ggdb -fPIC -static" }
-package.config["Debug"].links          = { }
+package.config["Debug"].defines        = { "DEBUG=1", "_DEBUG=1" };
+package.config["Debug"].buildoptions   = { "-O0 -ggdb -fPIC" }
 
--- TODO: Check for OS
-package.config["Release"].defines      = { "LINUX=1", "NDEBUG=1" };
-package.config["Debug"].defines        = { "LINUX=1", "DEBUG=1" };
+if (windows) then
+  package.defines = { "WINDOWS=1" };
+elseif (macosx) then
+  package.defines = { "MAC=1" };
+else
+  package.defines = { "LINUX=1" };
+end
 
 package.includepaths = {
     "../source",
@@ -31,11 +39,6 @@ package.includepaths = {
     "../source/vsti",
     "/usr/include",
     "../../../sdks/vstsdk2.4"
-}
-
-package.libpaths = {
-    "/usr/lib",
-    "../../../libs"
 }
 
 package.files = {

@@ -13,12 +13,12 @@ ifeq ($(CONFIG),Release)
   LIBDIR := ../..
   OBJDIR := intermediate/Release
   OUTDIR := ../..
-  CPPFLAGS := $(DEPFLAGS) -D "LINUX=1" -D "NDEBUG=1" -I "." -I "/usr/include" -I "/usr/include/freetype2"
-  CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -O2 -O2 -march=native -msse -ffast-math -fPIC
+  CPPFLAGS := $(DEPFLAGS) -D "LINUX=1" -D "NDEBUG=1" -I "."
+  CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -g -O3 `pkg-config --cflags freetype2` -O2 -mtune=generic -ffast-math -fomit-frame-pointer -fvisibility=hidden -fPIC
   CXXFLAGS += $(CFLAGS)
-  LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -s -L"/usr/X11R6/lib/" -L"/usr/lib/" -L"../.." -lfreetype -lpthread -lasound -lrt -lX11 -lXext
+  LDFLAGS += -L$(BINDIR) -L$(LIBDIR)
   LDDEPS :=
-  RESFLAGS := -D "LINUX=1" -D "NDEBUG=1" -I "." -I "/usr/include" -I "/usr/include/freetype2"
+  RESFLAGS := -D "LINUX=1" -D "NDEBUG=1" -I "."
   TARGET := libjuce-standalone-153.a
  BLDCMD = ar -rcs $(OUTDIR)/$(TARGET) $(OBJECTS) $(TARGET_ARCH)
 endif
@@ -28,12 +28,12 @@ ifeq ($(CONFIG),Debug)
   LIBDIR := ../..
   OBJDIR := intermediate/Debug
   OUTDIR := ../..
-  CPPFLAGS := $(DEPFLAGS) -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -I "." -I "/usr/include" -I "/usr/include/freetype2"
-  CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -g -O0 -ggdb -fPIC
+  CPPFLAGS := $(DEPFLAGS) -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -I "."
+  CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -g `pkg-config --cflags freetype2` -O0 -ggdb -fPIC
   CXXFLAGS += $(CFLAGS)
-  LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -L"/usr/X11R6/lib/" -L"/usr/lib/" -L"../.." -lfreetype -lpthread -lasound -lrt -lX11 -lXext
+  LDFLAGS += -L$(BINDIR) -L$(LIBDIR)
   LDDEPS :=
-  RESFLAGS := -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -I "." -I "/usr/include" -I "/usr/include/freetype2"
+  RESFLAGS := -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -I "."
   TARGET := libjuce-standalone-153_debug.a
  BLDCMD = ar -rcs $(OUTDIR)/$(TARGET) $(OBJECTS) $(TARGET_ARCH)
 endif
@@ -295,21 +295,6 @@ OBJECTS := \
 	$(OBJDIR)/juce_Random.o \
 	$(OBJDIR)/juce_MemoryBlock.o \
 	$(OBJDIR)/juce_posix_NamedPipe.o \
-	$(OBJDIR)/juce_linux_Audio.o \
-	$(OBJDIR)/juce_linux_AudioCDReader.o \
-	$(OBJDIR)/juce_linux_Clipboard.o \
-	$(OBJDIR)/juce_linux_FileChooser.o \
-	$(OBJDIR)/juce_linux_Files.o \
-	$(OBJDIR)/juce_linux_Fonts.o \
-	$(OBJDIR)/juce_linux_JackAudio.o \
-	$(OBJDIR)/juce_linux_Messaging.o \
-	$(OBJDIR)/juce_linux_Midi.o \
-	$(OBJDIR)/juce_linux_NativeCode.o \
-	$(OBJDIR)/juce_linux_Network.o \
-	$(OBJDIR)/juce_linux_SystemStats.o \
-	$(OBJDIR)/juce_linux_Threads.o \
-	$(OBJDIR)/juce_linux_WebBrowserComponent.o \
-	$(OBJDIR)/juce_linux_Windowing.o \
 	$(OBJDIR)/juce_CharacterFunctions.o \
 	$(OBJDIR)/juce_Identifier.o \
 	$(OBJDIR)/juce_JSON.o \
@@ -330,6 +315,21 @@ OBJECTS := \
 	$(OBJDIR)/juce_RecentlyOpenedFilesList.o \
 	$(OBJDIR)/juce_UndoManager.o \
 	$(OBJDIR)/juce_UnitTest.o \
+	$(OBJDIR)/juce_linux_Audio.o \
+	$(OBJDIR)/juce_linux_AudioCDReader.o \
+	$(OBJDIR)/juce_linux_Clipboard.o \
+	$(OBJDIR)/juce_linux_FileChooser.o \
+	$(OBJDIR)/juce_linux_Files.o \
+	$(OBJDIR)/juce_linux_Fonts.o \
+	$(OBJDIR)/juce_linux_JackAudio.o \
+	$(OBJDIR)/juce_linux_Messaging.o \
+	$(OBJDIR)/juce_linux_Midi.o \
+	$(OBJDIR)/juce_linux_NativeCode.o \
+	$(OBJDIR)/juce_linux_Network.o \
+	$(OBJDIR)/juce_linux_SystemStats.o \
+	$(OBJDIR)/juce_linux_Threads.o \
+	$(OBJDIR)/juce_linux_WebBrowserComponent.o \
+	$(OBJDIR)/juce_linux_Windowing.o \
 
 MKDIR_TYPE := msdos
 CMD := $(subst \,\\,$(ComSpec)$(COMSPEC))
@@ -1651,81 +1651,6 @@ $(OBJDIR)/juce_posix_NamedPipe.o: ../source/src/native/common/juce_posix_NamedPi
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
-$(OBJDIR)/juce_linux_Audio.o: ../source/src/native/linux/juce_linux_Audio.cpp
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/juce_linux_AudioCDReader.o: ../source/src/native/linux/juce_linux_AudioCDReader.cpp
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/juce_linux_Clipboard.o: ../source/src/native/linux/juce_linux_Clipboard.cpp
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/juce_linux_FileChooser.o: ../source/src/native/linux/juce_linux_FileChooser.cpp
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/juce_linux_Files.o: ../source/src/native/linux/juce_linux_Files.cpp
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/juce_linux_Fonts.o: ../source/src/native/linux/juce_linux_Fonts.cpp
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/juce_linux_JackAudio.o: ../source/src/native/linux/juce_linux_JackAudio.cpp
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/juce_linux_Messaging.o: ../source/src/native/linux/juce_linux_Messaging.cpp
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/juce_linux_Midi.o: ../source/src/native/linux/juce_linux_Midi.cpp
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/juce_linux_NativeCode.o: ../source/src/native/linux/juce_linux_NativeCode.cpp
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/juce_linux_Network.o: ../source/src/native/linux/juce_linux_Network.cpp
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/juce_linux_SystemStats.o: ../source/src/native/linux/juce_linux_SystemStats.cpp
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/juce_linux_Threads.o: ../source/src/native/linux/juce_linux_Threads.cpp
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/juce_linux_WebBrowserComponent.o: ../source/src/native/linux/juce_linux_WebBrowserComponent.cpp
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/juce_linux_Windowing.o: ../source/src/native/linux/juce_linux_Windowing.cpp
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
 $(OBJDIR)/juce_CharacterFunctions.o: ../source/src/text/juce_CharacterFunctions.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
@@ -1822,6 +1747,81 @@ $(OBJDIR)/juce_UndoManager.o: ../source/src/utilities/juce_UndoManager.cpp
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
 $(OBJDIR)/juce_UnitTest.o: ../source/src/utilities/juce_UnitTest.cpp
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/juce_linux_Audio.o: ../source/src/native/linux/juce_linux_Audio.cpp
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/juce_linux_AudioCDReader.o: ../source/src/native/linux/juce_linux_AudioCDReader.cpp
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/juce_linux_Clipboard.o: ../source/src/native/linux/juce_linux_Clipboard.cpp
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/juce_linux_FileChooser.o: ../source/src/native/linux/juce_linux_FileChooser.cpp
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/juce_linux_Files.o: ../source/src/native/linux/juce_linux_Files.cpp
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/juce_linux_Fonts.o: ../source/src/native/linux/juce_linux_Fonts.cpp
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/juce_linux_JackAudio.o: ../source/src/native/linux/juce_linux_JackAudio.cpp
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/juce_linux_Messaging.o: ../source/src/native/linux/juce_linux_Messaging.cpp
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/juce_linux_Midi.o: ../source/src/native/linux/juce_linux_Midi.cpp
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/juce_linux_NativeCode.o: ../source/src/native/linux/juce_linux_NativeCode.cpp
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/juce_linux_Network.o: ../source/src/native/linux/juce_linux_Network.cpp
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/juce_linux_SystemStats.o: ../source/src/native/linux/juce_linux_SystemStats.cpp
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/juce_linux_Threads.o: ../source/src/native/linux/juce_linux_Threads.cpp
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/juce_linux_WebBrowserComponent.o: ../source/src/native/linux/juce_linux_WebBrowserComponent.cpp
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/juce_linux_Windowing.o: ../source/src/native/linux/juce_linux_Windowing.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"

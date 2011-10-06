@@ -13,13 +13,13 @@ ifeq ($(CONFIG),Release)
   LIBDIR := ../../../bin
   OBJDIR := intermediate/Release
   OUTDIR := ../../../bin
-  CPPFLAGS := $(DEPFLAGS) -D "LINUX=1" -D "NDEBUG=1" -D "JUCE_USE_VSTSDK_2_4=1" -D "JucePlugin_Build_VST=1" -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_Standalone=0" -I "../source" -I "/usr/include" -I "/usr/include/freetype2" -I "../../../libs/juce-153/plugin" -I "../../../libs/juce-153/source" -I "../../../sdks/vstsdk2.4" -I "."
-  CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -fPIC -O2 -O2 -march=native -msse -ffast-math -fvisibility=hidden -static
+  CPPFLAGS := $(DEPFLAGS) -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=0" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=1" -D "JucePlugin_Build_Standalone=0" -D "JUCE_USE_VSTSDK_2_4=1" -D "LINUX=1" -D "NDEBUG=1" -I "../source" -I "." -I "../../../libs/juce-153/plugin" -I "../../../libs/juce-153/source" -I "../../../sdks/vstsdk2.4"
+  CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -fPIC -O3 `pkg-config --cflags freetype2` -O2 -mtune=generic -ffast-math -fomit-frame-pointer -fvisibility=hidden -fPIC
   CXXFLAGS += $(CFLAGS)
-  LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -shared -s -L"/usr/X11R6/lib" -L"/usr/lib" -L"../../../libs" -lfreetype -lpthread -lrt -lX11 -lXext -ljuce-plugin-153
+  LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -shared -s `pkg-config --libs freetype2` -Wl,-O1 -Wl,--as-needed -L"../../../libs" -lfreetype -lpthread -lrt -lX11 -lXext -ljuce-plugin-153
   LDDEPS :=
-  RESFLAGS := -D "LINUX=1" -D "NDEBUG=1" -D "JUCE_USE_VSTSDK_2_4=1" -D "JucePlugin_Build_VST=1" -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_Standalone=0" -I "../source" -I "/usr/include" -I "/usr/include/freetype2" -I "../../../libs/juce-153/plugin" -I "../../../libs/juce-153/source" -I "../../../sdks/vstsdk2.4" -I "."
-  TARGET := libTAL-Reverb-2.so
+  RESFLAGS := -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=0" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=1" -D "JucePlugin_Build_Standalone=0" -D "JUCE_USE_VSTSDK_2_4=1" -D "LINUX=1" -D "NDEBUG=1" -I "../source" -I "." -I "../../../libs/juce-153/plugin" -I "../../../libs/juce-153/source" -I "../../../sdks/vstsdk2.4"
+  TARGET := TAL-Reverb-2.so
  BLDCMD = $(CXX) -o $(OUTDIR)/$(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(TARGET_ARCH)
 endif
 
@@ -28,13 +28,13 @@ ifeq ($(CONFIG),Debug)
   LIBDIR := ../../../bin
   OBJDIR := intermediate/Debug
   OUTDIR := ../../../bin
-  CPPFLAGS := $(DEPFLAGS) -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -D "JUCE_USE_VSTSDK_2_4=1" -D "JucePlugin_Build_VST=1" -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_Standalone=0" -I "../source" -I "/usr/include" -I "/usr/include/freetype2" -I "../../../libs/juce-153/plugin" -I "../../../libs/juce-153/source" -I "../../../sdks/vstsdk2.4" -I "."
-  CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -fPIC -g -O0 -ggdb -static
+  CPPFLAGS := $(DEPFLAGS) -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=0" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=1" -D "JucePlugin_Build_Standalone=0" -D "JUCE_USE_VSTSDK_2_4=1" -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -I "../source" -I "." -I "../../../libs/juce-153/plugin" -I "../../../libs/juce-153/source" -I "../../../sdks/vstsdk2.4"
+  CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -fPIC -g `pkg-config --cflags freetype2` -O0 -ggdb -fPIC
   CXXFLAGS += $(CFLAGS)
-  LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -shared -L"/usr/X11R6/lib" -L"/usr/lib" -L"../../../libs" -lfreetype -lpthread -lrt -lX11 -lXext -ljuce-plugin-153_debug
+  LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -shared `pkg-config --libs freetype2` -L"../../../libs" -lfreetype -lpthread -lrt -lX11 -lXext -ljuce-plugin-153_debug
   LDDEPS :=
-  RESFLAGS := -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -D "JUCE_USE_VSTSDK_2_4=1" -D "JucePlugin_Build_VST=1" -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_Standalone=0" -I "../source" -I "/usr/include" -I "/usr/include/freetype2" -I "../../../libs/juce-153/plugin" -I "../../../libs/juce-153/source" -I "../../../sdks/vstsdk2.4" -I "."
-  TARGET := libTAL-Reverb-2_debug.so
+  RESFLAGS := -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=0" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=1" -D "JucePlugin_Build_Standalone=0" -D "JUCE_USE_VSTSDK_2_4=1" -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -I "../source" -I "." -I "../../../libs/juce-153/plugin" -I "../../../libs/juce-153/source" -I "../../../sdks/vstsdk2.4"
+  TARGET := TAL-Reverb-2_debug.so
  BLDCMD = $(CXX) -o $(OUTDIR)/$(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(TARGET_ARCH)
 endif
 

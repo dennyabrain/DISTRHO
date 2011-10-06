@@ -5,28 +5,38 @@ all: build
 
 build: libs plugins
 
-plugins: standalone lv2 vst
+libs: libs_standalone libs_plugin libs_lv2
 
-libs:
-	# Libs
+
+libs_standalone:
 	$(MAKE) -C ../libs/juce-153/standalone
+
+libs_plugin:
 	$(MAKE) -C ../libs/juce-153/plugin
+
+libs_lv2:
 	$(MAKE) -C ../libs/juce-lv2
 
+
+plugins: standalone lv2 vst
+
 standalone:
-	$(MAKE) -C arctican-function/Standalone
-	$(MAKE) -C arctican-pilgrim/Standalone
-	$(MAKE) -C hybridreverb2/Standalone
-	$(MAKE) -C sDelay/Standalone
-	$(MAKE) -C tal-dub-3-juce/Standalone
-	$(MAKE) -C tal-filter-juce/Standalone
-	$(MAKE) -C tal-filter-2-juce/Standalone
-	$(MAKE) -C tal-noisemaker-juce/Standalone
-	$(MAKE) -C tal-reverb-juce/Standalone
-	$(MAKE) -C tal-reverb-2-juce/Standalone
-	$(MAKE) -C tal-reverb-3-juce/Standalone
-	$(MAKE) -C tal-vocoder-2-juce/Standalone
-	$(MAKE) -C wolpertinger/Standalone
+# 	$(MAKE) -C arctican-function/Standalone
+# 	$(MAKE) -C arctican-pilgrim/Standalone
+# 	$(MAKE) -C argotlunar/Standalone
+# 	$(MAKE) -C hybridreverb2/Standalone
+# 	$(MAKE) -C juce_pitcher/Standalone
+# 	$(MAKE) -C sDelay/Standalone
+# 	$(MAKE) -C sorollet/Standalone
+# 	$(MAKE) -C tal-dub-3-juce/Standalone
+# 	$(MAKE) -C tal-filter-juce/Standalone
+# 	$(MAKE) -C tal-filter-2-juce/Standalone
+# 	$(MAKE) -C tal-noisemaker-juce/Standalone
+# 	$(MAKE) -C tal-reverb-juce/Standalone
+# 	$(MAKE) -C tal-reverb-2-juce/Standalone
+# 	$(MAKE) -C tal-reverb-3-juce/Standalone
+# 	$(MAKE) -C tal-vocoder-2-juce/Standalone
+# 	$(MAKE) -C wolpertinger/Standalone
 
 lv2:
 # 	$(MAKE) -C arctican-function/LV2
@@ -50,9 +60,11 @@ lv2:
 vst:
 	$(MAKE) -C arctican-function/VST
 	$(MAKE) -C arctican-pilgrim/VST
-	$(MAKE) -C huit/VST
+	$(MAKE) -C argotlunar/VST
 	$(MAKE) -C hybridreverb2/VST
+	$(MAKE) -C juce_pitcher/VST
 	$(MAKE) -C sDelay/VST
+	$(MAKE) -C sorollet/VST
 	$(MAKE) -C tal-dub-3-juce/VST
 	$(MAKE) -C tal-filter-juce/VST
 	$(MAKE) -C tal-filter-2-juce/VST
@@ -65,19 +77,19 @@ vst:
 
 clean:
 	# Standalone
-	$(MAKE) clean -C arctican-function/Standalone
-	$(MAKE) clean -C arctican-pilgrim/Standalone
-	$(MAKE) clean -C hybridreverb2/Standalone
-	$(MAKE) clean -C sDelay/Standalone
-	$(MAKE) clean -C tal-dub-3-juce/Standalone
-	$(MAKE) clean -C tal-filter-juce/Standalone
-	$(MAKE) clean -C tal-filter-2-juce/Standalone
-	$(MAKE) clean -C tal-noisemaker-juce/Standalone
-	$(MAKE) clean -C tal-reverb-juce/Standalone
-	$(MAKE) clean -C tal-reverb-2-juce/Standalone
-	$(MAKE) clean -C tal-reverb-3-juce/Standalone
-	$(MAKE) clean -C tal-vocoder-2-juce/Standalone
-	$(MAKE) clean -C wolpertinger/Standalone
+# 	$(MAKE) clean -C arctican-function/Standalone
+# 	$(MAKE) clean -C arctican-pilgrim/Standalone
+# 	$(MAKE) clean -C hybridreverb2/Standalone
+# 	$(MAKE) clean -C sDelay/Standalone
+# 	$(MAKE) clean -C tal-dub-3-juce/Standalone
+# 	$(MAKE) clean -C tal-filter-juce/Standalone
+# 	$(MAKE) clean -C tal-filter-2-juce/Standalone
+# 	$(MAKE) clean -C tal-noisemaker-juce/Standalone
+# 	$(MAKE) clean -C tal-reverb-juce/Standalone
+# 	$(MAKE) clean -C tal-reverb-2-juce/Standalone
+# 	$(MAKE) clean -C tal-reverb-3-juce/Standalone
+# 	$(MAKE) clean -C tal-vocoder-2-juce/Standalone
+# 	$(MAKE) clean -C wolpertinger/Standalone
 
 	# LV2
 # 	$(MAKE) clean -C arctican-function/LV2
@@ -99,9 +111,11 @@ clean:
 	# VST
 	$(MAKE) clean -C arctican-function/VST
 	$(MAKE) clean -C arctican-pilgrim/VST
-	$(MAKE) clean -C huit/VST
+	$(MAKE) clean -C argotlunar/VST
 	$(MAKE) clean -C hybridreverb2/VST
+	$(MAKE) clean -C juce_pitcher/VST
 	$(MAKE) clean -C sDelay/VST
+	$(MAKE) clean -C sorollet/VST
 	$(MAKE) clean -C tal-dub-3-juce/VST
 	$(MAKE) clean -C tal-filter-juce/VST
 	$(MAKE) clean -C tal-filter-2-juce/VST
