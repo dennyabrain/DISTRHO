@@ -9,17 +9,17 @@ endif
 
 export CONFIG
 
-.PHONY: all clean Wolpertinger
+.PHONY: all clean ThePilgrim
 
-all: Wolpertinger
+all: ThePilgrim
 
 Makefile: premake.lua
 	@echo ==== Regenerating Makefiles ====
 	@premake --file $^ --os linux --target gnu --cc gcc
 
-Wolpertinger:
-	@echo ==== Building Wolpertinger ====
-	@$(MAKE) --no-print-directory -C . -f Wolpertinger.make
+ThePilgrim:
+	@echo ==== Building ThePilgrim ====
+	@$(MAKE) --no-print-directory -C . -f ThePilgrim.make
 
 clean:
-	@$(MAKE) --no-print-directory -C . -f Wolpertinger.make clean
+	@$(MAKE) --no-print-directory -C . -f ThePilgrim.make clean

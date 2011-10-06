@@ -41,7 +41,6 @@ end
 
 package.includepaths = {
     "../source",
-    "../source/soundtouch",
     "../../../libs/juce-153/plugin",
     "../../../libs/juce-153/source",
     "../../../sdks/vstsdk2.4"

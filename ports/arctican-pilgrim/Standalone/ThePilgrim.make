@@ -13,13 +13,13 @@ ifeq ($(CONFIG),Release)
   LIBDIR := ../../../bin
   OBJDIR := intermediate/Release
   OUTDIR := ../../../bin
-  CPPFLAGS := $(DEPFLAGS) -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=0" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_Standalone=1" -D "LINUX=1" -D "NDEBUG=1" -I "../source" -I "../source/Engine" -I "." -I "./intermediate" -I "./intermediate/Release" -I "../../../libs/juce-153/standalone" -I "../../../libs/juce-153/source"
+  CPPFLAGS := $(DEPFLAGS) -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=0" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_Standalone=1" -D "LINUX=1" -D "NDEBUG=1" -I "../source" -I "../../../libs/juce-153/standalone" -I "../../../libs/juce-153/source"
   CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -O3 `pkg-config --cflags freetype2` -O2 -mtune=generic -ffast-math -fomit-frame-pointer -fvisibility=hidden -fPIC
   CXXFLAGS += $(CFLAGS)
   LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -s `pkg-config --libs freetype2` -Wl,-O1 -Wl,--as-needed -L"../../../libs" -lfreetype -lpthread -lasound -ldl -lrt -lX11 -lXext -ljuce-standalone-153
   LDDEPS :=
-  RESFLAGS := -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=0" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_Standalone=1" -D "LINUX=1" -D "NDEBUG=1" -I "../source" -I "../source/Engine" -I "." -I "./intermediate" -I "./intermediate/Release" -I "../../../libs/juce-153/standalone" -I "../../../libs/juce-153/source"
-  TARGET := TAL-NoiseMaker
+  RESFLAGS := -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=0" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_Standalone=1" -D "LINUX=1" -D "NDEBUG=1" -I "../source" -I "../../../libs/juce-153/standalone" -I "../../../libs/juce-153/source"
+  TARGET := ThePilgrim
  BLDCMD = $(CXX) -o $(OUTDIR)/$(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(TARGET_ARCH)
 endif
 
@@ -28,20 +28,22 @@ ifeq ($(CONFIG),Debug)
   LIBDIR := ../../../bin
   OBJDIR := intermediate/Debug
   OUTDIR := ../../../bin
-  CPPFLAGS := $(DEPFLAGS) -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=0" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_Standalone=1" -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -I "../source" -I "../source/Engine" -I "." -I "./intermediate" -I "./intermediate/Release" -I "../../../libs/juce-153/standalone" -I "../../../libs/juce-153/source"
+  CPPFLAGS := $(DEPFLAGS) -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=0" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_Standalone=1" -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -I "../source" -I "../../../libs/juce-153/standalone" -I "../../../libs/juce-153/source"
   CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -g `pkg-config --cflags freetype2` -O0 -ggdb -fPIC
   CXXFLAGS += $(CFLAGS)
   LDFLAGS += -L$(BINDIR) -L$(LIBDIR) `pkg-config --libs freetype2` -L"../../../libs" -lfreetype -lpthread -lasound -ldl -lrt -lX11 -lXext -ljuce-standalone-153_debug
   LDDEPS :=
-  RESFLAGS := -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=0" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_Standalone=1" -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -I "../source" -I "../source/Engine" -I "." -I "./intermediate" -I "./intermediate/Release" -I "../../../libs/juce-153/standalone" -I "../../../libs/juce-153/source"
-  TARGET := TAL-NoiseMaker_debug
+  RESFLAGS := -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=0" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_Standalone=1" -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -I "../source" -I "../../../libs/juce-153/standalone" -I "../../../libs/juce-153/source"
+  TARGET := ThePilgrim_debug
  BLDCMD = $(CXX) -o $(OUTDIR)/$(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(TARGET_ARCH)
 endif
 
 OBJECTS := \
-	$(OBJDIR)/TalComponent.o \
-	$(OBJDIR)/TalCore.o \
-	$(OBJDIR)/Lfo.o \
+	$(OBJDIR)/PluginEditor.o \
+	$(OBJDIR)/PluginProcessor.o \
+	$(OBJDIR)/Knob.o \
+	$(OBJDIR)/thepilgrimbackground.o \
+	$(OBJDIR)/knobs.o \
 	$(OBJDIR)/juce_StandaloneFilterWindow.o \
 	$(OBJDIR)/juce_StandaloneFilterApplication.o \
 
@@ -68,14 +70,14 @@ endif
 .PHONY: clean
 
 $(OUTDIR)/$(TARGET): $(OBJECTS) $(LDDEPS) $(RESOURCES)
-	@echo Linking TAL-NoiseMaker
+	@echo Linking ThePilgrim
 	-@$(CMD_MKBINDIR)
 	-@$(CMD_MKLIBDIR)
 	-@$(CMD_MKOUTDIR)
 	@$(BLDCMD)
 
 clean:
-	@echo Cleaning TAL-NoiseMaker
+	@echo Cleaning ThePilgrim
 ifeq ($(MKDIR_TYPE),posix)
 	-@rm -f $(OUTDIR)/$(TARGET)
 	-@rm -rf $(OBJDIR)
@@ -85,17 +87,27 @@ else
 	-@if exist $(subst /,\,$(OBJDIR)) rmdir /s /q $(subst /,\,$(OBJDIR))
 endif
 
-$(OBJDIR)/TalComponent.o: ../source/TalComponent.cpp
+$(OBJDIR)/PluginEditor.o: ../source/PluginEditor.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
-$(OBJDIR)/TalCore.o: ../source/TalCore.cpp
+$(OBJDIR)/PluginProcessor.o: ../source/PluginProcessor.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
-$(OBJDIR)/Lfo.o: ../source/Engine/Lfo.cpp
+$(OBJDIR)/Knob.o: ../source/Headers/UI/Knob.cpp
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/thepilgrimbackground.o: ../source/Headers/Binary\ Data/Backgrounds/thepilgrimbackground.cpp
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/knobs.o: ../source/Headers/Binary\ Data/UI/knobs.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
