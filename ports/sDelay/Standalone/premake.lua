@@ -13,12 +13,12 @@ package.linkflags = { "static-runtime" }
 package.config["Release"].target       = project.name
 package.config["Release"].objdir       = "intermediate/Release"
 package.config["Release"].buildoptions = { "-O2 -march=native -msse -ffast-math -fvisibility=hidden -static" }
-package.config["Release"].links        = { "freetype", "pthread", "asound", "rt", "X11", "Xext", "juce-standalone-153" }
+package.config["Release"].links        = { "freetype", "pthread", "asound", "dl", "rt", "X11", "Xext", "juce-standalone-153" }
 
 package.config["Debug"].target         = project.name .. "_debug"
 package.config["Debug"].objdir         = "intermediate/Debug"
 package.config["Debug"].buildoptions   = { "-O0 -ggdb -static" }
-package.config["Debug"].links          = { "freetype", "pthread", "asound", "rt", "X11", "Xext", "juce-standalone-153_debug" }
+package.config["Debug"].links          = { "freetype", "pthread", "asound", "dl", "rt", "X11", "Xext", "juce-standalone-153_debug" }
 
 -- TODO: Check for OS
 package.config["Release"].defines      = { "LINUX=1", "NDEBUG=1", "JucePlugin_Build_VST=0", "JucePlugin_Build_AU=0", "JucePlugin_Build_RTAS=0", "JucePlugin_Build_Standalone=1" };

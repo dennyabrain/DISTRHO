@@ -16,7 +16,7 @@ ifeq ($(CONFIG),Release)
   CPPFLAGS := $(DEPFLAGS) -D "LINUX=1" -D "NDEBUG=1" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_Standalone=1" -I "../source" -I "/usr/include" -I "/usr/include/freetype2" -I "../../../libs/juce-153/standalone" -I "../../../libs/juce-153/source"
   CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -O2 -O2 -march=native -msse -ffast-math -fvisibility=hidden -static
   CXXFLAGS += $(CFLAGS)
-  LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -s -L"/usr/X11R6/lib" -L"/usr/lib" -L"../../../libs" -lfreetype -lpthread -lasound -lrt -lX11 -lXext -ljuce-standalone-153
+  LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -s -L"/usr/X11R6/lib" -L"/usr/lib" -L"../../../libs" -lfreetype -lpthread -lasound -ldl -lrt -lX11 -lXext -ljuce-standalone-153
   LDDEPS :=
   RESFLAGS := -D "LINUX=1" -D "NDEBUG=1" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_Standalone=1" -I "../source" -I "/usr/include" -I "/usr/include/freetype2" -I "../../../libs/juce-153/standalone" -I "../../../libs/juce-153/source"
   TARGET := sDelay
@@ -31,7 +31,7 @@ ifeq ($(CONFIG),Debug)
   CPPFLAGS := $(DEPFLAGS) -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_Standalone=1" -I "../source" -I "/usr/include" -I "/usr/include/freetype2" -I "../../../libs/juce-153/standalone" -I "../../../libs/juce-153/source"
   CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -g -O0 -ggdb -static
   CXXFLAGS += $(CFLAGS)
-  LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -L"/usr/X11R6/lib" -L"/usr/lib" -L"../../../libs" -lfreetype -lpthread -lasound -lrt -lX11 -lXext -ljuce-standalone-153_debug
+  LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -L"/usr/X11R6/lib" -L"/usr/lib" -L"../../../libs" -lfreetype -lpthread -lasound -ldl -lrt -lX11 -lXext -ljuce-standalone-153_debug
   LDDEPS :=
   RESFLAGS := -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_Standalone=1" -I "../source" -I "/usr/include" -I "/usr/include/freetype2" -I "../../../libs/juce-153/standalone" -I "../../../libs/juce-153/source"
   TARGET := sDelay_debug

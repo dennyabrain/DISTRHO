@@ -40,10 +40,10 @@ sDelayEditorComponent::sDelayEditorComponent (DemoJuceFilter* const ownerFilter)
       label3 (0),
       label4 (0)
 {
-    addAndMakeVisible (slider = new Slider (T("new slider")));
+    addAndMakeVisible (slider = new Slider (T("delay slider")));
     slider->setRange (0, 3000, 1);
     slider->setSliderStyle (Slider::RotaryVerticalDrag);
-    slider->setTextBoxStyle (Slider::TextBoxBelow, false, 30, 20);
+    slider->setTextBoxStyle (Slider::TextBoxBelow, false, 40, 20);
     slider->addListener (this);
 
     addAndMakeVisible (feedSlider = new Slider (T("feedback slider")));
@@ -68,7 +68,7 @@ sDelayEditorComponent::sDelayEditorComponent (DemoJuceFilter* const ownerFilter)
     label->setColour (TextEditor::backgroundColourId, Colour (0x0));
 
     addAndMakeVisible (label2 = new Label (T("new label"),
-                                           T("Delay \n (ms)")));
+                                           T("Delay")));
     label2->setFont (Font (T("Arial Black"), 15.0000f, Font::plain));
     label2->setJustificationType (Justification::centredLeft);
     label2->setEditable (false, false, false);
