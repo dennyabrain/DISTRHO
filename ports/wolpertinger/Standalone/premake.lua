@@ -17,9 +17,9 @@ package.links      = { "freetype", "pthread", "asound", "dl", "rt", "m", "X11", 
 package.config["Release"].target       = project.name
 package.config["Release"].objdir       = "intermediate/Release"
 package.config["Release"].defines      = { "NDEBUG=1", "CONFIGURATION=\"Release\"" };
-package.config["Release"].buildoptions = { "-O2 -mtune=generic -ffast-math -fomit-frame-pointer -fvisibility=hidden -fPIC" }
+package.config["Release"].buildoptions = { "-O2 -mtune=generic -msse -ffast-math -fomit-frame-pointer -fvisibility=hidden -fPIC" }
 package.config["Release"].buildflags   = { "no-symbols", "optimize-speed" }
-package.config["Release"].linkoptions  = { "-Wl,-O1 -Wl,--as-needed" }
+-- package.config["Release"].linkoptions  = { "-Wl,-O1 -Wl,--as-needed" }
 package.config["Release"].links        = { "juce-standalone-153" }
 
 package.config["Debug"].target         = project.name .. "_debug"
@@ -34,8 +34,8 @@ elseif (macosx) then
   package.defines = { package.defines, "MAC=1", "BINTYPE=\"Mac-VST\"" };
 else
   package.defines = { package.defines, "LINUX=1", "BINTYPE=\"Linux-VST\"" };
-  package.buildoptions = { package.buildoptions, "`pkg-config --cflags freetype2`" }
-  package.linkoptions  = { package.linkoptions, "`pkg-config --libs freetype2`" }
+  package.buildoptions = { "`pkg-config --cflags freetype2`" }
+  package.linkoptions  = { "`pkg-config --libs freetype2`" }
 end
 
 package.includepaths = {

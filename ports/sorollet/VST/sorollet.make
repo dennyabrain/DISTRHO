@@ -14,9 +14,9 @@ ifeq ($(CONFIG),Release)
   OBJDIR := intermediate/Release
   OUTDIR := ../../../bin
   CPPFLAGS := $(DEPFLAGS) -D "LINUX=1" -D "NDEBUG=1" -I "../source" -I "../source/core" -I "../source/sys" -I "../source/vsti" -I "/usr/include" -I "../../../sdks/vstsdk2.4"
-  CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -fPIC -O3 -O2 -mtune=generic -ffast-math -fomit-frame-pointer -fvisibility=hidden -fPIC
+  CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -fPIC -O3 -O2 -mtune=generic -msse -ffast-math -fomit-frame-pointer -fvisibility=hidden -fPIC
   CXXFLAGS += $(CFLAGS)
-  LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -shared -s -Wl,-O1 -Wl,--as-needed
+  LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -shared -s
   LDDEPS :=
   RESFLAGS := -D "LINUX=1" -D "NDEBUG=1" -I "../source" -I "../source/core" -I "../source/sys" -I "../source/vsti" -I "/usr/include" -I "../../../sdks/vstsdk2.4"
   TARGET := sorollet.so

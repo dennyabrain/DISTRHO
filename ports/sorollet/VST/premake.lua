@@ -15,9 +15,9 @@ package.linkflags  = { "no-symbols", "static-runtime" }
 package.config["Release"].target       = project.name
 package.config["Release"].objdir       = "intermediate/Release"
 package.config["Release"].defines      = { "NDEBUG=1" };
-package.config["Release"].buildoptions = { "-O2 -mtune=generic -ffast-math -fomit-frame-pointer -fvisibility=hidden -fPIC" }
+package.config["Release"].buildoptions = { "-O2 -mtune=generic -msse -ffast-math -fomit-frame-pointer -fvisibility=hidden -fPIC" }
 package.config["Release"].buildflags   = { "no-symbols", "optimize-speed" }
-package.config["Release"].linkoptions  = { "-Wl,-O1 -Wl,--as-needed" }
+-- package.config["Release"].linkoptions  = { "-Wl,-O1 -Wl,--as-needed" }
 
 package.config["Debug"].target         = project.name .. "_debug"
 package.config["Debug"].objdir         = "intermediate/Debug"

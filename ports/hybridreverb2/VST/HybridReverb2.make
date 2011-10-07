@@ -14,9 +14,9 @@ ifeq ($(CONFIG),Release)
   OBJDIR := intermediate/Release
   OUTDIR := ../../../bin
   CPPFLAGS := $(DEPFLAGS) -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=0" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=1" -D "JucePlugin_Build_Standalone=0" -D "JUCE_USE_VSTSDK_2_4=1" -D "LINUX=1" -D "NDEBUG=1" -I "../source" -I "../../../libs/juce-153/plugin" -I "../../../libs/juce-153/source" -I "../../../sdks/vstsdk2.4"
-  CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -fPIC -O3 `pkg-config --cflags freetype2` -O2 -mtune=generic -ffast-math -fomit-frame-pointer -funroll-loops -fopenmp -fvisibility=hidden -fPIC `pkg-config fftw3f --cflags`
+  CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -fPIC -O3 `pkg-config --cflags freetype2` -O2 -mtune=generic -msse -ffast-math -fomit-frame-pointer -funroll-loops -fopenmp -fvisibility=hidden -fPIC `pkg-config fftw3f --cflags`
   CXXFLAGS += $(CFLAGS)
-  LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -shared -s `pkg-config fftw3f --libs` `pkg-config --libs freetype2` -Wl,-O1 -Wl,--as-needed -L"../../../libs" -lfreetype -lpthread -lrt -lX11 -lXext -lgomp -ljuce-plugin-153
+  LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -shared -s `pkg-config --libs freetype2` -L"../../../libs" -lfreetype -lpthread -lrt -lX11 -lXext -lgomp -ljuce-plugin-153
   LDDEPS :=
   RESFLAGS := -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=0" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=1" -D "JucePlugin_Build_Standalone=0" -D "JUCE_USE_VSTSDK_2_4=1" -D "LINUX=1" -D "NDEBUG=1" -I "../source" -I "../../../libs/juce-153/plugin" -I "../../../libs/juce-153/source" -I "../../../sdks/vstsdk2.4"
   TARGET := HybridReverb2.so
@@ -29,9 +29,9 @@ ifeq ($(CONFIG),Debug)
   OBJDIR := intermediate/Debug
   OUTDIR := ../../../bin
   CPPFLAGS := $(DEPFLAGS) -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=0" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=1" -D "JucePlugin_Build_Standalone=0" -D "JUCE_USE_VSTSDK_2_4=1" -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -I "../source" -I "../../../libs/juce-153/plugin" -I "../../../libs/juce-153/source" -I "../../../sdks/vstsdk2.4"
-  CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -fPIC -g `pkg-config --cflags freetype2` -O0 -ggdb -fPIC `pkg-config fftw3f --cflags`
+  CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -fPIC -g `pkg-config --cflags freetype2` -O0 -ggdb -msse -fPIC `pkg-config fftw3f --cflags`
   CXXFLAGS += $(CFLAGS)
-  LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -shared `pkg-config fftw3f --libs` `pkg-config --libs freetype2` -L"../../../libs" -lfreetype -lpthread -lrt -lX11 -lXext -lgomp -ljuce-plugin-153_debug
+  LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -shared `pkg-config --libs freetype2` -L"../../../libs" -lfreetype -lpthread -lrt -lX11 -lXext -lgomp -ljuce-plugin-153_debug
   LDDEPS :=
   RESFLAGS := -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=0" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=1" -D "JucePlugin_Build_Standalone=0" -D "JUCE_USE_VSTSDK_2_4=1" -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -I "../source" -I "../../../libs/juce-153/plugin" -I "../../../libs/juce-153/source" -I "../../../sdks/vstsdk2.4"
   TARGET := HybridReverb2_debug.so
