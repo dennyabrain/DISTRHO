@@ -39,27 +39,27 @@ ifeq ($(CONFIG),Debug)
 endif
 
 OBJECTS := \
-	$(OBJDIR)/HybridConvolver.o \
-	$(OBJDIR)/HybridConvolverDual.o \
-	$(OBJDIR)/HybridConvolverSingle.o \
-	$(OBJDIR)/HybridConvolverTripple.o \
-	$(OBJDIR)/HybridReverb2Processor.o \
-	$(OBJDIR)/LagrangeInterpolator.o \
-	$(OBJDIR)/MasterAndCommander.o \
 	$(OBJDIR)/Partitioner.o \
-	$(OBJDIR)/PresetManager.o \
 	$(OBJDIR)/SampleData.o \
+	$(OBJDIR)/HybridConvolverTripple.o \
 	$(OBJDIR)/SystemConfig.o \
+	$(OBJDIR)/LagrangeInterpolator.o \
+	$(OBJDIR)/HybridConvolverSingle.o \
 	$(OBJDIR)/TextList.o \
-	$(OBJDIR)/EditorComponent.o \
+	$(OBJDIR)/HybridConvolverDual.o \
+	$(OBJDIR)/PresetManager.o \
+	$(OBJDIR)/MasterAndCommander.o \
+	$(OBJDIR)/HybridConvolver.o \
+	$(OBJDIR)/HybridReverb2Processor.o \
+	$(OBJDIR)/TabMain.o \
 	$(OBJDIR)/FreqPlot.o \
+	$(OBJDIR)/TabTimbre.o \
+	$(OBJDIR)/TabModulation.o \
+	$(OBJDIR)/EditorComponent.o \
+	$(OBJDIR)/TabPresetEditor.o \
 	$(OBJDIR)/IRPlot.o \
 	$(OBJDIR)/TabAbout.o \
-	$(OBJDIR)/TabMain.o \
-	$(OBJDIR)/TabModulation.o \
 	$(OBJDIR)/TabPreferences.o \
-	$(OBJDIR)/TabPresetEditor.o \
-	$(OBJDIR)/TabTimbre.o \
 	$(OBJDIR)/libHybridConv.o \
 	$(OBJDIR)/juce_VST_Wrapper.o \
 
@@ -103,47 +103,7 @@ else
 	-@if exist $(subst /,\,$(OBJDIR)) rmdir /s /q $(subst /,\,$(OBJDIR))
 endif
 
-$(OBJDIR)/HybridConvolver.o: ../source/HybridConvolver.cpp
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/HybridConvolverDual.o: ../source/HybridConvolverDual.cpp
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/HybridConvolverSingle.o: ../source/HybridConvolverSingle.cpp
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/HybridConvolverTripple.o: ../source/HybridConvolverTripple.cpp
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/HybridReverb2Processor.o: ../source/HybridReverb2Processor.cpp
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/LagrangeInterpolator.o: ../source/LagrangeInterpolator.cpp
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/MasterAndCommander.o: ../source/MasterAndCommander.cpp
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
 $(OBJDIR)/Partitioner.o: ../source/Partitioner.cpp
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/PresetManager.o: ../source/PresetManager.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
@@ -153,7 +113,22 @@ $(OBJDIR)/SampleData.o: ../source/SampleData.cpp
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
+$(OBJDIR)/HybridConvolverTripple.o: ../source/HybridConvolverTripple.cpp
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
 $(OBJDIR)/SystemConfig.o: ../source/SystemConfig.cpp
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/LagrangeInterpolator.o: ../source/LagrangeInterpolator.cpp
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/HybridConvolverSingle.o: ../source/HybridConvolverSingle.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
@@ -163,12 +138,57 @@ $(OBJDIR)/TextList.o: ../source/TextList.cpp
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
-$(OBJDIR)/EditorComponent.o: ../source/gui/EditorComponent.cpp
+$(OBJDIR)/HybridConvolverDual.o: ../source/HybridConvolverDual.cpp
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/PresetManager.o: ../source/PresetManager.cpp
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/MasterAndCommander.o: ../source/MasterAndCommander.cpp
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/HybridConvolver.o: ../source/HybridConvolver.cpp
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/HybridReverb2Processor.o: ../source/HybridReverb2Processor.cpp
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/TabMain.o: ../source/gui/TabMain.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
 $(OBJDIR)/FreqPlot.o: ../source/gui/FreqPlot.cpp
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/TabTimbre.o: ../source/gui/TabTimbre.cpp
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/TabModulation.o: ../source/gui/TabModulation.cpp
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/EditorComponent.o: ../source/gui/EditorComponent.cpp
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/TabPresetEditor.o: ../source/gui/TabPresetEditor.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
@@ -183,27 +203,7 @@ $(OBJDIR)/TabAbout.o: ../source/gui/TabAbout.cpp
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
-$(OBJDIR)/TabMain.o: ../source/gui/TabMain.cpp
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/TabModulation.o: ../source/gui/TabModulation.cpp
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
 $(OBJDIR)/TabPreferences.o: ../source/gui/TabPreferences.cpp
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/TabPresetEditor.o: ../source/gui/TabPresetEditor.cpp
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/TabTimbre.o: ../source/gui/TabTimbre.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"

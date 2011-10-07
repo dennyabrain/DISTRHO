@@ -11,6 +11,7 @@
 .*.kate-swp
 
 bin/*
+debian
 intermediate
 juce_lv2_ttl_generator
 
