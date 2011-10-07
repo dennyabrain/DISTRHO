@@ -26,6 +26,7 @@ standalone:
 	$(MAKE) -C argotlunar/Standalone
 	$(MAKE) -C hybridreverb2/Standalone
 	$(MAKE) -C juce_pitcher/Standalone
+	$(MAKE) -C midilfo/Standalone
 	$(MAKE) -C sDelay/Standalone
 	$(MAKE) -C tal-dub-3-juce/Standalone
 	$(MAKE) -C tal-filter-juce/Standalone
@@ -81,6 +82,7 @@ clean:
 	$(MAKE) clean -C argotlunar/VST
 	$(MAKE) clean -C hybridreverb2/Standalone
 	$(MAKE) clean -C juce_pitcher/VST
+	$(MAKE) clean -C midilfo/Standalone
 	$(MAKE) clean -C sDelay/Standalone
 	$(MAKE) clean -C tal-dub-3-juce/Standalone
 	$(MAKE) clean -C tal-filter-juce/Standalone
