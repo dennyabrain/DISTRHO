@@ -14,9 +14,9 @@ ifeq ($(CONFIG),Release)
   OBJDIR := intermediate/Release
   OUTDIR := ../../../bin
   CPPFLAGS := $(DEPFLAGS) -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=0" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_Standalone=1" -D "LINUX=1" -D "NDEBUG=1" -I "../source" -I "../../../libs/juce-153/standalone" -I "../../../libs/juce-153/source"
-  CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -O3 `pkg-config --cflags freetype2` -O2 -mtune=generic -msse -ffast-math -fomit-frame-pointer -funroll-loops -fopenmp -fvisibility=hidden -fPIC `pkg-config fftw3f --cflags`
+  CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -O3 `pkg-config --cflags freetype2 fftw3f` -O2 -mtune=generic -msse -ffast-math -fomit-frame-pointer -funroll-loops -fopenmp -fvisibility=hidden -fPIC
   CXXFLAGS += $(CFLAGS)
-  LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -s `pkg-config --libs freetype2` -L"../../../libs" -lfreetype -lpthread -lasound -ldl -lrt -lX11 -lXext -lgomp -ljuce-standalone-153
+  LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -s `pkg-config --libs freetype2 fftw3f` -L"../../../libs" -lfreetype -lpthread -lasound -ldl -lrt -lX11 -lXext -lgomp -ljuce-standalone-153
   LDDEPS :=
   RESFLAGS := -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=0" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_Standalone=1" -D "LINUX=1" -D "NDEBUG=1" -I "../source" -I "../../../libs/juce-153/standalone" -I "../../../libs/juce-153/source"
   TARGET := HybridReverb2
@@ -29,9 +29,9 @@ ifeq ($(CONFIG),Debug)
   OBJDIR := intermediate/Debug
   OUTDIR := ../../../bin
   CPPFLAGS := $(DEPFLAGS) -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=0" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_Standalone=1" -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -I "../source" -I "../../../libs/juce-153/standalone" -I "../../../libs/juce-153/source"
-  CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -g `pkg-config --cflags freetype2` -O0 -ggdb -msse -fPIC `pkg-config fftw3f --cflags`
+  CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -g `pkg-config --cflags freetype2 fftw3f` -O0 -ggdb -msse -fPIC
   CXXFLAGS += $(CFLAGS)
-  LDFLAGS += -L$(BINDIR) -L$(LIBDIR) `pkg-config --libs freetype2` -L"../../../libs" -lfreetype -lpthread -lasound -ldl -lrt -lX11 -lXext -lgomp -ljuce-standalone-153_debug
+  LDFLAGS += -L$(BINDIR) -L$(LIBDIR) `pkg-config --libs freetype2 fftw3f` -L"../../../libs" -lfreetype -lpthread -lasound -ldl -lrt -lX11 -lXext -lgomp -ljuce-standalone-153_debug
   LDDEPS :=
   RESFLAGS := -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=0" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_Standalone=1" -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -I "../source" -I "../../../libs/juce-153/standalone" -I "../../../libs/juce-153/source"
   TARGET := HybridReverb2_debug
@@ -39,30 +39,30 @@ ifeq ($(CONFIG),Debug)
 endif
 
 OBJECTS := \
-	$(OBJDIR)/Partitioner.o \
-	$(OBJDIR)/SampleData.o \
-	$(OBJDIR)/HybridConvolverTripple.o \
-	$(OBJDIR)/SystemConfig.o \
-	$(OBJDIR)/LagrangeInterpolator.o \
-	$(OBJDIR)/HybridConvolverSingle.o \
-	$(OBJDIR)/TextList.o \
-	$(OBJDIR)/HybridConvolverDual.o \
-	$(OBJDIR)/PresetManager.o \
-	$(OBJDIR)/MasterAndCommander.o \
 	$(OBJDIR)/HybridConvolver.o \
+	$(OBJDIR)/HybridConvolverDual.o \
+	$(OBJDIR)/HybridConvolverSingle.o \
+	$(OBJDIR)/HybridConvolverTripple.o \
 	$(OBJDIR)/HybridReverb2Processor.o \
-	$(OBJDIR)/TabMain.o \
-	$(OBJDIR)/FreqPlot.o \
-	$(OBJDIR)/TabTimbre.o \
-	$(OBJDIR)/TabModulation.o \
+	$(OBJDIR)/LagrangeInterpolator.o \
+	$(OBJDIR)/MasterAndCommander.o \
+	$(OBJDIR)/Partitioner.o \
+	$(OBJDIR)/PresetManager.o \
+	$(OBJDIR)/SampleData.o \
+	$(OBJDIR)/SystemConfig.o \
+	$(OBJDIR)/TextList.o \
 	$(OBJDIR)/EditorComponent.o \
-	$(OBJDIR)/TabPresetEditor.o \
+	$(OBJDIR)/FreqPlot.o \
 	$(OBJDIR)/IRPlot.o \
 	$(OBJDIR)/TabAbout.o \
+	$(OBJDIR)/TabMain.o \
+	$(OBJDIR)/TabModulation.o \
 	$(OBJDIR)/TabPreferences.o \
+	$(OBJDIR)/TabPresetEditor.o \
+	$(OBJDIR)/TabTimbre.o \
 	$(OBJDIR)/libHybridConv.o \
-	$(OBJDIR)/juce_StandaloneFilterWindow.o \
 	$(OBJDIR)/juce_StandaloneFilterApplication.o \
+	$(OBJDIR)/juce_StandaloneFilterWindow.o \
 
 MKDIR_TYPE := msdos
 CMD := $(subst \,\\,$(ComSpec)$(COMSPEC))
@@ -104,37 +104,7 @@ else
 	-@if exist $(subst /,\,$(OBJDIR)) rmdir /s /q $(subst /,\,$(OBJDIR))
 endif
 
-$(OBJDIR)/Partitioner.o: ../source/Partitioner.cpp
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/SampleData.o: ../source/SampleData.cpp
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/HybridConvolverTripple.o: ../source/HybridConvolverTripple.cpp
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/SystemConfig.o: ../source/SystemConfig.cpp
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/LagrangeInterpolator.o: ../source/LagrangeInterpolator.cpp
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/HybridConvolverSingle.o: ../source/HybridConvolverSingle.cpp
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/TextList.o: ../source/TextList.cpp
+$(OBJDIR)/HybridConvolver.o: ../source/HybridConvolver.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
@@ -144,17 +114,12 @@ $(OBJDIR)/HybridConvolverDual.o: ../source/HybridConvolverDual.cpp
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
-$(OBJDIR)/PresetManager.o: ../source/PresetManager.cpp
+$(OBJDIR)/HybridConvolverSingle.o: ../source/HybridConvolverSingle.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
-$(OBJDIR)/MasterAndCommander.o: ../source/MasterAndCommander.cpp
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/HybridConvolver.o: ../source/HybridConvolver.cpp
+$(OBJDIR)/HybridConvolverTripple.o: ../source/HybridConvolverTripple.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
@@ -164,22 +129,37 @@ $(OBJDIR)/HybridReverb2Processor.o: ../source/HybridReverb2Processor.cpp
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
-$(OBJDIR)/TabMain.o: ../source/gui/TabMain.cpp
+$(OBJDIR)/LagrangeInterpolator.o: ../source/LagrangeInterpolator.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
-$(OBJDIR)/FreqPlot.o: ../source/gui/FreqPlot.cpp
+$(OBJDIR)/MasterAndCommander.o: ../source/MasterAndCommander.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
-$(OBJDIR)/TabTimbre.o: ../source/gui/TabTimbre.cpp
+$(OBJDIR)/Partitioner.o: ../source/Partitioner.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
-$(OBJDIR)/TabModulation.o: ../source/gui/TabModulation.cpp
+$(OBJDIR)/PresetManager.o: ../source/PresetManager.cpp
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/SampleData.o: ../source/SampleData.cpp
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/SystemConfig.o: ../source/SystemConfig.cpp
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/TextList.o: ../source/TextList.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
@@ -189,7 +169,7 @@ $(OBJDIR)/EditorComponent.o: ../source/gui/EditorComponent.cpp
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
-$(OBJDIR)/TabPresetEditor.o: ../source/gui/TabPresetEditor.cpp
+$(OBJDIR)/FreqPlot.o: ../source/gui/FreqPlot.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
@@ -204,7 +184,27 @@ $(OBJDIR)/TabAbout.o: ../source/gui/TabAbout.cpp
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
+$(OBJDIR)/TabMain.o: ../source/gui/TabMain.cpp
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/TabModulation.o: ../source/gui/TabModulation.cpp
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
 $(OBJDIR)/TabPreferences.o: ../source/gui/TabPreferences.cpp
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/TabPresetEditor.o: ../source/gui/TabPresetEditor.cpp
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/TabTimbre.o: ../source/gui/TabTimbre.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
@@ -214,12 +214,12 @@ $(OBJDIR)/libHybridConv.o: ../source/libHybridConv/libHybridConv.c
 	@echo $(notdir $<)
 	@$(CC) $(CFLAGS) -o "$@" -c "$<"
 
-$(OBJDIR)/juce_StandaloneFilterWindow.o: ../../../libs/juce-custom/Standalone/juce_StandaloneFilterWindow.cpp
+$(OBJDIR)/juce_StandaloneFilterApplication.o: ../../../libs/juce-custom/Standalone/juce_StandaloneFilterApplication.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
-$(OBJDIR)/juce_StandaloneFilterApplication.o: ../../../libs/juce-custom/Standalone/juce_StandaloneFilterApplication.cpp
+$(OBJDIR)/juce_StandaloneFilterWindow.o: ../../../libs/juce-custom/Standalone/juce_StandaloneFilterWindow.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
