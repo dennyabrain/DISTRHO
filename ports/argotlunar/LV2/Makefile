@@ -9,17 +9,17 @@ endif
 
 export CONFIG
 
-.PHONY: all clean argotlunar.lv2/argotlunar
+.PHONY: all clean argotlunar.lv2/Argotlunar
 
-all: argotlunar.lv2/argotlunar
+all: argotlunar.lv2/Argotlunar
 
 Makefile: premake.lua
 	@echo ==== Regenerating Makefiles ====
 	@premake --file $^ --os linux --target gnu --cc gcc
 
-argotlunar.lv2/argotlunar:
-	@echo ==== Building argotlunar.lv2/argotlunar ====
-	@$(MAKE) --no-print-directory -C . -f argotlunar.lv2/argotlunar.make
+argotlunar.lv2/Argotlunar:
+	@echo ==== Building argotlunar.lv2/Argotlunar ====
+	@$(MAKE) --no-print-directory -C . -f argotlunar.lv2/Argotlunar.make
 
 clean:
-	@$(MAKE) --no-print-directory -C . -f argotlunar.lv2/argotlunar.make clean
+	@$(MAKE) --no-print-directory -C . -f argotlunar.lv2/Argotlunar.make clean

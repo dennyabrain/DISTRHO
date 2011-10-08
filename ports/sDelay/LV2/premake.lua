@@ -1,5 +1,5 @@
 
-project.name = "sDelay.lv2/sDelay"
+project.name = "sDelay.lv2/sDelay_Plugin"
 project.bindir = "../../../bin"
 project.libdir = project.bindir
 project.configs = { "Release", "Debug" }

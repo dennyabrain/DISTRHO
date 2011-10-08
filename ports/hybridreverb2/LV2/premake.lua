@@ -1,5 +1,5 @@
 
-project.name = "HybridReverb2"
+project.name = "HybridReverb2.lv2/HybridReverb2"
 project.bindir = "../../../bin"
 project.libdir = project.bindir
 project.configs = { "Release", "Debug" }
@@ -10,7 +10,7 @@ package.kind = "dll"
 package.language = "c++"
 package.targetprefix = ""
 
-package.defines     = { "JucePlugin_Build_AU=0", "JucePlugin_Build_LV2=0", "JucePlugin_Build_RTAS=0", "JucePlugin_Build_VST=1", "JucePlugin_Build_Standalone=0", "JUCE_USE_VSTSDK_2_4=1" };
+package.defines     = { "JucePlugin_Build_AU=0", "JucePlugin_Build_LV2=1", "JucePlugin_Build_RTAS=0", "JucePlugin_Build_VST=1", "JucePlugin_Build_Standalone=0" };
 package.linkflags   = { "no-symbols", "static-runtime" }
 package.links       = { "freetype", "pthread", "rt", "X11", "Xext", "gomp" }
 
@@ -41,8 +41,7 @@ end
 package.includepaths = {
     "../source",
     "../../../libs/juce-153/plugin",
-    "../../../libs/juce-153/source",
-    "../../../sdks/vstsdk2.4"
+    "../../../libs/juce-153/source"
 }
 
 package.libpaths = {
@@ -54,6 +53,6 @@ package.files = {
         "../source/*.cpp",
         "../source/gui/*.cpp",
         "../source/libHybridConv/*.c",
-        "../../../libs/juce-153/source/src/audio/plugin_client/VST/juce_VST_Wrapper.cpp"
+        "../../../libs/juce-lv2/juce_LV2_Wrapper.cpp"
     )
 }

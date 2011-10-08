@@ -1,5 +1,5 @@
 
-project.name = "argotlunar.lv2/argotlunar"
+project.name = "argotlunar.lv2/Argotlunar"
 project.bindir = "../../../bin"
 project.libdir = project.bindir
 project.configs = { "Release", "Debug" }

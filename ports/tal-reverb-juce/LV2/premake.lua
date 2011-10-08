@@ -1,5 +1,5 @@
 
-project.name = "TAL-Reverb.lv2/TAL-Reverb"
+project.name = "TAL-Reverb.lv2/TAL_Reverb_Plugin"
 project.bindir = "../../../bin"
 project.libdir = project.bindir
 project.configs = { "Release", "Debug" }

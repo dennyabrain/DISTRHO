@@ -1,5 +1,5 @@
 
-project.name = "juce_pitcher.lv2/juce_pitcher"
+project.name = "juce_pitcher.lv2/Juce_Pitcher"
 project.bindir = "../../../bin"
 project.libdir = project.bindir
 project.configs = { "Release", "Debug" }

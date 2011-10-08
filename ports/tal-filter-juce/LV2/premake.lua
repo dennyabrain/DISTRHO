@@ -1,5 +1,5 @@
 
-project.name = "TAL-Filter.lv2/TAL-Filter"
+project.name = "TAL-Filter.lv2/TAL_Filter_Plugin"
 project.bindir = "../../../bin"
 project.libdir = project.bindir
 project.configs = { "Release", "Debug" }

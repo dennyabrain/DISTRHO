@@ -12,14 +12,14 @@ ifeq ($(CONFIG),Release)
   BINDIR := ../../../bin
   LIBDIR := ../../../bin
   OBJDIR := intermediate/Release
-  OUTDIR := ../../../bin/argotlunar.lv2
-  CPPFLAGS := $(DEPFLAGS) -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=1" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_Standalone=0" -D "LINUX=1" -D "NDEBUG=1" -I "../source" -I "../../../libs/juce-153/plugin" -I "../../../libs/juce-153/source"
+  OUTDIR := ../../../bin/juce_pitcher.lv2
+  CPPFLAGS := $(DEPFLAGS) -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=1" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_Standalone=0" -D "LINUX=1" -D "NDEBUG=1" -I "../source" -I "../source/soundtouch" -I "../../../libs/juce-153/plugin" -I "../../../libs/juce-153/source"
   CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -fPIC -O3 `pkg-config --cflags freetype2` -O2 -mtune=generic -msse -ffast-math -fomit-frame-pointer -fvisibility=hidden -fPIC
   CXXFLAGS += $(CFLAGS)
-  LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -shared -s `pkg-config --libs freetype2` -L"../../../libs" -lfreetype -lpthread -lrt -lX11 -lXext -ljuce-plugin-153
+  LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -shared -s `pkg-config --libs freetype2` -L"../../../libs" -lfreetype -lpthread -lrt -lm -lX11 -lXext -ljuce-plugin-153
   LDDEPS :=
-  RESFLAGS := -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=1" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_Standalone=0" -D "LINUX=1" -D "NDEBUG=1" -I "../source" -I "../../../libs/juce-153/plugin" -I "../../../libs/juce-153/source"
-  TARGET := argotlunar.so
+  RESFLAGS := -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=1" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_Standalone=0" -D "LINUX=1" -D "NDEBUG=1" -I "../source" -I "../source/soundtouch" -I "../../../libs/juce-153/plugin" -I "../../../libs/juce-153/source"
+  TARGET := Juce_Pitcher.so
  BLDCMD = $(CXX) -o $(OUTDIR)/$(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(TARGET_ARCH)
 endif
 
@@ -27,32 +27,29 @@ ifeq ($(CONFIG),Debug)
   BINDIR := ../../../bin
   LIBDIR := ../../../bin
   OBJDIR := intermediate/Debug
-  OUTDIR := ../../../bin/argotlunar.lv2
-  CPPFLAGS := $(DEPFLAGS) -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=1" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_Standalone=0" -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -I "../source" -I "../../../libs/juce-153/plugin" -I "../../../libs/juce-153/source"
-  CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -fPIC -g `pkg-config --cflags freetype2` -O0 -ggdb -fPIC
+  OUTDIR := ../../../bin/juce_pitcher.lv2
+  CPPFLAGS := $(DEPFLAGS) -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=1" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_Standalone=0" -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -I "../source" -I "../source/soundtouch" -I "../../../libs/juce-153/plugin" -I "../../../libs/juce-153/source"
+  CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -fPIC -g `pkg-config --cflags freetype2` -O0 -ggdb -msse -fPIC
   CXXFLAGS += $(CFLAGS)
-  LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -shared `pkg-config --libs freetype2` -L"../../../libs" -lfreetype -lpthread -lrt -lX11 -lXext -ljuce-plugin-153_debug
+  LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -shared `pkg-config --libs freetype2` -L"../../../libs" -lfreetype -lpthread -lrt -lm -lX11 -lXext -ljuce-plugin-153_debug
   LDDEPS :=
-  RESFLAGS := -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=1" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_Standalone=0" -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -I "../source" -I "../../../libs/juce-153/plugin" -I "../../../libs/juce-153/source"
-  TARGET := argotlunar_debug.so
+  RESFLAGS := -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=1" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_Standalone=0" -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -I "../source" -I "../source/soundtouch" -I "../../../libs/juce-153/plugin" -I "../../../libs/juce-153/source"
+  TARGET := Juce_Pitcher_debug.so
  BLDCMD = $(CXX) -o $(OUTDIR)/$(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(TARGET_ARCH)
 endif
 
 OBJECTS := \
-	$(OBJDIR)/CombFilter.o \
-	$(OBJDIR)/DelayLine.o \
-	$(OBJDIR)/Envelope.o \
-	$(OBJDIR)/Filter.o \
-	$(OBJDIR)/Grain.o \
-	$(OBJDIR)/GrainParametersGenerator.o \
-	$(OBJDIR)/Granulator.o \
-	$(OBJDIR)/Parameters.o \
-	$(OBJDIR)/PitchQuantizer.o \
-	$(OBJDIR)/Plugin.o \
-	$(OBJDIR)/PluginEditor.o \
-	$(OBJDIR)/Program.o \
-	$(OBJDIR)/ProgramBank.o \
-	$(OBJDIR)/TimeQuantizer.o \
+	$(OBJDIR)/JucePitcherComponent.o \
+	$(OBJDIR)/JucePitcherFilter.o \
+	$(OBJDIR)/AAFilter.o \
+	$(OBJDIR)/cpu_detect_x86_gcc.o \
+	$(OBJDIR)/FIFOSampleBuffer.o \
+	$(OBJDIR)/FIRFilter.o \
+	$(OBJDIR)/mmx_optimized.o \
+	$(OBJDIR)/RateTransposer.o \
+	$(OBJDIR)/SoundTouch.o \
+	$(OBJDIR)/sse_optimized.o \
+	$(OBJDIR)/TDStretch.o \
 	$(OBJDIR)/juce_LV2_Wrapper.o \
 
 MKDIR_TYPE := msdos
@@ -78,14 +75,14 @@ endif
 .PHONY: clean
 
 $(OUTDIR)/$(TARGET): $(OBJECTS) $(LDDEPS) $(RESOURCES)
-	@echo Linking argotlunar.lv2/argotlunar
+	@echo Linking juce_pitcher.lv2/Juce_Pitcher
 	-@$(CMD_MKBINDIR)
 	-@$(CMD_MKLIBDIR)
 	-@$(CMD_MKOUTDIR)
 	@$(BLDCMD)
 
 clean:
-	@echo Cleaning argotlunar.lv2/argotlunar
+	@echo Cleaning juce_pitcher.lv2/Juce_Pitcher
 ifeq ($(MKDIR_TYPE),posix)
 	-@rm -f $(OUTDIR)/$(TARGET)
 	-@rm -rf $(OBJDIR)
@@ -95,72 +92,57 @@ else
 	-@if exist $(subst /,\,$(OBJDIR)) rmdir /s /q $(subst /,\,$(OBJDIR))
 endif
 
-$(OBJDIR)/CombFilter.o: ../source/CombFilter.cpp
+$(OBJDIR)/JucePitcherComponent.o: ../source/JucePitcherComponent.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
-$(OBJDIR)/DelayLine.o: ../source/DelayLine.cpp
+$(OBJDIR)/JucePitcherFilter.o: ../source/JucePitcherFilter.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
-$(OBJDIR)/Envelope.o: ../source/Envelope.cpp
+$(OBJDIR)/AAFilter.o: ../source/soundtouch/AAFilter.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
-$(OBJDIR)/Filter.o: ../source/Filter.cpp
+$(OBJDIR)/cpu_detect_x86_gcc.o: ../source/soundtouch/cpu_detect_x86_gcc.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
-$(OBJDIR)/Grain.o: ../source/Grain.cpp
+$(OBJDIR)/FIFOSampleBuffer.o: ../source/soundtouch/FIFOSampleBuffer.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
-$(OBJDIR)/GrainParametersGenerator.o: ../source/GrainParametersGenerator.cpp
+$(OBJDIR)/FIRFilter.o: ../source/soundtouch/FIRFilter.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
-$(OBJDIR)/Granulator.o: ../source/Granulator.cpp
+$(OBJDIR)/mmx_optimized.o: ../source/soundtouch/mmx_optimized.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
-$(OBJDIR)/Parameters.o: ../source/Parameters.cpp
+$(OBJDIR)/RateTransposer.o: ../source/soundtouch/RateTransposer.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
-$(OBJDIR)/PitchQuantizer.o: ../source/PitchQuantizer.cpp
+$(OBJDIR)/SoundTouch.o: ../source/soundtouch/SoundTouch.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
-$(OBJDIR)/Plugin.o: ../source/Plugin.cpp
+$(OBJDIR)/sse_optimized.o: ../source/soundtouch/sse_optimized.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
-$(OBJDIR)/PluginEditor.o: ../source/PluginEditor.cpp
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/Program.o: ../source/Program.cpp
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/ProgramBank.o: ../source/ProgramBank.cpp
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/TimeQuantizer.o: ../source/TimeQuantizer.cpp
+$(OBJDIR)/TDStretch.o: ../source/soundtouch/TDStretch.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"

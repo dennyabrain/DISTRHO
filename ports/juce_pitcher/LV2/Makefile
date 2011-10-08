@@ -9,17 +9,17 @@ endif
 
 export CONFIG
 
-.PHONY: all clean juce_pitcher.lv2/juce_pitcher
+.PHONY: all clean juce_pitcher.lv2/Juce_Pitcher
 
-all: juce_pitcher.lv2/juce_pitcher
+all: juce_pitcher.lv2/Juce_Pitcher
 
 Makefile: premake.lua
 	@echo ==== Regenerating Makefiles ====
 	@premake --file $^ --os linux --target gnu --cc gcc
 
-juce_pitcher.lv2/juce_pitcher:
-	@echo ==== Building juce_pitcher.lv2/juce_pitcher ====
-	@$(MAKE) --no-print-directory -C . -f juce_pitcher.lv2/juce_pitcher.make
+juce_pitcher.lv2/Juce_Pitcher:
+	@echo ==== Building juce_pitcher.lv2/Juce_Pitcher ====
+	@$(MAKE) --no-print-directory -C . -f juce_pitcher.lv2/Juce_Pitcher.make
 
 clean:
-	@$(MAKE) --no-print-directory -C . -f juce_pitcher.lv2/juce_pitcher.make clean
+	@$(MAKE) --no-print-directory -C . -f juce_pitcher.lv2/Juce_Pitcher.make clean

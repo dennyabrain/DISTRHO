@@ -9,17 +9,17 @@ endif
 
 export CONFIG
 
-.PHONY: all clean sDelay.lv2/sDelay
+.PHONY: all clean sDelay.lv2/sDelay_Plugin
 
-all: sDelay.lv2/sDelay
+all: sDelay.lv2/sDelay_Plugin
 
 Makefile: premake.lua
 	@echo ==== Regenerating Makefiles ====
 	@premake --file $^ --os linux --target gnu --cc gcc
 
-sDelay.lv2/sDelay:
-	@echo ==== Building sDelay.lv2/sDelay ====
-	@$(MAKE) --no-print-directory -C . -f sDelay.lv2/sDelay.make
+sDelay.lv2/sDelay_Plugin:
+	@echo ==== Building sDelay.lv2/sDelay_Plugin ====
+	@$(MAKE) --no-print-directory -C . -f sDelay.lv2/sDelay_Plugin.make
 
 clean:
-	@$(MAKE) --no-print-directory -C . -f sDelay.lv2/sDelay.make clean
+	@$(MAKE) --no-print-directory -C . -f sDelay.lv2/sDelay_Plugin.make clean
