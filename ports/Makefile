@@ -39,21 +39,21 @@ standalone:
 	$(MAKE) -C wolpertinger/Standalone
 
 lv2:
-# 	$(MAKE) -C arctican-function/LV2
-# 	$(MAKE) -C arctican-pilgrim/LV2
-# 	$(MAKE) -C argotlunar/LV2
-#	$(MAKE) -C hybridreverb2/LV2
-# 	$(MAKE) -C sDelay/LV2
-# 	$(MAKE) -C juce_pitcher/LV2
-# 	$(MAKE) -C tal-dub-3-juce/LV2
-# 	$(MAKE) -C tal-filter-juce/LV2
-# 	$(MAKE) -C tal-filter-2-juce/LV2
-# 	$(MAKE) -C tal-noisemaker-juce/LV2
-# 	$(MAKE) -C tal-reverb-juce/LV2
-# 	$(MAKE) -C tal-reverb-2-juce/LV2
-# 	$(MAKE) -C tal-reverb-3-juce/LV2
-# 	$(MAKE) -C tal-vocoder-2-juce/LV2
-#	$(MAKE) -C wolpertinger/LV2
+	$(MAKE) -C arctican-function/LV2
+	$(MAKE) -C arctican-pilgrim/LV2
+	$(MAKE) -C argotlunar/LV2
+	$(MAKE) -C hybridreverb2/LV2
+	$(MAKE) -C sDelay/LV2
+	$(MAKE) -C juce_pitcher/LV2
+	$(MAKE) -C tal-dub-3-juce/LV2
+	$(MAKE) -C tal-filter-juce/LV2
+	$(MAKE) -C tal-filter-2-juce/LV2
+	$(MAKE) -C tal-noisemaker-juce/LV2
+	$(MAKE) -C tal-reverb-juce/LV2
+	$(MAKE) -C tal-reverb-2-juce/LV2
+	$(MAKE) -C tal-reverb-3-juce/LV2
+	$(MAKE) -C tal-vocoder-2-juce/LV2
+	$(MAKE) -C wolpertinger/LV2
 
 # 	../libs/juce_lv2_ttl_generator ../bin/*.lv2/*.so
 
@@ -95,21 +95,21 @@ clean:
 	$(MAKE) clean -C wolpertinger/Standalone
 
 	# LV2
-# 	$(MAKE) clean -C arctican-function/LV2
-# 	$(MAKE) clean -C arctican-pilgrim/LV2
-# 	$(MAKE) clean -C argotlunar/LV2
-#	$(MAKE) clean -C hybridreverb2/LV2
-# 	$(MAKE) clean -C juce_pitcher/LV2
-# 	$(MAKE) clean -C sDelay/LV2
-# 	$(MAKE) clean -C tal-dub-3-juce/LV2
-# 	$(MAKE) clean -C tal-filter-juce/LV2
-# 	$(MAKE) clean -C tal-filter-2-juce/LV2
-# 	$(MAKE) clean -C tal-noisemaker-juce/LV2
-# 	$(MAKE) clean -C tal-reverb-juce/LV2
-# 	$(MAKE) clean -C tal-reverb-2-juce/LV2
-# 	$(MAKE) clean -C tal-reverb-3-juce/LV2
-# 	$(MAKE) clean -C tal-vocoder-2-juce/LV2
-# 	$(MAKE) clean -C wolpertinger/LV2
+	$(MAKE) clean -C arctican-function/LV2
+	$(MAKE) clean -C arctican-pilgrim/LV2
+	$(MAKE) clean -C argotlunar/LV2
+	$(MAKE) clean -C hybridreverb2/LV2
+	$(MAKE) clean -C juce_pitcher/LV2
+	$(MAKE) clean -C sDelay/LV2
+	$(MAKE) clean -C tal-dub-3-juce/LV2
+	$(MAKE) clean -C tal-filter-juce/LV2
+	$(MAKE) clean -C tal-filter-2-juce/LV2
+	$(MAKE) clean -C tal-noisemaker-juce/LV2
+	$(MAKE) clean -C tal-reverb-juce/LV2
+	$(MAKE) clean -C tal-reverb-2-juce/LV2
+	$(MAKE) clean -C tal-reverb-3-juce/LV2
+	$(MAKE) clean -C tal-vocoder-2-juce/LV2
+	$(MAKE) clean -C wolpertinger/LV2
 
 	# VST
 	$(MAKE) clean -C arctican-function/VST
