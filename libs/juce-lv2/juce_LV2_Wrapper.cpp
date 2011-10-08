@@ -717,13 +717,20 @@ public:
     JuceLV2DocumentWindow (const String& title) :
     DocumentWindow(title, Colours::white, DocumentWindow::minimiseButton | DocumentWindow::closeButton, true)
     {
+        closed = false;
     }
 
     /** Close button handler */
     void closeButtonPressed()
     {
         removeFromDesktop();
+        closed = true;
     }
+
+    bool isClosed() { return closed; }
+
+private:
+    bool closed;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (JuceLV2DocumentWindow);
 };
@@ -733,19 +740,16 @@ public:
 class JuceLv2ExternalUI : public lv2_external_ui
 {
 public:
-    JuceLv2ExternalUI (AudioProcessor* filter_, AudioProcessorEditor* const editor_, lv2_external_ui_host* externalUIHost_, LV2UI_Controller controller_) :
+    JuceLv2ExternalUI (AudioProcessor* filter_, AudioProcessorEditor* const editor_, const String& title) :
             filter(filter_),
             editor(editor_),
-            window(nullptr),
-            externalUIHost(externalUIHost_),
-            controller(controller_)
+            window(nullptr)
     {
-        run = do_ui_run;
+        run  = do_ui_run;
         show = do_ui_show;
         hide = do_ui_hide;
 
         const MessageManagerLock mmLock;
-        String title = externalUIHost->plugin_human_id != nullptr ? String(externalUIHost->plugin_human_id) : filter->getName();
         window = new JuceLV2DocumentWindow(title);
         window->setOpaque(true);
         window->setAlwaysOnTop(true);
@@ -755,20 +759,16 @@ public:
 
     ~JuceLv2ExternalUI()
     {
-        filter->editorBeingDeleted(editor);
-        editor = nullptr;
         if (window)
-          delete window;
-        if (externalUIHost)
-          externalUIHost->ui_closed(controller);
+            delete window;
     }
 
     static void do_ui_run(lv2_external_ui * _this_)
     {
         const MessageManagerLock mmLock;
         JuceLv2ExternalUI* externalUI = (JuceLv2ExternalUI*)_this_;
-        if (externalUI->window)
-          externalUI->window->repaint();
+        if (externalUI->window && !externalUI->window->isClosed())
+            externalUI->window->repaint();
     }
 
     static void do_ui_show(lv2_external_ui * _this_)
@@ -779,10 +779,10 @@ public:
         {
             externalUI->window->setTopLeftPosition(100,100);
             externalUI->window->addToDesktop();
-	    //externalUI->window->addToDesktop(externalUI->window->getDesktopWindowStyleFlags());
+            //externalUI->window->addToDesktop(externalUI->window->getDesktopWindowStyleFlags());
         }
         if (externalUI->window)
-          externalUI->window->setVisible(true);
+            externalUI->window->setVisible(true);
     }
 
     static void do_ui_hide(lv2_external_ui * _this_)
@@ -793,21 +793,28 @@ public:
           externalUI->window->setVisible(false);
     }
 
+    bool isClosed()
+    {
+        if (window)
+            return window->isClosed();
+        else
+            return false;
+    }
+
 private:
     AudioProcessor* filter;
     AudioProcessorEditor* editor;
-    DocumentWindow* window;
+    JuceLV2DocumentWindow* window;
 
     lv2_external_ui externalUI;
-    lv2_external_ui_host* externalUIHost;
-    LV2UI_Controller controller;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (JuceLv2ExternalUI);
 };
 
 //==============================================================================
 // Create a new JUCE Editor
-class JuceLv2Editor : public AudioProcessorListener
+class JuceLv2Editor : public AudioProcessorListener,
+                      public Timer
 {
 public:
     JuceLv2Editor (AudioProcessor* filter_, const LV2UI_Descriptor* uiDescriptor_, LV2UI_Write_Function writeFunction_, LV2UI_Controller controller_, LV2UI_Widget* widget, const LV2_Feature* const* features, bool isExternalUI) :
@@ -816,7 +823,8 @@ public:
             writeFunction(writeFunction_),
             controller(controller_),
             editor(nullptr),
-            externalUI(nullptr)
+            externalUI(nullptr),
+            externalUIHost(nullptr)
     {
         filter->addListener(this);
 
@@ -830,11 +838,9 @@ public:
             if (isExternalUI)
             {
                 // External UI
-                lv2_external_ui_host* externalUIHost = nullptr;
-
                 for (uint16 j = 0; features[j]; j++)
                 {
-                    if ((strcmp(features[j]->URI, LV2_EXTERNAL_UI_URI) == 0 || strcmp(features[j]->URI, LV2_EXTERNAL_UI_DEPRECATED_URI)) && features[j]->data)
+                    if ((strcmp(features[j]->URI, LV2_EXTERNAL_UI_URI) == 0 || strcmp(features[j]->URI, LV2_EXTERNAL_UI_DEPRECATED_URI) == 0) && features[j]->data)
                     {
                         externalUIHost = (lv2_external_ui_host*)features[j]->data;
                         break;
@@ -843,8 +849,10 @@ public:
 
                 if (externalUIHost)
                 {
-                    externalUI = new JuceLv2ExternalUI(filter, editor, externalUIHost, controller);
+                    String title = externalUIHost->plugin_human_id != nullptr ? String(externalUIHost->plugin_human_id) : filter->getName();
+                    externalUI = new JuceLv2ExternalUI(filter, editor, title);
                     *widget = externalUI;
+                    startTimer(100);
                 }
                 else
                 {
@@ -883,6 +891,8 @@ public:
         JUCE_AUTORELEASEPOOL
         PopupMenu::dismissAllActiveMenus();
 
+        stopTimer();
+
         filter->removeListener(this);
 
         if (externalUI)
@@ -918,10 +928,22 @@ public:
 
     void audioProcessorChanged (AudioProcessor*) {}
 
+    void timerCallback()
+    {
+        if (externalUI->isClosed())
+        {
+            if (externalUIHost)
+                externalUIHost->ui_closed(controller);
+
+            stopTimer();
+        }
+    }
+
 private:
     AudioProcessor* filter;
     AudioProcessorEditor* editor;
     JuceLv2ExternalUI* externalUI;
+    lv2_external_ui_host* externalUIHost;
 
     const LV2UI_Descriptor* uiDescriptor;
     LV2UI_Write_Function writeFunction;
