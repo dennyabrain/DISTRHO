@@ -299,6 +299,8 @@ juce_ImplementSingleton (SharedMessageThread)
 
 static Array<void*> activePlugins;
 
+class JuceLv2Editor;
+
 //==============================================================================
 // Create a new JUCE LV2 Plugin
 class JuceLV2Wrapper
@@ -672,6 +674,7 @@ public:
     //==============================================================================
 private:
     AudioProcessor* filter;
+    JuceLv2Editor* lv2Editor;
     MidiBuffer midiEvents;
     int numInChans, numOutChans;
     bool isProcessing, firstProcessCallback;
@@ -741,7 +744,6 @@ class JuceLv2ExternalUI : public lv2_external_ui
 {
 public:
     JuceLv2ExternalUI (AudioProcessor* filter_, AudioProcessorEditor* const editor_, const String& title) :
-            filter(filter_),
             editor(editor_),
             window(nullptr)
     {
@@ -802,11 +804,8 @@ public:
     }
 
 private:
-    AudioProcessor* filter;
     AudioProcessorEditor* editor;
     JuceLV2DocumentWindow* window;
-
-    lv2_external_ui externalUI;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (JuceLv2ExternalUI);
 };
