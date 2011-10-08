@@ -30,18 +30,18 @@ extern AudioProcessor* JUCE_CALLTYPE createPluginFilter();
 String nameToSymbol(const String& name, const uint32 portIndex)
 {
     String trimmedName = name.trimStart().trimEnd().toLowerCase();
-	
+
     if (trimmedName.isEmpty())
-		return String(portIndex);
-	
+        return String(portIndex);
+
     String symbol;
     for (int i=0; i < trimmedName.length(); i++)
     {
-		const juce_wchar c = trimmedName[i];
-		if (std::isalpha(c) || std::isdigit(c))
-			symbol += c;
-		else
-			symbol += '_';
+        const juce_wchar c = trimmedName[i];
+        if (std::isalpha(c) || std::isdigit(c))
+            symbol += c;
+        else
+            symbol += '_';
     }
     return symbol;
 }
@@ -232,13 +232,13 @@ void createTtlFiles()
     String URI = getURI();
     String Binary = getBinaryName();
     String BinaryTtl = Binary + ".ttl";
-	
+
     std::cout << "Writing manifest.ttl...";
     std::fstream manifest("manifest.ttl", std::ios::out);
     manifest << makeManifestTtl(URI, Binary) << std::endl;
     manifest.close();
     std::cout << " done!" << std::endl;
-	
+
     std::cout << "Writing " << BinaryTtl << "...";
     std::fstream plugin(BinaryTtl.toUTF8(), std::ios::out);
     plugin << makePluginTtl(URI, Binary) << std::endl;
@@ -408,7 +408,7 @@ public:
 
 #if JucePlugin_WantsMidiInput
             if (port == index)
-	    {
+            {
                 midiInPort = (LV2_Event_Buffer*)dataLocation;
                 return;
             }
@@ -417,7 +417,7 @@ public:
 
 #if JucePlugin_ProducesMidiOutput
             if (port == index)
-	    {
+            {
                 midiOutPort = (LV2_Event_Buffer*)dataLocation;
                 return;
             }
@@ -425,27 +425,27 @@ public:
 #endif
 
             for (int i=0; i < numInChans; ++i, ++index)
-	    {
+            {
                 if (port == index)
-		{
+                {
                     audioInPorts[i] = (float*)dataLocation;
                     return;
                 }
             }
 
             for (int i=0; i < numOutChans; ++i, ++index)
-	    {
+            {
                 if (port == index)
-		{
+                {
                     audioOutPorts[i] = (float*)dataLocation;
                     return;
                 }
             }
 
             for (int i=0; i < filter->getNumParameters(); ++i, ++index)
-	    {
+            {
                 if (port == index)
-		{
+                {
                     parameterInPorts.set(i, (float*)dataLocation);
                     return;
                 }
@@ -532,7 +532,7 @@ public:
             {
                 cur_value = *(float*)parameterInPorts[i];
                 if (parameterInPortsValues[i] != cur_value)
-		{
+                {
                     filter->setParameter(i, cur_value);
                     parameterInPortsValues.setUnchecked(i, cur_value);
                 }
@@ -589,17 +589,14 @@ public:
                     LV2_Event_Iterator iter;
                     lv2_event_begin(&iter, midiInPort);
                     uint32 sampleFrame = 0;
-		    uint8_t* data = 0;
+                    uint8* data = 0;
 
                     while (sampleFrame < numSamples && lv2_event_is_valid(&iter))
                     {
-						LV2_Event* event = lv2_event_get(&iter, &data);
-						sampleFrame = event->frames;
-						midiEvents.addEvent(data, event->size, event->frames);
-						lv2_event_increment(&iter);
-						
-						//if (event && event->type == 0)
-						//	event_unref(event);
+                        LV2_Event* event = lv2_event_get(&iter, &data);
+                        sampleFrame = event->frames;
+                        midiEvents.addEvent(data, event->size, event->frames);
+                        lv2_event_increment(&iter);
                     }
                 }
 
@@ -618,7 +615,7 @@ public:
             const int numEvents = midiEvents.getNumEvents();
 
             LV2_Event_Iterator iter;
-            lv2_event_buffer_reset(midiOutPort, LV2_EVENT_AUDIO_STAMP, (uint8_t*)(midiOutPort + 1));
+            lv2_event_buffer_reset(midiOutPort, LV2_EVENT_AUDIO_STAMP, (uint8*)(midiOutPort + 1));
             lv2_event_begin(&iter, midiOutPort);
 
             const JUCE_NAMESPACE::uint8* midiEventData;
@@ -657,7 +654,7 @@ public:
             return;
         data.setSize (0);
         if (filter)
-			filter->getStateInformation(data);
+            filter->getStateInformation(data);
     }
 
     void setChunk (const MemoryBlock& data)
@@ -666,7 +663,7 @@ public:
             return;
         filter->setStateInformation(data.getData(), data.getSize());
     }
-	
+
     LV2_URI_Map_Feature* getURIMap()
     {
         return uriMap;
@@ -716,19 +713,19 @@ private:
 class JuceLV2DocumentWindow : public DocumentWindow
 {
 public:
-	/** Creates a Document Window wrapper */
-	JuceLV2DocumentWindow (const String& title) :
-	DocumentWindow(title, Colours::white, DocumentWindow::minimiseButton | DocumentWindow::closeButton, true)
-	{
-	}
-	
-	/** Close button handler */
-	void closeButtonPressed()
-	{
-		removeFromDesktop();
-	}
-	
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (JuceLV2DocumentWindow);
+    /** Creates a Document Window wrapper */
+    JuceLV2DocumentWindow (const String& title) :
+    DocumentWindow(title, Colours::white, DocumentWindow::minimiseButton | DocumentWindow::closeButton, true)
+    {
+    }
+
+    /** Close button handler */
+    void closeButtonPressed()
+    {
+        removeFromDesktop();
+    }
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (JuceLV2DocumentWindow);
 };
 
 //==============================================================================
@@ -977,47 +974,47 @@ void juceLV2Cleanup(LV2_Handle instance)
 //==============================================================================
 void juceLV2Save(LV2_Handle instance, LV2_Persist_Store_Function store, void* callbackData)
 {
-	JuceLV2Wrapper* wrapper = (JuceLV2Wrapper*)instance;
-	jassert(wrapper);
-	
-	const String juceChunkURI = getURI() + "#chunk";
-	MemoryBlock chunkMemory;
-	wrapper->getChunk(chunkMemory);
-	
-	LV2_URI_Map_Feature* uri_map = wrapper->getURIMap();
-	store(callbackData,
-		  uri_map->uri_to_id(wrapper, 0, juceChunkURI.toUTF8().getAddress()),
-		  chunkMemory.getData(),
-		  chunkMemory.getSize(),
-		  uri_map->uri_to_id(wrapper, 0, "juce_binary_chunk"),
-		  LV2_PERSIST_IS_POD | LV2_PERSIST_IS_PORTABLE);
+    JuceLV2Wrapper* wrapper = (JuceLV2Wrapper*)instance;
+    jassert(wrapper);
+
+    const String juceChunkURI = getURI() + "#chunk";
+    MemoryBlock chunkMemory;
+    wrapper->getChunk(chunkMemory);
+
+    LV2_URI_Map_Feature* uri_map = wrapper->getURIMap();
+    store(callbackData,
+          uri_map->uri_to_id(wrapper, 0, juceChunkURI.toUTF8().getAddress()),
+          chunkMemory.getData(),
+          chunkMemory.getSize(),
+          uri_map->uri_to_id(wrapper, 0, "juce_binary_chunk"),
+          LV2_PERSIST_IS_POD | LV2_PERSIST_IS_PORTABLE);
 }
 
 void juceLV2Restore(LV2_Handle instance, LV2_Persist_Retrieve_Function retrieve, void* callbackData)
 {
-	JuceLV2Wrapper* wrapper = (JuceLV2Wrapper*)instance;
-	jassert(wrapper);
-	
-	const String juceChunkURI = getURI() + "#chunk";
-	LV2_URI_Map_Feature* uri_map = wrapper->getURIMap();
-	
-	size_t size;
-	uint32 type;
-	uint32 flags;
-	const void *data = retrieve(  callbackData,
+    JuceLV2Wrapper* wrapper = (JuceLV2Wrapper*)instance;
+    jassert(wrapper);
+
+    const String juceChunkURI = getURI() + "#chunk";
+    LV2_URI_Map_Feature* uri_map = wrapper->getURIMap();
+
+    size_t size;
+    uint32 type;
+    uint32 flags;
+    const void *data = retrieve(callbackData,
                                 uri_map->uri_to_id(wrapper, 0, juceChunkURI.toUTF8().getAddress()),
                                 &size, &type, &flags);
-	
-	MemoryBlock chunkMemory(data, size);
-	wrapper->setChunk(chunkMemory);
+
+    MemoryBlock chunkMemory(data, size);
+    wrapper->setChunk(chunkMemory);
 }
 
 const void* juceLV2ExtensionData(const char* uri)
 {
-	static const LV2_Persist persist = { juceLV2Save, juceLV2Restore };
-	if (strcmp(uri, LV2_PERSIST_URI) == 0)
-		return &persist;
-	return nullptr;
+    static const LV2_Persist persist = { juceLV2Save, juceLV2Restore };
+    if (strcmp(uri, LV2_PERSIST_URI) == 0)
+        return &persist;
+    return nullptr;
 }
 
 //==============================================================================
