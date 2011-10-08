@@ -265,6 +265,7 @@
 #define JucePlugin_RTASProductId            JucePlugin_PluginCode
 
 #define JucePlugin_TailLengthSeconds 0
+#define JucePlugin_LV2Category             "DelayPlugin"
 
 //==============================================================================
 

@@ -107,8 +107,8 @@
  #error "You need to define at least one plugin format value in your JucePluginCharacteristics.h file!"
 #endif
 
-#if JucePlugin_Build_LV2 && !JucePlugin_LV2Category
- #warning "JucePlugin_LV2Category is not defined, please define it in your JucePluginCharacteristics.h file"
+#if JucePlugin_Build_LV2 && !defined(JucePlugin_LV2Category)
+ #warning "You should define the JucePlugin_LV2Category value in your JucePluginCharacteristics.h file"
 #endif
 
 #if JucePlugin_Build_VST && (JUCE_USE_VSTSDK_2_4 != 0 && JUCE_USE_VSTSDK_2_4 != 1)

@@ -57,8 +57,10 @@
 */
 #ifdef MRALIAS2_FX
 #define JucePlugin_IsSynth                          0
+#define JucePlugin_LV2Category                      "UtilityPlugin"
 #else
 #define JucePlugin_IsSynth                          1
+#define JucePlugin_LV2Category                      "InstrumentPlugin"
 #endif
 
 /** The name of your plugin. (Try to keep this as short as possible)

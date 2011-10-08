@@ -19,6 +19,7 @@
 #define JucePlugin_VersionString        "2.0.0"
 #define JucePlugin_VSTUniqueID          JucePlugin_PluginCode
 #define JucePlugin_VSTCategory          kPlugCategEffect
+#define JucePlugin_LV2Category          "ModulatorPlugin"
 #define JucePlugin_AUMainType           kAudioUnitType_Effect
 #define JucePlugin_AUSubType            JucePlugin_PluginCode
 #define JucePlugin_AUExportPrefix       ArgotlunarAU

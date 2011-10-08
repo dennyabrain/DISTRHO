@@ -278,6 +278,8 @@
 
 #define JucePlugin_TailLengthSeconds 0
 
+#define JucePlugin_LV2Category              "PitchPlugin"
+
 //==============================================================================
 
 #endif

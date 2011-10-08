@@ -286,6 +286,8 @@
 // ...whatever!
 #define JUCE_ObjCExtraSuffix 3
 
+#define JucePlugin_LV2Category "InstrumentPlugin"
+
 //==============================================================================
 
 #endif
