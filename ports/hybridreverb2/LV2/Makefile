@@ -9,17 +9,17 @@ endif
 
 export CONFIG
 
-.PHONY: all clean HybridReverb2.lv2
+.PHONY: all clean HybridReverb2
 
-all: HybridReverb2.lv2
+all: HybridReverb2
 
 Makefile: premake.lua
 	@echo ==== Regenerating Makefiles ====
 	@premake --file $^ --os linux --target gnu --cc gcc
 
-HybridReverb2.lv2:
-	@echo ==== Building HybridReverb2.lv2 ====
-	@$(MAKE) --no-print-directory -C . -f HybridReverb2.lv2.make
+HybridReverb2:
+	@echo ==== Building HybridReverb2 ====
+	@$(MAKE) --no-print-directory -C . -f HybridReverb2.make
 
 clean:
-	@$(MAKE) --no-print-directory -C . -f HybridReverb2.lv2.make clean
+	@$(MAKE) --no-print-directory -C . -f HybridReverb2.make clean

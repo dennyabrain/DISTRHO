@@ -15,173 +15,137 @@
 // LV2 includes
 #include "lv2/lv2.h"
 #include "lv2/event.h"
-#include "lv2/event_helpers.h"
-#include "lv2/instance_access.h"
-#include "lv2/uri_map.h"
+#include "lv2/event-helpers.h"
+#include "lv2/instance-access.h"
+#include "lv2/persist.h"
+#include "lv2/uri-map.h"
 #include "lv2/ui.h"
 #include "lv2/lv2_external_ui.h"
 
-// These are dummy values!
-enum FakePlugCategory
-{
-    kPlugCategUnknown,
-    kPlugCategEffect,
-    kPlugCategSynth,
-    kPlugCategAnalysis,
-    kPlugCategMastering,
-    kPlugCategSpacializer,
-    kPlugCategRoomFx,
-    kPlugSurroundFx,
-    kPlugCategRestoration,
-    kPlugCategOfflineProcess,
-    kPlugCategGenerator
-};
-
 extern AudioProcessor* JUCE_CALLTYPE createPluginFilter();
 
-String name_to_symbol(String Name, uint32_t port_index)
+//==============================================================================
+// Various helper functions for creating the ttl files
+/** Converts a name to an LV2 compatible symbol. */
+String nameToSymbol(const String& name, const uint32 portIndex)
 {
-    String Symbol = Name.trimStart().trimEnd().replace(" ", "_").toLowerCase();
-
-    if (Symbol.isEmpty())
+    String trimmedName = name.trimStart().trimEnd().toLowerCase();
+	
+    if (trimmedName.isEmpty())
+		return String(portIndex);
+	
+    String symbol;
+    for (int i=0; i < trimmedName.length(); i++)
     {
-        Symbol += String(port_index);
+		const juce_wchar c = trimmedName[i];
+		if (std::isalpha(c) || std::isdigit(c))
+			symbol += c;
+		else
+			symbol += '_';
     }
-    else
-    {
-        for (int i=0; i < Symbol.length(); i++)
-        {
-            if (std::isalpha(Symbol[i]) || std::isdigit(Symbol[i]) || Symbol[i] == '_') {
-                // nothing
-            } else {
-                Symbol[i] == '_';
-            }
-        }
-    }
-
-    return Symbol;
+    return symbol;
 }
 
-String float_to_string(float value)
+/** Returns the URI of the plugin */
+String getURI()
 {
-    if (value < 0.0f || value > 1.0f) {
-        std::cerr << "WARNING - Parameter uses out-of-bounds value -> " << value << std::endl;
-    }
-    String string(value);
-    if (!string.contains(".")) {
-        string += ".0";
-    }
-    return string;
+    return String("urn:" JucePlugin_Manufacturer ":" JucePlugin_Name).replace(" ", "_");
 }
 
-String get_uri()
-{
-    return String("urn:" JucePlugin_Manufacturer ":" JucePlugin_Name ":" JucePlugin_VersionString).replace(" ", "_");
-}
-
-String get_juce_ui_uri()
+/** Returns the URI of the Juce UI */
+String getJuceUIURI()
 {
     return String("urn:" JucePlugin_Manufacturer ":" JucePlugin_Name ":JUCE-Native-UI").replace(" ", "_");
 }
 
-String get_external_ui_uri()
+/** Returns the URI of the External UI */
+String getExternalUIURI(bool isNew)
 {
-    return String("urn:" JucePlugin_Manufacturer ":" JucePlugin_Name ":JUCE-External-UI").replace(" ", "_");
+    if (isNew)
+      return String("urn:" JucePlugin_Manufacturer ":" JucePlugin_Name ":JUCE-External-UI").replace(" ", "_");
+    else
+      return String("urn:" JucePlugin_Manufacturer ":" JucePlugin_Name ":JUCE-OldExternal-UI").replace(" ", "_");
 }
 
-String get_binary_name()
+/** Returns the name of the plugin binary file */
+String getBinaryName()
 {
-    return String(JucePlugin_Name).replace(" ", "_");
+	return String(JucePlugin_Name).replace(" ", "_");
 }
 
-String get_plugin_type()
+/** Returns plugin type, defined in JucePluginCharacteristics.h */
+const String getPluginType()
 {
-    String ptype;
-
-    switch (JucePlugin_VSTCategory) {
-    case kPlugCategSynth:
-        ptype += "lv2:InstrumentPlugin";
-        break;
-    case kPlugCategAnalysis:
-        ptype += "lv2:AnalyserPlugin";
-        break;
-    case kPlugCategMastering:
-        ptype += "lv2:DynamicsPlugin";
-        break;
-    case kPlugCategSpacializer:
-        ptype += "lv2:SpatialPlugin";
-        break;
-    case kPlugCategRoomFx:
-        ptype += "lv2:ModulatorPlugin";
-        break;
-    case kPlugCategRestoration:
-        ptype += "lv2:UtilityPlugin";
-        break;
-    case kPlugCategGenerator:
-        ptype += "lv2:GeneratorPlugin";
-        break;
-    }
-
-    if (ptype.isNotEmpty()) {
-        ptype += ", ";
-    }
-
-    ptype += "lv2:Plugin";
-    return ptype;
+    String pluginType;
+#if defined(JucePlugin_LV2Category)
+	pluginType = "lv2:" JucePlugin_LV2Category;
+#endif
+    if (pluginType.isNotEmpty())
+        pluginType += ", ";
+	
+    pluginType += "lv2:Plugin";
+    return pluginType;
 }
 
-String get_manifest_ttl(String URI, String Binary)
+/** Create the manifest.ttl contents */
+String makeManifestTtl(const String& uri, const String& binary)
 {
     String manifest;
     manifest += "@prefix lv2:  <http://lv2plug.in/ns/lv2core#> .\n";
     manifest += "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\n";
     manifest += "\n";
-    manifest += "<" + URI + ">\n";
+    manifest += "<" + uri + ">\n";
     manifest += "    a lv2:Plugin ;\n";
-    manifest += "    lv2:binary <" + Binary + ".so> ;\n";
-    manifest += "    rdfs:seeAlso <" + Binary +".ttl> .\n";
+    manifest += "    lv2:binary <" + binary + ".so> ;\n";
+    manifest += "    rdfs:seeAlso <" + binary +".ttl> .\n";
     return manifest;
 }
 
-String get_plugin_ttl(String URI, String Binary)
+/** Create the plugin.ttl contents */
+String makePluginTtl(const String& uri, const String& binary)
 {
-    uint32_t i, port_index = 0;
-    AudioProcessor* filter = createPluginFilter();
+    uint32 portIndex = 0;
+    ScopedPointer<AudioProcessor> filter (createPluginFilter());
 
     String plugin;
     plugin += "@prefix doap:  <http://usefulinc.com/ns/doap#> .\n";
-    //plugin += "@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n";
-    //plugin += "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\n";
+    plugin += "@prefix foaf:  <http://xmlns.com/foaf/0.1/> .\n";
     plugin += "@prefix lv2:   <http://lv2plug.in/ns/lv2core#> .\n";
     plugin += "@prefix lv2ev: <http://lv2plug.in/ns/ext/event#> .\n";
     plugin += "@prefix lv2ui: <http://lv2plug.in/ns/extensions/ui#> .\n";
     plugin += "\n";
 
-    if (filter->hasEditor()) {
-        plugin += "<" + get_juce_ui_uri() + ">\n";
+    if (filter->hasEditor())
+    {
+        plugin += "<" + getJuceUIURI() + ">\n";
         plugin += "    a lv2ui:JUCEUI ;\n";
-        plugin += "    lv2ui:binary <" + Binary + ".so> .\n";
-        plugin += "<" + get_external_ui_uri() + ">\n";
+        plugin += "    lv2ui:binary <" + binary + ".so> .\n";
+        plugin += "<" + getExternalUIURI(true) + ">\n";
+        plugin += "    a \"http://nedko.arnaudov.name/lv2/external_ui/\" ;\n";
+        plugin += "    lv2ui:binary <" + binary + ".so> .\n";
+        plugin += "<" + getExternalUIURI(false) + ">\n";
         plugin += "    a lv2ui:external ;\n";
-        plugin += "    lv2ui:binary <" + Binary + ".so> .\n";
+        plugin += "    lv2ui:binary <" + binary + ".so> .\n";
         plugin += "\n";
     }
 
-    plugin += "<" + URI + ">\n";
-    plugin += "    a " + get_plugin_type() + " ;\n";
+    plugin += "<" + uri + ">\n";
+    plugin += "    a " + getPluginType() + " ;\n";
+    plugin += "    lv2:optionalFeature <http://lv2plug.in/ns/ext/persist> ;\n";
 
-    if (filter->hasEditor()) {
-        plugin += "    lv2ui:ui <" + get_juce_ui_uri() + ">,\n";
-        plugin += "             <" + get_external_ui_uri() + ">;\n";
+    if (filter->hasEditor())
+    {
+        plugin += "    lv2ui:ui <" + getJuceUIURI() + "> ,\n";
+        plugin += "             <" + getExternalUIURI(true) + "> ,\n";
+        plugin += "             <" + getExternalUIURI(false) + "> ;\n";
     }
-
     plugin += "\n";
 
 #if JucePlugin_WantsMidiInput
     plugin += "    lv2:port [\n";
     plugin += "      a lv2:InputPort, lv2ev:EventPort;\n";
     plugin += "      lv2ev:supportsEvent <http://lv2plug.in/ns/ext/midi#MidiEvent>;\n";
-    plugin += "      lv2:index " + String(port_index++) + ";\n";
+    plugin += "      lv2:index " + String(portIndex++) + ";\n";
     plugin += "      lv2:symbol \"midi_in\";\n";
     plugin += "      lv2:name \"MIDI Input\";\n";
     plugin += "    ] ;\n\n";
@@ -191,106 +155,99 @@ String get_plugin_ttl(String URI, String Binary)
     plugin += "    lv2:port [\n";
     plugin += "      a lv2:OutputPort, lv2ev:EventPort;\n";
     plugin += "      lv2ev:supportsEvent <http://lv2plug.in/ns/ext/midi#MidiEvent>;\n";
-    plugin += "      lv2:index " + String(port_index++) + ";\n";
+    plugin += "      lv2:index " + String(portIndex++) + ";\n";
     plugin += "      lv2:symbol \"midi_out\";\n";
     plugin += "      lv2:name \"MIDI Output\";\n";
     plugin += "    ] ;\n\n";
 #endif
 
-    for (i=0; i<JucePlugin_MaxNumInputChannels; i++) {
-        if (i == 0) {
+    for (int i=0; i<JucePlugin_MaxNumInputChannels; i++)
+    {
+        if (i == 0)
             plugin += "    lv2:port [\n";
-        } else {
+        else
             plugin += "    [\n";
-        }
 
         plugin += "      a lv2:InputPort, lv2:AudioPort;\n";
-        //plugin += "      lv2:datatype lv2:float;\n";
-        plugin += "      lv2:index " + String(port_index++) + ";\n";
+        plugin += "      lv2:index " + String(portIndex++) + ";\n";
         plugin += "      lv2:symbol \"audio_in_" + String(i+1) + "\";\n";
         plugin += "      lv2:name \"Audio Input " + String(i+1) + "\";\n";
 
-        if (i+1 == JucePlugin_MaxNumInputChannels) {
+        if (i+1 == JucePlugin_MaxNumInputChannels)
             plugin += "    ] ;\n\n";
-        } else {
+        else
             plugin += "    ],\n";
-        }
     }
 
-    for (i=0; i<JucePlugin_MaxNumOutputChannels; i++) {
-        if (i == 0) {
+    for (int i=0; i<JucePlugin_MaxNumOutputChannels; i++)
+    {
+        if (i == 0)
             plugin += "    lv2:port [\n";
-        } else {
+        else
             plugin += "    [\n";
-        }
 
         plugin += "      a lv2:OutputPort, lv2:AudioPort;\n";
-        //plugin += "      lv2:datatype lv2:float;\n";
-        plugin += "      lv2:index " + String(port_index++) + ";\n";
+        plugin += "      lv2:index " + String(portIndex++) + ";\n";
         plugin += "      lv2:symbol \"audio_out_" + String(i+1) + "\";\n";
         plugin += "      lv2:name \"Audio Output " + String(i+1) + "\";\n";
 
-        if (i+1 == JucePlugin_MaxNumOutputChannels) {
+        if (i+1 == JucePlugin_MaxNumOutputChannels)
             plugin += "    ] ;\n\n";
-        } else {
+        else
             plugin += "    ],\n";
-        }
     }
 
-    for (i=0; i < filter->getNumParameters(); i++) {
-        if (i == 0) {
+    for (int i=0; i < filter->getNumParameters(); i++)
+    {
+        if (i == 0)
             plugin += "    lv2:port [\n";
-        } else {
+        else
             plugin += "    [\n";
-        }
 
         plugin += "      a lv2:InputPort;\n";
         plugin += "      a lv2:ControlPort;\n";
-        //plugin += "      lv2:datatype lv2:float;\n";
-        plugin += "      lv2:index " + String(port_index++) + ";\n";
-        plugin += "      lv2:symbol \"" + name_to_symbol(filter->getParameterName(i), i) + "\";\n";
+        plugin += "      lv2:index " + String(portIndex++) + ";\n";
+        plugin += "      lv2:symbol \"" + nameToSymbol(filter->getParameterName(i), i) + "\";\n";
         plugin += "      lv2:name \"" + filter->getParameterName(i) + "\";\n";
-        plugin += "      lv2:default " + float_to_string(filter->getParameter(i)) + ";\n";
+        plugin += "      lv2:default " + String(filter->getParameter(i)) + ";\n";
         plugin += "      lv2:minimum 0.0;\n";
         plugin += "      lv2:maximum 1.0;\n";
 
-        if (i+1 == filter->getNumParameters()) {
+        if (i+1 == filter->getNumParameters())
             plugin += "    ] ;\n\n";
-        } else {
+        else
             plugin += "    ],\n";
-        }
     }
 
     plugin += "    doap:name \"" JucePlugin_Name "\" ;\n";
-    plugin += "    doap:creator \"" JucePlugin_Manufacturer "\" .\n";
+    plugin += "    doap:maintainer [ foaf:name \"" JucePlugin_Manufacturer "\" ] .\n";
 
-    delete filter;
     return plugin;
 }
 
-void generate_ttl()
+/** Creates the manifest.ttl and plugin.ttl files */
+void createTtlFiles()
 {
-    String URI = get_uri();
-    String Binary = get_binary_name();
-    String BinaryTTL = Binary + ".ttl";
-
+    ScopedJuceInitialiser_GUI juceInitialiser;
+    String URI = getURI();
+    String Binary = getBinaryName();
+    String BinaryTtl = Binary + ".ttl";
+	
     std::cout << "Writing manifest.ttl...";
     std::fstream manifest("manifest.ttl", std::ios::out);
-    manifest << get_manifest_ttl(URI, Binary) << std::endl;
+    manifest << makeManifestTtl(URI, Binary) << std::endl;
     manifest.close();
     std::cout << " done!" << std::endl;
-
-    std::cout << "Writing " << BinaryTTL << "...";
-    std::fstream plugin(BinaryTTL.toUTF8(), std::ios::out);
-    plugin << get_plugin_ttl(URI, Binary) << std::endl;
+	
+    std::cout << "Writing " << BinaryTtl << "...";
+    std::fstream plugin(BinaryTtl.toUTF8(), std::ios::out);
+    plugin << makePluginTtl(URI, Binary) << std::endl;
     plugin.close();
     std::cout << " done!" << std::endl;
 }
 
 //==============================================================================
 BEGIN_JUCE_NAMESPACE
- //extern void juce_callAnyTimersSynchronously();
-
  #if JUCE_MAC
   extern void initialiseMac();
  #endif
@@ -307,7 +264,6 @@ public:
         initialised (false)
     {
         startThread (7);
-
         while (! initialised)
             sleep (1);
     }
@@ -345,20 +301,20 @@ static Array<void*> activePlugins;
 
 //==============================================================================
 // Create a new JUCE LV2 Plugin
-class JuceLV2Wrapper : private Timer
+class JuceLV2Wrapper
 {
 public:
-    JuceLV2Wrapper(const LV2_Descriptor* descriptor_, double sample_rate_, const LV2_Feature* const* features) :
-            chunkMemoryTime (0),
+    JuceLV2Wrapper(const LV2_Descriptor* descriptor_, double sampleRate_, const LV2_Feature* const* features) :
             numInChans (JucePlugin_MaxNumInputChannels),
             numOutChans (JucePlugin_MaxNumOutputChannels),
             isProcessing (false),
             firstProcessCallback (true),
             descriptor (descriptor_),
-            sample_rate (sample_rate_),
-            buffer_size (512),
-            midi_uri_id (0),
-            port_count (0)
+            sampleRate (sampleRate_),
+            bufferSize (512),
+            uriMap(nullptr),
+            midiURIId (0),
+            portCount (0)
     {
         JUCE_AUTORELEASEPOOL;
         initialiseJuce_GUI();
@@ -374,47 +330,42 @@ public:
 
         // Port count
 #if JucePlugin_WantsMidiInput
-        port_count += 1;
+        portCount += 1;
 #endif
 #if JucePlugin_ProducesMidiOutput
-        port_count += 1;
+        portCount += 1;
 #endif
-        port_count += numInChans;
-        port_count += numOutChans;
-        port_count += filter->getNumParameters();
+        portCount += numInChans;
+        portCount += numOutChans;
+        portCount += filter->getNumParameters();
 
         // Set Port data
-        port_min = nullptr;
-        port_mout = nullptr;
-        ports_ctrl.insertMultiple(0, nullptr, filter->getNumParameters());
-        ports_ctrl_last.insertMultiple(0, 0.0f, filter->getNumParameters());
+        midiInPort = nullptr;
+        midiOutPort = nullptr;
+        parameterInPorts.insertMultiple(0, nullptr, filter->getNumParameters());
+        parameterInPortsValues.insertMultiple(0, 0.0f, filter->getNumParameters());
 
-        for (int i=0; i < numInChans; i++) {
-            ports_ain[i] = nullptr;
-        }
+        for (int i=0; i < numInChans; i++)
+            audioInPorts[i] = nullptr;
 
-        for (int i=0; i < numOutChans; i++) {
-            ports_aout[i] = nullptr;
-        }
+        for (int i=0; i < numOutChans; i++)
+            audioOutPorts[i] = nullptr;
 
-        for (int i=0; i < filter->getNumParameters(); i++) {
-            ports_ctrl_last.set(i, filter->getParameter(i));
-        }
+        for (int i=0; i < filter->getNumParameters(); i++)
+            parameterInPortsValues.set(i, filter->getParameter(i));
 
         // Get MIDI URI Id
-        for (uint16_t j = 0; features[j]; j++)
+        for (uint16 j = 0; features[j]; j++)
         {
             if (strcmp(features[j]->URI, LV2_URI_MAP_URI) == 0)
             {
-                LV2_URI_Map_Feature* uri_feature = (LV2_URI_Map_Feature*)features[j]->data;
-                midi_uri_id = uri_feature->uri_to_id(uri_feature->callback_data, LV2_EVENT_URI, "http://lv2plug.in/ns/ext/midi#MidiEvent");
+                uriMap = (LV2_URI_Map_Feature*)features[j]->data;
+                midiURIId = uriMap->uri_to_id(uriMap->callback_data, LV2_EVENT_URI, "http://lv2plug.in/ns/ext/midi#MidiEvent");
                 break;
             }
         }
 
         activePlugins.add (this);
-
-        startTimer(1000);
     }
 
     ~JuceLV2Wrapper()
@@ -425,16 +376,14 @@ public:
 #if JUCE_LINUX
             MessageManagerLock mmLock;
 #endif
-            stopTimer();
-
             delete filter;
             filter = nullptr;
 
             channels.free();
             deleteTempChannels();
 
-            ports_ctrl.clear();
-            ports_ctrl_last.clear();
+            parameterInPorts.clear();
+            parameterInPortsValues.clear();
 
             jassert (activePlugins.contains (this));
             activePlugins.removeValue (this);
@@ -451,83 +400,87 @@ public:
 
     //==============================================================================
     // LV2 Descriptor Calls
-    void do_connect_port(uint32_t port, void* data_location)
+    void doConnectPort(const uint32 port, void* dataLocation)
     {
-        if (port < port_count)
+        if (port < portCount)
         {
-            int i;
-            uint32_t index = 0;
+            uint32 index = 0;
 
 #if JucePlugin_WantsMidiInput
-            if (port == index) {
-                port_min = (LV2_Event_Buffer*)data_location;
+            if (port == index)
+	    {
+                midiInPort = (LV2_Event_Buffer*)dataLocation;
                 return;
             }
-            index += 1;
+            ++index;
 #endif
 
 #if JucePlugin_ProducesMidiOutput
-            if (port == index) {
-                port_mout = (LV2_Event_Buffer*)data_location;
+            if (port == index)
+	    {
+                midiOutPort = (LV2_Event_Buffer*)dataLocation;
                 return;
             }
-            index += 1;
+            ++index;
 #endif
 
-            for (i=0; i < numInChans; i++) {
-                if (port == index) {
-                    ports_ain[i] = (float*)data_location;
+            for (int i=0; i < numInChans; ++i, ++index)
+	    {
+                if (port == index)
+		{
+                    audioInPorts[i] = (float*)dataLocation;
                     return;
                 }
-                index += 1;
             }
 
-            for (i=0; i < numOutChans; i++) {
-                if (port == index) {
-                    ports_aout[i] = (float*)data_location;
+            for (int i=0; i < numOutChans; ++i, ++index)
+	    {
+                if (port == index)
+		{
+                    audioOutPorts[i] = (float*)dataLocation;
                     return;
                 }
-                index += 1;
             }
 
-            for (i=0; i < filter->getNumParameters(); i++) {
-                if (port == index) {
-                    ports_ctrl.set(i, (float*)data_location);
+            for (int i=0; i < filter->getNumParameters(); ++i, ++index)
+	    {
+                if (port == index)
+		{
+                    parameterInPorts.set(i, (float*)dataLocation);
                     return;
                 }
-                index += 1;
             }
         }
     }
 
-    void do_activate()
+    void doActivate()
     {
         if (filter != nullptr)
         {
             isProcessing = true;
             channels.calloc (numInChans + numOutChans);
 
-            jassert (sample_rate > 0);
-            if (sample_rate <= 0.0)
-                sample_rate = 44100.0;
+            jassert (sampleRate > 0);
+            if (sampleRate <= 0.0)
+                sampleRate = 44100.0;
 
-            jassert (buffer_size > 0);
+            jassert (bufferSize > 0);
 
             firstProcessCallback = true;
 
             filter->setNonRealtime (false);
-            filter->setPlayConfigDetails (numInChans, numOutChans, sample_rate, buffer_size);
+            filter->setPlayConfigDetails (numInChans, numOutChans, sampleRate, bufferSize);
 
             deleteTempChannels();
 
-            filter->prepareToPlay (sample_rate, buffer_size);
+            filter->prepareToPlay (sampleRate, bufferSize);
 
             midiEvents.ensureSize (2048);
             midiEvents.clear();
         }
     }
 
-    void do_deactivate()
+    void doDeactivate()
     {
         if (filter != nullptr)
         {
@@ -540,7 +493,7 @@ public:
         }
     }
 
-    void do_run(uint32_t sample_count)
+    void doRun(uint32 numSamples)
     {
         if (firstProcessCallback)
         {
@@ -552,7 +505,7 @@ public:
             // (tragically, some hosts actually need this, although it's stupid to have
             //  to do it here..)
             if (! isProcessing)
-                do_activate();
+                doActivate();
 
             filter->setNonRealtime (false);
 
@@ -564,23 +517,24 @@ public:
         }
 
         // Check if buffer size changed
-        if (buffer_size != sample_count)
+        if (bufferSize != numSamples)
         {
-            buffer_size = sample_count;
-            filter->setPlayConfigDetails(numInChans, numOutChans, sample_rate, buffer_size);
-            filter->prepareToPlay(sample_rate, buffer_size);
+            bufferSize = numSamples;
+            filter->setPlayConfigDetails(numInChans, numOutChans, sampleRate, bufferSize);
+            filter->prepareToPlay(sampleRate, bufferSize);
         }
 
         // Check for updated parameters
         float cur_value;
-        for (int i = 0; i < ports_ctrl.size(); i++)
+        for (int i = 0; i < parameterInPorts.size(); i++)
         {
-            if (ports_ctrl[i] != nullptr)
+            if (parameterInPorts[i] != nullptr)
             {
-                cur_value = *(float*)ports_ctrl[i];
-                if (ports_ctrl_last[i] != cur_value) {
+                cur_value = *(float*)parameterInPorts[i];
+                if (parameterInPortsValues[i] != cur_value)
+		{
                     filter->setParameter(i, cur_value);
-                    ports_ctrl_last.setUnchecked(i, cur_value);
+                    parameterInPortsValues.setUnchecked(i, cur_value);
                 }
             }
         }
@@ -596,72 +550,76 @@ public:
             if (filter->isSuspended())
             {
                 for (int i = 0; i < numOut; ++i)
-                    zeromem (ports_aout[i], sizeof (float) * sample_count);
+                    zeromem (audioOutPorts[i], sizeof (float) * numSamples);
             }
             else
             {
-                int i;
+	        int i;
                 for (i = 0; i < numOut; ++i)
                 {
                     float* chan = tempChannels.getUnchecked(i);
 
                     if (chan == 0)
                     {
-                        chan = ports_aout[i];
+                        chan = audioOutPorts[i];
 
                         // if some output channels are disabled, some hosts supply the same buffer
                         // for multiple channels - this buggers up our method of copying the
                         // inputs over the outputs, so we need to create unique temp buffers in this case..
                         for (int j = i; --j >= 0;)
                         {
-                            if (ports_aout[j] == chan)
+                            if (audioOutPorts[j] == chan)
                             {
-                                chan = new float [buffer_size * 2];
+                                chan = new float [bufferSize * 2];
                                 tempChannels.set (i, chan);
                                 break;
                             }
                         }
                     }
 
-                    if (i < numIn && chan != ports_ain[i])
-                        memcpy (chan, ports_ain[i], sizeof (float) * sample_count);
+                    if (i < numIn && chan != audioInPorts[i])
+                        memcpy (chan, audioInPorts[i], sizeof (float) * numSamples);
 
                     channels[i] = chan;
                 }
 
                 // LV2 MIDI Input
-                if (port_min != nullptr)
+                if (midiInPort != nullptr)
                 {
                     LV2_Event_Iterator iter;
-                    lv2_event_begin(&iter, port_min);
+                    lv2_event_begin(&iter, midiInPort);
+                    uint32 sampleFrame = 0;
+		    uint8_t* data = 0;
 
-                    lv2_event_buffer_reset(port_min, LV2_EVENT_AUDIO_STAMP, (uint8_t*)(port_min + 1));
-
-                    for (uint32_t i=0; i < iter.buf->event_count; ++i) {
-                        uint8_t* data;
-                        LV2_Event* ev = lv2_event_get(&iter, &data);
-                        midiEvents.addEvent(data, ev->size, ev->frames);
-                        lv2_event_increment(&iter);
+                    while (sampleFrame < numSamples && lv2_event_is_valid(&iter))
+                    {
+						LV2_Event* event = lv2_event_get(&iter, &data);
+						sampleFrame = event->frames;
+						midiEvents.addEvent(data, event->size, event->frames);
+						lv2_event_increment(&iter);
+						
+						//if (event && event->type == 0)
+						//	event_unref(event);
                     }
                 }
 
                 for (; i < numIn; ++i)
-                    channels[i] = ports_ain[i];
+                    channels[i] = audioInPorts[i];
 
-                AudioSampleBuffer chans (channels, jmax (numIn, numOut), sample_count);
+                AudioSampleBuffer chans (channels, jmax (numIn, numOut), numSamples);
 
                 filter->processBlock (chans, midiEvents);
             }
         }
 
-        if (! midiEvents.isEmpty() && port_mout != nullptr)
+        if (! midiEvents.isEmpty() && midiOutPort != nullptr)
         {
 #if JucePlugin_ProducesMidiOutput
             const int numEvents = midiEvents.getNumEvents();
 
             LV2_Event_Iterator iter;
-            lv2_event_buffer_reset(port_mout, LV2_EVENT_AUDIO_STAMP, (uint8_t*)(port_mout + 1));
-            lv2_event_begin(&iter, port_mout);
+            lv2_event_buffer_reset(midiOutPort, LV2_EVENT_AUDIO_STAMP, (uint8_t*)(midiOutPort + 1));
+            lv2_event_begin(&iter, midiOutPort);
 
             const JUCE_NAMESPACE::uint8* midiEventData;
             int midiEventSize, midiEventPosition;
@@ -671,22 +629,20 @@ public:
             {
                 jassert (midiEventPosition >= 0 && midiEventPosition < sample_count);
 
-                lv2_event_write(&iter, midiEventPosition, 0, midi_uri_id, midiEventSize, midiEventData);
+                lv2_event_write(&iter, midiEventPosition, 0, midiURIId, midiEventSize, midiEventData);
             }
 #endif
             midiEvents.clear();
         }
     }
 
-    void do_cleanup()
+    void doCleanup()
     {
-#if 0
         if (descriptor)
         {
             free((void*)descriptor->URI);
             delete descriptor;
         }
-#endif
     }
 
     //==============================================================================
@@ -695,70 +651,50 @@ public:
     AudioProcessor* getFilter() { return filter; }
 
     //==============================================================================
-    int32_t getChunk (void** data)
-    {
-        if (filter == nullptr)
-            return 0;
-
-        chunkMemory.setSize (0);
-        filter->getCurrentProgramStateInformation (chunkMemory);
-
-        *data = (void*) chunkMemory.getData();
-
-        // because the chunk is only needed temporarily by the host (or at least you'd
-        // hope so) we'll give it a while and then free it in the timer callback.
-        chunkMemoryTime = JUCE_NAMESPACE::Time::getApproximateMillisecondCounter();
-
-        return (int32_t) chunkMemory.getSize();
-    }
-
-    void setChunk (void* data, int32_t byteSize)
+    void getChunk (MemoryBlock& data)
     {
         if (filter == nullptr)
             return;
-
-        chunkMemory.setSize (0);
-        chunkMemoryTime = 0;
-
-        if (byteSize > 0 && data != nullptr)
-        {
-            filter->setCurrentProgramStateInformation (data, byteSize);
-        }
+        data.setSize (0);
+        if (filter)
+			filter->getStateInformation(data);
     }
 
-    void timerCallback()
+    void setChunk (const MemoryBlock& data)
     {
-        if (chunkMemoryTime > 0 && chunkMemoryTime < JUCE_NAMESPACE::Time::getApproximateMillisecondCounter() - 2000)
-        {
-            chunkMemoryTime = 0;
-            chunkMemory.setSize (0);
-        }
+        if (filter == nullptr)
+            return;
+        filter->setStateInformation(data.getData(), data.getSize());
+    }
+	
+    LV2_URI_Map_Feature* getURIMap()
+    {
+        return uriMap;
     }
 
     //==============================================================================
 private:
     AudioProcessor* filter;
-    JUCE_NAMESPACE::MemoryBlock chunkMemory;
-    JUCE_NAMESPACE::uint32 chunkMemoryTime;
     MidiBuffer midiEvents;
     int numInChans, numOutChans;
     bool isProcessing, firstProcessCallback;
     HeapBlock<float*> channels;
-    Array<float*> tempChannels;  // see note in do_run()
+    Array<float*> tempChannels;  // see note in doRun()
 
     const LV2_Descriptor* descriptor;
 
-    double sample_rate;
-    int buffer_size;
-    uint16_t midi_uri_id;
-    uint32_t port_count;
+    double sampleRate;
+    uint32 bufferSize;
+    LV2_URI_Map_Feature* uriMap;
+    uint16 midiURIId;
+    uint32 portCount;
 
-    LV2_Event_Buffer* port_min;
-    LV2_Event_Buffer* port_mout;
-    float* ports_ain[JucePlugin_MaxNumInputChannels];
-    float* ports_aout[JucePlugin_MaxNumOutputChannels];
-    Array<float*> ports_ctrl;
-    Array<float> ports_ctrl_last;
+    LV2_Event_Buffer* midiInPort;
+    LV2_Event_Buffer* midiOutPort;
+    float* audioInPorts[JucePlugin_MaxNumInputChannels];
+    float* audioOutPorts[JucePlugin_MaxNumOutputChannels];
+    Array<float*> parameterInPorts;
+    Array<float> parameterInPortsValues;
 
     //==============================================================================
     void deleteTempChannels()
@@ -776,16 +712,35 @@ private:
 };
 
 //==============================================================================
-// Create a new JUCE External UI
-class JuceLv2ExternalUI : public lv2_external_ui
-                          //public Button::Listener
+/** Lightweight DocumentWindow subclass that captures close button presses, and responds by removing the external ui. */
+class JuceLV2DocumentWindow : public DocumentWindow
 {
 public:
-    JuceLv2ExternalUI (AudioProcessor* filter_, AudioProcessorEditor* const editor_, lv2_external_ui_host* external_ui_host_, LV2UI_Controller controller_) :
+	/** Creates a Document Window wrapper */
+	JuceLV2DocumentWindow (const String& title) :
+	DocumentWindow(title, Colours::white, DocumentWindow::minimiseButton | DocumentWindow::closeButton, true)
+	{
+	}
+	
+	/** Close button handler */
+	void closeButtonPressed()
+	{
+		removeFromDesktop();
+	}
+	
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (JuceLV2DocumentWindow);
+};
+
+//==============================================================================
+/** Create a new JUCE External UI */
+class JuceLv2ExternalUI : public lv2_external_ui
+{
+public:
+    JuceLv2ExternalUI (AudioProcessor* filter_, AudioProcessorEditor* const editor_, lv2_external_ui_host* externalUIHost_, LV2UI_Controller controller_) :
             filter(filter_),
             editor(editor_),
             window(nullptr),
-            external_ui_host(external_ui_host_),
+            externalUIHost(externalUIHost_),
             controller(controller_)
     {
         run = do_ui_run;
@@ -793,22 +748,22 @@ public:
         hide = do_ui_hide;
 
         const MessageManagerLock mmLock;
-        String title = external_ui_host->plugin_human_id != nullptr ? String(external_ui_host->plugin_human_id) : filter->getName();
-        window = new DocumentWindow(title, Colours::white, DocumentWindow::minimiseButton | DocumentWindow::closeButton, false);
-        //window->setOpaque(true);
-        //window->setAlwaysOnTop(true);
-        window->setDropShadowEnabled(false);
+        String title = externalUIHost->plugin_human_id != nullptr ? String(externalUIHost->plugin_human_id) : filter->getName();
+        window = new JuceLV2DocumentWindow(title);
+        window->setOpaque(true);
+        window->setAlwaysOnTop(true);
         window->setUsingNativeTitleBar(true);
         window->setContentNonOwned(editor, true);
-        window->setVisible(false);
     }
 
     ~JuceLv2ExternalUI()
     {
+        filter->editorBeingDeleted(editor);
+        editor = nullptr;
         if (window)
           delete window;
-        if (external_ui_host)
-          external_ui_host->ui_closed(controller);
+        if (externalUIHost)
+          externalUIHost->ui_closed(controller);
     }
 
     static void do_ui_run(lv2_external_ui * _this_)
@@ -824,7 +779,11 @@ public:
         const MessageManagerLock mmLock;
         JuceLv2ExternalUI* externalUI = (JuceLv2ExternalUI*)_this_;
         if (!externalUI->window->isOnDesktop())
-         externalUI->window->addToDesktop();
+        {
+            externalUI->window->setTopLeftPosition(100,100);
+            externalUI->window->addToDesktop();
+	    //externalUI->window->addToDesktop(externalUI->window->getDesktopWindowStyleFlags());
+        }
         if (externalUI->window)
           externalUI->window->setVisible(true);
     }
@@ -837,33 +796,13 @@ public:
           externalUI->window->setVisible(false);
     }
 
-#if 0
-    void buttonClicked(Button* button)
-    {
-      std::cerr << "button clicked" << std::endl;
-      if (button == window->getCloseButton())
-      {
-        std::cerr << "HERE!" << std::endl;
-        //delete externalUI;
-        //externalUI = nullptr;
-      } 
-    }
-
-    void buttonStateChanged(Button*) {}
-
-    Button* getCloseButton()
-    {
-       return window->getCloseButton();
-    }
-#endif
-
 private:
     AudioProcessor* filter;
     AudioProcessorEditor* editor;
     DocumentWindow* window;
 
-    lv2_external_ui external_ui;
-    lv2_external_ui_host* external_ui_host;
+    lv2_external_ui externalUI;
+    lv2_external_ui_host* externalUIHost;
     LV2UI_Controller controller;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (JuceLv2ExternalUI);
@@ -874,10 +813,10 @@ private:
 class JuceLv2Editor : public AudioProcessorListener
 {
 public:
-    JuceLv2Editor (AudioProcessor* filter_, const LV2UI_Descriptor* ui_descriptor_, LV2UI_Write_Function write_function_, LV2UI_Controller controller_, LV2UI_Widget* widget, const LV2_Feature* const* features, bool isExternalUI) :
+    JuceLv2Editor (AudioProcessor* filter_, const LV2UI_Descriptor* uiDescriptor_, LV2UI_Write_Function writeFunction_, LV2UI_Controller controller_, LV2UI_Widget* widget, const LV2_Feature* const* features, bool isExternalUI) :
             filter(filter_),
-            ui_descriptor(ui_descriptor_),
-            write_function(write_function_),
+            uiDescriptor(uiDescriptor_),
+            writeFunction(writeFunction_),
             controller(controller_),
             editor(nullptr),
             externalUI(nullptr)
@@ -886,7 +825,7 @@ public:
 
         if (filter->hasEditor())
         {
-            editor = filter->createEditor();
+            editor = filter->createEditorIfNeeded();
         }
 
         if (editor)
@@ -894,21 +833,20 @@ public:
             if (isExternalUI)
             {
                 // External UI
-                lv2_external_ui_host* external_ui_host = nullptr;
+                lv2_external_ui_host* externalUIHost = nullptr;
 
-                for (uint16_t j = 0; features[j]; j++)
+                for (uint16 j = 0; features[j]; j++)
                 {
-                    if (strcmp(features[j]->URI, LV2_EXTERNAL_UI_URI) == 0 && features[j]->data)
+                    if ((strcmp(features[j]->URI, LV2_EXTERNAL_UI_URI) == 0 || strcmp(features[j]->URI, LV2_EXTERNAL_UI_DEPRECATED_URI)) && features[j]->data)
                     {
-                        external_ui_host = (lv2_external_ui_host*)features[j]->data;
+                        externalUIHost = (lv2_external_ui_host*)features[j]->data;
                         break;
                     }
                 }
 
-                if (external_ui_host)
+                if (externalUIHost)
                 {
-                    externalUI = new JuceLv2ExternalUI(filter, editor, external_ui_host, controller);
-                    //externalUI->getCloseButton()->addListener(this);
+                    externalUI = new JuceLv2ExternalUI(filter, editor, externalUIHost, controller);
                     *widget = externalUI;
                 }
                 else
@@ -931,16 +869,16 @@ public:
             std::cerr << "Plugin has no UI" << std::endl;
         }
 
-        // Padding for control ports
-        ctrl_pad = 0;
+        // Offset for control ports
+        parameterPortOffset = 0;
 #if JucePlugin_WantsMidiInput
-        ctrl_pad += 1;
+        parameterPortOffset += 1;
 #endif
 #if JucePlugin_ProducesMidiOutput
-        ctrl_pad += 1;
+        parameterPortOffset += 1;
 #endif
-        ctrl_pad += JucePlugin_MaxNumInputChannels;
-        ctrl_pad += JucePlugin_MaxNumOutputChannels;
+        parameterPortOffset += JucePlugin_MaxNumInputChannels;
+        parameterPortOffset += JucePlugin_MaxNumOutputChannels;
     }
 
     ~JuceLv2Editor()
@@ -955,33 +893,30 @@ public:
 
         if (editor)
         {
-          //filter->editorBeingDeleted(editor);
+          filter->editorBeingDeleted(editor);
           delete editor;
         }
     }
 
-    void do_port_event(uint32_t port_index, float value)
+    void doPortEvent(const uint32 portIndex, const float value)
     {
-        filter->setParameter(port_index-ctrl_pad, value);
+        filter->setParameter(portIndex-parameterPortOffset, value);
     }
 
-    void do_cleanup()
+    void doCleanup()
     {
-        // We should only do this after UI gets working
-#if 0
-        if (ui_descriptor)
+        if (uiDescriptor)
         {
-            free((void*)ui_descriptor->URI);
-            delete ui_descriptor;
+            free((void*)uiDescriptor->URI);
+            delete uiDescriptor;
         }
-#endif
     }
 
     //==============================================================================
     void audioProcessorParameterChanged (AudioProcessor*, int index, float newValue)
     {
-        if (controller && write_function)
-            write_function(controller, index+ctrl_pad, 4 /* sizeof(float) */, 0, &newValue);
+        if (controller && writeFunction)
+            writeFunction(controller, index+parameterPortOffset, sizeof(float), 0, &newValue);
     }
 
     void audioProcessorChanged (AudioProcessor*) {}
@@ -991,71 +926,111 @@ private:
     AudioProcessorEditor* editor;
     JuceLv2ExternalUI* externalUI;
 
-    const LV2UI_Descriptor* ui_descriptor;
-    LV2UI_Write_Function write_function;
+    const LV2UI_Descriptor* uiDescriptor;
+    LV2UI_Write_Function writeFunction;
     LV2UI_Controller controller;
 
-    int32_t ctrl_pad;
+    int32 parameterPortOffset;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (JuceLv2Editor);
 };
 
 //==============================================================================
 // LV2 descriptor functions
-LV2_Handle juce_lv2_instantiate(const LV2_Descriptor* descriptor, double sample_rate, const char* bundle_path, const LV2_Feature* const* features)
+LV2_Handle juceLV2Instantiate(const LV2_Descriptor* descriptor, double sampleRate, const char* bundlePath, const LV2_Feature* const* features)
 {
-    JuceLV2Wrapper* wrapper = new JuceLV2Wrapper(descriptor, sample_rate, features);
+    JuceLV2Wrapper* wrapper = new JuceLV2Wrapper(descriptor, sampleRate, features);
     return wrapper;
 }
 
-void juce_lv2_connect_port(LV2_Handle instance, uint32_t port, void* data_location)
+void juceLV2ConnectPort(LV2_Handle instance, uint32 port, void* dataLocation)
 {
     JuceLV2Wrapper* wrapper = (JuceLV2Wrapper*)instance;
-    wrapper->do_connect_port(port, data_location);
+    wrapper->doConnectPort(port, dataLocation);
 }
 
-void juce_lv2_activate(LV2_Handle instance)
+void juceLV2Activate(LV2_Handle instance)
 {
     JuceLV2Wrapper* wrapper = (JuceLV2Wrapper*)instance;
-    wrapper->do_activate();
+    wrapper->doActivate();
 }
 
-void juce_lv2_run(LV2_Handle instance, uint32_t sample_count)
+void juceLV2Run(LV2_Handle instance, uint32 sampleCount)
 {
     JuceLV2Wrapper* wrapper = (JuceLV2Wrapper*)instance;
-    wrapper->do_run(sample_count);
+    wrapper->doRun(sampleCount);
 }
 
-void juce_lv2_deactivate(LV2_Handle instance)
+void juceLV2Deactivate(LV2_Handle instance)
 {
     JuceLV2Wrapper* wrapper = (JuceLV2Wrapper*)instance;
-    wrapper->do_deactivate();
+    wrapper->doDeactivate();
 }
 
-void juce_lv2_cleanup(LV2_Handle instance)
+void juceLV2Cleanup(LV2_Handle instance)
 {
     JuceLV2Wrapper* wrapper = (JuceLV2Wrapper*)instance;
-    wrapper->do_cleanup();
+    wrapper->doCleanup();
     delete wrapper;
 }
 
-const void* juce_lv2_extension_data(const char* uri)
+//==============================================================================
+void juceLV2Save(LV2_Handle instance, LV2_Persist_Store_Function store, void* callbackData)
 {
-    printf("TODO :: juce_lv2_extension_data()\n");
-    return nullptr;
+	JuceLV2Wrapper* wrapper = (JuceLV2Wrapper*)instance;
+	jassert(wrapper);
+	
+	const String juceChunkURI = getURI() + "#chunk";
+	MemoryBlock chunkMemory;
+	wrapper->getChunk(chunkMemory);
+	
+	LV2_URI_Map_Feature* uri_map = wrapper->getURIMap();
+	store(callbackData,
+		  uri_map->uri_to_id(wrapper, 0, juceChunkURI.toUTF8().getAddress()),
+		  chunkMemory.getData(),
+		  chunkMemory.getSize(),
+		  uri_map->uri_to_id(wrapper, 0, "juce_binary_chunk"),
+		  LV2_PERSIST_IS_POD | LV2_PERSIST_IS_PORTABLE);
+}
+
+void juceLV2Restore(LV2_Handle instance, LV2_Persist_Retrieve_Function retrieve, void* callbackData)
+{
+	JuceLV2Wrapper* wrapper = (JuceLV2Wrapper*)instance;
+	jassert(wrapper);
+	
+	const String juceChunkURI = getURI() + "#chunk";
+	LV2_URI_Map_Feature* uri_map = wrapper->getURIMap();
+	
+	size_t size;
+	uint32 type;
+	uint32 flags;
+	const void *data = retrieve(  callbackData,
+                                uri_map->uri_to_id(wrapper, 0, juceChunkURI.toUTF8().getAddress()),
+                                &size, &type, &flags);
+	
+	MemoryBlock chunkMemory(data, size);
+	wrapper->setChunk(chunkMemory);
+}
+
+const void* juceLV2ExtensionData(const char* uri)
+{
+	static const LV2_Persist persist = { juceLV2Save, juceLV2Restore };
+	if (strcmp(uri, LV2_PERSIST_URI) == 0)
+		return &persist;
+	return nullptr;
 }
 
 //==============================================================================
-LV2UI_Handle juce_lv2ui_instantiate(const LV2UI_Descriptor* descriptor, LV2UI_Write_Function write_function, LV2UI_Controller controller, LV2UI_Widget* widget, const LV2_Feature* const* features, bool isExternalUI)
+LV2UI_Handle juceLV2UIInstantiate(const LV2UI_Descriptor* descriptor, LV2UI_Write_Function writeFunction, LV2UI_Controller controller, LV2UI_Widget* widget, const LV2_Feature* const* features, bool isExternalUI)
 {
     const MessageManagerLock mmLock;
 
-    for (uint16_t i = 0; features[i]; i++)
+    for (uint16 i = 0; features[i]; i++)
     {
         if (strcmp(features[i]->URI, LV2_INSTANCE_ACCESS_URI) == 0 && features[i]->data)
         {
             JuceLV2Wrapper* wrapper = (JuceLV2Wrapper*)features[i]->data;
-            JuceLv2Editor* editor = new JuceLv2Editor(wrapper->getFilter(), descriptor, write_function, controller, widget, features, isExternalUI);
+            JuceLv2Editor* editor = new JuceLv2Editor(wrapper->getFilter(), descriptor, writeFunction, controller, widget, features, isExternalUI);
             return editor;
         }
     }
@@ -1064,33 +1039,33 @@ LV2UI_Handle juce_lv2ui_instantiate(const LV2UI_Descriptor* descriptor, LV2UI_Wr
     return nullptr;
 }
 
-LV2UI_Handle juce_lv2ui_instantiate_JUCE(const LV2UI_Descriptor* descriptor, const char* plugin_uri, const char* bundle_path, LV2UI_Write_Function write_function, LV2UI_Controller controller, LV2UI_Widget* widget, const LV2_Feature* const* features)
+LV2UI_Handle juceLV2UIInstantiateJuce(const LV2UI_Descriptor* descriptor, const char* plugin_uri, const char* bundle_path, LV2UI_Write_Function writeFunction, LV2UI_Controller controller, LV2UI_Widget* widget, const LV2_Feature* const* features)
 {
-    return juce_lv2ui_instantiate(descriptor, write_function, controller, widget, features, false);
+    return juceLV2UIInstantiate(descriptor, writeFunction, controller, widget, features, false);
 }
 
-LV2UI_Handle juce_lv2ui_instantiate_external(const LV2UI_Descriptor* descriptor, const char* plugin_uri, const char* bundle_path, LV2UI_Write_Function write_function, LV2UI_Controller controller, LV2UI_Widget* widget, const LV2_Feature* const* features)
+LV2UI_Handle juceLV2UIInstantiateExternal(const LV2UI_Descriptor* descriptor, const char* plugin_uri, const char* bundle_path, LV2UI_Write_Function writeFunction, LV2UI_Controller controller, LV2UI_Widget* widget, const LV2_Feature* const* features)
 {
-    return juce_lv2ui_instantiate(descriptor, write_function, controller, widget, features, true);
+    return juceLV2UIInstantiate(descriptor, writeFunction, controller, widget, features, true);
 }
 
-void juce_lv2ui_port_event(LV2UI_Handle instance, uint32_t port_index, uint32_t buffer_size, uint32_t format, const void* buffer)
+void juceLV2UIPortEvent(LV2UI_Handle instance, uint32 portIndex, uint32 bufferSize, uint32 format, const void* buffer)
 {
     const MessageManagerLock mmLock;
     JuceLv2Editor* editor = (JuceLv2Editor*)instance;
 
-    if (buffer_size == 4 /* sizeof(float) */ && format == 0)
+    if (bufferSize == sizeof(float) && format == 0)
     {
         float value = *(float*)buffer;
-        editor->do_port_event(port_index, value);
+        editor->doPortEvent(portIndex, value);
     }
 }
 
-void juce_lv2ui_cleanup(LV2UI_Handle instance)
+void juceLV2UICleanup(LV2UI_Handle instance)
 {
     const MessageManagerLock mmLock;
     JuceLv2Editor* editor = (JuceLv2Editor*)instance;
-    editor->do_cleanup();
+    editor->doCleanup();
     delete editor;
 }
 
@@ -1099,106 +1074,116 @@ void juce_lv2ui_cleanup(LV2UI_Handle instance)
 LV2_Descriptor* getNewLv2Plugin()
 {
     LV2_Descriptor* const Lv2Plugin = new LV2_Descriptor;
-    Lv2Plugin->URI = strdup((const char*) get_uri().toUTF8());
-    Lv2Plugin->instantiate = juce_lv2_instantiate;
-    Lv2Plugin->connect_port = juce_lv2_connect_port;
-    Lv2Plugin->activate = juce_lv2_activate;
-    Lv2Plugin->run = juce_lv2_run;
-    Lv2Plugin->deactivate = juce_lv2_deactivate;
-    Lv2Plugin->cleanup = juce_lv2_cleanup;
-    Lv2Plugin->extension_data = juce_lv2_extension_data;
+    Lv2Plugin->URI = strdup((const char*) getURI().toUTF8());
+    Lv2Plugin->instantiate = juceLV2Instantiate;
+    Lv2Plugin->connect_port = juceLV2ConnectPort;
+    Lv2Plugin->activate = juceLV2Activate;
+    Lv2Plugin->run = juceLV2Run;
+    Lv2Plugin->deactivate = juceLV2Deactivate;
+    Lv2Plugin->cleanup = juceLV2Cleanup;
+    Lv2Plugin->extension_data = juceLV2ExtensionData;
     return Lv2Plugin;
 }
 
 LV2UI_Descriptor* getNewLv2UI_JUCE()
 {
     LV2UI_Descriptor* Lv2UI = new LV2UI_Descriptor;
-    Lv2UI->URI = strdup((const char*) get_juce_ui_uri().toUTF8());
-    Lv2UI->instantiate = juce_lv2ui_instantiate_JUCE;
-    Lv2UI->cleanup = juce_lv2ui_cleanup;
-    Lv2UI->port_event = juce_lv2ui_port_event;
-    Lv2UI->extension_data = juce_lv2_extension_data;
+    Lv2UI->URI = strdup((const char*) getJuceUIURI().toUTF8());
+    Lv2UI->instantiate = juceLV2UIInstantiateJuce;
+    Lv2UI->cleanup = juceLV2UICleanup;
+    Lv2UI->port_event = juceLV2UIPortEvent;
+    Lv2UI->extension_data = juceLV2ExtensionData;
     return Lv2UI;
 }
 
-LV2UI_Descriptor* getNewLv2UI_External()
+LV2UI_Descriptor* getNewLv2UI_External(bool isNew)
 {
     LV2UI_Descriptor* Lv2UI = new LV2UI_Descriptor;
-    Lv2UI->URI = strdup((const char*) get_external_ui_uri().toUTF8());
-    Lv2UI->instantiate = juce_lv2ui_instantiate_external;
-    Lv2UI->cleanup = juce_lv2ui_cleanup;
-    Lv2UI->port_event = juce_lv2ui_port_event;
-    Lv2UI->extension_data = juce_lv2_extension_data;
+    Lv2UI->URI = strdup((const char*) getExternalUIURI(isNew).toUTF8());
+    Lv2UI->instantiate = juceLV2UIInstantiateExternal;
+    Lv2UI->cleanup = juceLV2UICleanup;
+    Lv2UI->port_event = juceLV2UIPortEvent;
+    Lv2UI->extension_data = juceLV2ExtensionData;
     return Lv2UI;
 }
 
-LV2UI_Descriptor* getNewLv2UI(bool external)
+LV2UI_Descriptor* getNewLv2UI(uint32 index)
 {
-    return external ? getNewLv2UI_External() : getNewLv2UI_JUCE();
+    switch (index)
+    {
+      case 0:
+        return getNewLv2UI_JUCE();
+      case 1:
+        return getNewLv2UI_External(true);
+      case 2:
+        return getNewLv2UI_External(false);
+      default:
+        return nullptr;
+    }
 }
 
 //==============================================================================
 // Mac startup code..
 #if JUCE_MAC
 
-    extern "C" __attribute__ ((visibility("default"))) void juce_lv2_ttl_generator()
-    {
-        generate_ttl();
-    }
+extern "C" __attribute__ ((visibility("default"))) void juce_lv2_ttl_generator()
+{
+    createTtlFiles();
+}
 
-    extern "C" __attribute__ ((visibility("default"))) const LV2_Descriptor* lv2_descriptor(uint32_t index)
-    {
-        initialiseMac();
-        return (index == 0) ? getNewLv2Plugin() : nullptr;
-    }
+extern "C" __attribute__ ((visibility("default"))) const LV2_Descriptor* lv2_descriptor(uint32 index)
+{
+    initialiseMac();
+    return (index == 0) ? getNewLv2Plugin() : nullptr;
+}
 
-    extern "C" __attribute__ ((visibility("default"))) const LV2UI_Descriptor* lv2ui_descriptor(uint32_t index)
-    {
-        return (index <= 1) ? getNewLv2UI((index == 1)) : nullptr;
-    }
+extern "C" __attribute__ ((visibility("default"))) const LV2UI_Descriptor* lv2ui_descriptor(uint32 index)
+{
+    return (index <= 2) ? getNewLv2UI(index) : nullptr;
+}
 
 //==============================================================================
 // Linux startup code..
 #elif JUCE_LINUX
 
-    extern "C" __attribute__ ((visibility("default"))) void juce_lv2_ttl_generator()
-    {
-        generate_ttl();
-    }
+extern "C" __attribute__ ((visibility("default"))) void juce_lv2_ttl_generator()
+{
+    createTtlFiles();
+}
 
-    extern "C" __attribute__ ((visibility("default"))) const LV2_Descriptor* lv2_descriptor(uint32_t index)
-    {
-        SharedMessageThread::getInstance();
-        return (index == 0) ? getNewLv2Plugin() : nullptr;
-    }
+extern "C" __attribute__ ((visibility("default"))) const LV2_Descriptor* lv2_descriptor(uint32 index)
+{
+    SharedMessageThread::getInstance();
+    return (index == 0) ? getNewLv2Plugin() : nullptr;
+}
 
-    extern "C" __attribute__ ((visibility("default"))) const LV2UI_Descriptor* lv2ui_descriptor(uint32_t index)
-    {
-        return (index <= 1) ? getNewLv2UI((index == 1)) : nullptr;
-    }
+extern "C" __attribute__ ((visibility("default"))) const LV2UI_Descriptor* lv2ui_descriptor(uint32 index)
+{
+    return (index <= 2) ? getNewLv2UI(index) : nullptr;
+}
 
-    // don't put initialiseJuce_GUI or shutdownJuce_GUI in these... it will crash!
-    __attribute__((constructor)) void myPluginInit() {}
-    __attribute__((destructor))  void myPluginFini() {}
+// don't put initialiseJuce_GUI or shutdownJuce_GUI in these... it will crash!
+__attribute__((constructor)) void myPluginInit() {}
+__attribute__((destructor))  void myPluginFini() {}
 
 //==============================================================================
 // Win32 startup code..
 #else
 
-    extern "C" __declspec (dllexport) void juce_lv2_ttl_generator()
-    {
-        generate_ttl();
-    }
+extern "C" __declspec (dllexport) void juce_lv2_ttl_generator()
+{
+    createTtlFiles();
+}
 
-    extern "C" __declspec (dllexport) const LV2_Descriptor* lv2_descriptor(uint32_t index)
-    {
-        return (index == 0) ? getNewLv2Plugin() : nullptr;
-    }
+extern "C" __declspec (dllexport) const LV2_Descriptor* lv2_descriptor(uint32 index)
+{
+    return (index == 0) ? getNewLv2Plugin() : nullptr;
+}
 
-    extern "C" __declspec (dllexport) const LV2UI_Descriptor* lv2ui_descriptor(uint32_t index)
-    {
-        return (index <= 1) ? getNewLv2UI((index == 1)) : nullptr;
-    }
+extern "C" __declspec (dllexport) const LV2UI_Descriptor* lv2ui_descriptor(uint32 index)
+{
+    return (index <= 2) ? getNewLv2UI(index) : nullptr;
+}
 
 #endif
 
