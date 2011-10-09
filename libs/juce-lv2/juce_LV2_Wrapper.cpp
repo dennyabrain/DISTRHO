@@ -924,7 +924,8 @@ public:
             free((void*)descriptor->URI);
             delete descriptor;
         }
-        lv2Editor->doCleanup();
+        if (lv2Editor)
+            lv2Editor->doCleanup();
     }
 
     //==============================================================================
