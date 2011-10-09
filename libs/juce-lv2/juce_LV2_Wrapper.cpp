@@ -425,11 +425,11 @@ private:
 
 //==============================================================================
 /** Create a new JUCE Editor */
-class JuceLv2Editor : public AudioProcessorListener,
+class JuceLV2Editor : public AudioProcessorListener,
                       public Timer
 {
 public:
-    JuceLv2Editor (AudioProcessor* filter_, const LV2UI_Descriptor* uiDescriptor_, LV2UI_Write_Function writeFunction_, LV2UI_Controller controller_, LV2UI_Widget* widget, const LV2_Feature* const* features, bool isExternalUI) :
+    JuceLV2Editor (AudioProcessor* filter_, const LV2UI_Descriptor* uiDescriptor_, LV2UI_Write_Function writeFunction_, LV2UI_Controller controller_, LV2UI_Widget* widget, const LV2_Feature* const* features, bool isExternalUI) :
             filter(filter_),
             uiDescriptor(uiDescriptor_),
             writeFunction(writeFunction_),
@@ -497,7 +497,7 @@ public:
         parameterPortOffset += JucePlugin_MaxNumOutputChannels;
     }
 
-    ~JuceLv2Editor()
+    ~JuceLV2Editor()
     {
         JUCE_AUTORELEASEPOOL
         PopupMenu::dismissAllActiveMenus();
@@ -576,7 +576,7 @@ private:
 
     int32 parameterPortOffset;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (JuceLv2Editor);
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (JuceLV2Editor);
 };
 
 //==============================================================================
@@ -960,7 +960,7 @@ public:
         return lv2Editor != nullptr;
     }
 
-    JuceLv2Editor* getLV2Editor(LV2UI_Write_Function writeFunction, LV2UI_Controller controller, LV2UI_Widget* widget)
+    JuceLV2Editor* getLV2Editor(LV2UI_Write_Function writeFunction, LV2UI_Controller controller, LV2UI_Widget* widget)
     {
         if (lv2Editor)
         {
@@ -971,13 +971,13 @@ public:
     
     void createLV2Editor(const LV2UI_Descriptor* uiDescriptor, LV2UI_Write_Function writeFunction, LV2UI_Controller controller, LV2UI_Widget* widget, const LV2_Feature* const* features, bool isExternalUI)
     {
-        lv2Editor = new JuceLv2Editor(filter, uiDescriptor, writeFunction, controller, widget, features, isExternalUI);
+        lv2Editor = new JuceLV2Editor(filter, uiDescriptor, writeFunction, controller, widget, features, isExternalUI);
     }
 
     //==============================================================================
 private:
     AudioProcessor* filter;
-    JuceLv2Editor* lv2Editor;
+    JuceLV2Editor* lv2Editor;
     MidiBuffer midiEvents;
     int numInChans, numOutChans;
     bool isProcessing, firstProcessCallback;
@@ -1135,7 +1135,7 @@ LV2UI_Handle juceLV2UIInstantiateExternal(const LV2UI_Descriptor* descriptor, co
 void juceLV2UIPortEvent(LV2UI_Handle instance, uint32 portIndex, uint32 bufferSize, uint32 format, const void* buffer)
 {
     const MessageManagerLock mmLock;
-    JuceLv2Editor* editor = (JuceLv2Editor*)instance;
+    JuceLV2Editor* editor = (JuceLV2Editor*)instance;
 
     if (bufferSize == sizeof(float) && format == 0)
     {
@@ -1147,7 +1147,7 @@ void juceLV2UIPortEvent(LV2UI_Handle instance, uint32 portIndex, uint32 bufferSi
 void juceLV2UICleanup(LV2UI_Handle instance)
 {
 //     const MessageManagerLock mmLock;
-//     JuceLv2Editor* editor = (JuceLv2Editor*)instance;
+//     JuceLV2Editor* editor = (JuceLV2Editor*)instance;
     //editor->doCleanup();
     //delete editor;
 }
