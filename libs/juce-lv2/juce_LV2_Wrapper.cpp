@@ -306,16 +306,23 @@ class JuceLV2DocumentWindow : public DocumentWindow
 public:
     /** Creates a Document Window wrapper */
     JuceLV2DocumentWindow (const String& title) :
-    DocumentWindow(title, Colours::white, DocumentWindow::minimiseButton | DocumentWindow::closeButton, true)
+            DocumentWindow (title, Colours::white, DocumentWindow::minimiseButton | DocumentWindow::closeButton, true),
+            closed(false),
+            lastPos(100, 100)
     {
-        closed = false;
     }
 
     /** Close button handler */
     void closeButtonPressed()
     {
+        lastPos = getScreenPosition();
         removeFromDesktop();
         closed = true;
+    }
+    
+    Point<int> getLastPos()
+    {
+      return lastPos;
     }
 
     bool isClosed()
@@ -330,6 +337,7 @@ public:
 
 private:
     bool closed;
+    Point<int> lastPos;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (JuceLV2DocumentWindow);
 };
@@ -377,7 +385,8 @@ public:
         {
             if (!externalUI->window->isOnDesktop())
             {
-                externalUI->window->setTopLeftPosition(100,100);
+                Point<int> lastPos = externalUI->window->getLastPos();
+                externalUI->window->setTopLeftPosition(lastPos.getX(), lastPos.getY());
                 externalUI->window->addToDesktop();
                 //externalUI->window->addToDesktop(externalUI->window->getDesktopWindowStyleFlags());
             }
@@ -531,13 +540,17 @@ public:
     void audioProcessorChanged (AudioProcessor*) {}
 
     //==============================================================================
-    void resetExternalUI(LV2UI_Widget* widget, bool mapWidget)
+    void resetExternalUI(LV2UI_Write_Function writeFunction_, LV2UI_Controller controller_, LV2UI_Widget* widget, bool mapWidget)
     {
+        writeFunction = writeFunction_;
+        controller = controller_;
+
         if (externalUI)
         {
             externalUI->resetWindow();
             startTimer(100);
         }
+
         if (mapWidget)
             *widget = externalUI;
     }
@@ -943,11 +956,16 @@ public:
         return uriMap;
     }
     
-    JuceLv2Editor* getLV2Editor(LV2UI_Widget* widget, bool mapWidget)
+    bool hasLV2Editor()
+    {
+        return lv2Editor != nullptr;
+    }
+
+    JuceLv2Editor* getLV2Editor(LV2UI_Write_Function writeFunction, LV2UI_Controller controller, LV2UI_Widget* widget, bool mapWidget)
     {
         if (lv2Editor)
         {
-            lv2Editor->resetExternalUI(widget, mapWidget);
+            lv2Editor->resetExternalUI(writeFunction, controller, widget, mapWidget);
         }
         return lv2Editor;
     }
@@ -1093,12 +1111,12 @@ LV2UI_Handle juceLV2UIInstantiate(const LV2UI_Descriptor* uiDescriptor, LV2UI_Wr
         {
             JuceLV2Wrapper* wrapper = (JuceLV2Wrapper*)features[i]->data;
 
-            if (!wrapper->getLV2Editor(nullptr, false))
+            if (!wrapper->hasLV2Editor())
             {
                 wrapper->createLV2Editor(uiDescriptor, writeFunction, controller, widget, features, isExternalUI);
             }
 
-            return wrapper->getLV2Editor(widget, true);
+            return wrapper->getLV2Editor(writeFunction, controller, widget, true);
         }
     }
 
