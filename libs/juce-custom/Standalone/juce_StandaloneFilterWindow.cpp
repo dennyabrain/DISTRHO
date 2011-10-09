@@ -91,12 +91,6 @@ StandaloneFilterWindow::StandaloneFilterWindow (const String& title,
     setDropShadowEnabled(false);
     setUsingNativeTitleBar(getGlobalSettings()->getBoolValue("nativeTitleBar", true));
 
-#if JUCE_MAC
-    setMacMainMenu (this);
-#else
-    setMenuBar (this);
-#endif
-
     setContentOwned (filter->createEditorIfNeeded(), true);
 
     const int x = globalSettings->getIntValue ("windowX", -100);
@@ -106,6 +100,12 @@ StandaloneFilterWindow::StandaloneFilterWindow (const String& title,
         setBoundsConstrained (Rectangle<int> (x, y, getWidth(), getHeight()));
     else
         centreWithSize (getWidth(), getHeight());
+
+#if JUCE_MAC
+    setMacMainMenu (this);
+#else
+    setMenuBar (this);
+#endif
 }
 
 StandaloneFilterWindow::~StandaloneFilterWindow()
