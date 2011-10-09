@@ -118,7 +118,7 @@ String makePluginTtl(const String& uri, const String& binary)
     if (filter->hasEditor())
     {
         plugin += "<" + getJuceUIURI() + ">\n";
-        plugin += "    a lv2ui:JUCEUI ;\n";
+        plugin += "    a lv2ui:JuceUI ;\n";
         plugin += "    lv2ui:binary <" + binary + ".so> .\n";
         plugin += "<" + getExternalUIURI(true) + ">\n";
         plugin += "    a \"http://nedko.arnaudov.name/lv2/external_ui/\" ;\n";
