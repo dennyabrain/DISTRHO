@@ -400,7 +400,7 @@ public:
         else
             return false;
     }
-    
+
     void resetWindow()
     {
         if (window)
@@ -531,13 +531,15 @@ public:
     void audioProcessorChanged (AudioProcessor*) {}
 
     //==============================================================================
-    void resetExternalUI()
+    void resetExternalUI(LV2UI_Widget* widget, bool mapWidget)
     {
         if (externalUI)
         {
             externalUI->resetWindow();
             startTimer(100);
         }
+        if (mapWidget)
+            *widget = externalUI;
     }
 
     void timerCallback()
@@ -941,11 +943,12 @@ public:
         return uriMap;
     }
     
-    JuceLv2Editor* getLV2Editor()
+    JuceLv2Editor* getLV2Editor(LV2UI_Widget* widget, bool mapWidget)
     {
         if (lv2Editor)
-            lv2Editor->resetExternalUI();
-
+        {
+            lv2Editor->resetExternalUI(widget, mapWidget);
+        }
         return lv2Editor;
     }
     
@@ -1090,14 +1093,15 @@ LV2UI_Handle juceLV2UIInstantiate(const LV2UI_Descriptor* uiDescriptor, LV2UI_Wr
         {
             JuceLV2Wrapper* wrapper = (JuceLV2Wrapper*)features[i]->data;
 
-            if (!wrapper->getLV2Editor())
+            if (!wrapper->getLV2Editor(nullptr, false))
+            {
                 wrapper->createLV2Editor(uiDescriptor, writeFunction, controller, widget, features, isExternalUI);
+            }
 
-            return wrapper->getLV2Editor();
+            return wrapper->getLV2Editor(widget, true);
         }
     }
 
-    std::cerr << "Host does not support instance data - cannot use UI" << std::endl;
     return nullptr;
 }
 
@@ -1125,8 +1129,8 @@ void juceLV2UIPortEvent(LV2UI_Handle instance, uint32 portIndex, uint32 bufferSi
 
 void juceLV2UICleanup(LV2UI_Handle instance)
 {
-    const MessageManagerLock mmLock;
-    JuceLv2Editor* editor = (JuceLv2Editor*)instance;
+//     const MessageManagerLock mmLock;
+//     JuceLv2Editor* editor = (JuceLv2Editor*)instance;
     //editor->doCleanup();
     //delete editor;
 }
