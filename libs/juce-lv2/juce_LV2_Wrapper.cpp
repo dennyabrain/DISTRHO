@@ -540,19 +540,17 @@ public:
     void audioProcessorChanged (AudioProcessor*) {}
 
     //==============================================================================
-    void resetExternalUI(LV2UI_Write_Function writeFunction_, LV2UI_Controller controller_, LV2UI_Widget* widget, bool mapWidget)
+    void resetExternalUI(LV2UI_Write_Function writeFunction_, LV2UI_Controller controller_, LV2UI_Widget* widget)
     {
         writeFunction = writeFunction_;
         controller = controller_;
+        *widget = externalUI;
 
         if (externalUI)
         {
             externalUI->resetWindow();
             startTimer(100);
         }
-
-        if (mapWidget)
-            *widget = externalUI;
     }
 
     void timerCallback()
@@ -594,8 +592,8 @@ public:
             descriptor (descriptor_),
             sampleRate (sampleRate_),
             bufferSize (512),
-            lv2Editor(nullptr),
-            uriMap(nullptr),
+            lv2Editor (nullptr),
+            uriMap (nullptr),
             midiURIId (0),
             portCount (0)
     {
@@ -961,11 +959,11 @@ public:
         return lv2Editor != nullptr;
     }
 
-    JuceLv2Editor* getLV2Editor(LV2UI_Write_Function writeFunction, LV2UI_Controller controller, LV2UI_Widget* widget, bool mapWidget)
+    JuceLv2Editor* getLV2Editor(LV2UI_Write_Function writeFunction, LV2UI_Controller controller, LV2UI_Widget* widget)
     {
         if (lv2Editor)
         {
-            lv2Editor->resetExternalUI(writeFunction, controller, widget, mapWidget);
+            lv2Editor->resetExternalUI(writeFunction, controller, widget);
         }
         return lv2Editor;
     }
@@ -1116,7 +1114,7 @@ LV2UI_Handle juceLV2UIInstantiate(const LV2UI_Descriptor* uiDescriptor, LV2UI_Wr
                 wrapper->createLV2Editor(uiDescriptor, writeFunction, controller, widget, features, isExternalUI);
             }
 
-            return wrapper->getLV2Editor(writeFunction, controller, widget, true);
+            return wrapper->getLV2Editor(writeFunction, controller, widget);
         }
     }
 
