@@ -28,15 +28,20 @@ public:
     ~DistrhoPluginAudioProcessorEditor();
 
     //==============================================================================
-    void timerCallback();
+    void paint (Graphics& g);
+    void resized();
     
     //==============================================================================
-    void paint (Graphics& g);
     void sliderValueChanged (Slider* slider);
 
+    //==============================================================================
+    void timerCallback();
+    
 private:
-    Slider sLow, sMid, sHigh, sMaster;
-    Slider sLowMidFreq, sMidHighFreq;
+//     Slider sLow, sMid, sHigh, sMaster;
+//     Slider sLowMidFreq, sMidHighFreq;
+
+    Image backgroundImage;
 
     DistrhoPluginAudioProcessor* getProcessor() const
     {

@@ -38,11 +38,9 @@ StandaloneFilterWindow::StandaloneFilterWindow (const String& title,
                                                 const Colour& backgroundColour)
     : DocumentWindow (title, backgroundColour,
                       DocumentWindow::minimiseButton
-                       | DocumentWindow::closeButton),
+                       | DocumentWindow::closeButton, false),
       nativeTitleBarCheck(false)
 {
-    setTitleBarButtonsRequired (DocumentWindow::minimiseButton | DocumentWindow::closeButton, false);
-
     JUCE_TRY
     {
         filter = createPluginFilter();
@@ -55,11 +53,24 @@ StandaloneFilterWindow::StandaloneFilterWindow (const String& title,
         JUCEApplication::quit();
     }
 
+    PropertySet* const globalSettings = getGlobalSettings();
+    const int x = globalSettings->getIntValue ("windowX", 100);
+    const int y = globalSettings->getIntValue ("windowY", 100);
+
+    setDropShadowEnabled(false);
+    setUsingNativeTitleBar(getGlobalSettings()->getBoolValue("nativeTitleBar", true));
+
+#if JUCE_MAC
+    setMacMainMenu (this);
+#else
+    setMenuBar (this);
+#endif
+
+    setTopLeftPosition (x, y);
+
     filter->setPlayConfigDetails (JucePlugin_MaxNumInputChannels,
                                   JucePlugin_MaxNumOutputChannels,
                                   44100, 512);
-
-    PropertySet* const globalSettings = getGlobalSettings();
 
     deviceManager = new AudioDeviceManager();
     deviceManager->addAudioCallback (&player);
@@ -88,25 +99,12 @@ StandaloneFilterWindow::StandaloneFilterWindow (const String& title,
         }
     }
 
-    setDropShadowEnabled(false);
+    // We need addToDesktop so the GUI gets painted and properly resized, but it can flash while resizing.
+    // so hide it, add to desktop, and show it back
+    setVisible(false);
+    addToDesktop();
     setContentOwned (filter->createEditorIfNeeded(), true);
-
-    const int x = globalSettings->getIntValue ("windowX", -100);
-    const int y = globalSettings->getIntValue ("windowY", -100);
-
-    if (x != -100 && y != -100)
-        setBoundsConstrained (Rectangle<int> (x, y, getWidth(), getHeight()));
-    else
-        centreWithSize (getWidth(), getHeight());
-
-    setUsingNativeTitleBar(getGlobalSettings()->getBoolValue("nativeTitleBar", true));
-
-#if JUCE_MAC
-    setMacMainMenu (this);
-#else
-    setMenuBar (this);
-#endif
-
+    setVisible(true);
 }
 
 StandaloneFilterWindow::~StandaloneFilterWindow()

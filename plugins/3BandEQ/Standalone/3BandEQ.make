@@ -41,6 +41,7 @@ endif
 OBJECTS := \
 	$(OBJDIR)/PluginEditor.o \
 	$(OBJDIR)/PluginProcessor.o \
+	$(OBJDIR)/DistrhoArtwork.o \
 	$(OBJDIR)/juce_StandaloneFilterWindow.o \
 	$(OBJDIR)/juce_StandaloneFilterApplication.o \
 
@@ -90,6 +91,11 @@ $(OBJDIR)/PluginEditor.o: ../source/PluginEditor.cpp
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
 $(OBJDIR)/PluginProcessor.o: ../source/PluginProcessor.cpp
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/DistrhoArtwork.o: ../source/DistrhoArtwork.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
