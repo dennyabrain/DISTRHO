@@ -31,37 +31,37 @@ DistrhoPluginAudioProcessorEditor::DistrhoPluginAudioProcessorEditor (DistrhoPlu
 
     sLow = new ImageSlider(sliderImage, sliderSpace, DistrhoPluginAudioProcessor::pLow);
     sLow->setBounds (49, sliderTop, sliderImage.getWidth(), sliderSpace + sliderImage.getHeight());
-    sLow->setValue (ourProcessor->getParameter(DistrhoPluginAudioProcessor::pLow), false);
+    sLow->setValue (ourProcessor->getParameter(DistrhoPluginAudioProcessor::pLow));
     sLow->addListener (this);
     addAndMakeVisible (sLow);
 
     sMid = new ImageSlider(sliderImage, sliderSpace, DistrhoPluginAudioProcessor::pMid);
     sMid->setBounds (115, sliderTop, sliderImage.getWidth(), sliderSpace + sliderImage.getHeight());
-    sMid->setValue (ourProcessor->getParameter(DistrhoPluginAudioProcessor::pMid), false);
+    sMid->setValue (ourProcessor->getParameter(DistrhoPluginAudioProcessor::pMid));
     sMid->addListener (this);
     addAndMakeVisible (sMid);
 
     sHigh = new ImageSlider(sliderImage, sliderSpace, DistrhoPluginAudioProcessor::pHigh);
     sHigh->setBounds (178, sliderTop, sliderImage.getWidth(), sliderSpace + sliderImage.getHeight());
-    sHigh->setValue (ourProcessor->getParameter(DistrhoPluginAudioProcessor::pHigh), false);
+    sHigh->setValue (ourProcessor->getParameter(DistrhoPluginAudioProcessor::pHigh));
     sHigh->addListener (this);
     addAndMakeVisible (sHigh);
 
     sMaster = new ImageSlider(sliderImage, sliderSpace, DistrhoPluginAudioProcessor::pMaster);
     sMaster->setBounds (282, sliderTop, sliderImage.getWidth(), sliderSpace + sliderImage.getHeight());
-    sMaster->setValue (ourProcessor->getParameter(DistrhoPluginAudioProcessor::pMaster), false);
+    sMaster->setValue (ourProcessor->getParameter(DistrhoPluginAudioProcessor::pMaster));
     sMaster->addListener (this);
     addAndMakeVisible (sMaster);
 
     sLowMidFreq = new FilmStripKnob(knobImage, knobFrames, false, DistrhoPluginAudioProcessor::pLowMidFreq);
     sLowMidFreq->setBounds (72, 270, knobImage.getWidth(), knobImage.getHeight() / knobFrames);
-    sLowMidFreq->setValue (ourProcessor->getParameter(DistrhoPluginAudioProcessor::pLowMidFreq), false);
+    sLowMidFreq->setValue (ourProcessor->getParameter(DistrhoPluginAudioProcessor::pLowMidFreq));
     sLowMidFreq->addListener (this);
     addAndMakeVisible (sLowMidFreq);
 
     sMidHighFreq = new FilmStripKnob(knobImage, knobFrames, false, DistrhoPluginAudioProcessor::pMidHighFreq);
     sMidHighFreq->setBounds (160, 270, knobImage.getWidth(), knobImage.getHeight() / knobFrames);
-    sMidHighFreq->setValue (ourProcessor->getParameter(DistrhoPluginAudioProcessor::pMidHighFreq), false);
+    sMidHighFreq->setValue (ourProcessor->getParameter(DistrhoPluginAudioProcessor::pMidHighFreq));
     sMidHighFreq->addListener (this);
     addAndMakeVisible (sMidHighFreq);
     

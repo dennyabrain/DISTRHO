@@ -131,7 +131,8 @@ void DistrhoPluginAudioProcessor::setParameter (int index, float newValue)
 
 const String DistrhoPluginAudioProcessor::getParameterName (int index)
 {
-    switch (index) {
+    switch (index)
+    {
       case pLow:
         return "Low";
       case pMid:
@@ -150,6 +151,21 @@ const String DistrhoPluginAudioProcessor::getParameterName (int index)
 
 const String DistrhoPluginAudioProcessor::getParameterText (int index)
 {
+    switch (index)
+    {
+      case pLow:
+        return String (log(lowVol)*AMP_DB, 1);
+      case pMid:
+        return String (log(midVol)*AMP_DB, 1);
+      case pHigh:
+        return String (log(highVol)*AMP_DB, 1);
+      case pMaster:
+        return String (log(outVol)*AMP_DB, 1);
+      case pLowMidFreq:
+        return String (freqLP, 0);
+      case pMidHighFreq:
+        return String (freqHP, 0);
+    }
     return String::empty;
 }
 
@@ -275,8 +291,6 @@ void DistrhoPluginAudioProcessor::getStateInformation (MemoryBlock& destData)
 {
     XmlElement xml ("3BandEQ-Settings");
 
-    //xml.setAttribute ("uiWidth", lastUIWidth);
-    //xml.setAttribute ("uiHeight", lastUIHeight);
     xml.setAttribute ("Low", fLow);
     xml.setAttribute ("Mid", fMid);
     xml.setAttribute ("High", fHigh);
@@ -293,9 +307,6 @@ void DistrhoPluginAudioProcessor::setStateInformation (const void* data, int siz
 
     if (xmlState != nullptr && xmlState->hasTagName ("3BandEQ-Settings"))
     {
-        //lastUIWidth  = xmlState->getIntAttribute ("uiWidth", lastUIWidth);
-        //lastUIHeight = xmlState->getIntAttribute ("uiHeight", lastUIHeight);
-
         fLow  = (float) xmlState->getDoubleAttribute ("Low", fLow);
         fMid  = (float) xmlState->getDoubleAttribute ("Mid", fMid);
         fHigh  = (float) xmlState->getDoubleAttribute ("High", fHigh);
