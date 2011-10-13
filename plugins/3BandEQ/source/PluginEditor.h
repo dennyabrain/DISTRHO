@@ -15,6 +15,9 @@
 #include "JucePluginCharacteristics.h"
 #include "PluginProcessor.h"
 
+#include "../../common/FilmStripKnob.h"
+#include "../../common/ImageSlider.h"
+
 
 //==============================================================================
 /**
@@ -29,18 +32,21 @@ public:
 
     //==============================================================================
     void paint (Graphics& g);
-    void resized();
-    
-    //==============================================================================
-    void sliderValueChanged (Slider* slider);
+    void sliderValueChanged (Slider* caller);
 
     //==============================================================================
     void timerCallback();
-    
-private:
-//     Slider sLow, sMid, sHigh, sMaster;
-//     Slider sLowMidFreq, sMidHighFreq;
 
+private:
+    ImageSlider* sLow;
+    ImageSlider* sMid;
+    ImageSlider* sHigh;
+    ImageSlider* sMaster;
+    FilmStripKnob* sLowMidFreq;
+    FilmStripKnob* sMidHighFreq;
+
+    Image knobImage;
+    Image sliderImage;
     Image backgroundImage;
 
     DistrhoPluginAudioProcessor* getProcessor() const

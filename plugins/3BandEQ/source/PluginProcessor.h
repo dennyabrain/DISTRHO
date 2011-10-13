@@ -75,10 +75,11 @@ public:
       pMidHighFreq,
       pMAX
     };
-    
-    float fLow, fMid, fHigh, fMaster, fLowMidFreq, fMidHighFreq;
 
 private:
+    //==============================================================================
+    float fLow, fMid, fHigh, fMaster, fLowMidFreq, fMidHighFreq;
+
     //==============================================================================
     float lowVol, midVol, highVol, outVol;
     float freqLP, freqHP;
@@ -89,6 +90,7 @@ private:
     float out1LP, out2LP, out1HP, out2HP;
     float tmp1LP, tmp2LP, tmp1HP, tmp2HP;
 
+    //==============================================================================
     bool initialized;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DistrhoPluginAudioProcessor);

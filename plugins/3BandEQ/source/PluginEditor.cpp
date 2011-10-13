@@ -16,72 +16,56 @@
 //==============================================================================
 DistrhoPluginAudioProcessorEditor::DistrhoPluginAudioProcessorEditor (DistrhoPluginAudioProcessor* ownerFilter)
     : AudioProcessorEditor (ownerFilter)
-//       sLow("Low"),
-//       sMid("Mid"),
-//       sHigh("High"),
-//       sMaster("Master"),
-//       sLowMidFreq("LowMidFreq"),
-//       sMidHighFreq("MidHighFreq")
-{
-      setSize (392, 372);
+{  
+    DistrhoPluginAudioProcessor* const ourProcessor = getProcessor();
 
-//     DistrhoPluginAudioProcessor* ourProcessor = getProcessor();
-
-//     Image backgroundImage = ImageCache::getFromMemory(DistrhoArtwork::background_png, DistrhoArtwork::background_pngSize);
-//     setSize(backgroundImage.getWidth(), backgroundImage.getHeight());
-
-//     addAndMakeVisible (&sLow);
-//     sLow.setSliderStyle(Slider::LinearVertical);
-//     sLow.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
-//     sLow.setRange (0.0, 1.0, 0.01);
-//     sLow.setValue (ourProcessor->fLow);
-//     sLow.setBounds (20, 20, 20, 200);
-//     sLow.addListener (this);
-// 
-//     addAndMakeVisible (&sMid);
-//     sMid.setSliderStyle(Slider::LinearVertical);
-//     sMid.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
-//     sMid.setRange (0.0, 1.0, 0.01);
-//     sMid.setValue (ourProcessor->fMid);
-//     sMid.setBounds (120, 20, 20, 200);
-//     sMid.addListener (this);
-// 
-//     addAndMakeVisible (&sHigh);
-//     sHigh.setSliderStyle(Slider::LinearVertical);
-//     sHigh.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
-//     sHigh.setRange (0.0, 1.0, 0.01);
-//     sHigh.setValue (ourProcessor->fHigh);
-//     sHigh.setBounds (220, 20, 20, 200);
-//     sHigh.addListener (this);
-
-//     addAndMakeVisible (&sMaster);
-//     sMaster.setSliderStyle(Slider::LinearVertical);
-//     sMaster.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
-//     sMaster.setRange (0.0, 1.0, 0.01);
-//     sMaster.setValue (ourProcessor->fMaster);
-//     sMaster.setBounds (340, 20, 20, 200);
-//     sMaster.addListener (this);
-
-//     addAndMakeVisible (&sLowMidFreq);
-//     sLowMidFreq.setSliderStyle(Slider::Rotary);
-//     sLowMidFreq.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
-//     sLowMidFreq.setRange (0.0, 1.0, 0.01);
-//     sLowMidFreq.setValue (ourProcessor->fLowMidFreq);
-//     sLowMidFreq.setRotaryParameters(225, 135, false);
-//     sLowMidFreq.setBounds (60, 220, 40, 40);
-//     sLowMidFreq.addListener (this);
-
-//     addAndMakeVisible (&sMidHighFreq);
-//     sMidHighFreq.setSliderStyle(Slider::Rotary);
-//     sMidHighFreq.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
-//     sMidHighFreq.setRange (0.0, 1.0, 0.01);
-//     sMidHighFreq.setValue (ourProcessor->fMidHighFreq);
-//     sMidHighFreq.setRotaryParameters(225, 135, false);
-//     sMidHighFreq.setBounds (160, 220, 40, 40);
-//     sMidHighFreq.addListener (this);
-
-    startTimer (50);
+    knobImage       = ImageCache::getFromMemory(DistrhoArtwork::knob_png, DistrhoArtwork::knob_pngSize);
+    sliderImage     = ImageCache::getFromMemory(DistrhoArtwork::slider_png, DistrhoArtwork::slider_pngSize);
     backgroundImage = ImageFileFormat::loadFrom (DistrhoArtwork::background_png, DistrhoArtwork::background_pngSize);
+
+    setSize (backgroundImage.getWidth(), backgroundImage.getHeight());
+
+    const int sliderTop    = 39;
+    const int sliderSpace  = 157;
+    const int knobFrames   = 70;
+
+    sLow = new ImageSlider(sliderImage, sliderSpace, DistrhoPluginAudioProcessor::pLow);
+    sLow->setBounds (49, sliderTop, sliderImage.getWidth(), sliderSpace + sliderImage.getHeight());
+    sLow->setValue (ourProcessor->getParameter(DistrhoPluginAudioProcessor::pLow), false);
+    sLow->addListener (this);
+    addAndMakeVisible (sLow);
+
+    sMid = new ImageSlider(sliderImage, sliderSpace, DistrhoPluginAudioProcessor::pMid);
+    sMid->setBounds (115, sliderTop, sliderImage.getWidth(), sliderSpace + sliderImage.getHeight());
+    sMid->setValue (ourProcessor->getParameter(DistrhoPluginAudioProcessor::pMid), false);
+    sMid->addListener (this);
+    addAndMakeVisible (sMid);
+
+    sHigh = new ImageSlider(sliderImage, sliderSpace, DistrhoPluginAudioProcessor::pHigh);
+    sHigh->setBounds (178, sliderTop, sliderImage.getWidth(), sliderSpace + sliderImage.getHeight());
+    sHigh->setValue (ourProcessor->getParameter(DistrhoPluginAudioProcessor::pHigh), false);
+    sHigh->addListener (this);
+    addAndMakeVisible (sHigh);
+
+    sMaster = new ImageSlider(sliderImage, sliderSpace, DistrhoPluginAudioProcessor::pMaster);
+    sMaster->setBounds (282, sliderTop, sliderImage.getWidth(), sliderSpace + sliderImage.getHeight());
+    sMaster->setValue (ourProcessor->getParameter(DistrhoPluginAudioProcessor::pMaster), false);
+    sMaster->addListener (this);
+    addAndMakeVisible (sMaster);
+
+    sLowMidFreq = new FilmStripKnob(knobImage, knobFrames, false, DistrhoPluginAudioProcessor::pLowMidFreq);
+    sLowMidFreq->setBounds (72, 270, knobImage.getWidth(), knobImage.getHeight() / knobFrames);
+    sLowMidFreq->setValue (ourProcessor->getParameter(DistrhoPluginAudioProcessor::pLowMidFreq), false);
+    sLowMidFreq->addListener (this);
+    addAndMakeVisible (sLowMidFreq);
+
+    sMidHighFreq = new FilmStripKnob(knobImage, knobFrames, false, DistrhoPluginAudioProcessor::pMidHighFreq);
+    sMidHighFreq->setBounds (160, 270, knobImage.getWidth(), knobImage.getHeight() / knobFrames);
+    sMidHighFreq->setValue (ourProcessor->getParameter(DistrhoPluginAudioProcessor::pMidHighFreq), false);
+    sMidHighFreq->addListener (this);
+    addAndMakeVisible (sMidHighFreq);
+    
+    startTimer (50);
 }
 
 DistrhoPluginAudioProcessorEditor::~DistrhoPluginAudioProcessorEditor()
@@ -93,56 +77,32 @@ DistrhoPluginAudioProcessorEditor::~DistrhoPluginAudioProcessorEditor()
 void DistrhoPluginAudioProcessorEditor::paint (Graphics& g)
 {
     g.fillAll (Colours::white);
-    g.drawImage(backgroundImage,0,0,392,372,0,0,392,372,false);
-
-//     Image backgroundImage = ImageCache::getFromMemory();
-//     g.drawImage (backgroundImage,
-//                  0, 0, backgroundImage.getWidth(), backgroundImage.getHeight(),
-//                  0, 0, backgroundImage.getWidth(), backgroundImage.getHeight());
+    g.drawImage(backgroundImage,
+                0, 0, backgroundImage.getWidth(), backgroundImage.getHeight(),
+                0, 0, backgroundImage.getWidth(), backgroundImage.getHeight(),
+                false);
 }
 
-void DistrhoPluginAudioProcessorEditor::resized()
+void DistrhoPluginAudioProcessorEditor::sliderValueChanged (Slider* caller)
 {
-}
+    DistrhoPluginAudioProcessor* const ourProcessor = getProcessor();
 
-//==============================================================================
-void DistrhoPluginAudioProcessorEditor::sliderValueChanged (Slider* slider)
-{
-//     if (slider == &sLow)
-//     {
-//         getProcessor()->setParameterNotifyingHost (DistrhoPluginAudioProcessor::pLow, (float) sLow.getValue());
-//     }
-//     else if (slider == &sMid)
-//     {
-//         getProcessor()->setParameterNotifyingHost (DistrhoPluginAudioProcessor::pMid, (float) sMid.getValue());
-//     }
-//     else if (slider == &sHigh)
-//     {
-//         getProcessor()->setParameterNotifyingHost (DistrhoPluginAudioProcessor::pHigh, (float) sHigh.getValue());
-//     }
-//     else if (slider == &sMaster)
-//     {
-//         getProcessor()->setParameterNotifyingHost (DistrhoPluginAudioProcessor::pMaster, (float) sMaster.getValue());
-//     }
-//     else if (slider == &sLowMidFreq)
-//     {
-//         getProcessor()->setParameterNotifyingHost (DistrhoPluginAudioProcessor::pLowMidFreq, (float) sLowMidFreq.getValue());
-//     }
-//     else if (slider == &sMidHighFreq)
-//     {
-//         getProcessor()->setParameterNotifyingHost (DistrhoPluginAudioProcessor::pMidHighFreq, (float) sMidHighFreq.getValue());
-//     }
+    NamedValueSet values = caller->getProperties();
+    if (values.contains(Identifier("index")))
+    {
+        ourProcessor->setParameterNotifyingHost(values["index"], (float)caller->getValue());
+    }
 }
 
 //==============================================================================
 void DistrhoPluginAudioProcessorEditor::timerCallback()
 {
-//     DistrhoPluginAudioProcessor* ourProcessor = getProcessor();
+    DistrhoPluginAudioProcessor* const ourProcessor = getProcessor();
 
-//     sLow.setValue (ourProcessor->fLow, false);
-//     sMid.setValue (ourProcessor->fMid, false);
-//     sHigh.setValue (ourProcessor->fHigh, false);
-//     sMaster.setValue (ourProcessor->fMaster, false);
-//     sLowMidFreq.setValue (ourProcessor->fLowMidFreq, false);
-//     sMidHighFreq.setValue (ourProcessor->fMidHighFreq, false);
+    sLow->setValue (ourProcessor->getParameter(DistrhoPluginAudioProcessor::pLow), false);
+    sMid->setValue (ourProcessor->getParameter(DistrhoPluginAudioProcessor::pMid), false);
+    sHigh->setValue (ourProcessor->getParameter(DistrhoPluginAudioProcessor::pHigh), false);
+    sMaster->setValue (ourProcessor->getParameter(DistrhoPluginAudioProcessor::pMaster), false);
+    sLowMidFreq->setValue (ourProcessor->getParameter(DistrhoPluginAudioProcessor::pLowMidFreq), false);
+    sMidHighFreq->setValue (ourProcessor->getParameter(DistrhoPluginAudioProcessor::pMidHighFreq), false);
 }
