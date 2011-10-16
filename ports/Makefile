@@ -3,10 +3,10 @@
 all: build
 
 
-build: libs plugins
+build: libs standalone lv2 vst
+
 
 libs: libs_standalone libs_plugin libs_lv2
-
 
 libs_standalone:
 	$(MAKE) -C ../libs/juce-153/standalone
@@ -18,9 +18,7 @@ libs_lv2:
 	$(MAKE) -C ../libs/juce-lv2
 
 
-plugins: standalone lv2 vst
-
-standalone:
+standalone: libs_standalone
 	$(MAKE) -C arctican-function/Standalone
 	$(MAKE) -C arctican-pilgrim/Standalone
 	$(MAKE) -C argotlunar/Standalone
@@ -38,7 +36,8 @@ standalone:
 	$(MAKE) -C tal-vocoder-2-juce/Standalone
 	$(MAKE) -C wolpertinger/Standalone
 
-lv2:
+
+lv2: libs_plugin libs_lv2
 	$(MAKE) -C arctican-function/LV2
 	$(MAKE) -C arctican-pilgrim/LV2
 	$(MAKE) -C argotlunar/LV2
@@ -57,7 +56,8 @@ lv2:
 
 # 	../libs/juce_lv2_ttl_generator ../bin/*.lv2/*.so
 
-vst:
+
+vst: libs_plugin
 	$(MAKE) -C arctican-function/VST
 	$(MAKE) -C arctican-pilgrim/VST
 	$(MAKE) -C argotlunar/VST
@@ -74,6 +74,7 @@ vst:
 	$(MAKE) -C tal-reverb-3-juce/VST
 	$(MAKE) -C tal-vocoder-2-juce/VST
 	$(MAKE) -C wolpertinger/VST
+
 
 clean:
 	# Standalone
