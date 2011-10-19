@@ -445,11 +445,12 @@ class JuceLV2Editor : public AudioProcessorListener,
                       public Timer
 {
 public:
-    JuceLV2Editor (AudioProcessor* filter_, const LV2UI_Descriptor* uiDescriptor_, LV2UI_Write_Function writeFunction_, LV2UI_Controller controller_, LV2UI_Widget* widget, const LV2_Feature* const* features, Lv2UiType uiType) :
+    JuceLV2Editor (AudioProcessor* filter_, const LV2UI_Descriptor* uiDescriptor_, LV2UI_Write_Function writeFunction_, LV2UI_Controller controller_, LV2UI_Widget* widget, const LV2_Feature* const* features, Lv2UiType uiType_) :
             filter(filter_),
             uiDescriptor(uiDescriptor_),
             writeFunction(writeFunction_),
             controller(controller_),
+            uiType(uiType_),
             editor(nullptr),
             externalUI(nullptr),
             externalUIHost(nullptr)
@@ -466,6 +467,11 @@ public:
             switch(uiType)
             {
             case LV2_UI_X11:
+                std::cerr << "------------------------------------ Trying to init window handle" << std::endl;
+                editor->setOpaque (true);
+                editor->setVisible (true);
+                editor->addToDesktop(0);
+                printf("-------------------------- TEST winId -> %li\n", editor->getWindowHandle());
                 *widget = editor->getWindowHandle();
                 break;
             case LV2_UI_JUCE:
@@ -556,16 +562,20 @@ public:
     void audioProcessorChanged (AudioProcessor*) {}
 
     //==============================================================================
-    void resetExternalUI(LV2UI_Write_Function writeFunction_, LV2UI_Controller controller_, LV2UI_Widget* widget)
+    void resetExternalUIIfNeeded(LV2UI_Write_Function writeFunction_, LV2UI_Controller controller_, LV2UI_Widget* widget)
     {
         writeFunction = writeFunction_;
         controller = controller_;
-        *widget = externalUI;
 
-        if (externalUI)
+        if (uiType == LV2_UI_EXTERNAL)
         {
-            externalUI->resetWindow();
-            startTimer(100);
+            *widget = externalUI;
+
+            if (externalUI)
+            {
+                externalUI->resetWindow();
+                startTimer(100);
+            }
         }
     }
 
@@ -589,6 +599,7 @@ private:
     const LV2UI_Descriptor* uiDescriptor;
     LV2UI_Write_Function writeFunction;
     LV2UI_Controller controller;
+    Lv2UiType uiType;
 
     int32 parameterPortOffset;
 
@@ -975,7 +986,7 @@ public:
     {
         if (lv2Editor)
         {
-            lv2Editor->resetExternalUI(writeFunction, controller, widget);
+            lv2Editor->resetExternalUIIfNeeded(writeFunction, controller, widget);
         }
         return lv2Editor;
     }
@@ -1114,6 +1125,7 @@ const void* juceLV2ExtensionData(const char* uri)
 LV2UI_Handle juceLV2UIInstantiate(const LV2UI_Descriptor* uiDescriptor, LV2UI_Write_Function writeFunction, LV2UI_Controller controller, LV2UI_Widget* widget, const LV2_Feature* const* features, Lv2UiType uiType)
 {
     const MessageManagerLock mmLock;
+    std::cerr << "------------------------- instantiate" << std::endl;
 
     for (uint16 i = 0; features[i]; i++)
     {
@@ -1123,12 +1135,15 @@ LV2UI_Handle juceLV2UIInstantiate(const LV2UI_Descriptor* uiDescriptor, LV2UI_Wr
 
             if (!wrapper->hasLV2Editor())
             {
+                std::cerr << "------------------------- Created Window" << std::endl;
                 wrapper->createLV2Editor(uiDescriptor, writeFunction, controller, widget, features, uiType);
             }
 
             return wrapper->getLV2Editor(writeFunction, controller, widget);
         }
     }
+
+    std::cerr << "Host does not support instance-access, cannot use UI" << std::endl;
 
     return nullptr;
 }
@@ -1247,6 +1262,7 @@ LV2UI_Descriptor* getNewLv2UI(uint32 index)
     switch (index)
     {
       case 0:
+        std::cerr << "-------------------------------------- requested X11 obj" << std::endl;
         return &NewLv2UI_X11_Obj;
       case 1:
         return &NewLv2UI_Juce_Obj;
