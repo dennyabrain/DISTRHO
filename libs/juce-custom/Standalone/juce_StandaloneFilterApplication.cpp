@@ -91,7 +91,7 @@ void StandaloneFilterApplication::initialise (const String& commandLine)
 
     window->toFront (true);
     window->setVisible (true);
-    
+
     Process::setPriority (Process::HighPriority);
 }
 

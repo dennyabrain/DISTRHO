@@ -467,18 +467,18 @@ public:
             switch(uiType)
             {
             case LV2_UI_X11:
-                std::cerr << "------------------------------------ Trying to init window handle" << std::endl;
                 editor->setOpaque (true);
-                editor->setVisible (true);
+                //editor->setVisible (true);
                 editor->addToDesktop(0);
-                printf("-------------------------- TEST winId -> %li\n", editor->getWindowHandle());
                 *widget = editor->getWindowHandle();
                 break;
+
             case LV2_UI_JUCE:
-                //editor->setOpaque (true);
+                editor->setOpaque (true);
                 //editor->setVisible (true);
                 *widget = editor;
                 break;
+
             case LV2_UI_EXTERNAL:
                 for (uint16 j = 0; features[j]; j++)
                 {
@@ -491,7 +491,7 @@ public:
 
                 if (externalUIHost)
                 {
-                    String title = (externalUIHost->plugin_human_id && externalUIHost->plugin_human_id[0] != '0') ? String(externalUIHost->plugin_human_id) : filter->getName();
+                    String title = (externalUIHost->plugin_human_id && externalUIHost->plugin_human_id[0] != 0) ? String(externalUIHost->plugin_human_id) : filter->getName();
                     externalUI = new JuceLv2ExternalUI(filter, editor, title);
                     *widget = externalUI;
                 }
@@ -501,6 +501,7 @@ public:
                     std::cerr << "Failed to init external UI host" << std::endl;
                 }
                 break;
+
             default:
                 *widget = nullptr;
                 std::cerr << "Unknown UI Type" << std::endl;
@@ -1125,7 +1126,6 @@ const void* juceLV2ExtensionData(const char* uri)
 LV2UI_Handle juceLV2UIInstantiate(const LV2UI_Descriptor* uiDescriptor, LV2UI_Write_Function writeFunction, LV2UI_Controller controller, LV2UI_Widget* widget, const LV2_Feature* const* features, Lv2UiType uiType)
 {
     const MessageManagerLock mmLock;
-    std::cerr << "------------------------- instantiate" << std::endl;
 
     for (uint16 i = 0; features[i]; i++)
     {
@@ -1135,7 +1135,6 @@ LV2UI_Handle juceLV2UIInstantiate(const LV2UI_Descriptor* uiDescriptor, LV2UI_Wr
 
             if (!wrapper->hasLV2Editor())
             {
-                std::cerr << "------------------------- Created Window" << std::endl;
                 wrapper->createLV2Editor(uiDescriptor, writeFunction, controller, widget, features, uiType);
             }
 
@@ -1144,7 +1143,6 @@ LV2UI_Handle juceLV2UIInstantiate(const LV2UI_Descriptor* uiDescriptor, LV2UI_Wr
     }
 
     std::cerr << "Host does not support instance-access, cannot use UI" << std::endl;
-
     return nullptr;
 }
 
@@ -1262,7 +1260,6 @@ LV2UI_Descriptor* getNewLv2UI(uint32 index)
     switch (index)
     {
       case 0:
-        std::cerr << "-------------------------------------- requested X11 obj" << std::endl;
         return &NewLv2UI_X11_Obj;
       case 1:
         return &NewLv2UI_Juce_Obj;
