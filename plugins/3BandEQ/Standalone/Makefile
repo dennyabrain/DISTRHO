@@ -15,7 +15,7 @@ all: 3BandEQ
 
 Makefile: premake.lua
 	@echo ==== Regenerating Makefiles ====
-	@premake --file $^ --os linux --target gnu --cc gcc
+	@premake --file $^ --os macosx --target gnu
 
 3BandEQ:
 	@echo ==== Building 3BandEQ ====

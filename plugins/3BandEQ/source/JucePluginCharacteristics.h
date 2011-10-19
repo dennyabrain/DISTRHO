@@ -35,7 +35,7 @@
 #define JucePlugin_AUExportPrefix       DISTRHO_3BandEQ_AU
 #define JucePlugin_AUExportPrefixQuoted "DISTRHO_3BandEQ_AU"
 #define JucePlugin_AUManufacturerCode   DISTRHO_3BandEQ_MC
-#define JucePlugin_CFBundleIdentifier   com.distrho.3bandeq
+#define JucePlugin_CFBundleIdentifier   com.distrho.3BandEQ
 #define JucePlugin_AUCocoaViewClassName DISTRHO_3BandEQ_VCN
 #define JucePlugin_RTASCategory         ePlugInCategory_None
 #define JucePlugin_RTASManufacturerCode JucePlugin_ManufacturerCode
