@@ -64,7 +64,7 @@ DistrhoPluginAudioProcessorEditor::DistrhoPluginAudioProcessorEditor (DistrhoPlu
     sMidHighFreq->setValue (ourProcessor->getParameter(DistrhoPluginAudioProcessor::pMidHighFreq));
     sMidHighFreq->addListener (this);
     addAndMakeVisible (sMidHighFreq);
-    
+
     startTimer (50);
 }
 

@@ -20,6 +20,7 @@
 #include "lv2/persist.h"
 #include "lv2/uri-map.h"
 #include "lv2/ui.h"
+#include "lv2/ui-resize.h"
 #include "lv2/lv2_external_ui.h"
 
 extern AudioProcessor* JUCE_CALLTYPE createPluginFilter();
@@ -453,7 +454,8 @@ public:
             uiType(uiType_),
             editor(nullptr),
             externalUI(nullptr),
-            externalUIHost(nullptr)
+            externalUIHost(nullptr),
+            uiResizeFeature(nullptr)
     {
         filter->addListener(this);
 
@@ -468,9 +470,18 @@ public:
             {
             case LV2_UI_X11:
                 editor->setOpaque (true);
-                //editor->setVisible (true);
-                editor->addToDesktop(0);
+                editor->addToDesktop (0);
                 *widget = editor->getWindowHandle();
+                for (uint16 j = 0; features[j]; j++)
+                {
+                    if (strcmp(features[j]->URI, LV2_UI_RESIZE_URI) == 0 && features[j]->data)
+                    {
+                        uiResizeFeature = (LV2_UI_Resize_Feature*)features[j]->data;
+                        uiResizeFeature->ui_resize(uiResizeFeature->data, editor->getWidth(), editor->getHeight());
+                        break;
+                    }
+                }
+
                 break;
 
             case LV2_UI_JUCE:
@@ -596,6 +607,7 @@ private:
     AudioProcessorEditor* editor;
     JuceLv2ExternalUI* externalUI;
     lv2_external_ui_host* externalUIHost;
+    LV2_UI_Resize_Feature* uiResizeFeature;
 
     const LV2UI_Descriptor* uiDescriptor;
     LV2UI_Write_Function writeFunction;

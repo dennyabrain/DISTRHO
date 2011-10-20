@@ -86,13 +86,13 @@ private:
 
     float xLP, a0LP, b1LP;
     float xHP, a0HP, b1HP;
-    
+
     float out1LP, out2LP, out1HP, out2HP;
     float tmp1LP, tmp2LP, tmp1HP, tmp2HP;
 
     //==============================================================================
     bool initialized;
-    
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DistrhoPluginAudioProcessor);
 };
 
