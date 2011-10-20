@@ -474,7 +474,7 @@ public:
                 *widget = editor->getWindowHandle();
                 for (uint16 j = 0; features[j]; j++)
                 {
-                    if (strcmp(features[j]->URI, LV2_UI_RESIZE_URI) == 0 && features[j]->data)
+                    if (strcmp(features[j]->URI, LV2_UI_RESIZE_URI "#UIResize") == 0 && features[j]->data)
                     {
                         uiResizeFeature = (LV2_UI_Resize_Feature*)features[j]->data;
                         uiResizeFeature->ui_resize(uiResizeFeature->data, editor->getWidth(), editor->getHeight());
