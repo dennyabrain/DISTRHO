@@ -448,14 +448,14 @@ class JuceLV2Editor : public AudioProcessorListener,
 public:
     JuceLV2Editor (AudioProcessor* filter_, const LV2UI_Descriptor* uiDescriptor_, LV2UI_Write_Function writeFunction_, LV2UI_Controller controller_, LV2UI_Widget* widget, const LV2_Feature* const* features, Lv2UiType uiType_) :
             filter(filter_),
-            uiDescriptor(uiDescriptor_),
-            writeFunction(writeFunction_),
-            controller(controller_),
-            uiType(uiType_),
             editor(nullptr),
             externalUI(nullptr),
             externalUIHost(nullptr),
-            uiResizeFeature(nullptr)
+            uiResizeFeature(nullptr),
+            uiDescriptor(uiDescriptor_),
+            writeFunction(writeFunction_),
+            controller(controller_),
+            uiType(uiType_)
     {
         filter->addListener(this);
 
@@ -625,6 +625,7 @@ class JuceLV2Wrapper
 {
 public:
     JuceLV2Wrapper(const LV2_Descriptor* descriptor_, double sampleRate_, const LV2_Feature* const* features) :
+            lv2Editor (nullptr),
             numInChans (JucePlugin_MaxNumInputChannels),
             numOutChans (JucePlugin_MaxNumOutputChannels),
             isProcessing (false),
@@ -632,7 +633,6 @@ public:
             descriptor (descriptor_),
             sampleRate (sampleRate_),
             bufferSize (512),
-            lv2Editor (nullptr),
             uriMap (nullptr),
             midiURIId (0),
             portCount (0)

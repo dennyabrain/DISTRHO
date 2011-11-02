@@ -34,6 +34,10 @@ package.includepaths = {
     "."
 }
 
+if (windows) then
+  package.includepaths = { package.includepaths, "../../../sdks/ASIOSDK2"}
+end
+
 package.files = {
   matchfiles (
     "../source/src/application/*.cpp",
