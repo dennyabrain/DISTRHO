@@ -872,16 +872,21 @@ public:
         // update time position
         if (timePosPort != nullptr)
         {
+            LV2_Event* event = nullptr;
             LV2_Event_Iterator iter;
             lv2_event_begin(&iter, timePosPort);
+            uint8* data = nullptr;
 
-            if (lv2_event_is_valid(&iter))
+            while (lv2_event_is_valid(&iter))
             {
-                // TODO
-                //uint8* data = 0;
-                //LV2_Event* event = lv2_event_get(&iter, &data);
-                //memcpy(&timePos, data, sizeof(LV2_Time_Position));
+                event = lv2_event_get(&iter, &data);
+                lv2_event_increment(&iter);
             }
+
+            if (event != nullptr && event->size == sizeof(LV2_Time_Position))
+              memcpy(&timePos, data, sizeof(LV2_Time_Position));
+            else
+              memset(&timePos, 0, sizeof(LV2_Time_Position));
 
         } else
           memset(&timePos, 0, sizeof(LV2_Time_Position));
