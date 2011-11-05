@@ -19,6 +19,7 @@
 #include "lv2/instance-access.h"
 #include "lv2/persist.h"
 #include "lv2/uri-map.h"
+#include "lv2/time.h"
 #include "lv2/ui.h"
 #include "lv2/ui-resize.h"
 #include "lv2/lv2_external_ui.h"
@@ -151,6 +152,15 @@ String makePluginTtl(const String& uri, const String& binary)
         plugin += "             <" + getExternalUIURI(false) + "> ;\n";
     }
     plugin += "\n";
+
+    plugin += "    lv2:port [\n";
+    plugin += "      a lv2:InputPort, lv2ev:EventPort;\n";
+    plugin += "      lv2ev:supportsEvent <http://lv2plug.in/ns/ext/time#Position>;\n";
+    plugin += "      lv2:index " + String(portIndex++) + ";\n";
+    plugin += "      lv2:symbol \"lv2_time_pos\";\n";
+    plugin += "      lv2:name \"LV2 Position\";\n";
+    plugin += "      lv2:portProperty lv2:connectionOptional ;\n";
+    plugin += "    ] ;\n\n";
 
 #if JucePlugin_WantsMidiInput
     plugin += "    lv2:port [\n";
@@ -525,7 +535,7 @@ public:
         }
 
         // Offset for control ports
-        parameterPortOffset = 0;
+        parameterPortOffset = 1;
 #if JucePlugin_WantsMidiInput
         parameterPortOffset += 1;
 #endif
@@ -650,6 +660,7 @@ public:
         filter->setPlayConfigDetails(numInChans, numOutChans, 0, 0);
 
         // Port count
+        portCount += 1; // 0 == Position
 #if JucePlugin_WantsMidiInput
         portCount += 1;
 #endif
@@ -660,8 +671,11 @@ public:
         portCount += numOutChans;
         portCount += filter->getNumParameters();
 
+        memset(&timePos, 0, sizeof(LV2_Time_Position));
+
         // Set Port data
-        midiInPort = nullptr;
+        timePosPort = nullptr;
+        midiInPort  = nullptr;
         midiOutPort = nullptr;
         parameterInPorts.insertMultiple(0, nullptr, filter->getNumParameters());
         parameterInPortsValues.insertMultiple(0, 0.0f, filter->getNumParameters());
@@ -729,6 +743,13 @@ public:
         if (port < portCount)
         {
             uint32 index = 0;
+
+            if (port == 0)
+            {
+                timePosPort = (LV2_Event_Buffer*)dataLocation;
+                return;
+            }
+            ++index;
 
 #if JucePlugin_WantsMidiInput
             if (port == index)
@@ -848,6 +869,23 @@ public:
             filter->prepareToPlay(sampleRate, bufferSize);
         }
 
+        // update time position
+        if (timePosPort != nullptr)
+        {
+            LV2_Event_Iterator iter;
+            lv2_event_begin(&iter, timePosPort);
+
+            if (lv2_event_is_valid(&iter))
+            {
+                // TODO
+                //uint8* data = 0;
+                //LV2_Event* event = lv2_event_get(&iter, &data);
+                //memcpy(&timePos, data, sizeof(LV2_Time_Position));
+            }
+
+        } else
+          memset(&timePos, 0, sizeof(LV2_Time_Position));
+
         // Check for updated parameters
         float cur_value;
         for (int i = 0; i < parameterInPorts.size(); i++)
@@ -966,6 +1004,37 @@ public:
     //==============================================================================
     // JUCE Stuff
 
+    bool getCurrentPosition (AudioPlayHead::CurrentPositionInfo& info)
+    {
+        if (sampleRate <= 0)
+            return false;
+
+        if ((timePos.flags & LV2_TIME_HAS_BBT) != 0)
+        {
+            info.bpm = timePos.beats_per_minute;
+            info.timeSigNumerator   = timePos.beats_per_bar;
+            info.timeSigDenominator = timePos.beat_type;
+            info.ppqPosition = (timePos.frame / sampleRate) * timePos.beats_per_minute / 60.0;
+            info.ppqPositionOfLastBarStart = 0;
+        }
+        else
+        {
+            info.bpm = 120.0;
+            info.timeSigNumerator = 4;
+            info.timeSigDenominator = 4;
+            info.ppqPosition = 0;
+            info.ppqPositionOfLastBarStart = 0;
+        }
+
+        info.timeInSeconds  = timePos.frame / sampleRate;
+        info.editOriginTime = 0;
+        info.frameRate = AudioPlayHead::fpsUnknown;
+        info.isPlaying   = (timePos.state == LV2_TIME_ROLLING);
+        info.isRecording = false;
+
+        return true;
+    }
+
     AudioProcessor* getFilter() { return filter; }
 
     //==============================================================================
@@ -1023,10 +1092,12 @@ private:
 
     double sampleRate;
     uint32 bufferSize;
+    LV2_Time_Position timePos;
     LV2_URI_Map_Feature* uriMap;
     uint16 midiURIId;
     uint32 portCount;
 
+    LV2_Event_Buffer* timePosPort;
     LV2_Event_Buffer* midiInPort;
     LV2_Event_Buffer* midiOutPort;
     float* audioInPorts[JucePlugin_MaxNumInputChannels];
