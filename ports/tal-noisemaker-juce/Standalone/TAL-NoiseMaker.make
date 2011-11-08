@@ -42,8 +42,8 @@ OBJECTS := \
 	$(OBJDIR)/TalComponent.o \
 	$(OBJDIR)/TalCore.o \
 	$(OBJDIR)/Lfo.o \
-	$(OBJDIR)/juce_StandaloneFilterWindow.o \
 	$(OBJDIR)/juce_StandaloneFilterApplication.o \
+	$(OBJDIR)/juce_StandaloneFilterWindow.o \
 
 MKDIR_TYPE := msdos
 CMD := $(subst \,\\,$(ComSpec)$(COMSPEC))
@@ -100,12 +100,12 @@ $(OBJDIR)/Lfo.o: ../source/Engine/Lfo.cpp
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
-$(OBJDIR)/juce_StandaloneFilterWindow.o: ../../../libs/juce-custom/Standalone/juce_StandaloneFilterWindow.cpp
+$(OBJDIR)/juce_StandaloneFilterApplication.o: ../../../libs/juce-custom/Standalone/juce_StandaloneFilterApplication.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
-$(OBJDIR)/juce_StandaloneFilterApplication.o: ../../../libs/juce-custom/Standalone/juce_StandaloneFilterApplication.cpp
+$(OBJDIR)/juce_StandaloneFilterWindow.o: ../../../libs/juce-custom/Standalone/juce_StandaloneFilterWindow.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"

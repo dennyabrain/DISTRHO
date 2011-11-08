@@ -41,19 +41,19 @@ endif
 OBJECTS := \
 	$(OBJDIR)/AboutBox.o \
 	$(OBJDIR)/CCMapSlider.o \
-	$(OBJDIR)/MrAlias2.o \
-	$(OBJDIR)/MrAliasGUI.o \
-	$(OBJDIR)/PizButton.o \
 	$(OBJDIR)/VSTSlider.o \
-	$(OBJDIR)/WaveDrawWindow.o \
+	$(OBJDIR)/PizButton.o \
 	$(OBJDIR)/WaveDrawer.o \
-	$(OBJDIR)/effects.o \
+	$(OBJDIR)/piz_ComboBox.o \
 	$(OBJDIR)/functions.o \
 	$(OBJDIR)/led.o \
-	$(OBJDIR)/piz_ComboBox.o \
+	$(OBJDIR)/MrAliasGUI.o \
+	$(OBJDIR)/MrAlias2.o \
 	$(OBJDIR)/piz_LookAndFeel.o \
-	$(OBJDIR)/juce_StandaloneFilterWindow.o \
+	$(OBJDIR)/WaveDrawWindow.o \
+	$(OBJDIR)/effects.o \
 	$(OBJDIR)/juce_StandaloneFilterApplication.o \
+	$(OBJDIR)/juce_StandaloneFilterWindow.o \
 
 MKDIR_TYPE := msdos
 CMD := $(subst \,\\,$(ComSpec)$(COMSPEC))
@@ -105,12 +105,7 @@ $(OBJDIR)/CCMapSlider.o: ../source/CCMapSlider.cpp
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
-$(OBJDIR)/MrAlias2.o: ../source/MrAlias2.cpp
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/MrAliasGUI.o: ../source/MrAliasGUI.cpp
+$(OBJDIR)/VSTSlider.o: ../source/VSTSlider.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
@@ -120,22 +115,12 @@ $(OBJDIR)/PizButton.o: ../source/PizButton.cpp
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
-$(OBJDIR)/VSTSlider.o: ../source/VSTSlider.cpp
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/WaveDrawWindow.o: ../source/WaveDrawWindow.cpp
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
 $(OBJDIR)/WaveDrawer.o: ../source/WaveDrawer.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
-$(OBJDIR)/effects.o: ../source/effects.cpp
+$(OBJDIR)/piz_ComboBox.o: ../source/piz_ComboBox.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
@@ -150,7 +135,12 @@ $(OBJDIR)/led.o: ../source/led.cpp
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
-$(OBJDIR)/piz_ComboBox.o: ../source/piz_ComboBox.cpp
+$(OBJDIR)/MrAliasGUI.o: ../source/MrAliasGUI.cpp
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/MrAlias2.o: ../source/MrAlias2.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
@@ -160,12 +150,22 @@ $(OBJDIR)/piz_LookAndFeel.o: ../source/piz_LookAndFeel.cpp
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
-$(OBJDIR)/juce_StandaloneFilterWindow.o: ../../../libs/juce-custom/Standalone/juce_StandaloneFilterWindow.cpp
+$(OBJDIR)/WaveDrawWindow.o: ../source/WaveDrawWindow.cpp
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/effects.o: ../source/effects.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
 $(OBJDIR)/juce_StandaloneFilterApplication.o: ../../../libs/juce-custom/Standalone/juce_StandaloneFilterApplication.cpp
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/juce_StandaloneFilterWindow.o: ../../../libs/juce-custom/Standalone/juce_StandaloneFilterWindow.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"

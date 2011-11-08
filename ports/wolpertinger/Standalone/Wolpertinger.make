@@ -39,16 +39,16 @@ ifeq ($(CONFIG),Debug)
 endif
 
 OBJECTS := \
-	$(OBJDIR)/ADSRenv.o \
-	$(OBJDIR)/tabbed-editor.o \
-	$(OBJDIR)/synth.o \
-	$(OBJDIR)/about.o \
-	$(OBJDIR)/RotatingToggleButton.o \
-	$(OBJDIR)/editor.o \
 	$(OBJDIR)/PresetComboBox.o \
 	$(OBJDIR)/KeyboardButton.o \
-	$(OBJDIR)/juce_StandaloneFilterWindow.o \
+	$(OBJDIR)/tabbed-editor.o \
+	$(OBJDIR)/RotatingToggleButton.o \
+	$(OBJDIR)/editor.o \
+	$(OBJDIR)/ADSRenv.o \
+	$(OBJDIR)/synth.o \
+	$(OBJDIR)/about.o \
 	$(OBJDIR)/juce_StandaloneFilterApplication.o \
+	$(OBJDIR)/juce_StandaloneFilterWindow.o \
 
 MKDIR_TYPE := msdos
 CMD := $(subst \,\\,$(ComSpec)$(COMSPEC))
@@ -90,22 +90,17 @@ else
 	-@if exist $(subst /,\,$(OBJDIR)) rmdir /s /q $(subst /,\,$(OBJDIR))
 endif
 
-$(OBJDIR)/ADSRenv.o: ../source/ADSRenv.cpp
+$(OBJDIR)/PresetComboBox.o: ../source/PresetComboBox.cpp
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/KeyboardButton.o: ../source/KeyboardButton.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
 $(OBJDIR)/tabbed-editor.o: ../source/tabbed-editor.cpp
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/synth.o: ../source/synth.cpp
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/about.o: ../source/about.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
@@ -120,22 +115,27 @@ $(OBJDIR)/editor.o: ../source/editor.cpp
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
-$(OBJDIR)/PresetComboBox.o: ../source/PresetComboBox.cpp
+$(OBJDIR)/ADSRenv.o: ../source/ADSRenv.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
-$(OBJDIR)/KeyboardButton.o: ../source/KeyboardButton.cpp
+$(OBJDIR)/synth.o: ../source/synth.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
-$(OBJDIR)/juce_StandaloneFilterWindow.o: ../../../libs/juce-custom/Standalone/juce_StandaloneFilterWindow.cpp
+$(OBJDIR)/about.o: ../source/about.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
 $(OBJDIR)/juce_StandaloneFilterApplication.o: ../../../libs/juce-custom/Standalone/juce_StandaloneFilterApplication.cpp
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/juce_StandaloneFilterWindow.o: ../../../libs/juce-custom/Standalone/juce_StandaloneFilterWindow.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"

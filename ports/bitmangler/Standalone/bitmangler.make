@@ -39,11 +39,11 @@ ifeq ($(CONFIG),Debug)
 endif
 
 OBJECTS := \
+	$(OBJDIR)/bitManglerEditor.o \
 	$(OBJDIR)/bitFloat.o \
 	$(OBJDIR)/bitMangler.o \
-	$(OBJDIR)/bitManglerEditor.o \
-	$(OBJDIR)/juce_StandaloneFilterWindow.o \
 	$(OBJDIR)/juce_StandaloneFilterApplication.o \
+	$(OBJDIR)/juce_StandaloneFilterWindow.o \
 
 MKDIR_TYPE := msdos
 CMD := $(subst \,\\,$(ComSpec)$(COMSPEC))
@@ -85,6 +85,11 @@ else
 	-@if exist $(subst /,\,$(OBJDIR)) rmdir /s /q $(subst /,\,$(OBJDIR))
 endif
 
+$(OBJDIR)/bitManglerEditor.o: ../source/bitManglerEditor.cpp
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
 $(OBJDIR)/bitFloat.o: ../source/bitFloat.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
@@ -95,17 +100,12 @@ $(OBJDIR)/bitMangler.o: ../source/bitMangler.cpp
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
-$(OBJDIR)/bitManglerEditor.o: ../source/bitManglerEditor.cpp
+$(OBJDIR)/juce_StandaloneFilterApplication.o: ../../../libs/juce-custom/Standalone/juce_StandaloneFilterApplication.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
 $(OBJDIR)/juce_StandaloneFilterWindow.o: ../../../libs/juce-custom/Standalone/juce_StandaloneFilterWindow.cpp
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/juce_StandaloneFilterApplication.o: ../../../libs/juce-custom/Standalone/juce_StandaloneFilterApplication.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"

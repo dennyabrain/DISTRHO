@@ -1354,8 +1354,23 @@ public:
             handleKeyPress (keyCode, unicodeChar);
     }
 
+    static bool keyReleaseMsgShouldBeIgnored(const XKeyEvent* keyReleaseEvent) {
+	if (XPending(display)) {
+	    XEvent e;
+	    XPeekEvent(display, &e);
+	    // same timestamp + same keycode + keypress => this is an auto-repeat keyRelease/keyPress pair !
+	    if ((e.type == 2 /* KeyPress */) &&
+		(e.xkey.keycode == keyReleaseEvent->keycode) &&
+		(e.xkey.time == keyReleaseEvent->time)) {
+	      return true;
+	    }
+	}
+        return false;
+    }
+
     void handleKeyReleaseEvent (const XKeyEvent* const keyEvent)
     {
+	if (keyReleaseMsgShouldBeIgnored(keyEvent)) return;
         updateKeyStates (keyEvent->keycode, false);
         KeySym sym;
 
@@ -2146,12 +2161,13 @@ private:
         swa.border_pixel = 0;
         swa.background_pixmap = None;
         swa.colormap = colormap;
+        swa.override_redirect = (getComponent()->isAlwaysOnTop() && (styleFlags & windowIsTemporary)) ? true : false;
         swa.event_mask = getAllEventsMask();
 
         windowH = XCreateWindow (display, parentToAddTo != 0 ? parentToAddTo : root,
                                  0, 0, 1, 1,
                                  0, depth, InputOutput, visual,
-                                 CWBorderPixel | CWColormap | CWBackPixmap | CWEventMask,
+                                 CWBorderPixel | CWColormap | CWBackPixmap | CWEventMask| CWOverrideRedirect,
                                  &swa);
 
         XGrabButton (display, AnyButton, AnyModifier, windowH, False,

@@ -39,9 +39,9 @@ ifeq ($(CONFIG),Debug)
 endif
 
 OBJECTS := \
+	$(OBJDIR)/bitManglerEditor.o \
 	$(OBJDIR)/bitFloat.o \
 	$(OBJDIR)/bitMangler.o \
-	$(OBJDIR)/bitManglerEditor.o \
 	$(OBJDIR)/juce_VST_Wrapper.o \
 
 MKDIR_TYPE := msdos
@@ -84,17 +84,17 @@ else
 	-@if exist $(subst /,\,$(OBJDIR)) rmdir /s /q $(subst /,\,$(OBJDIR))
 endif
 
+$(OBJDIR)/bitManglerEditor.o: ../source/bitManglerEditor.cpp
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
 $(OBJDIR)/bitFloat.o: ../source/bitFloat.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
 $(OBJDIR)/bitMangler.o: ../source/bitMangler.cpp
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/bitManglerEditor.o: ../source/bitManglerEditor.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"

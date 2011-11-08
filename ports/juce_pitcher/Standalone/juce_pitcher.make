@@ -39,19 +39,19 @@ ifeq ($(CONFIG),Debug)
 endif
 
 OBJECTS := \
-	$(OBJDIR)/JucePitcherComponent.o \
 	$(OBJDIR)/JucePitcherFilter.o \
-	$(OBJDIR)/AAFilter.o \
+	$(OBJDIR)/JucePitcherComponent.o \
 	$(OBJDIR)/cpu_detect_x86_gcc.o \
-	$(OBJDIR)/FIFOSampleBuffer.o \
 	$(OBJDIR)/FIRFilter.o \
+	$(OBJDIR)/sse_optimized.o \
+	$(OBJDIR)/FIFOSampleBuffer.o \
+	$(OBJDIR)/TDStretch.o \
 	$(OBJDIR)/mmx_optimized.o \
+	$(OBJDIR)/AAFilter.o \
 	$(OBJDIR)/RateTransposer.o \
 	$(OBJDIR)/SoundTouch.o \
-	$(OBJDIR)/sse_optimized.o \
-	$(OBJDIR)/TDStretch.o \
-	$(OBJDIR)/juce_StandaloneFilterWindow.o \
 	$(OBJDIR)/juce_StandaloneFilterApplication.o \
+	$(OBJDIR)/juce_StandaloneFilterWindow.o \
 
 MKDIR_TYPE := msdos
 CMD := $(subst \,\\,$(ComSpec)$(COMSPEC))
@@ -93,17 +93,12 @@ else
 	-@if exist $(subst /,\,$(OBJDIR)) rmdir /s /q $(subst /,\,$(OBJDIR))
 endif
 
-$(OBJDIR)/JucePitcherComponent.o: ../source/JucePitcherComponent.cpp
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
 $(OBJDIR)/JucePitcherFilter.o: ../source/JucePitcherFilter.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
-$(OBJDIR)/AAFilter.o: ../source/soundtouch/AAFilter.cpp
+$(OBJDIR)/JucePitcherComponent.o: ../source/JucePitcherComponent.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
@@ -113,17 +108,32 @@ $(OBJDIR)/cpu_detect_x86_gcc.o: ../source/soundtouch/cpu_detect_x86_gcc.cpp
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
-$(OBJDIR)/FIFOSampleBuffer.o: ../source/soundtouch/FIFOSampleBuffer.cpp
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
 $(OBJDIR)/FIRFilter.o: ../source/soundtouch/FIRFilter.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
+$(OBJDIR)/sse_optimized.o: ../source/soundtouch/sse_optimized.cpp
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/FIFOSampleBuffer.o: ../source/soundtouch/FIFOSampleBuffer.cpp
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/TDStretch.o: ../source/soundtouch/TDStretch.cpp
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
 $(OBJDIR)/mmx_optimized.o: ../source/soundtouch/mmx_optimized.cpp
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/AAFilter.o: ../source/soundtouch/AAFilter.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
@@ -138,22 +148,12 @@ $(OBJDIR)/SoundTouch.o: ../source/soundtouch/SoundTouch.cpp
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
-$(OBJDIR)/sse_optimized.o: ../source/soundtouch/sse_optimized.cpp
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/TDStretch.o: ../source/soundtouch/TDStretch.cpp
+$(OBJDIR)/juce_StandaloneFilterApplication.o: ../../../libs/juce-custom/Standalone/juce_StandaloneFilterApplication.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
 $(OBJDIR)/juce_StandaloneFilterWindow.o: ../../../libs/juce-custom/Standalone/juce_StandaloneFilterWindow.cpp
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/juce_StandaloneFilterApplication.o: ../../../libs/juce-custom/Standalone/juce_StandaloneFilterApplication.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"

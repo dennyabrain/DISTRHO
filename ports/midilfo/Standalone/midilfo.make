@@ -39,11 +39,11 @@ ifeq ($(CONFIG),Debug)
 endif
 
 OBJECTS := \
-	$(OBJDIR)/MidiDevice.o \
-	$(OBJDIR)/MainComponent.o \
-	$(OBJDIR)/MyThread.o \
-	$(OBJDIR)/MyMidiInputCallback.o \
 	$(OBJDIR)/ProcessingCore.o \
+	$(OBJDIR)/MyThread.o \
+	$(OBJDIR)/MainComponent.o \
+	$(OBJDIR)/MidiDevice.o \
+	$(OBJDIR)/MyMidiInputCallback.o \
 	$(OBJDIR)/Main.o \
 
 MKDIR_TYPE := msdos
@@ -86,12 +86,7 @@ else
 	-@if exist $(subst /,\,$(OBJDIR)) rmdir /s /q $(subst /,\,$(OBJDIR))
 endif
 
-$(OBJDIR)/MidiDevice.o: ../source/MidiDevice.cpp
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/MainComponent.o: ../source/MainComponent.cpp
+$(OBJDIR)/ProcessingCore.o: ../source/ProcessingCore.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
@@ -101,12 +96,17 @@ $(OBJDIR)/MyThread.o: ../source/MyThread.cpp
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
-$(OBJDIR)/MyMidiInputCallback.o: ../source/MyMidiInputCallback.cpp
+$(OBJDIR)/MainComponent.o: ../source/MainComponent.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
-$(OBJDIR)/ProcessingCore.o: ../source/ProcessingCore.cpp
+$(OBJDIR)/MidiDevice.o: ../source/MidiDevice.cpp
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/MyMidiInputCallback.o: ../source/MyMidiInputCallback.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"

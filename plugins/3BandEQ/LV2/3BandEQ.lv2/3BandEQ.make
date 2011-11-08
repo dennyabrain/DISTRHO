@@ -40,8 +40,8 @@ endif
 
 OBJECTS := \
 	$(OBJDIR)/PluginEditor.o \
-	$(OBJDIR)/PluginProcessor.o \
 	$(OBJDIR)/DistrhoArtwork.o \
+	$(OBJDIR)/PluginProcessor.o \
 	$(OBJDIR)/juce_LV2_Wrapper.o \
 
 MKDIR_TYPE := msdos
@@ -89,12 +89,12 @@ $(OBJDIR)/PluginEditor.o: ../source/PluginEditor.cpp
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
-$(OBJDIR)/PluginProcessor.o: ../source/PluginProcessor.cpp
+$(OBJDIR)/DistrhoArtwork.o: ../source/DistrhoArtwork.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
-$(OBJDIR)/DistrhoArtwork.o: ../source/DistrhoArtwork.cpp
+$(OBJDIR)/PluginProcessor.o: ../source/PluginProcessor.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"

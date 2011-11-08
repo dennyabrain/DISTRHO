@@ -15,7 +15,7 @@ all: juce-standalone-153
 
 Makefile: premake.lua
 	@echo ==== Regenerating Makefiles ====
-	@premake --file $^ --os macosx --target gnu
+	@premake --file $^ --os linux --target gnu --cc gcc
 
 juce-standalone-153:
 	@echo ==== Building juce-standalone-153 ====

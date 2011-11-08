@@ -39,16 +39,16 @@ ifeq ($(CONFIG),Debug)
 endif
 
 OBJECTS := \
-	$(OBJDIR)/SorolletADSR.o \
-	$(OBJDIR)/SorolletEQ.o \
 	$(OBJDIR)/SorolletFilter.o \
+	$(OBJDIR)/SorolletADSR.o \
 	$(OBJDIR)/SorolletVoice.o \
+	$(OBJDIR)/SorolletEQ.o \
 	$(OBJDIR)/MathUtils.o \
 	$(OBJDIR)/SorolletVSTi.o \
 	$(OBJDIR)/SorolletVSTiProgram.o \
 	$(OBJDIR)/main.o \
-	$(OBJDIR)/audioeffect.o \
 	$(OBJDIR)/audioeffectx.o \
+	$(OBJDIR)/audioeffect.o \
 	$(OBJDIR)/vstplugmain.o \
 
 MKDIR_TYPE := msdos
@@ -91,22 +91,22 @@ else
 	-@if exist $(subst /,\,$(OBJDIR)) rmdir /s /q $(subst /,\,$(OBJDIR))
 endif
 
-$(OBJDIR)/SorolletADSR.o: ../source/core/SorolletADSR.cpp
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/SorolletEQ.o: ../source/core/SorolletEQ.cpp
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
 $(OBJDIR)/SorolletFilter.o: ../source/core/SorolletFilter.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
+$(OBJDIR)/SorolletADSR.o: ../source/core/SorolletADSR.cpp
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
 $(OBJDIR)/SorolletVoice.o: ../source/core/SorolletVoice.cpp
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/SorolletEQ.o: ../source/core/SorolletEQ.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
@@ -131,12 +131,12 @@ $(OBJDIR)/main.o: ../source/vsti/main.cpp
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
-$(OBJDIR)/audioeffect.o: ../../../sdks/vstsdk2.4/public.sdk/source/vst2.x/audioeffect.cpp
+$(OBJDIR)/audioeffectx.o: ../../../sdks/vstsdk2.4/public.sdk/source/vst2.x/audioeffectx.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
-$(OBJDIR)/audioeffectx.o: ../../../sdks/vstsdk2.4/public.sdk/source/vst2.x/audioeffectx.cpp
+$(OBJDIR)/audioeffect.o: ../../../sdks/vstsdk2.4/public.sdk/source/vst2.x/audioeffect.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
