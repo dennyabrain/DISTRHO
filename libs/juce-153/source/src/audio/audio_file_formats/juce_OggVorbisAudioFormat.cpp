@@ -24,7 +24,7 @@
 */
 
 #include "../../core/juce_TargetPlatform.h"
-#include "juce_Config.h"
+#include "../../../juce_Config.h"
 
 #if JUCE_USE_OGGVORBIS
 
