@@ -161,7 +161,8 @@ public:
                                 const Colour& backgroundColour,
                                 bool escapeKeyTriggersCloseButton,
                                 bool shouldBeResizable = false,
-                                bool useBottomRightCornerResizer = false);
+                                bool useBottomRightCornerResizer = false,
+                                bool useNativeTitleBar = false);
    #endif
 
 protected:

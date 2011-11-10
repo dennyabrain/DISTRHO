@@ -321,7 +321,7 @@ void StandaloneFilterWindow::showAudioSettingsDialog()
 
     selectorComp.setSize (500, 450);
 
-    DialogWindow::showModalDialog (TRANS("Audio Settings"), &selectorComp, this, Colours::lightgrey, true, false, false);
+    DialogWindow::showModalDialog (TRANS("Audio Settings"), &selectorComp, this, Colours::lightgrey, true, false, false, isUsingNativeTitleBar());
 }
 
 //==============================================================================

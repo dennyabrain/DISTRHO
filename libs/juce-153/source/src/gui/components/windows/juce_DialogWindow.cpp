@@ -70,7 +70,8 @@ public:
                       const Colour& colour,
                       const bool escapeKeyTriggersCloseButton_,
                       const bool shouldBeResizable,
-                      const bool useBottomRightCornerResizer)
+                      const bool useBottomRightCornerResizer,
+                      const bool useNativeTitleBar = false)
         : DialogWindow (title, colour, escapeKeyTriggersCloseButton_, true)
     {
         if (! JUCEApplication::isStandaloneApp())
@@ -79,6 +80,7 @@ public:
         setContentNonOwned (contentComponent_, true);
         centreAroundComponent (componentToCentreAround, getWidth(), getHeight());
         setResizable (shouldBeResizable, useBottomRightCornerResizer);
+        setUsingNativeTitleBar (useNativeTitleBar);
     }
 
     void closeButtonPressed()
@@ -114,11 +116,12 @@ int DialogWindow::showModalDialog (const String& dialogTitle,
                                    const Colour& backgroundColour,
                                    const bool escapeKeyTriggersCloseButton,
                                    const bool shouldBeResizable,
-                                   const bool useBottomRightCornerResizer)
+                                   const bool useBottomRightCornerResizer,
+                                   const bool useNativeTitleBar)
 {
     TempDialogWindow dw (dialogTitle, contentComponent, componentToCentreAround,
                          backgroundColour, escapeKeyTriggersCloseButton,
-                         shouldBeResizable, useBottomRightCornerResizer);
+                         shouldBeResizable, useBottomRightCornerResizer, useNativeTitleBar);
 
     return dw.runModalLoop();
 }
