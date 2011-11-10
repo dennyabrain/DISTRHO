@@ -9,9 +9,9 @@ endif
 
 export CONFIG
 
-.PHONY: all clean juce-standalone-vst-153
+.PHONY: all clean juce-standalone-vst-153 juce-standalone-vst-153
 
-all: juce-standalone-vst-153
+all: juce-standalone-vst-153 juce-standalone-vst-153
 
 Makefile: premake.lua
 	@echo ==== Regenerating Makefiles ====
@@ -21,5 +21,10 @@ juce-standalone-vst-153:
 	@echo ==== Building juce-standalone-vst-153 ====
 	@$(MAKE) --no-print-directory -C . -f juce-standalone-vst-153.make
 
+juce-standalone-vst-153:
+	@echo ==== Building juce-standalone-vst-153 ====
+	@$(MAKE) --no-print-directory -C . -f juce-standalone-vst-153.make
+
 clean:
+	@$(MAKE) --no-print-directory -C . -f juce-standalone-vst-153.make clean
 	@$(MAKE) --no-print-directory -C . -f juce-standalone-vst-153.make clean

@@ -3,6 +3,7 @@ project.name = "juce-standalone-vst-153"
 project.bindir = "../.."
 project.libdir = project.bindir
 project.configs = { "Release", "Debug" }
+package.defines = { "JUCE_USE_VSTSDK_2_4=1", "JUCE_PLUGINHOST_VST=1" };
 
 package = newpackage()
 package.name = project.name
@@ -12,30 +13,31 @@ package.linkflags = { "static-runtime" }
 
 package.config["Release"].target       = project.name
 package.config["Release"].objdir       = "intermediate/Release"
-package.config["Release"].buildoptions = { "-O2 -march=native -msse -ffast-math -fPIC" }
-package.config["Release"].links        = { "freetype", "pthread", "asound", "rt", "X11", "Xext" }
+package.config["Release"].defines      = { "NDEBUG=1" };
+package.config["Release"].buildflags   = { "optimize-speed" }
 
 package.config["Debug"].target         = project.name .. "_debug"
 package.config["Debug"].objdir         = "intermediate/Debug"
-package.config["Debug"].buildoptions   = { "-O0 -ggdb -fPIC" }
-package.config["Debug"].links          = { "freetype", "pthread", "asound", "rt", "X11", "Xext" }
+package.config["Debug"].defines        = { "DEBUG=1", "_DEBUG=1" };
 
--- TODO: check for OS
-package.config["Release"].defines      = { "LINUX=1", "NDEBUG=1", "JUCE_USE_VSTSDK_2_4=1" }
-package.config["Debug"].defines        = { "LINUX=1", "DEBUG=1", "_DEBUG=1", "JUCE_USE_VSTSDK_2_4=1" }
+if (windows) then
+  package.defines = { package.defines, "WINDOWS=1" };
+else
+  package.config["Release"].buildoptions = { "-O2 -mtune=generic -ffast-math -fomit-frame-pointer -fPIC" }
+  package.config["Debug"].buildoptions   = { "-O0 -ggdb -fPIC" }
+  if (macosx) then
+    package.defines = { package.defines, "MAC=1" };
+  else
+    package.defines = { package.defines, "LINUX=1" };
+    package.buildoptions = { "`pkg-config --cflags freetype2`" }
+  end
+end
 
-package.includepaths = {
-    ".",
-    "/usr/include",
-    "/usr/include/freetype2",
-    "../../../vstsdk2.4"
-}
-
-package.libpaths = {
-    "/usr/X11R6/lib/",
-    "/usr/lib/",
-    "../.."
-}
+if (windows) then
+  package.includepaths = { ".", "../../../vstsdk2.4", "../../../sdks/ASIOSDK2" }
+else
+  package.includepaths = { ".", "../../../vstsdk2.4" }
+end
 
 package.files = {
   matchfiles (
@@ -85,12 +87,18 @@ package.files = {
     "../source/src/maths/*.cpp",
     "../source/src/memory/*.cpp",
     "../source/src/native/common/*.cpp",
-    -- "../source/src/native/android/*.cpp",
-    "../source/src/native/linux/*.cpp",
-    -- "../source/src/native/mac/*.cpp",
-    -- "../source/src/native/windows/*.cpp",
     "../source/src/text/*.cpp",
     "../source/src/threads/*.cpp",
     "../source/src/utilities/*.cpp"
     )
 }
+
+if (windows) then
+  package.files = { package.files, matchfiles ("../source/src/native/windows/*.cpp") }
+elseif (macosx) then
+  package.files = { package.files, matchfiles ("../source/src/native/mac/*.cpp") }
+else
+  package.files = { package.files, matchfiles ("../source/src/native/linux/*.cpp") }
+end
+
+-- Missing android -> "../source/src/native/android/*.cpp"

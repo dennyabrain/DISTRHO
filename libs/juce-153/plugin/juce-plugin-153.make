@@ -14,7 +14,7 @@ ifeq ($(CONFIG),Release)
   OBJDIR := intermediate/Release
   OUTDIR := ../..
   CPPFLAGS := $(DEPFLAGS) -D "LINUX=1" -D "NDEBUG=1" -I "."
-  CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -g -O3 `pkg-config --cflags freetype2` -O2 -mtune=generic -ffast-math -fomit-frame-pointer -fPIC
+  CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -g -O3 `pkg-config --cflags freetype2` -O2 -mtune=generic -ffast-math -fomit-frame-pointer -fvisibility=hidden -fPIC
   CXXFLAGS += $(CFLAGS)
   LDFLAGS += -L$(BINDIR) -L$(LIBDIR)
   LDDEPS :=
