@@ -20,7 +20,7 @@ ifeq ($(CONFIG),Release)
   LDDEPS :=
   RESFLAGS := -D "LINUX=1" -D "NDEBUG=1" -I "../source" -I "/usr/include" -I "/usr/include/freetype2" -I "../../../libs/juce-153/standalone" -I "../../../libs/juce-153/source"
   TARGET := mr-alias2
- BLDCMD = $(CXX) -o $(OUTDIR)/$(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(TARGET_ARCH)
+ BLDCMD = $(CXX) -o $(OUTDIR)/$(TARGET) $(OBJECTS) $(LDFLAGS) $(LDFLAGS) $(RESOURCES) $(TARGET_ARCH)
 endif
 
 ifeq ($(CONFIG),Debug)
@@ -35,7 +35,7 @@ ifeq ($(CONFIG),Debug)
   LDDEPS :=
   RESFLAGS := -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -I "../source" -I "/usr/include" -I "/usr/include/freetype2" -I "../../../libs/juce-153/standalone" -I "../../../libs/juce-153/source"
   TARGET := mr-alias2_debug
- BLDCMD = $(CXX) -o $(OUTDIR)/$(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(TARGET_ARCH)
+ BLDCMD = $(CXX) -o $(OUTDIR)/$(TARGET) $(OBJECTS) $(LDFLAGS) $(LDFLAGS) $(RESOURCES) $(TARGET_ARCH)
 endif
 
 OBJECTS := \

@@ -20,7 +20,7 @@ ifeq ($(CONFIG),Release)
   LDDEPS :=
   RESFLAGS := -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=1" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_Standalone=0" -D "BUILDDATE="`date +%F`"" -D "WOLPVERSION="0041"" -D "WOLPVERSIONSTRING="0.4.1"" -D "LINUX=1" -D "BINTYPE="Linux-LV2"" -D "NDEBUG=1" -D "CONFIGURATION="Release"" -I "../source" -I "../../../libs/juce-153/plugin" -I "../../../libs/juce-153/source"
   TARGET := Wolpertinger.so
- BLDCMD = $(CXX) -o $(OUTDIR)/$(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(TARGET_ARCH)
+ BLDCMD = $(CXX) -o $(OUTDIR)/$(TARGET) $(OBJECTS) $(LDFLAGS) $(LDFLAGS) $(RESOURCES) $(TARGET_ARCH)
 endif
 
 ifeq ($(CONFIG),Debug)
@@ -35,7 +35,7 @@ ifeq ($(CONFIG),Debug)
   LDDEPS :=
   RESFLAGS := -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=1" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_Standalone=0" -D "BUILDDATE="`date +%F`"" -D "WOLPVERSION="0041"" -D "WOLPVERSIONSTRING="0.4.1"" -D "LINUX=1" -D "BINTYPE="Linux-LV2"" -D "DEBUG=1" -D "_DEBUG=1" -D "CONFIGURATION="Debug"" -I "../source" -I "../../../libs/juce-153/plugin" -I "../../../libs/juce-153/source"
   TARGET := Wolpertinger_debug.so
- BLDCMD = $(CXX) -o $(OUTDIR)/$(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(TARGET_ARCH)
+ BLDCMD = $(CXX) -o $(OUTDIR)/$(TARGET) $(OBJECTS) $(LDFLAGS) $(LDFLAGS) $(RESOURCES) $(TARGET_ARCH)
 endif
 
 OBJECTS := \

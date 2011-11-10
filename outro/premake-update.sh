@@ -15,6 +15,8 @@ for i in $FILES; do
   cd $FOLDER
   echo premake --os linux --target gnu --cc gcc
   premake --os linux --target gnu --cc gcc
+  echo sed "s/\\\$(LDFLAGS)/\\\$(LDFLAGS) \\\$(LDFLAGS)/" -i `find . -name \*.make`
+  sed "s/\$(LDFLAGS)/\$(LDFLAGS) \$(LDFLAGS)/" -i `find . -name \*.make`
   if [ -d ../libs ]; then
     echo cd ..
     cd ..
