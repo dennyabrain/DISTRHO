@@ -9,17 +9,17 @@ endif
 
 export CONFIG
 
-.PHONY: all clean TAL-Vocoder-2.lv2/TAL_Vocoder_II_Plugin
+.PHONY: all clean TAL-Plugins.lv2/TAL_Vocoder_II_Plugin
 
-all: TAL-Vocoder-2.lv2/TAL_Vocoder_II_Plugin
+all: TAL-Plugins.lv2/TAL_Vocoder_II_Plugin
 
 Makefile: premake.lua
 	@echo ==== Regenerating Makefiles ====
 	@premake --file $^ --os linux --target gnu --cc gcc
 
-TAL-Vocoder-2.lv2/TAL_Vocoder_II_Plugin:
-	@echo ==== Building TAL-Vocoder-2.lv2/TAL_Vocoder_II_Plugin ====
-	@$(MAKE) --no-print-directory -C . -f TAL-Vocoder-2.lv2/TAL_Vocoder_II_Plugin.make
+TAL-Plugins.lv2/TAL_Vocoder_II_Plugin:
+	@echo ==== Building TAL-Plugins.lv2/TAL_Vocoder_II_Plugin ====
+	@$(MAKE) --no-print-directory -C . -f TAL-Plugins.lv2/TAL_Vocoder_II_Plugin.make
 
 clean:
-	@$(MAKE) --no-print-directory -C . -f TAL-Vocoder-2.lv2/TAL_Vocoder_II_Plugin.make clean
+	@$(MAKE) --no-print-directory -C . -f TAL-Plugins.lv2/TAL_Vocoder_II_Plugin.make clean

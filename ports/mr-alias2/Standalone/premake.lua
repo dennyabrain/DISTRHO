@@ -12,17 +12,29 @@ package.linkflags = { "static-runtime" }
 
 package.config["Release"].target       = project.name
 package.config["Release"].objdir       = "intermediate/Release"
-package.config["Release"].buildoptions = { "-O2 -march=native -msse -ffast-math -fvisibility=hidden -static" }
-package.config["Release"].links        = { "freetype", "pthread", "asound", "dl", "rt", "X11", "Xext", "juce-standalone-153" }
+package.config["Release"].defines      = { "NDEBUG=1" };
+package.config["Release"].buildflags   = { "no-symbols", "optimize-speed" }
+package.config["Release"].links        = { "juce-standalone-153" }
 
 package.config["Debug"].target         = project.name .. "_debug"
 package.config["Debug"].objdir         = "intermediate/Debug"
-package.config["Debug"].buildoptions   = { "-O0 -ggdb -static" }
-package.config["Debug"].links          = { "freetype", "pthread", "asound", "dl", "rt", "X11", "Xext", "juce-standalone-153_debug" }
+package.config["Debug"].defines        = { "DEBUG=1", "_DEBUG=1" };
+package.config["Debug"].links          = { "juce-standalone-153_debug" }
 
--- TODO: Check for OS
-package.config["Release"].defines      = { "LINUX=1", "NDEBUG=1", "JucePlugin_Build_VST=0", "JucePlugin_Build_AU=0", "JucePlugin_Build_RTAS=0", "JucePlugin_Build_Standalone=1" };
-package.config["Debug"].defines        = { "LINUX=1", "DEBUG=1", "_DEBUG=1", "JucePlugin_Build_VST=0", "JucePlugin_Build_AU=0", "JucePlugin_Build_RTAS=0", "JucePlugin_Build_Standalone=1" };
+if (windows) then
+  package.defines = { package.defines, "WINDOWS=1" };
+else
+  package.config["Release"].buildoptions = { "-O2 -mtune=generic -msse -ffast-math -fomit-frame-pointer -fvisibility=hidden -fPIC" }
+--   package.config["Release"].linkoptions  = { "-Wl,-O1 -Wl,--as-needed" }
+  package.config["Debug"].buildoptions   = { "-O0 -ggdb -fPIC" }
+  if (macosx) then
+    package.defines = { package.defines, "MAC=1" };
+  else
+    package.defines = { package.defines, "LINUX=1" };
+    package.buildoptions = { "`pkg-config --cflags freetype2`" }
+    package.linkoptions  = { "`pkg-config --libs freetype2`" }
+  end
+end
 
 package.includepaths = {
     "../source",

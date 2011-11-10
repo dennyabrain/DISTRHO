@@ -54,8 +54,6 @@ lv2: libs_plugin libs_lv2
 	$(MAKE) -C tal-vocoder-2-juce/LV2
 	$(MAKE) -C wolpertinger/LV2
 
-# 	../libs/juce_lv2_ttl_generator ../bin/*.lv2/*.so
-
 
 vst: libs_plugin
 	$(MAKE) -C arctican-function/VST

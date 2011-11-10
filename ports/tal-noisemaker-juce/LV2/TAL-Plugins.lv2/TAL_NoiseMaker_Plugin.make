@@ -12,14 +12,14 @@ ifeq ($(CONFIG),Release)
   BINDIR := ../../../bin
   LIBDIR := ../../../bin
   OBJDIR := intermediate/Release
-  OUTDIR := ../../../bin/TAL-Reverb.lv2
-  CPPFLAGS := $(DEPFLAGS) -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=1" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_Standalone=0" -D "LINUX=1" -D "NDEBUG=1" -I "../source" -I "." -I "../../../libs/juce-153/plugin" -I "../../../libs/juce-153/source"
+  OUTDIR := ../../../bin/TAL-Plugins.lv2
+  CPPFLAGS := $(DEPFLAGS) -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=1" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_Standalone=0" -D "LINUX=1" -D "NDEBUG=1" -I "../source" -I "../source/Engine" -I "." -I "./intermediate" -I "./intermediate/Release" -I "../../../libs/juce-153/plugin" -I "../../../libs/juce-153/source"
   CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -fPIC -O3 `pkg-config --cflags freetype2` -O2 -mtune=generic -msse -ffast-math -fomit-frame-pointer -fvisibility=hidden -fPIC
   CXXFLAGS += $(CFLAGS)
   LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -shared -s `pkg-config --libs freetype2` -L"../../../libs" -lfreetype -lpthread -lrt -lX11 -lXext -ljuce-plugin-153
   LDDEPS :=
-  RESFLAGS := -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=1" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_Standalone=0" -D "LINUX=1" -D "NDEBUG=1" -I "../source" -I "." -I "../../../libs/juce-153/plugin" -I "../../../libs/juce-153/source"
-  TARGET := TAL_Reverb_Plugin.so
+  RESFLAGS := -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=1" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_Standalone=0" -D "LINUX=1" -D "NDEBUG=1" -I "../source" -I "../source/Engine" -I "." -I "./intermediate" -I "./intermediate/Release" -I "../../../libs/juce-153/plugin" -I "../../../libs/juce-153/source"
+  TARGET := TAL_NoiseMaker_Plugin.so
  BLDCMD = $(CXX) -o $(OUTDIR)/$(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(TARGET_ARCH)
 endif
 
@@ -27,20 +27,21 @@ ifeq ($(CONFIG),Debug)
   BINDIR := ../../../bin
   LIBDIR := ../../../bin
   OBJDIR := intermediate/Debug
-  OUTDIR := ../../../bin/TAL-Reverb.lv2
-  CPPFLAGS := $(DEPFLAGS) -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=1" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_Standalone=0" -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -I "../source" -I "." -I "../../../libs/juce-153/plugin" -I "../../../libs/juce-153/source"
+  OUTDIR := ../../../bin/TAL-Plugins.lv2
+  CPPFLAGS := $(DEPFLAGS) -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=1" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_Standalone=0" -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -I "../source" -I "../source/Engine" -I "." -I "./intermediate" -I "./intermediate/Release" -I "../../../libs/juce-153/plugin" -I "../../../libs/juce-153/source"
   CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -fPIC -g `pkg-config --cflags freetype2` -O0 -ggdb -fPIC
   CXXFLAGS += $(CFLAGS)
   LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -shared `pkg-config --libs freetype2` -L"../../../libs" -lfreetype -lpthread -lrt -lX11 -lXext -ljuce-plugin-153_debug
   LDDEPS :=
-  RESFLAGS := -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=1" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_Standalone=0" -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -I "../source" -I "." -I "../../../libs/juce-153/plugin" -I "../../../libs/juce-153/source"
-  TARGET := TAL_Reverb_Plugin_debug.so
+  RESFLAGS := -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=1" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_Standalone=0" -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -I "../source" -I "../source/Engine" -I "." -I "./intermediate" -I "./intermediate/Release" -I "../../../libs/juce-153/plugin" -I "../../../libs/juce-153/source"
+  TARGET := TAL_NoiseMaker_Plugin_debug.so
  BLDCMD = $(CXX) -o $(OUTDIR)/$(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(TARGET_ARCH)
 endif
 
 OBJECTS := \
-	$(OBJDIR)/ReverbComponent.o \
+	$(OBJDIR)/TalComponent.o \
 	$(OBJDIR)/TalCore.o \
+	$(OBJDIR)/Lfo.o \
 	$(OBJDIR)/juce_LV2_Wrapper.o \
 
 MKDIR_TYPE := msdos
@@ -66,14 +67,14 @@ endif
 .PHONY: clean
 
 $(OUTDIR)/$(TARGET): $(OBJECTS) $(LDDEPS) $(RESOURCES)
-	@echo Linking TAL-Reverb.lv2/TAL_Reverb_Plugin
+	@echo Linking TAL-Plugins.lv2/TAL_NoiseMaker_Plugin
 	-@$(CMD_MKBINDIR)
 	-@$(CMD_MKLIBDIR)
 	-@$(CMD_MKOUTDIR)
 	@$(BLDCMD)
 
 clean:
-	@echo Cleaning TAL-Reverb.lv2/TAL_Reverb_Plugin
+	@echo Cleaning TAL-Plugins.lv2/TAL_NoiseMaker_Plugin
 ifeq ($(MKDIR_TYPE),posix)
 	-@rm -f $(OUTDIR)/$(TARGET)
 	-@rm -rf $(OBJDIR)
@@ -83,12 +84,17 @@ else
 	-@if exist $(subst /,\,$(OBJDIR)) rmdir /s /q $(subst /,\,$(OBJDIR))
 endif
 
-$(OBJDIR)/ReverbComponent.o: ../source/ReverbComponent.cpp
+$(OBJDIR)/TalComponent.o: ../source/TalComponent.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
 $(OBJDIR)/TalCore.o: ../source/TalCore.cpp
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/Lfo.o: ../source/Engine/Lfo.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"

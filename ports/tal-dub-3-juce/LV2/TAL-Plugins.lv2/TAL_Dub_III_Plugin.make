@@ -12,14 +12,14 @@ ifeq ($(CONFIG),Release)
   BINDIR := ../../../bin
   LIBDIR := ../../../bin
   OBJDIR := intermediate/Release
-  OUTDIR := ../../../bin/TAL-Reverb-2.lv2
+  OUTDIR := ../../../bin/TAL-Plugins.lv2
   CPPFLAGS := $(DEPFLAGS) -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=1" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_Standalone=0" -D "LINUX=1" -D "NDEBUG=1" -I "../source" -I "." -I "../../../libs/juce-153/plugin" -I "../../../libs/juce-153/source"
   CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -fPIC -O3 `pkg-config --cflags freetype2` -O2 -mtune=generic -msse -ffast-math -fomit-frame-pointer -fvisibility=hidden -fPIC
   CXXFLAGS += $(CFLAGS)
   LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -shared -s `pkg-config --libs freetype2` -L"../../../libs" -lfreetype -lpthread -lrt -lX11 -lXext -ljuce-plugin-153
   LDDEPS :=
   RESFLAGS := -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=1" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_Standalone=0" -D "LINUX=1" -D "NDEBUG=1" -I "../source" -I "." -I "../../../libs/juce-153/plugin" -I "../../../libs/juce-153/source"
-  TARGET := TAL_Reverb_II_Plugin.so
+  TARGET := TAL_Dub_III_Plugin.so
  BLDCMD = $(CXX) -o $(OUTDIR)/$(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(TARGET_ARCH)
 endif
 
@@ -27,14 +27,14 @@ ifeq ($(CONFIG),Debug)
   BINDIR := ../../../bin
   LIBDIR := ../../../bin
   OBJDIR := intermediate/Debug
-  OUTDIR := ../../../bin/TAL-Reverb-2.lv2
+  OUTDIR := ../../../bin/TAL-Plugins.lv2
   CPPFLAGS := $(DEPFLAGS) -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=1" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_Standalone=0" -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -I "../source" -I "." -I "../../../libs/juce-153/plugin" -I "../../../libs/juce-153/source"
   CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -fPIC -g `pkg-config --cflags freetype2` -O0 -ggdb -fPIC
   CXXFLAGS += $(CFLAGS)
   LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -shared `pkg-config --libs freetype2` -L"../../../libs" -lfreetype -lpthread -lrt -lX11 -lXext -ljuce-plugin-153_debug
   LDDEPS :=
   RESFLAGS := -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=1" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_Standalone=0" -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -I "../source" -I "." -I "../../../libs/juce-153/plugin" -I "../../../libs/juce-153/source"
-  TARGET := TAL_Reverb_II_Plugin_debug.so
+  TARGET := TAL_Dub_III_Plugin_debug.so
  BLDCMD = $(CXX) -o $(OUTDIR)/$(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(TARGET_ARCH)
 endif
 
@@ -66,14 +66,14 @@ endif
 .PHONY: clean
 
 $(OUTDIR)/$(TARGET): $(OBJECTS) $(LDDEPS) $(RESOURCES)
-	@echo Linking TAL-Reverb-2.lv2/TAL_Reverb_II_Plugin
+	@echo Linking TAL-Plugins.lv2/TAL_Dub_III_Plugin
 	-@$(CMD_MKBINDIR)
 	-@$(CMD_MKLIBDIR)
 	-@$(CMD_MKOUTDIR)
 	@$(BLDCMD)
 
 clean:
-	@echo Cleaning TAL-Reverb-2.lv2/TAL_Reverb_II_Plugin
+	@echo Cleaning TAL-Plugins.lv2/TAL_Dub_III_Plugin
 ifeq ($(MKDIR_TYPE),posix)
 	-@rm -f $(OUTDIR)/$(TARGET)
 	-@rm -rf $(OBJDIR)

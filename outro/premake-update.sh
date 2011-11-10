@@ -15,6 +15,14 @@ for i in $FILES; do
   cd $FOLDER
   echo premake --os linux --target gnu --cc gcc
   premake --os linux --target gnu --cc gcc
-  echo cd ../../..
-  cd ../../..
+  if [ -d ../libs ]; then
+    echo cd ..
+    cd ..
+  elif [ -d ../../libs ]; then
+    echo cd ../..
+    cd ../..
+  else
+    echo cd ../../..
+    cd ../../..
+  fi
 done
