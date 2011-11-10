@@ -1,0 +1,22 @@
+From: falkTX <falktx@gmail.com>
+Date: Thu, 10 Nov 2011 16:26:59 +0000 (+0000)
+Subject: Prefer JACK Audio over ALSA
+X-Git-Url: http://distrho.git.sourceforge.net/git/gitweb.cgi?p=distrho%2Fdistrho;a=commitdiff_plain;h=9ee7373fb66d91ce8c70f200849ece05cd36fb85
+
+Prefer JACK Audio over ALSA
+---
+
+diff --git a/libs/juce-153/source/src/audio/devices/juce_AudioDeviceManager.cpp b/libs/juce-153/source/src/audio/devices/juce_AudioDeviceManager.cpp
+index 77e7316..3bcf2a7 100755
+--- a/libs/juce-153/source/src/audio/devices/juce_AudioDeviceManager.cpp
++++ b/libs/juce-153/source/src/audio/devices/juce_AudioDeviceManager.cpp
+@@ -116,8 +116,8 @@ void AudioDeviceManager::createAudioDeviceTypes (OwnedArray <AudioIODeviceType>&
+     addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_ASIO());
+     addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_CoreAudio());
+     addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_iOSAudio());
+-    addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_ALSA());
+     addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_JACK());
++    addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_ALSA());
+     addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_Android());
+ }
+ 

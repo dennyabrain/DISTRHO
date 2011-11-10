@@ -1,0 +1,59 @@
+From: falkTX <falktx@gmail.com>
+Date: Thu, 10 Nov 2011 16:40:56 +0000 (+0000)
+Subject: Allow to use native titlebar in the device manager
+X-Git-Url: http://distrho.git.sourceforge.net/git/gitweb.cgi?p=distrho%2Fdistrho;a=commitdiff_plain;h=e99a124a8ca87be05ce9378e3ee8d568d5f388be
+
+Allow to use native titlebar in the device manager
+---
+
+diff --git a/libs/juce-153/source/src/gui/components/windows/juce_DialogWindow.cpp b/libs/juce-153/source/src/gui/components/windows/juce_DialogWindow.cpp
+index 7d5085f..18e0b5d 100755
+--- a/libs/juce-153/source/src/gui/components/windows/juce_DialogWindow.cpp
++++ b/libs/juce-153/source/src/gui/components/windows/juce_DialogWindow.cpp
+@@ -70,7 +70,8 @@ public:
+                       const Colour& colour,
+                       const bool escapeKeyTriggersCloseButton_,
+                       const bool shouldBeResizable,
+-                      const bool useBottomRightCornerResizer)
++                      const bool useBottomRightCornerResizer,
++                      const bool useNativeTitleBar = false)
+         : DialogWindow (title, colour, escapeKeyTriggersCloseButton_, true)
+     {
+         if (! JUCEApplication::isStandaloneApp())
+@@ -79,6 +80,7 @@ public:
+         setContentNonOwned (contentComponent_, true);
+         centreAroundComponent (componentToCentreAround, getWidth(), getHeight());
+         setResizable (shouldBeResizable, useBottomRightCornerResizer);
++        setUsingNativeTitleBar (useNativeTitleBar);
+     }
+ 
+     void closeButtonPressed()
+@@ -114,11 +116,12 @@ int DialogWindow::showModalDialog (const String& dialogTitle,
+                                    const Colour& backgroundColour,
+                                    const bool escapeKeyTriggersCloseButton,
+                                    const bool shouldBeResizable,
+-                                   const bool useBottomRightCornerResizer)
++                                   const bool useBottomRightCornerResizer,
++                                   const bool useNativeTitleBar)
+ {
+     TempDialogWindow dw (dialogTitle, contentComponent, componentToCentreAround,
+                          backgroundColour, escapeKeyTriggersCloseButton,
+-                         shouldBeResizable, useBottomRightCornerResizer);
++                         shouldBeResizable, useBottomRightCornerResizer, useNativeTitleBar);
+ 
+     return dw.runModalLoop();
+ }
+diff --git a/libs/juce-153/source/src/gui/components/windows/juce_DialogWindow.h b/libs/juce-153/source/src/gui/components/windows/juce_DialogWindow.h
+index 830d473..ea00452 100755
+--- a/libs/juce-153/source/src/gui/components/windows/juce_DialogWindow.h
++++ b/libs/juce-153/source/src/gui/components/windows/juce_DialogWindow.h
+@@ -161,7 +161,8 @@ public:
+                                 const Colour& backgroundColour,
+                                 bool escapeKeyTriggersCloseButton,
+                                 bool shouldBeResizable = false,
+-                                bool useBottomRightCornerResizer = false);
++                                bool useBottomRightCornerResizer = false,
++                                bool useNativeTitleBar = false);
+    #endif
+ 
+ protected:
