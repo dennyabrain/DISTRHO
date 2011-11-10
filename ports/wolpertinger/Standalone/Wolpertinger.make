@@ -49,6 +49,7 @@ OBJECTS := \
 	$(OBJDIR)/about.o \
 	$(OBJDIR)/juce_StandaloneFilterApplication.o \
 	$(OBJDIR)/juce_StandaloneFilterWindow.o \
+	$(OBJDIR)/DistrhoIcon.o \
 
 MKDIR_TYPE := msdos
 CMD := $(subst \,\\,$(ComSpec)$(COMSPEC))
@@ -136,6 +137,11 @@ $(OBJDIR)/juce_StandaloneFilterApplication.o: ../../../libs/juce-custom/Standalo
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
 $(OBJDIR)/juce_StandaloneFilterWindow.o: ../../../libs/juce-custom/Standalone/juce_StandaloneFilterWindow.cpp
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/DistrhoIcon.o: ../../../libs/juce-custom/Standalone/DistrhoIcon.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"

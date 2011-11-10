@@ -82,6 +82,7 @@ private:
     ScopedPointer<AudioDeviceManager> deviceManager;
     AudioProcessorPlayer player;
     bool nativeTitleBarCheck;
+    Image windowIcon;
 
     void deleteFilter();
 

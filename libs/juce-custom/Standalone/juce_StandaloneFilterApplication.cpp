@@ -1,13 +1,6 @@
 
 #include "juce_StandaloneFilterWindow.h"
 
-namespace {
-const char* juce_getApplicationNameForJack()
-{
-  return JucePlugin_Name;
-}
-}
-
 //==============================================================================
 /**
     A class that can be used to run a simple standalone application containing your filter.

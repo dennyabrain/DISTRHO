@@ -25,8 +25,6 @@ standalone: libs_standalone
 lv2: libs_plugin libs_lv2
 	$(MAKE) -C 3BandEQ/LV2
 
-# 	../libs/juce_lv2_ttl_generator ../bin/*.lv2/*.so
-
 
 vst: libs_plugin
 	$(MAKE) -C 3BandEQ/VST

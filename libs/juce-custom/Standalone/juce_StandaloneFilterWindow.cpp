@@ -24,6 +24,7 @@
 */
 
 #include "juce_StandaloneFilterWindow.h"
+#include "DistrhoIcon.h"
 
 
 //==============================================================================
@@ -59,6 +60,9 @@ StandaloneFilterWindow::StandaloneFilterWindow (const String& title,
 
     setDropShadowEnabled(false);
     setUsingNativeTitleBar(getGlobalSettings()->getBoolValue("nativeTitleBar", true));
+
+    windowIcon = ImageCache::getFromMemory(DistrhoIcon::logo_png, DistrhoIcon::logo_pngSize);
+    setIcon(windowIcon);
 
 #if JUCE_MAC
     setMacMainMenu (this);
