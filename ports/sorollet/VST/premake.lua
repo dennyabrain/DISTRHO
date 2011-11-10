@@ -29,8 +29,7 @@ if (windows) then
 elseif (macosx) then
   package.defines = { "MAC=1" };
 else
-  package.defines = { "LINUX=1" };
---   package.defines = { "LINUX=1", "__cdecl=\"\"" };
+  package.defines = { "LINUX=1", "__cdecl=\"\"" };
 end
 
 package.includepaths = {

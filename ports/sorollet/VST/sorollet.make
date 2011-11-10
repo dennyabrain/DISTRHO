@@ -13,12 +13,12 @@ ifeq ($(CONFIG),Release)
   LIBDIR := ../../../bin
   OBJDIR := intermediate/Release
   OUTDIR := ../../../bin
-  CPPFLAGS := $(DEPFLAGS) -D "LINUX=1" -D "NDEBUG=1" -I "../source" -I "../source/core" -I "../source/sys" -I "../source/vsti" -I "/usr/include" -I "../../../sdks/vstsdk2.4"
+  CPPFLAGS := $(DEPFLAGS) -D "LINUX=1" -D "__cdecl=""" -D "NDEBUG=1" -I "../source" -I "../source/core" -I "../source/sys" -I "../source/vsti" -I "/usr/include" -I "../../../sdks/vstsdk2.4"
   CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -fPIC -O3 -O2 -mtune=generic -msse -ffast-math -fomit-frame-pointer -fvisibility=hidden -fPIC
   CXXFLAGS += $(CFLAGS)
   LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -shared -s
   LDDEPS :=
-  RESFLAGS := -D "LINUX=1" -D "NDEBUG=1" -I "../source" -I "../source/core" -I "../source/sys" -I "../source/vsti" -I "/usr/include" -I "../../../sdks/vstsdk2.4"
+  RESFLAGS := -D "LINUX=1" -D "__cdecl=""" -D "NDEBUG=1" -I "../source" -I "../source/core" -I "../source/sys" -I "../source/vsti" -I "/usr/include" -I "../../../sdks/vstsdk2.4"
   TARGET := sorollet.so
  BLDCMD = $(CXX) -o $(OUTDIR)/$(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(TARGET_ARCH)
 endif
@@ -28,12 +28,12 @@ ifeq ($(CONFIG),Debug)
   LIBDIR := ../../../bin
   OBJDIR := intermediate/Debug
   OUTDIR := ../../../bin
-  CPPFLAGS := $(DEPFLAGS) -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -I "../source" -I "../source/core" -I "../source/sys" -I "../source/vsti" -I "/usr/include" -I "../../../sdks/vstsdk2.4"
+  CPPFLAGS := $(DEPFLAGS) -D "LINUX=1" -D "__cdecl=""" -D "DEBUG=1" -D "_DEBUG=1" -I "../source" -I "../source/core" -I "../source/sys" -I "../source/vsti" -I "/usr/include" -I "../../../sdks/vstsdk2.4"
   CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -fPIC -g -O0 -ggdb -fPIC
   CXXFLAGS += $(CFLAGS)
   LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -shared
   LDDEPS :=
-  RESFLAGS := -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -I "../source" -I "../source/core" -I "../source/sys" -I "../source/vsti" -I "/usr/include" -I "../../../sdks/vstsdk2.4"
+  RESFLAGS := -D "LINUX=1" -D "__cdecl=""" -D "DEBUG=1" -D "_DEBUG=1" -I "../source" -I "../source/core" -I "../source/sys" -I "../source/vsti" -I "/usr/include" -I "../../../sdks/vstsdk2.4"
   TARGET := sorollet_debug.so
  BLDCMD = $(CXX) -o $(OUTDIR)/$(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(TARGET_ARCH)
 endif
