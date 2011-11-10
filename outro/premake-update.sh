@@ -13,6 +13,8 @@ for i in $FILES; do
   FOLDER=`echo $i | awk sub'("/premake.lua","")'`
   echo cd $FOLDER
   cd $FOLDER
+  echo premake --os windows --target vs2005
+  premake --os windows --target vs2005
   echo premake --os linux --target gnu --cc gcc
   premake --os linux --target gnu --cc gcc
   echo sed "s/\\\$(LDFLAGS)/\\\$(LDFLAGS) \\\$(LDFLAGS)/" -i `find . -name \*.make`

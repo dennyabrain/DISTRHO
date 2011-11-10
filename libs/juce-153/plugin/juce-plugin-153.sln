@@ -1,0 +1,21 @@
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "juce-plugin-153", "./juce-plugin-153.vcproj", "{7F5688D4-F813-DDF7-DA24-794541341946}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Release|Win32 = Release|Win32
+		Debug|Win32 = Debug|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7F5688D4-F813-DDF7-DA24-794541341946}.Release|Win32.ActiveCfg = Release|Win32
+		{7F5688D4-F813-DDF7-DA24-794541341946}.Release|Win32.Build.0 = Release|Win32
+		{7F5688D4-F813-DDF7-DA24-794541341946}.Debug|Win32.ActiveCfg = Debug|Win32
+		{7F5688D4-F813-DDF7-DA24-794541341946}.Debug|Win32.Build.0 = Debug|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
