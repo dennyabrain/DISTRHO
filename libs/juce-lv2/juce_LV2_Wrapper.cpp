@@ -154,31 +154,31 @@ String makePluginTtl(const String& uri, const String& binary)
     plugin += "\n";
 
     plugin += "    lv2:port [\n";
-    plugin += "      a lv2:InputPort, lv2ev:EventPort;\n";
-    plugin += "      lv2ev:supportsEvent <http://lv2plug.in/ns/ext/time#Position>;\n";
-    plugin += "      lv2:index " + String(portIndex++) + ";\n";
-    plugin += "      lv2:symbol \"lv2_time_pos\";\n";
-    plugin += "      lv2:name \"LV2 Position\";\n";
+    plugin += "      a lv2:InputPort, lv2ev:EventPort ;\n";
+    plugin += "      lv2ev:supportsEvent <http://lv2plug.in/ns/ext/time#Position> ;\n";
+    plugin += "      lv2:index " + String(portIndex++) + " ;\n";
+    plugin += "      lv2:symbol \"lv2_time_pos\" ;\n";
+    plugin += "      lv2:name \"LV2 Position\" ;\n";
     plugin += "      lv2:portProperty lv2:connectionOptional ;\n";
     plugin += "    ] ;\n\n";
 
 #if JucePlugin_WantsMidiInput
     plugin += "    lv2:port [\n";
-    plugin += "      a lv2:InputPort, lv2ev:EventPort;\n";
-    plugin += "      lv2ev:supportsEvent <http://lv2plug.in/ns/ext/midi#MidiEvent>;\n";
-    plugin += "      lv2:index " + String(portIndex++) + ";\n";
-    plugin += "      lv2:symbol \"midi_in\";\n";
-    plugin += "      lv2:name \"MIDI Input\";\n";
+    plugin += "      a lv2:InputPort, lv2ev:EventPort ;\n";
+    plugin += "      lv2ev:supportsEvent <http://lv2plug.in/ns/ext/midi#MidiEvent> ;\n";
+    plugin += "      lv2:index " + String(portIndex++) + " ;\n";
+    plugin += "      lv2:symbol \"midi_in\" ;\n";
+    plugin += "      lv2:name \"MIDI Input\" ;\n";
     plugin += "    ] ;\n\n";
 #endif
 
 #if JucePlugin_ProducesMidiOutput
     plugin += "    lv2:port [\n";
-    plugin += "      a lv2:OutputPort, lv2ev:EventPort;\n";
-    plugin += "      lv2ev:supportsEvent <http://lv2plug.in/ns/ext/midi#MidiEvent>;\n";
-    plugin += "      lv2:index " + String(portIndex++) + ";\n";
-    plugin += "      lv2:symbol \"midi_out\";\n";
-    plugin += "      lv2:name \"MIDI Output\";\n";
+    plugin += "      a lv2:OutputPort, lv2ev:EventPort ;\n";
+    plugin += "      lv2ev:supportsEvent <http://lv2plug.in/ns/ext/midi#MidiEvent> ;\n";
+    plugin += "      lv2:index " + String(portIndex++) + " ;\n";
+    plugin += "      lv2:symbol \"midi_out\" ;\n";
+    plugin += "      lv2:name \"MIDI Output\" ;\n";
     plugin += "    ] ;\n\n";
 #endif
 
@@ -189,10 +189,10 @@ String makePluginTtl(const String& uri, const String& binary)
         else
             plugin += "    [\n";
 
-        plugin += "      a lv2:InputPort, lv2:AudioPort;\n";
-        plugin += "      lv2:index " + String(portIndex++) + ";\n";
-        plugin += "      lv2:symbol \"audio_in_" + String(i+1) + "\";\n";
-        plugin += "      lv2:name \"Audio Input " + String(i+1) + "\";\n";
+        plugin += "      a lv2:InputPort, lv2:AudioPort ;\n";
+        plugin += "      lv2:index " + String(portIndex++) + " ;\n";
+        plugin += "      lv2:symbol \"audio_in_" + String(i+1) + "\" ;\n";
+        plugin += "      lv2:name \"Audio Input " + String(i+1) + "\" ;\n";
 
         if (i+1 == JucePlugin_MaxNumInputChannels)
             plugin += "    ] ;\n\n";
@@ -207,10 +207,10 @@ String makePluginTtl(const String& uri, const String& binary)
         else
             plugin += "    [\n";
 
-        plugin += "      a lv2:OutputPort, lv2:AudioPort;\n";
-        plugin += "      lv2:index " + String(portIndex++) + ";\n";
-        plugin += "      lv2:symbol \"audio_out_" + String(i+1) + "\";\n";
-        plugin += "      lv2:name \"Audio Output " + String(i+1) + "\";\n";
+        plugin += "      a lv2:OutputPort, lv2:AudioPort ;\n";
+        plugin += "      lv2:index " + String(portIndex++) + " ;\n";
+        plugin += "      lv2:symbol \"audio_out_" + String(i+1) + "\" ;\n";
+        plugin += "      lv2:name \"Audio Output " + String(i+1) + "\" ;\n";
 
         if (i+1 == JucePlugin_MaxNumOutputChannels)
             plugin += "    ] ;\n\n";
@@ -225,14 +225,14 @@ String makePluginTtl(const String& uri, const String& binary)
         else
             plugin += "    [\n";
 
-        plugin += "      a lv2:InputPort;\n";
-        plugin += "      a lv2:ControlPort;\n";
-        plugin += "      lv2:index " + String(portIndex++) + ";\n";
-        plugin += "      lv2:symbol \"" + nameToSymbol(filter->getParameterName(i), i) + "\";\n";
-        plugin += "      lv2:name \"" + filter->getParameterName(i) + "\";\n";
-        plugin += "      lv2:default " + String(filter->getParameter(i)) + ";\n";
-        plugin += "      lv2:minimum 0.0;\n";
-        plugin += "      lv2:maximum 1.0;\n";
+        plugin += "      a lv2:InputPort ;\n";
+        plugin += "      a lv2:ControlPort ;\n";
+        plugin += "      lv2:index " + String(portIndex++) + " ;\n";
+        plugin += "      lv2:symbol \"" + nameToSymbol(filter->getParameterName(i), i) + "\" ;\n";
+        plugin += "      lv2:name \"" + filter->getParameterName(i) + "\" ;\n";
+        plugin += "      lv2:default " + String(filter->getParameter(i)) + " ;\n";
+        plugin += "      lv2:minimum 0.0 ;\n";
+        plugin += "      lv2:maximum 1.0 ;\n";
 
         if (i+1 == filter->getNumParameters())
             plugin += "    ] ;\n\n";
@@ -327,7 +327,7 @@ enum Lv2UiType {
 };
 
 //==============================================================================
-/** Lightweight DocumentWindow subclass that captures close button presses, and responds by removing the external ui. */
+/** Lightweight DocumentWindow subclass that captures close button presses, and responds by closing the external ui. */
 class JuceLV2DocumentWindow : public DocumentWindow
 {
 public:
@@ -496,7 +496,7 @@ public:
 
             case LV2_UI_JUCE:
                 editor->setOpaque (true);
-                //editor->setVisible (true);
+                //editor->setVisible (true); // FIXME - untested, there are no Juce LV2 Hosts yet
                 *widget = editor;
                 break;
 
