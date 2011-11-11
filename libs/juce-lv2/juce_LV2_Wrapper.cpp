@@ -153,6 +153,7 @@ String makePluginTtl(const String& uri, const String& binary)
     }
     plugin += "\n";
 
+#if JucePlugin_WantsLV2TimePos
     plugin += "    lv2:port [\n";
     plugin += "      a lv2:InputPort, lv2ev:EventPort ;\n";
     plugin += "      lv2ev:supportsEvent <http://lv2plug.in/ns/ext/time#Position> ;\n";
@@ -161,6 +162,7 @@ String makePluginTtl(const String& uri, const String& binary)
     plugin += "      lv2:name \"LV2 Position\" ;\n";
     plugin += "      lv2:portProperty lv2:connectionOptional ;\n";
     plugin += "    ] ;\n\n";
+#endif
 
 #if JucePlugin_WantsMidiInput
     plugin += "    lv2:port [\n";
@@ -535,7 +537,10 @@ public:
         }
 
         // Offset for control ports
-        parameterPortOffset = 1;
+        parameterPortOffset = 0;
+#if JucePlugin_WantsLV2TimePos
+        parameterPortOffset += 1;
+#endif
 #if JucePlugin_WantsMidiInput
         parameterPortOffset += 1;
 #endif
@@ -660,7 +665,10 @@ public:
         filter->setPlayConfigDetails(numInChans, numOutChans, 0, 0);
 
         // Port count
+        portCount  = 0;
+#if JucePlugin_WantsLV2TimePos
         portCount += 1; // 0 == Position
+#endif
 #if JucePlugin_WantsMidiInput
         portCount += 1;
 #endif
@@ -744,12 +752,14 @@ public:
         {
             uint32 index = 0;
 
+#if JucePlugin_WantsLV2TimePos
             if (port == 0)
             {
                 timePosPort = (LV2_Event_Buffer*)dataLocation;
                 return;
             }
             ++index;
+#endif
 
 #if JucePlugin_WantsMidiInput
             if (port == index)
@@ -1009,6 +1019,7 @@ public:
     //==============================================================================
     // JUCE Stuff
 
+#if JucePlugin_WantsLV2TimePos
     bool getCurrentPosition (AudioPlayHead::CurrentPositionInfo& info)
     {
         if (sampleRate <= 0)
@@ -1039,6 +1050,7 @@ public:
 
         return true;
     }
+#endif
 
     AudioProcessor* getFilter() { return filter; }
 
