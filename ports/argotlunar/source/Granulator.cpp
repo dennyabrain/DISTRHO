@@ -2,6 +2,8 @@
 
 Granulator::Granulator(Parameters* parameters, const int internal_block_size)
 {
+  for (int i = 0; i < kMaxGrains; i++)
+    graincloud[i] = nullptr;
   this->parameters = parameters;
   this->internal_block_size = internal_block_size;
   delay_line = new DelayLine(kBufferSeconds, internal_block_size);
@@ -133,6 +135,9 @@ void Granulator::hardClip(float* input, int sampleframes)
 void Granulator::deleteGrains()
 {
   for (int i = 0; i < kMaxGrains; i++)
-    delete graincloud[i];
+  {
+    if (graincloud[i])
+      delete graincloud[i];
+  }
 }
 
