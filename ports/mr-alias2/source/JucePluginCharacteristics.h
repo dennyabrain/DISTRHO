@@ -344,6 +344,8 @@
 
 #define JUCE_ObjCExtraSuffix PIZ_MR_ALIAS_PRO_230
 
+#define JucePlugin_WantsLV2TimePos          1
+
 
 //==============================================================================
 

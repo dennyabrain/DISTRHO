@@ -3,26 +3,20 @@
 all: build
 
 
-build: libs plugins ports
+build: build_libs build_plugins build_ports
 
 
-libs: libs_standalone libs_plugin libs_lv2
-
-libs_standalone:
+build_libs:
 	$(MAKE) -C libs/juce-153/standalone
-
-libs_plugin:
 	$(MAKE) -C libs/juce-153/plugin
-
-libs_lv2:
 	$(MAKE) -C libs/juce-lv2
 
 
-plugins:
+build_plugins:
 	$(MAKE) -C plugins
 
 
-ports:
+build_ports:
 	$(MAKE) -C ports
 
 
