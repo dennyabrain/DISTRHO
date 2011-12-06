@@ -17,7 +17,7 @@
 #include "lv2/event.h"
 #include "lv2/event-helpers.h"
 #include "lv2/instance-access.h"
-#include "lv2/persist.h"
+#include "lv2/state.h"
 #include "lv2/uri-map.h"
 #include "lv2/time.h"
 #include "lv2/ui.h"
@@ -28,7 +28,8 @@ extern AudioProcessor* JUCE_CALLTYPE createPluginFilter();
 
 //==============================================================================
 // Various helper functions for creating the ttl files
-/** Converts a name to an LV2 compatible symbol. */
+
+/** Converts a parameter name to an LV2 compatible symbol. */
 String nameToSymbol(const String& name, const uint32 portIndex)
 {
     String trimmedName = name.trimStart().trimEnd().toLowerCase();
@@ -60,12 +61,6 @@ String getX11UIURI()
     return String("urn:" JucePlugin_Manufacturer ":" JucePlugin_Name ":X11-UI").replace(" ", "_");
 }
 
-/** Returns the URI of the Juce UI */
-String getJuceUIURI()
-{
-    return String("urn:" JucePlugin_Manufacturer ":" JucePlugin_Name ":JUCE-Native-UI").replace(" ", "_");
-}
-
 /** Returns the URI of the External UI */
 String getExternalUIURI(bool isNew)
 {
@@ -78,7 +73,7 @@ String getExternalUIURI(bool isNew)
 /** Returns the name of the plugin binary file */
 String getBinaryName()
 {
-	return String(JucePlugin_Name).replace(" ", "_");
+    return String(JucePlugin_Name).replace(" ", "_");
 }
 
 /** Returns plugin type, defined in JucePluginCharacteristics.h */
@@ -121,15 +116,13 @@ String makePluginTtl(const String& uri, const String& binary)
     plugin += "@prefix lv2:   <http://lv2plug.in/ns/lv2core#> .\n";
     plugin += "@prefix lv2ev: <http://lv2plug.in/ns/ext/event#> .\n";
     plugin += "@prefix lv2ui: <http://lv2plug.in/ns/extensions/ui#> .\n";
+    plugin += "@prefix lv2st: <http://lv2plug.in/ns/ext/state#> .\n";
     plugin += "\n";
 
     if (filter->hasEditor())
     {
         plugin += "<" + getX11UIURI() + ">\n";
         plugin += "    a lv2ui:X11UI ;\n";
-        plugin += "    lv2ui:binary <" + binary + ".so> .\n";
-        plugin += "<" + getJuceUIURI() + ">\n";
-        plugin += "    a lv2ui:JuceUI ;\n";
         plugin += "    lv2ui:binary <" + binary + ".so> .\n";
         plugin += "<" + getExternalUIURI(true) + ">\n";
         plugin += "    a <http://nedko.arnaudov.name/lv2/external_ui/> ;\n";
@@ -142,12 +135,11 @@ String makePluginTtl(const String& uri, const String& binary)
 
     plugin += "<" + uri + ">\n";
     plugin += "    a " + getPluginType() + " ;\n";
-    plugin += "    lv2:optionalFeature <http://lv2plug.in/ns/ext/persist> ;\n";
+    plugin += "    lv2:extensionData lv2st:Interface ;\n";
 
     if (filter->hasEditor())
     {
         plugin += "    lv2ui:ui <" + getX11UIURI() + "> ,\n";
-        plugin += "             <" + getJuceUIURI() + "> ,\n";
         plugin += "             <" + getExternalUIURI(true) + "> ,\n";
         plugin += "             <" + getExternalUIURI(false) + "> ;\n";
     }
@@ -324,7 +316,6 @@ static Array<void*> activePlugins;
 
 enum Lv2UiType {
   LV2_UI_X11 = 1,
-  LV2_UI_JUCE,
   LV2_UI_EXTERNAL
 };
 
@@ -493,13 +484,6 @@ public:
                         break;
                     }
                 }
-
-                break;
-
-            case LV2_UI_JUCE:
-                editor->setOpaque (true);
-                //editor->setVisible (true); // FIXME - untested, there are no Juce LV2 Hosts yet
-                *widget = editor;
                 break;
 
             case LV2_UI_EXTERNAL:
@@ -667,7 +651,7 @@ public:
         // Port count
         portCount  = 0;
 #if JucePlugin_WantsLV2TimePos
-        portCount += 1; // 0 == Position
+        portCount += 1;
 #endif
 #if JucePlugin_WantsMidiInput
         portCount += 1;
@@ -1177,7 +1161,7 @@ void juceLV2Cleanup(LV2_Handle instance)
 }
 
 //==============================================================================
-void juceLV2Save(LV2_Handle instance, LV2_Persist_Store_Function store, void* callbackData)
+void juceLV2Save(LV2_Handle instance, LV2_State_Store_Function store, LV2_State_Handle handle, uint32_t flags, const LV2_Feature* const* features)
 {
     JuceLV2Wrapper* wrapper = (JuceLV2Wrapper*)instance;
     jassert(wrapper);
@@ -1187,15 +1171,15 @@ void juceLV2Save(LV2_Handle instance, LV2_Persist_Store_Function store, void* ca
     wrapper->getChunk(chunkMemory);
 
     LV2_URI_Map_Feature* uri_map = wrapper->getURIMap();
-    store(callbackData,
+    store(handle,
           uri_map->uri_to_id(wrapper, 0, juceChunkURI.toUTF8().getAddress()),
           chunkMemory.getData(),
           chunkMemory.getSize(),
           uri_map->uri_to_id(wrapper, 0, "juce_binary_chunk"),
-          LV2_PERSIST_IS_POD | LV2_PERSIST_IS_PORTABLE);
+          LV2_STATE_IS_POD | LV2_STATE_IS_PORTABLE);
 }
 
-void juceLV2Restore(LV2_Handle instance, LV2_Persist_Retrieve_Function retrieve, void* callbackData)
+void juceLV2Restore(LV2_Handle instance, LV2_State_Retrieve_Function retrieve, LV2_State_Handle handle, uint32_t flags, const LV2_Feature* const* features)
 {
     JuceLV2Wrapper* wrapper = (JuceLV2Wrapper*)instance;
     jassert(wrapper);
@@ -1205,8 +1189,7 @@ void juceLV2Restore(LV2_Handle instance, LV2_Persist_Retrieve_Function retrieve,
 
     size_t size;
     uint32 type;
-    uint32 flags;
-    const void *data = retrieve(callbackData,
+    const void *data = retrieve(handle,
                                 uri_map->uri_to_id(wrapper, 0, juceChunkURI.toUTF8().getAddress()),
                                 &size, &type, &flags);
 
@@ -1216,9 +1199,9 @@ void juceLV2Restore(LV2_Handle instance, LV2_Persist_Retrieve_Function retrieve,
 
 const void* juceLV2ExtensionData(const char* uri)
 {
-    static const LV2_Persist persist = { juceLV2Save, juceLV2Restore };
-    if (strcmp(uri, LV2_PERSIST_URI) == 0)
-        return &persist;
+    static const LV2_State_Interface state = { juceLV2Save, juceLV2Restore };
+    if (strcmp(uri, LV2_STATE_URI) == 0)
+        return &state;
     return nullptr;
 }
 
@@ -1251,11 +1234,6 @@ LV2UI_Handle juceLV2UIInstantiateX11(const LV2UI_Descriptor* descriptor, const c
     return juceLV2UIInstantiate(descriptor, writeFunction, controller, widget, features, LV2_UI_X11);
 }
 
-LV2UI_Handle juceLV2UIInstantiateJuce(const LV2UI_Descriptor* descriptor, const char* plugin_uri, const char* bundle_path, LV2UI_Write_Function writeFunction, LV2UI_Controller controller, LV2UI_Widget* widget, const LV2_Feature* const* features)
-{
-    return juceLV2UIInstantiate(descriptor, writeFunction, controller, widget, features, LV2_UI_JUCE);
-}
-
 LV2UI_Handle juceLV2UIInstantiateExternal(const LV2UI_Descriptor* descriptor, const char* plugin_uri, const char* bundle_path, LV2UI_Write_Function writeFunction, LV2UI_Controller controller, LV2UI_Widget* widget, const LV2_Feature* const* features)
 {
     return juceLV2UIInstantiate(descriptor, writeFunction, controller, widget, features, LV2_UI_EXTERNAL);
@@ -1266,7 +1244,7 @@ void juceLV2UIPortEvent(LV2UI_Handle instance, uint32 portIndex, uint32 bufferSi
     const MessageManagerLock mmLock;
     JuceLV2Editor* editor = (JuceLV2Editor*)instance;
 
-    if (bufferSize == sizeof(float) && format == 0)
+    if (editor && bufferSize == sizeof(float) && format == 0)
     {
         float value = *(float*)buffer;
         editor->doPortEvent(portIndex, value);
@@ -1310,19 +1288,6 @@ public:
     }
 };
 
-class NewLv2UI_Juce : public LV2UI_Descriptor
-{
-public:
-    NewLv2UI_Juce()
-    {
-        URI            = strdup((const char*) getJuceUIURI().toUTF8());
-        instantiate    = juceLV2UIInstantiateJuce;
-        cleanup        = juceLV2UICleanup;
-        port_event     = juceLV2UIPortEvent;
-        extension_data = juceLV2ExtensionData;
-    }
-};
-
 class NewLv2UI_external : public LV2UI_Descriptor
 {
 public:
@@ -1351,7 +1316,6 @@ public:
 
 static NewLv2Plugin  NewLv2Plugin_Obj;
 static NewLv2UI_X11  NewLv2UI_X11_Obj;
-static NewLv2UI_Juce NewLv2UI_Juce_Obj;
 static NewLv2UI_external    NewLv2UI_external_Obj;
 static NewLv2UI_externalOld NewLv2UI_externalOld_Obj;
 
@@ -1361,8 +1325,6 @@ LV2UI_Descriptor* getNewLv2UI(uint32 index)
     {
       case 0:
         return &NewLv2UI_X11_Obj;
-      case 1:
-        return &NewLv2UI_Juce_Obj;
       case 2:
         return &NewLv2UI_external_Obj;
       case 3:
@@ -1389,7 +1351,7 @@ extern "C" __attribute__ ((visibility("default"))) const LV2_Descriptor* lv2_des
 
 extern "C" __attribute__ ((visibility("default"))) const LV2UI_Descriptor* lv2ui_descriptor(uint32 index)
 {
-    return (index <= 3) ? getNewLv2UI(index) : nullptr;
+    return (index <= 2) ? getNewLv2UI(index) : nullptr;
 }
 
 //==============================================================================
@@ -1409,7 +1371,7 @@ extern "C" __attribute__ ((visibility("default"))) const LV2_Descriptor* lv2_des
 
 extern "C" __attribute__ ((visibility("default"))) const LV2UI_Descriptor* lv2ui_descriptor(uint32 index)
 {
-    return (index <= 3) ? getNewLv2UI(index) : nullptr;
+    return (index <= 2) ? getNewLv2UI(index) : nullptr;
 }
 
 // don't put initialiseJuce_GUI or shutdownJuce_GUI in these... it will crash!
@@ -1432,7 +1394,7 @@ extern "C" __declspec (dllexport) const LV2_Descriptor* lv2_descriptor(uint32 in
 
 extern "C" __declspec (dllexport) const LV2UI_Descriptor* lv2ui_descriptor(uint32 index)
 {
-    return (index <= 3) ? getNewLv2UI(index) : nullptr;
+    return (index <= 2) ? getNewLv2UI(index) : nullptr;
 }
 
 #endif
