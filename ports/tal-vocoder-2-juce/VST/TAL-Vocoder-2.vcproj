@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="TAL-Vocoder-2"
-	ProjectGUID="{24132437-E261-E63F-5181-ED27AE41DAC4}"
+	ProjectGUID="{03449539-6590-6618-14E6-8A1AE3B6A3CA}"
 	RootNamespace="TAL-Vocoder-2"
 	Keyword="Win32Proj"
 	>

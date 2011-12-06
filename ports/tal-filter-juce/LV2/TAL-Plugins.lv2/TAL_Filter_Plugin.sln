@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TAL-Plugins.lv2/TAL_Filter_Plugin", "./TAL-Plugins.lv2/TAL_Filter_Plugin.vcproj", "{C936405B-8C5C-223F-8191-AB44E5DBD2EE}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TAL-Plugins.lv2/TAL_Filter_Plugin", "./TAL-Plugins.lv2/TAL_Filter_Plugin.vcproj", "{A970F91D-A95E-9F39-4BEC-A216133D74C2}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
@@ -10,10 +10,10 @@ Global
 		Debug|Win32 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{C936405B-8C5C-223F-8191-AB44E5DBD2EE}.Release|Win32.ActiveCfg = Release|Win32
-		{C936405B-8C5C-223F-8191-AB44E5DBD2EE}.Release|Win32.Build.0 = Release|Win32
-		{C936405B-8C5C-223F-8191-AB44E5DBD2EE}.Debug|Win32.ActiveCfg = Debug|Win32
-		{C936405B-8C5C-223F-8191-AB44E5DBD2EE}.Debug|Win32.Build.0 = Debug|Win32
+		{A970F91D-A95E-9F39-4BEC-A216133D74C2}.Release|Win32.ActiveCfg = Release|Win32
+		{A970F91D-A95E-9F39-4BEC-A216133D74C2}.Release|Win32.Build.0 = Release|Win32
+		{A970F91D-A95E-9F39-4BEC-A216133D74C2}.Debug|Win32.ActiveCfg = Debug|Win32
+		{A970F91D-A95E-9F39-4BEC-A216133D74C2}.Debug|Win32.Build.0 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

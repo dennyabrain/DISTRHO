@@ -1,10 +1,10 @@
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "juce-standalone-vst-153", "./juce-standalone-vst-153.vcproj", "{269AAA38-1F75-BBF4-B19F-8D39DE6B8371}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "juce-standalone-vst-153", "./juce-standalone-vst-153.vcproj", "{741D97C7-2146-BF34-5B2B-B067F081C618}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "juce-standalone-vst-153", "./juce-standalone-vst-153.vcproj", "{200E3795-A869-50F7-19A8-5CAFBE7B71A2}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "juce-standalone-vst-153", "./juce-standalone-vst-153.vcproj", "{5131D108-A21F-7B5B-6B94-3450170F8284}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
@@ -14,14 +14,14 @@ Global
 		Debug|Win32 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{269AAA38-1F75-BBF4-B19F-8D39DE6B8371}.Release|Win32.ActiveCfg = Release|Win32
-		{269AAA38-1F75-BBF4-B19F-8D39DE6B8371}.Release|Win32.Build.0 = Release|Win32
-		{269AAA38-1F75-BBF4-B19F-8D39DE6B8371}.Debug|Win32.ActiveCfg = Debug|Win32
-		{269AAA38-1F75-BBF4-B19F-8D39DE6B8371}.Debug|Win32.Build.0 = Debug|Win32
-		{200E3795-A869-50F7-19A8-5CAFBE7B71A2}.Release|Win32.ActiveCfg = Release|Win32
-		{200E3795-A869-50F7-19A8-5CAFBE7B71A2}.Release|Win32.Build.0 = Release|Win32
-		{200E3795-A869-50F7-19A8-5CAFBE7B71A2}.Debug|Win32.ActiveCfg = Debug|Win32
-		{200E3795-A869-50F7-19A8-5CAFBE7B71A2}.Debug|Win32.Build.0 = Debug|Win32
+		{741D97C7-2146-BF34-5B2B-B067F081C618}.Release|Win32.ActiveCfg = Release|Win32
+		{741D97C7-2146-BF34-5B2B-B067F081C618}.Release|Win32.Build.0 = Release|Win32
+		{741D97C7-2146-BF34-5B2B-B067F081C618}.Debug|Win32.ActiveCfg = Debug|Win32
+		{741D97C7-2146-BF34-5B2B-B067F081C618}.Debug|Win32.Build.0 = Debug|Win32
+		{5131D108-A21F-7B5B-6B94-3450170F8284}.Release|Win32.ActiveCfg = Release|Win32
+		{5131D108-A21F-7B5B-6B94-3450170F8284}.Release|Win32.Build.0 = Release|Win32
+		{5131D108-A21F-7B5B-6B94-3450170F8284}.Debug|Win32.ActiveCfg = Debug|Win32
+		{5131D108-A21F-7B5B-6B94-3450170F8284}.Debug|Win32.Build.0 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

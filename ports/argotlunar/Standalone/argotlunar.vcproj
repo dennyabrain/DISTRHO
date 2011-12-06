@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="argotlunar"
-	ProjectGUID="{E7C50762-0091-31E7-1C11-CFF1C2A4CA49}"
+	ProjectGUID="{4325D425-A141-14CF-3916-0C647E7A5D45}"
 	RootNamespace="argotlunar"
 	Keyword="Win32Proj"
 	>

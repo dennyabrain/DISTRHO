@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bitmangler.lv2/bitmangler", "./bitmangler.lv2/bitmangler.vcproj", "{608A5B58-EA82-716F-2453-BF4F90E9C9F7}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bitmangler.lv2/bitmangler", "./bitmangler.lv2/bitmangler.vcproj", "{B4F993F1-F837-2DAA-83D7-BF977B79DA08}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
@@ -10,10 +10,10 @@ Global
 		Debug|Win32 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{608A5B58-EA82-716F-2453-BF4F90E9C9F7}.Release|Win32.ActiveCfg = Release|Win32
-		{608A5B58-EA82-716F-2453-BF4F90E9C9F7}.Release|Win32.Build.0 = Release|Win32
-		{608A5B58-EA82-716F-2453-BF4F90E9C9F7}.Debug|Win32.ActiveCfg = Debug|Win32
-		{608A5B58-EA82-716F-2453-BF4F90E9C9F7}.Debug|Win32.Build.0 = Debug|Win32
+		{B4F993F1-F837-2DAA-83D7-BF977B79DA08}.Release|Win32.ActiveCfg = Release|Win32
+		{B4F993F1-F837-2DAA-83D7-BF977B79DA08}.Release|Win32.Build.0 = Release|Win32
+		{B4F993F1-F837-2DAA-83D7-BF977B79DA08}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B4F993F1-F837-2DAA-83D7-BF977B79DA08}.Debug|Win32.Build.0 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

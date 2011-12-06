@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="juced"
-	ProjectGUID="{72D6ADB9-3766-5931-95BB-94877CE4E603}"
+	ProjectGUID="{4303DF16-1952-1FD2-4BF8-8F95CDC3F690}"
 	RootNamespace="juced"
 	Keyword="Win32Proj"
 	>

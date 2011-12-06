@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="ThePilgrim.lv2/The_Pilgrim"
-	ProjectGUID="{330E9544-BB99-D795-888B-E0B08A407839}"
+	ProjectGUID="{793FE82A-2985-C65F-305F-9C3DD57E025C}"
 	RootNamespace="ThePilgrim.lv2/The_Pilgrim"
 	Keyword="Win32Proj"
 	>

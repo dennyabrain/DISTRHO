@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="HybridReverb2.lv2/HybridReverb2"
-	ProjectGUID="{F65A9B5D-1F7F-5ECD-4A0C-BC8738F24538}"
+	ProjectGUID="{411A95CA-0846-BA06-9CCB-89D5E1DCFA20}"
 	RootNamespace="HybridReverb2.lv2/HybridReverb2"
 	Keyword="Win32Proj"
 	>

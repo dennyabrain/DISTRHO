@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="bitmangler"
-	ProjectGUID="{C1EEEE97-7CEE-FA94-39DD-28791C8EF78A}"
+	ProjectGUID="{C85FFB86-2AE9-6E86-3897-B62A93F24E38}"
 	RootNamespace="bitmangler"
 	Keyword="Win32Proj"
 	>
