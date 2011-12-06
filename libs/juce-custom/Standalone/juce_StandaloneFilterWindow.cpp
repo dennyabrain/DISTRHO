@@ -24,7 +24,7 @@
 */
 
 #include "juce_StandaloneFilterWindow.h"
-#include "DistrhoIcon.h"
+//#include "DistrhoIcon.h"
 
 
 //==============================================================================
@@ -61,8 +61,8 @@ StandaloneFilterWindow::StandaloneFilterWindow (const String& title,
     setDropShadowEnabled(false);
     setUsingNativeTitleBar(getGlobalSettings()->getBoolValue("nativeTitleBar", true));
 
-    windowIcon = ImageCache::getFromMemory(DistrhoIcon::logo_png, DistrhoIcon::logo_pngSize);
-    setIcon(windowIcon);
+    //windowIcon = ImageCache::getFromMemory(DistrhoIcon::logo_png, DistrhoIcon::logo_pngSize);
+    //setIcon(windowIcon);
 
 #if JUCE_MAC
     setMacMainMenu (this);
@@ -174,11 +174,13 @@ const PopupMenu StandaloneFilterWindow::getMenuForIndex (int topLevelMenuIndex, 
     }
     else if (topLevelMenuIndex == 1)
     {
-	if (filter != nullptr && filter->getNumPrograms() > 0) {
-	  for (int i=0; i < filter->getNumPrograms(); i++)
-	    menu.addItem (11+i, filter->getProgramName(i));
-	} else
-	  menu.addItem (10, TRANS("(none)"), false);
+        if (filter != nullptr && filter->getNumPrograms() > 0)
+        {
+            for (int i=0; i < filter->getNumPrograms(); i++)
+                menu.addItem (11+i, filter->getProgramName(i));
+        }
+        else
+            menu.addItem (10, TRANS("(none)"), false);
     }
     else if (topLevelMenuIndex == 2)
     {
@@ -186,9 +188,9 @@ const PopupMenu StandaloneFilterWindow::getMenuForIndex (int topLevelMenuIndex, 
         menu.addItem (5, TRANS("Audio Settings..."));
         menu.addSeparator();
         if (isUsingNativeTitleBar())
-	  menu.addItem (6, "Use JUCE Titlebar");
-	else
-	  menu.addItem (6, "Use Native Titlebar");
+            menu.addItem (6, "Use JUCE Titlebar");
+        else
+            menu.addItem (6, "Use Native Titlebar");
     }
     return menu;
 }

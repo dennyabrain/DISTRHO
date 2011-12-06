@@ -863,7 +863,7 @@ public:
             filter->prepareToPlay(sampleRate, bufferSize);
         }
 
-        // update time position
+#if JucePlugin_WantsLV2TimePos
         if (timePosPort != nullptr)
         {
             LV2_Event* event = nullptr;
@@ -884,6 +884,7 @@ public:
 
         } else
           memset(&timePos, 0, sizeof(LV2_Time_Position));
+#endif
 
         // Check for updated parameters
         float cur_value;
