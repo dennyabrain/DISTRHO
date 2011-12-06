@@ -87,6 +87,10 @@ BEGIN_JUCE_NAMESPACE
   #pragma warning (disable: 4996)
 #endif
 
+#ifdef __GNUC__
+  #define __cdecl
+#endif
+
 /*  Obviously you're going to need the Steinberg vstsdk2.4 folder in
     your include path if you want to add VST support.
 
