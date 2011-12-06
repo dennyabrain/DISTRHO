@@ -15,7 +15,7 @@
 #define JucePlugin_Desc                 "3BandEQ"
 #define JucePlugin_Manufacturer         "DISTRHO"
 #define JucePlugin_ManufacturerCode     'DIST'
-#define JucePlugin_PluginCode           'Plug'
+#define JucePlugin_PluginCode           'D3EQ'
 #define JucePlugin_MaxNumInputChannels  2
 #define JucePlugin_MaxNumOutputChannels 2
 #define JucePlugin_PreferredChannelConfigurations   {1, 1}, {2, 2}

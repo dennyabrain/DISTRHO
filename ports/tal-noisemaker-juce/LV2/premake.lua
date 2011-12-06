@@ -1,5 +1,5 @@
 
-project.name = "TAL-Plugins.lv2/TAL_NoiseMaker_Plugin"
+project.name = "TAL-NoiseMaker.lv2/TAL_NoiseMaker_Plugin"
 project.bindir = "../../../bin"
 project.libdir = project.bindir
 project.configs = { "Release", "Debug" }

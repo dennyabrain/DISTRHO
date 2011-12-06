@@ -9,17 +9,17 @@ endif
 
 export CONFIG
 
-.PHONY: all clean TAL-Plugins.lv2/TAL_NoiseMaker_Plugin
+.PHONY: all clean TAL-NoiseMaker.lv2/TAL_NoiseMaker_Plugin
 
-all: TAL-Plugins.lv2/TAL_NoiseMaker_Plugin
+all: TAL-NoiseMaker.lv2/TAL_NoiseMaker_Plugin
 
 Makefile: premake.lua
 	@echo ==== Regenerating Makefiles ====
 	@premake --file $^ --os linux --target gnu --cc gcc
 
-TAL-Plugins.lv2/TAL_NoiseMaker_Plugin:
-	@echo ==== Building TAL-Plugins.lv2/TAL_NoiseMaker_Plugin ====
-	@$(MAKE) --no-print-directory -C . -f TAL-Plugins.lv2/TAL_NoiseMaker_Plugin.make
+TAL-NoiseMaker.lv2/TAL_NoiseMaker_Plugin:
+	@echo ==== Building TAL-NoiseMaker.lv2/TAL_NoiseMaker_Plugin ====
+	@$(MAKE) --no-print-directory -C . -f TAL-NoiseMaker.lv2/TAL_NoiseMaker_Plugin.make
 
 clean:
-	@$(MAKE) --no-print-directory -C . -f TAL-Plugins.lv2/TAL_NoiseMaker_Plugin.make clean
+	@$(MAKE) --no-print-directory -C . -f TAL-NoiseMaker.lv2/TAL_NoiseMaker_Plugin.make clean

@@ -33,7 +33,7 @@ else
 end
 
 if (windows) then
-  package.includepaths = { ".", "../../../sdks/ASIOSDK2" }
+  package.includepaths = { ".", "../../../sdks/ASIOSDK2/common" }
 else
   package.includepaths = { "." }
 end

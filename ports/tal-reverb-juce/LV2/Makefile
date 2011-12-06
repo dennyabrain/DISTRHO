@@ -9,17 +9,17 @@ endif
 
 export CONFIG
 
-.PHONY: all clean TAL-Plugins.lv2/TAL_Reverb_Plugin
+.PHONY: all clean TAL-Reverb.lv2/TAL_Reverb_Plugin
 
-all: TAL-Plugins.lv2/TAL_Reverb_Plugin
+all: TAL-Reverb.lv2/TAL_Reverb_Plugin
 
 Makefile: premake.lua
 	@echo ==== Regenerating Makefiles ====
 	@premake --file $^ --os linux --target gnu --cc gcc
 
-TAL-Plugins.lv2/TAL_Reverb_Plugin:
-	@echo ==== Building TAL-Plugins.lv2/TAL_Reverb_Plugin ====
-	@$(MAKE) --no-print-directory -C . -f TAL-Plugins.lv2/TAL_Reverb_Plugin.make
+TAL-Reverb.lv2/TAL_Reverb_Plugin:
+	@echo ==== Building TAL-Reverb.lv2/TAL_Reverb_Plugin ====
+	@$(MAKE) --no-print-directory -C . -f TAL-Reverb.lv2/TAL_Reverb_Plugin.make
 
 clean:
-	@$(MAKE) --no-print-directory -C . -f TAL-Plugins.lv2/TAL_Reverb_Plugin.make clean
+	@$(MAKE) --no-print-directory -C . -f TAL-Reverb.lv2/TAL_Reverb_Plugin.make clean

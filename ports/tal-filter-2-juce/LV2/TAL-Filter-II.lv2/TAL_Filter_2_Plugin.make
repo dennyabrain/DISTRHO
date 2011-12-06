@@ -12,14 +12,14 @@ ifeq ($(CONFIG),Release)
   BINDIR := ../../../bin
   LIBDIR := ../../../bin
   OBJDIR := intermediate/Release
-  OUTDIR := ../../../bin/3BandEQ.lv2
-  CPPFLAGS := $(DEPFLAGS) -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=1" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_Standalone=0" -D "LINUX=1" -D "NDEBUG=1" -I "../source" -I "../../../libs/juce-153/plugin" -I "../../../libs/juce-153/source"
+  OUTDIR := ../../../bin/TAL-Filter-II.lv2
+  CPPFLAGS := $(DEPFLAGS) -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=1" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_Standalone=0" -D "LINUX=1" -D "NDEBUG=1" -I "../source" -I "." -I "../../../libs/juce-153/plugin" -I "../../../libs/juce-153/source"
   CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -fPIC -O3 `pkg-config --cflags freetype2` -O2 -mtune=generic -msse -ffast-math -fomit-frame-pointer -fvisibility=hidden -fPIC
   CXXFLAGS += $(CFLAGS)
   LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -shared -s `pkg-config --libs freetype2` -L"../../../libs" -lfreetype -lpthread -lrt -lX11 -lXext -ljuce-plugin-153
   LDDEPS :=
-  RESFLAGS := -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=1" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_Standalone=0" -D "LINUX=1" -D "NDEBUG=1" -I "../source" -I "../../../libs/juce-153/plugin" -I "../../../libs/juce-153/source"
-  TARGET := 3BandEQ.so
+  RESFLAGS := -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=1" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_Standalone=0" -D "LINUX=1" -D "NDEBUG=1" -I "../source" -I "." -I "../../../libs/juce-153/plugin" -I "../../../libs/juce-153/source"
+  TARGET := TAL_Filter_2_Plugin.so
  BLDCMD = $(CXX) -o $(OUTDIR)/$(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(TARGET_ARCH)
 endif
 
@@ -27,21 +27,20 @@ ifeq ($(CONFIG),Debug)
   BINDIR := ../../../bin
   LIBDIR := ../../../bin
   OBJDIR := intermediate/Debug
-  OUTDIR := ../../../bin/3BandEQ.lv2
-  CPPFLAGS := $(DEPFLAGS) -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=1" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_Standalone=0" -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -I "../source" -I "../../../libs/juce-153/plugin" -I "../../../libs/juce-153/source"
+  OUTDIR := ../../../bin/TAL-Filter-II.lv2
+  CPPFLAGS := $(DEPFLAGS) -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=1" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_Standalone=0" -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -I "../source" -I "." -I "../../../libs/juce-153/plugin" -I "../../../libs/juce-153/source"
   CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -fPIC -g `pkg-config --cflags freetype2` -O0 -ggdb -fPIC
   CXXFLAGS += $(CFLAGS)
   LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -shared `pkg-config --libs freetype2` -L"../../../libs" -lfreetype -lpthread -lrt -lX11 -lXext -ljuce-plugin-153_debug
   LDDEPS :=
-  RESFLAGS := -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=1" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_Standalone=0" -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -I "../source" -I "../../../libs/juce-153/plugin" -I "../../../libs/juce-153/source"
-  TARGET := 3BandEQ_debug.so
+  RESFLAGS := -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=1" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_Standalone=0" -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -I "../source" -I "." -I "../../../libs/juce-153/plugin" -I "../../../libs/juce-153/source"
+  TARGET := TAL_Filter_2_Plugin_debug.so
  BLDCMD = $(CXX) -o $(OUTDIR)/$(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(TARGET_ARCH)
 endif
 
 OBJECTS := \
-	$(OBJDIR)/PluginEditor.o \
-	$(OBJDIR)/DistrhoArtwork.o \
-	$(OBJDIR)/PluginProcessor.o \
+	$(OBJDIR)/TalComponent.o \
+	$(OBJDIR)/TalCore.o \
 	$(OBJDIR)/juce_LV2_Wrapper.o \
 
 MKDIR_TYPE := msdos
@@ -67,14 +66,14 @@ endif
 .PHONY: clean
 
 $(OUTDIR)/$(TARGET): $(OBJECTS) $(LDDEPS) $(RESOURCES)
-	@echo Linking 3BandEQ.lv2/3BandEQ
+	@echo Linking TAL-Filter-II.lv2/TAL_Filter_2_Plugin
 	-@$(CMD_MKBINDIR)
 	-@$(CMD_MKLIBDIR)
 	-@$(CMD_MKOUTDIR)
 	@$(BLDCMD)
 
 clean:
-	@echo Cleaning 3BandEQ.lv2/3BandEQ
+	@echo Cleaning TAL-Filter-II.lv2/TAL_Filter_2_Plugin
 ifeq ($(MKDIR_TYPE),posix)
 	-@rm -f $(OUTDIR)/$(TARGET)
 	-@rm -rf $(OBJDIR)
@@ -84,17 +83,12 @@ else
 	-@if exist $(subst /,\,$(OBJDIR)) rmdir /s /q $(subst /,\,$(OBJDIR))
 endif
 
-$(OBJDIR)/PluginEditor.o: ../source/PluginEditor.cpp
+$(OBJDIR)/TalComponent.o: ../source/TalComponent.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
-$(OBJDIR)/DistrhoArtwork.o: ../source/DistrhoArtwork.cpp
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/PluginProcessor.o: ../source/PluginProcessor.cpp
+$(OBJDIR)/TalCore.o: ../source/TalCore.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"

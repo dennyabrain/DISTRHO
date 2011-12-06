@@ -28,7 +28,7 @@
 
 
 #include "../../../../src/core/juce_TargetPlatform.h"
-#include "../../../../juce_Config.h"
+#include "juce_Config.h"
 
 #if JUCE_MSVC
   #pragma warning (disable: 4267 4127 4244 4996 4100 4701 4702 4013 4133 4206 4305 4189 4706)

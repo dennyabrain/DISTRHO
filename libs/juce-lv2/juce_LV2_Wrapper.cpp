@@ -1326,9 +1326,9 @@ LV2UI_Descriptor* getNewLv2UI(uint32 index)
     {
       case 0:
         return &NewLv2UI_X11_Obj;
-      case 2:
+      case 1:
         return &NewLv2UI_external_Obj;
-      case 3:
+      case 2:
         return &NewLv2UI_externalOld_Obj;
       default:
         return nullptr;

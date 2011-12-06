@@ -9,17 +9,17 @@ endif
 
 export CONFIG
 
-.PHONY: all clean TAL-Plugins.lv2/TAL_Filter_Plugin
+.PHONY: all clean TAL-Filter.lv2/TAL_Filter_Plugin
 
-all: TAL-Plugins.lv2/TAL_Filter_Plugin
+all: TAL-Filter.lv2/TAL_Filter_Plugin
 
 Makefile: premake.lua
 	@echo ==== Regenerating Makefiles ====
 	@premake --file $^ --os linux --target gnu --cc gcc
 
-TAL-Plugins.lv2/TAL_Filter_Plugin:
-	@echo ==== Building TAL-Plugins.lv2/TAL_Filter_Plugin ====
-	@$(MAKE) --no-print-directory -C . -f TAL-Plugins.lv2/TAL_Filter_Plugin.make
+TAL-Filter.lv2/TAL_Filter_Plugin:
+	@echo ==== Building TAL-Filter.lv2/TAL_Filter_Plugin ====
+	@$(MAKE) --no-print-directory -C . -f TAL-Filter.lv2/TAL_Filter_Plugin.make
 
 clean:
-	@$(MAKE) --no-print-directory -C . -f TAL-Plugins.lv2/TAL_Filter_Plugin.make clean
+	@$(MAKE) --no-print-directory -C . -f TAL-Filter.lv2/TAL_Filter_Plugin.make clean

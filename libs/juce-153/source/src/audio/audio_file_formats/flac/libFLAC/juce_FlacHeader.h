@@ -27,7 +27,7 @@
 // tasks..
 
 #include "../../../../core/juce_TargetPlatform.h"
-#include "../../../../../juce_Config.h"
+#include "juce_Config.h"
 
 #define VERSION "1.2.1"
 

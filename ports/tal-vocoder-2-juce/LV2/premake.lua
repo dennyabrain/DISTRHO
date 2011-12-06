@@ -1,5 +1,5 @@
 
-project.name = "TAL-Plugins.lv2/TAL_Vocoder_II_Plugin"
+project.name = "TAL-Vocoder-II.lv2/TAL_Vocoder_II_Plugin"
 project.bindir = "../../../bin"
 project.libdir = project.bindir
 project.configs = { "Release", "Debug" }
