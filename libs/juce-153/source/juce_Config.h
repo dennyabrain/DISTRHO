@@ -1,1 +1,1 @@
-../standalone/juce_Config.h
+../plugin/juce_Config.h

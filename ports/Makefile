@@ -78,9 +78,9 @@ clean:
 	# Standalone
 	$(MAKE) clean -C arctican-function/Standalone
 	$(MAKE) clean -C arctican-pilgrim/Standalone
-	$(MAKE) clean -C argotlunar/VST
+	$(MAKE) clean -C argotlunar/Standalone
 	$(MAKE) clean -C hybridreverb2/Standalone
-	$(MAKE) clean -C juce_pitcher/VST
+	$(MAKE) clean -C juce_pitcher/Standalone
 	$(MAKE) clean -C midilfo/Standalone
 	$(MAKE) clean -C sDelay/Standalone
 	$(MAKE) clean -C tal-dub-3-juce/Standalone
