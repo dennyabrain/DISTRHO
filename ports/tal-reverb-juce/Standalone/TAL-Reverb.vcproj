@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="TAL-Reverb"
-	ProjectGUID="{984DC7A2-3F38-4692-7A16-5B5117DFA0CF}"
+	ProjectGUID="{DDB57677-6123-478C-EFB5-1AF60CD980AA}"
 	RootNamespace="TAL-Reverb"
 	Keyword="Win32Proj"
 	>
@@ -215,9 +215,6 @@
 					</File>
 					<File
 						RelativePath="..\..\..\libs\juce-custom\Standalone\juce_StandaloneFilterWindow.cpp">
-					</File>
-					<File
-						RelativePath="..\..\..\libs\juce-custom\Standalone\DistrhoIcon.cpp">
 					</File>
 				</Filter>
 			</Filter>

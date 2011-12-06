@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="TAL-Vocoder-2"
-	ProjectGUID="{95EE8081-3DB0-6642-00F3-4B8EDC9D95E2}"
+	ProjectGUID="{DA634B5D-4C51-324B-D5B9-A03C504AD908}"
 	RootNamespace="TAL-Vocoder-2"
 	Keyword="Win32Proj"
 	>
@@ -228,9 +228,6 @@
 					</File>
 					<File
 						RelativePath="..\..\..\libs\juce-custom\Standalone\juce_StandaloneFilterWindow.cpp">
-					</File>
-					<File
-						RelativePath="..\..\..\libs\juce-custom\Standalone\DistrhoIcon.cpp">
 					</File>
 				</Filter>
 			</Filter>

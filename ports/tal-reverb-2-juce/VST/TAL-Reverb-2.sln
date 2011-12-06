@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TAL-Reverb-2", "./TAL-Reverb-2.vcproj", "{4C33F2F5-247E-AE9E-ED2A-1FC92FF0189F}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TAL-Reverb-2", "./TAL-Reverb-2.vcproj", "{CDA6B84F-5732-EF8F-8DAD-B027FF712FB6}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
@@ -10,10 +10,10 @@ Global
 		Debug|Win32 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{4C33F2F5-247E-AE9E-ED2A-1FC92FF0189F}.Release|Win32.ActiveCfg = Release|Win32
-		{4C33F2F5-247E-AE9E-ED2A-1FC92FF0189F}.Release|Win32.Build.0 = Release|Win32
-		{4C33F2F5-247E-AE9E-ED2A-1FC92FF0189F}.Debug|Win32.ActiveCfg = Debug|Win32
-		{4C33F2F5-247E-AE9E-ED2A-1FC92FF0189F}.Debug|Win32.Build.0 = Debug|Win32
+		{CDA6B84F-5732-EF8F-8DAD-B027FF712FB6}.Release|Win32.ActiveCfg = Release|Win32
+		{CDA6B84F-5732-EF8F-8DAD-B027FF712FB6}.Release|Win32.Build.0 = Release|Win32
+		{CDA6B84F-5732-EF8F-8DAD-B027FF712FB6}.Debug|Win32.ActiveCfg = Debug|Win32
+		{CDA6B84F-5732-EF8F-8DAD-B027FF712FB6}.Debug|Win32.Build.0 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

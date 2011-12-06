@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="bitmangler"
-	ProjectGUID="{C85FFB86-2AE9-6E86-3897-B62A93F24E38}"
+	ProjectGUID="{B70E5B8C-6F1F-6D0D-B2B7-EB29664B94E3}"
 	RootNamespace="bitmangler"
 	Keyword="Win32Proj"
 	>
@@ -218,9 +218,6 @@
 					</File>
 					<File
 						RelativePath="..\..\..\libs\juce-custom\Standalone\juce_StandaloneFilterWindow.cpp">
-					</File>
-					<File
-						RelativePath="..\..\..\libs\juce-custom\Standalone\DistrhoIcon.cpp">
 					</File>
 				</Filter>
 			</Filter>

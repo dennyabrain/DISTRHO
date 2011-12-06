@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="ThePilgrim"
-	ProjectGUID="{EEDD3BFB-DD17-0552-4D1E-E131404326C3}"
+	ProjectGUID="{006F61C2-D81B-E13D-56B3-2EC7EA738DBD}"
 	RootNamespace="ThePilgrim"
 	Keyword="Win32Proj"
 	>
@@ -249,9 +249,6 @@
 					</File>
 					<File
 						RelativePath="..\..\..\libs\juce-custom\Standalone\juce_StandaloneFilterWindow.cpp">
-					</File>
-					<File
-						RelativePath="..\..\..\libs\juce-custom\Standalone\DistrhoIcon.cpp">
 					</File>
 				</Filter>
 			</Filter>

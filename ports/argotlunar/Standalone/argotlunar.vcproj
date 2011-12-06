@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="argotlunar"
-	ProjectGUID="{4325D425-A141-14CF-3916-0C647E7A5D45}"
+	ProjectGUID="{9607F9F1-73D8-CB83-459F-1073DC758581}"
 	RootNamespace="argotlunar"
 	Keyword="Win32Proj"
 	>
@@ -251,9 +251,6 @@
 					</File>
 					<File
 						RelativePath="..\..\..\libs\juce-custom\Standalone\juce_StandaloneFilterWindow.cpp">
-					</File>
-					<File
-						RelativePath="..\..\..\libs\juce-custom\Standalone\DistrhoIcon.cpp">
 					</File>
 				</Filter>
 			</Filter>

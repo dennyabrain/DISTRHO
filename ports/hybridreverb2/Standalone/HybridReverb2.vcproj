@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="HybridReverb2"
-	ProjectGUID="{39321A4A-1C47-85E4-CB19-DD1B435EA6AF}"
+	ProjectGUID="{819BF616-EFA6-197C-CFBF-E3F8C1405935}"
 	RootNamespace="HybridReverb2"
 	Keyword="Win32Proj"
 	>
@@ -285,9 +285,6 @@
 					</File>
 					<File
 						RelativePath="..\..\..\libs\juce-custom\Standalone\juce_StandaloneFilterWindow.cpp">
-					</File>
-					<File
-						RelativePath="..\..\..\libs\juce-custom\Standalone\DistrhoIcon.cpp">
 					</File>
 				</Filter>
 			</Filter>

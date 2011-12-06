@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="juce-standalone-153"
-	ProjectGUID="{8830E91D-FCA8-58A8-E71C-45EBCE94183F}"
+	ProjectGUID="{62B7A095-3604-7332-EE36-99B7DADD11B4}"
 	RootNamespace="juce-standalone-153"
 	Keyword="Win32Proj"
 	>
@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="2"
-				AdditionalIncludeDirectories=".;../../../sdks/ASIOSDK2"
+				AdditionalIncludeDirectories=".;../../../sdks/ASIOSDK2/common"
 				PreprocessorDefinitions="WINDOWS=1;NDEBUG=1"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -56,7 +56,7 @@
 			<Tool
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="WINDOWS=1;NDEBUG=1"
-				AdditionalIncludeDirectories=".;../../../sdks/ASIOSDK2"
+				AdditionalIncludeDirectories=".;../../../sdks/ASIOSDK2/common"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
@@ -115,7 +115,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".;../../../sdks/ASIOSDK2"
+				AdditionalIncludeDirectories=".;../../../sdks/ASIOSDK2/common"
 				PreprocessorDefinitions="WINDOWS=1;DEBUG=1;_DEBUG=1"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -132,7 +132,7 @@
 			<Tool
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="WINDOWS=1;DEBUG=1;_DEBUG=1"
-				AdditionalIncludeDirectories=".;../../../sdks/ASIOSDK2"
+				AdditionalIncludeDirectories=".;../../../sdks/ASIOSDK2/common"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"

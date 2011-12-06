@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="TAL-Filter-2"
-	ProjectGUID="{9624AC01-4B02-826F-FB5D-2E0ECC2A6A9A}"
+	ProjectGUID="{D9B13C90-FDC4-EF99-F93D-D4CA88975139}"
 	RootNamespace="TAL-Filter-2"
 	Keyword="Win32Proj"
 	>
@@ -215,9 +215,6 @@
 					</File>
 					<File
 						RelativePath="..\..\..\libs\juce-custom\Standalone\juce_StandaloneFilterWindow.cpp">
-					</File>
-					<File
-						RelativePath="..\..\..\libs\juce-custom\Standalone\DistrhoIcon.cpp">
 					</File>
 				</Filter>
 			</Filter>

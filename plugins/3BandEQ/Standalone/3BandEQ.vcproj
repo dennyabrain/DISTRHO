@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="3BandEQ"
-	ProjectGUID="{9E3086D3-EEAA-D622-AA8C-BB97C2545746}"
+	ProjectGUID="{969B9657-2486-3BE1-E814-295CA835673F}"
 	RootNamespace="3BandEQ"
 	Keyword="Win32Proj"
 	>
@@ -218,9 +218,6 @@
 					</File>
 					<File
 						RelativePath="..\..\..\libs\juce-custom\Standalone\juce_StandaloneFilterWindow.cpp">
-					</File>
-					<File
-						RelativePath="..\..\..\libs\juce-custom\Standalone\DistrhoIcon.cpp">
 					</File>
 				</Filter>
 			</Filter>

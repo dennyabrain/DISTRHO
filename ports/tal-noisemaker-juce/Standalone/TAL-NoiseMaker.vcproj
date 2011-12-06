@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="TAL-NoiseMaker"
-	ProjectGUID="{E14B8600-F3C9-5007-14F5-CC3CA08BB021}"
+	ProjectGUID="{5EBCEF3F-237C-0D7D-9510-1D7C0D98AE26}"
 	RootNamespace="TAL-NoiseMaker"
 	Keyword="Win32Proj"
 	>
@@ -223,9 +223,6 @@
 					</File>
 					<File
 						RelativePath="..\..\..\libs\juce-custom\Standalone\juce_StandaloneFilterWindow.cpp">
-					</File>
-					<File
-						RelativePath="..\..\..\libs\juce-custom\Standalone\DistrhoIcon.cpp">
 					</File>
 				</Filter>
 			</Filter>

@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TAL-Dub-3", "./TAL-Dub-3.vcproj", "{694BDBF1-DD6C-7718-5D0E-F99E02F43AB1}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TAL-Dub-3", "./TAL-Dub-3.vcproj", "{82BBCD8F-7078-FB2F-F334-7C75D8237148}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
@@ -10,10 +10,10 @@ Global
 		Debug|Win32 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{694BDBF1-DD6C-7718-5D0E-F99E02F43AB1}.Release|Win32.ActiveCfg = Release|Win32
-		{694BDBF1-DD6C-7718-5D0E-F99E02F43AB1}.Release|Win32.Build.0 = Release|Win32
-		{694BDBF1-DD6C-7718-5D0E-F99E02F43AB1}.Debug|Win32.ActiveCfg = Debug|Win32
-		{694BDBF1-DD6C-7718-5D0E-F99E02F43AB1}.Debug|Win32.Build.0 = Debug|Win32
+		{82BBCD8F-7078-FB2F-F334-7C75D8237148}.Release|Win32.ActiveCfg = Release|Win32
+		{82BBCD8F-7078-FB2F-F334-7C75D8237148}.Release|Win32.Build.0 = Release|Win32
+		{82BBCD8F-7078-FB2F-F334-7C75D8237148}.Debug|Win32.ActiveCfg = Debug|Win32
+		{82BBCD8F-7078-FB2F-F334-7C75D8237148}.Debug|Win32.Build.0 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

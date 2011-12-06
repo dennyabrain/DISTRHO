@@ -10,6 +10,7 @@ libs: libs_standalone libs_plugin libs_lv2
 
 libs_standalone:
 	$(MAKE) -C ../libs/juce-153/standalone
+	$(MAKE) -C ../libs/juce-153/standalone-vst
 
 libs_plugin:
 	$(MAKE) -C ../libs/juce-153/plugin

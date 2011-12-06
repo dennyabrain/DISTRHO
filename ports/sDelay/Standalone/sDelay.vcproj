@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="sDelay"
-	ProjectGUID="{07C26460-E637-72AA-16C1-0E3F80882A49}"
+	ProjectGUID="{CC8C2198-16E4-4F22-6B7D-B5D92F4B7967}"
 	RootNamespace="sDelay"
 	Keyword="Win32Proj"
 	>
@@ -215,9 +215,6 @@
 					</File>
 					<File
 						RelativePath="..\..\..\libs\juce-custom\Standalone\juce_StandaloneFilterWindow.cpp">
-					</File>
-					<File
-						RelativePath="..\..\..\libs\juce-custom\Standalone\DistrhoIcon.cpp">
 					</File>
 				</Filter>
 			</Filter>

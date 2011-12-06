@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="sDelay.lv2/sDelay_Plugin"
-	ProjectGUID="{8E8C7B88-8C93-4FFE-F5A4-FA071D5754B0}"
+	ProjectGUID="{760B5CF2-50F2-F1E6-2D1B-5D15CB0E3AF3}"
 	RootNamespace="sDelay.lv2/sDelay_Plugin"
 	Keyword="Win32Proj"
 	>

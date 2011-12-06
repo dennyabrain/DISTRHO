@@ -8,6 +8,7 @@ build: build_libs build_plugins build_ports
 
 build_libs:
 	$(MAKE) -C libs/juce-153/standalone
+	$(MAKE) -C libs/juce-153/standalone-vst
 	$(MAKE) -C libs/juce-153/plugin
 	$(MAKE) -C libs/juce-lv2
 
@@ -22,6 +23,7 @@ build_ports:
 
 clean:
 	$(MAKE) clean -C libs/juce-153/standalone
+	$(MAKE) clean -C libs/juce-153/standalone-vst
 	$(MAKE) clean -C libs/juce-153/plugin
 	$(MAKE) clean -C libs/juce-lv2
 	$(MAKE) clean -C plugins

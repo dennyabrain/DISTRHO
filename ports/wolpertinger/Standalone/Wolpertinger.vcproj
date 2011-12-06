@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="Wolpertinger"
-	ProjectGUID="{AE378083-5F1D-6A72-4B08-658C60DF0A7F}"
+	ProjectGUID="{B2D98757-B2CB-CD6F-6D05-F5CED05538DA}"
 	RootNamespace="Wolpertinger"
 	Keyword="Win32Proj"
 	>
@@ -233,9 +233,6 @@
 					</File>
 					<File
 						RelativePath="..\..\..\libs\juce-custom\Standalone\juce_StandaloneFilterWindow.cpp">
-					</File>
-					<File
-						RelativePath="..\..\..\libs\juce-custom\Standalone\DistrhoIcon.cpp">
 					</File>
 				</Filter>
 			</Filter>
