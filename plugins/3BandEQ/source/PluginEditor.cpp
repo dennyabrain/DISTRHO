@@ -54,7 +54,7 @@ DistrhoPluginAudioProcessorEditor::DistrhoPluginAudioProcessorEditor (DistrhoPlu
     addAndMakeVisible (sMaster);
 
     sLowMidFreq = new FilmStripKnob(knobImage, knobFrames, false, DistrhoPluginAudioProcessor::pLowMidFreq);
-    sLowMidFreq->setBounds (72, 270, knobImage.getWidth(), knobImage.getHeight() / knobFrames);
+    sLowMidFreq->setBounds (66, 270, knobImage.getWidth(), knobImage.getHeight() / knobFrames);
     sLowMidFreq->setValue (ourProcessor->getParameter(DistrhoPluginAudioProcessor::pLowMidFreq));
     sLowMidFreq->addListener (this);
     addAndMakeVisible (sLowMidFreq);
