@@ -17,6 +17,7 @@
 #include "lv2/event.h"
 #include "lv2/event-helpers.h"
 #include "lv2/instance-access.h"
+#include "lv2/programs.h"
 #include "lv2/state.h"
 #include "lv2/uri-map.h"
 #include "lv2/time.h"
@@ -116,7 +117,6 @@ String makePluginTtl(const String& uri, const String& binary)
     plugin += "@prefix lv2:   <http://lv2plug.in/ns/lv2core#> .\n";
     plugin += "@prefix lv2ev: <http://lv2plug.in/ns/ext/event#> .\n";
     plugin += "@prefix lv2ui: <http://lv2plug.in/ns/extensions/ui#> .\n";
-    plugin += "@prefix lv2st: <http://lv2plug.in/ns/ext/state#> .\n";
     plugin += "\n";
 
     if (filter->hasEditor())
@@ -135,7 +135,8 @@ String makePluginTtl(const String& uri, const String& binary)
 
     plugin += "<" + uri + ">\n";
     plugin += "    a " + getPluginType() + " ;\n";
-    plugin += "    lv2:extensionData lv2st:Interface ;\n";
+    plugin += "    lv2:extensionData http://lv2plug.in/ns/ext/state#Interface ;\n";
+    plugin += "    lv2:extensionData http://kxstudio.sourceforge.net/ns/lv2_programs#extensionData ;\n";
 
     if (filter->hasEditor())
     {
@@ -1203,11 +1204,40 @@ void juceLV2Restore(LV2_Handle instance, LV2_State_Retrieve_Function retrieve, L
     wrapper->setChunk(chunkMemory);
 }
 
+//==============================================================================
+unsigned int juceLV2GetProgramCount(LV2_Handle instance)
+{
+    JuceLV2Wrapper* wrapper = (JuceLV2Wrapper*)instance;
+    jassert(wrapper);
+
+    return wrapper->getFilter()->getNumPrograms();
+}
+
+const char* juceLV2GetProgramName(LV2_Handle instance, unsigned int program)
+{
+    JuceLV2Wrapper* wrapper = (JuceLV2Wrapper*)instance;
+    jassert(wrapper);
+
+    return wrapper->getFilter()->getProgramName(program).toUTF8().getAddress();
+}
+
+int juceLV2SetProgram(LV2_Handle instance, unsigned int program)
+{
+    JuceLV2Wrapper* wrapper = (JuceLV2Wrapper*)instance;
+    jassert(wrapper);
+
+    wrapper->getFilter()->setCurrentProgram(program);
+    return 0;
+}
+
 const void* juceLV2ExtensionData(const char* uri)
 {
     static const LV2_State_Interface state = { juceLV2Save, juceLV2Restore };
+    static const LV2_Programs_Feature programs = { juceLV2GetProgramCount, juceLV2GetProgramName, juceLV2SetProgram };
     if (strcmp(uri, LV2_STATE_INTERFACE_URI) == 0)
         return &state;
+    else if (strcmp(uri, LV2_PROGRAMS_EXTENSION_DATA_URI) == 0)
+        return &programs;
     return nullptr;
 }
 
