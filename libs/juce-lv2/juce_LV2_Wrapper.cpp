@@ -620,7 +620,7 @@ private:
 
 //==============================================================================
 // Create a new JUCE LV2 Plugin
-class JuceLV2Wrapper
+class JuceLV2Wrapper : public AudioPlayHead
 {
 public:
     JuceLV2Wrapper(const LV2_Descriptor* descriptor_, double sampleRate_, const LV2_Feature* const* features) :
@@ -647,6 +647,7 @@ public:
         jassert(filter != nullptr);
 
         filter->setPlayConfigDetails(numInChans, numOutChans, 0, 0);
+        filter->setPlayHead (this);
 
         // Port count
         portCount  = 0;
@@ -1006,13 +1007,13 @@ public:
     //==============================================================================
     // JUCE Stuff
 
-#if JucePlugin_WantsLV2TimePos
     bool getCurrentPosition (AudioPlayHead::CurrentPositionInfo& info)
     {
-        if (sampleRate <= 0)
+#if JucePlugin_WantsLV2TimePos
+        if (timePosPort == nullptr || sampleRate <= 0)
             return false;
 
-        if ((timePos.flags & LV2_TIME_HAS_BBT) != 0)
+        if (timePos.flags & LV2_TIME_HAS_BBT)
         {
             info.bpm = timePos.beats_per_minute;
             info.timeSigNumerator   = timePos.beats_per_bar;
@@ -1022,7 +1023,7 @@ public:
         }
         else
         {
-            info.bpm = 120.0;
+            info.bpm = 130.0;
             info.timeSigNumerator = 4;
             info.timeSigDenominator = 4;
             info.ppqPosition = 0;
@@ -1036,8 +1037,10 @@ public:
         info.isRecording = false;
 
         return true;
-    }
+#else
+        return false;
 #endif
+    }
 
     AudioProcessor* getFilter() { return filter; }
 
