@@ -135,8 +135,8 @@ String makePluginTtl(const String& uri, const String& binary)
 
     plugin += "<" + uri + ">\n";
     plugin += "    a " + getPluginType() + " ;\n";
-    plugin += "    lv2:extensionData http://lv2plug.in/ns/ext/state#Interface ;\n";
-    plugin += "    lv2:extensionData http://kxstudio.sourceforge.net/ns/lv2_programs#extensionData ;\n";
+    plugin += "    lv2:extensionData <http://lv2plug.in/ns/ext/state#Interface> ;\n";
+    plugin += "    lv2:extensionData <http://kxstudio.sourceforge.net/ns/lv2_programs#extensionData> ;\n";
 
     if (filter->hasEditor())
     {
@@ -1183,7 +1183,7 @@ void juceLV2Save(LV2_Handle instance, LV2_State_Store_Function store, LV2_State_
           chunkMemory.getData(),
           chunkMemory.getSize(),
           uriMap->uri_to_id(uriMap->callback_data, 0, "juce_binary_chunk"),
-          LV2_STATE_IS_POD | LV2_STATE_IS_PORTABLE);
+          LV2_STATE_IS_POD);
 }
 
 void juceLV2Restore(LV2_Handle instance, LV2_State_Retrieve_Function retrieve, LV2_State_Handle handle, uint32_t flags, const LV2_Feature* const* features)
