@@ -1171,12 +1171,12 @@ void juceLV2Save(LV2_Handle instance, LV2_State_Store_Function store, LV2_State_
     MemoryBlock chunkMemory;
     wrapper->getChunk(chunkMemory);
 
-    LV2_URI_Map_Feature* uri_map = wrapper->getURIMap();
+    LV2_URI_Map_Feature* uriMap = wrapper->getURIMap();
     store(handle,
-          uri_map->uri_to_id(wrapper, 0, juceChunkURI.toUTF8().getAddress()),
+          uriMap->uri_to_id(uriMap->callback_data, 0, juceChunkURI.toUTF8().getAddress()),
           chunkMemory.getData(),
           chunkMemory.getSize(),
-          uri_map->uri_to_id(wrapper, 0, "juce_binary_chunk"),
+          uriMap->uri_to_id(uriMap->callback_data, 0, "juce_binary_chunk"),
           LV2_STATE_IS_POD | LV2_STATE_IS_PORTABLE);
 }
 
@@ -1186,12 +1186,12 @@ void juceLV2Restore(LV2_Handle instance, LV2_State_Retrieve_Function retrieve, L
     jassert(wrapper);
 
     const String juceChunkURI = getURI() + "#chunk";
-    LV2_URI_Map_Feature* uri_map = wrapper->getURIMap();
+    LV2_URI_Map_Feature* uriMap = wrapper->getURIMap();
 
     size_t size;
     uint32 type;
     const void *data = retrieve(handle,
-                                uri_map->uri_to_id(wrapper, 0, juceChunkURI.toUTF8().getAddress()),
+                                uriMap->uri_to_id(uriMap->callback_data, 0, juceChunkURI.toUTF8().getAddress()),
                                 &size, &type, &flags);
 
     MemoryBlock chunkMemory(data, size);
@@ -1201,7 +1201,7 @@ void juceLV2Restore(LV2_Handle instance, LV2_State_Retrieve_Function retrieve, L
 const void* juceLV2ExtensionData(const char* uri)
 {
     static const LV2_State_Interface state = { juceLV2Save, juceLV2Restore };
-    if (strcmp(uri, LV2_STATE_URI) == 0)
+    if (strcmp(uri, LV2_STATE_INTERFACE_URI) == 0)
         return &state;
     return nullptr;
 }
