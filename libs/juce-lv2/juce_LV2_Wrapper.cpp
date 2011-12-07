@@ -881,8 +881,8 @@ public:
               memcpy(&timePos, data, sizeof(LV2_Time_Position));
             else
               memset(&timePos, 0, sizeof(LV2_Time_Position));
-
-        } else
+        }
+        else
           memset(&timePos, 0, sizeof(LV2_Time_Position));
 #endif
 
@@ -948,6 +948,8 @@ public:
                 // LV2 MIDI Input
                 if (midiInPort != nullptr)
                 {
+                    midiEvents.clear();
+
                     LV2_Event_Iterator iter;
                     lv2_event_begin(&iter, midiInPort);
                     uint32 sampleFrame = 0;
@@ -955,7 +957,7 @@ public:
 
                     while (sampleFrame < numSamples && lv2_event_is_valid(&iter))
                     {
-                        LV2_Event* event = lv2_event_get(&iter, &data);
+                        const LV2_Event* event = lv2_event_get(&iter, &data);
                         sampleFrame = event->frames;
                         midiEvents.addEvent(data, event->size, event->frames);
                         lv2_event_increment(&iter);
