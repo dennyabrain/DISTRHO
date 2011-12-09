@@ -257,6 +257,8 @@
 
 #define JucePlugin_LV2Category               "ReverbPlugin"
 
+#define JucePlugin_WantsLV2Chunks            1
+
 //==============================================================================
 
 #endif
