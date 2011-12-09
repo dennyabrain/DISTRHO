@@ -34,9 +34,16 @@ else
 end
 
 if (windows) then
-  package.includepaths = { ".", "../../../sdks/ASIOSDK2/common", "../../../sdks/vstsdk2.4" }
+  package.includepaths = {
+    ".",
+    "../../../sdks/ASIOSDK2/common",
+    "../../../sdks/vstsdk2.4"
+  }
 else
-  package.includepaths = { ".", "../../../sdks/vstsdk2.4" }
+  package.includepaths = {
+    ".",
+    "../../../sdks/vstsdk2.4"
+  }
 end
 
 package.files = {

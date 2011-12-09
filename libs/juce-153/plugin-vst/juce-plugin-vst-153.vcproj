@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8.00"
-	Name="juce-plugin-153"
-	ProjectGUID="{4C63391A-EB1F-6119-257B-2FD58CB80E43}"
-	RootNamespace="juce-plugin-153"
+	Name="juce-plugin-vst-153"
+	ProjectGUID="{ED8F58B1-5091-5DDD-D623-4A2277FA1C0D}"
+	RootNamespace="juce-plugin-vst-153"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -40,8 +40,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="2"
-				AdditionalIncludeDirectories="."
-				PreprocessorDefinitions="WINDOWS=1;NDEBUG=1"
+				AdditionalIncludeDirectories=".;../../../sdks/vstsdk2.4"
+				PreprocessorDefinitions="JUCE_USE_VSTSDK_2_4=1;JUCE_PLUGINHOST_VST=1;WINDOWS=1;NDEBUG=1"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -55,15 +55,15 @@
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="WINDOWS=1;NDEBUG=1"
-				AdditionalIncludeDirectories="."
+				PreprocessorDefinitions="JUCE_USE_VSTSDK_2_4=1;JUCE_PLUGINHOST_VST=1;WINDOWS=1;NDEBUG=1"
+				AdditionalIncludeDirectories=".;../../../sdks/vstsdk2.4"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)/juce-plugin-153.lib"
+				OutputFile="$(OutDir)/juce-plugin-vst-153.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -115,8 +115,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="."
-				PreprocessorDefinitions="WINDOWS=1;DEBUG=1;_DEBUG=1"
+				AdditionalIncludeDirectories=".;../../../sdks/vstsdk2.4"
+				PreprocessorDefinitions="JUCE_USE_VSTSDK_2_4=1;JUCE_PLUGINHOST_VST=1;WINDOWS=1;DEBUG=1;_DEBUG=1"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -131,15 +131,15 @@
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="WINDOWS=1;DEBUG=1;_DEBUG=1"
-				AdditionalIncludeDirectories="."
+				PreprocessorDefinitions="JUCE_USE_VSTSDK_2_4=1;JUCE_PLUGINHOST_VST=1;WINDOWS=1;DEBUG=1;_DEBUG=1"
+				AdditionalIncludeDirectories=".;../../../sdks/vstsdk2.4"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)/juce-plugin-153_debug.lib"
+				OutputFile="$(OutDir)/juce-plugin-vst-153_debug.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"

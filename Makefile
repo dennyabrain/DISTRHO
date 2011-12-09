@@ -10,12 +10,11 @@ build_libs:
 	$(MAKE) -C libs/juce-153/standalone
 	$(MAKE) -C libs/juce-153/standalone-vst
 	$(MAKE) -C libs/juce-153/plugin
+	$(MAKE) -C libs/juce-153/plugin-vst
 	$(MAKE) -C libs/juce-lv2
-
 
 build_plugins:
 	$(MAKE) -C plugins
-
 
 build_ports:
 	$(MAKE) -C ports
@@ -25,6 +24,36 @@ clean:
 	$(MAKE) clean -C libs/juce-153/standalone
 	$(MAKE) clean -C libs/juce-153/standalone-vst
 	$(MAKE) clean -C libs/juce-153/plugin
+	$(MAKE) clean -C libs/juce-153/plugin-vst
 	$(MAKE) clean -C libs/juce-lv2
 	$(MAKE) clean -C plugins
 	$(MAKE) clean -C ports
+
+
+# Custom build types
+standalone:
+	$(MAKE) -C libs/juce-153/standalone
+	$(MAKE) -C plugins standalone
+	$(MAKE) -C ports standalone
+
+standalone_vst:
+	$(MAKE) -C libs/juce-153/standalone-vst
+	$(MAKE) -C plugins standalone_vst
+	$(MAKE) -C ports standalone_vst
+
+lv2:
+	$(MAKE) -C libs/juce-153/plugin
+	$(MAKE) -C libs/juce-lv2
+	$(MAKE) -C plugins lv2
+	$(MAKE) -C ports lv2
+
+lv2_vst:
+	$(MAKE) -C libs/juce-153/plugin-vst
+	$(MAKE) -C libs/juce-lv2
+	$(MAKE) -C plugins lv2_vst
+	$(MAKE) -C ports lv2_vst
+
+vst:
+	$(MAKE) -C libs/juce-153/plugin
+	$(MAKE) -C plugins vst
+	$(MAKE) -C ports vst

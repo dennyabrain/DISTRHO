@@ -1,5 +1,5 @@
 
-project.name    = "juce-standalone-153"
+project.name    = "juce-plugin-vst-153"
 project.bindir  = "../.."
 project.libdir  = project.bindir
 project.configs = { "Release", "Debug" }
@@ -9,6 +9,7 @@ package.name = project.name
 package.kind = "lib"
 package.language  = "c++"
 package.linkflags = { "static-runtime" }
+package.defines   = { "JUCE_USE_VSTSDK_2_4=1", "JUCE_PLUGINHOST_VST=1" }
 
 package.config["Release"].target     = project.name
 package.config["Release"].objdir     = "intermediate/Release"
@@ -20,28 +21,22 @@ package.config["Debug"].objdir       = "intermediate/Debug"
 package.config["Debug"].defines      = { "DEBUG=1", "_DEBUG=1" }
 
 if (windows) then
-  package.defines = { "WINDOWS=1" }
+  package.defines = { package.defines, "WINDOWS=1" }
 else
-  package.config["Release"].buildoptions = { "-O2 -mtune=generic -ffast-math -fomit-frame-pointer -fPIC" }
+  package.config["Release"].buildoptions = { "-O2 -mtune=generic -ffast-math -fomit-frame-pointer -fvisibility=hidden -fPIC" }
   package.config["Debug"].buildoptions   = { "-O0 -ggdb -fPIC" }
   if (macosx) then
-    package.defines = { "MAC=1" }
+    package.defines = { package.defines, "MAC=1" }
   else
-    package.defines = { "LINUX=1" }
+    package.defines = { package.defines, "LINUX=1" }
     package.buildoptions = { "`pkg-config --cflags freetype2`" }
   end
 end
 
-if (windows) then
-  package.includepaths = {
+package.includepaths = {
     ".",
-    "../../../sdks/ASIOSDK2/common"
-  }
-else
-  package.includepaths = {
-    "."
-  }
-end
+    "../../../sdks/vstsdk2.4"
+}
 
 package.files = {
   matchfiles (
@@ -101,8 +96,7 @@ if (windows) then
   package.files = {
     package.files,
     matchfiles (
-      "../source/src/native/windows/*.cpp",
-      "../source/src/native/linux/juce_linux_JackAudio.cpp"
+      "../source/src/native/windows/*.cpp"
     )
   }
 elseif (macosx) then

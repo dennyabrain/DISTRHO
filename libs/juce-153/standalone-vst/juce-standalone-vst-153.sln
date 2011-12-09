@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "juce-standalone-vst-153", "./juce-standalone-vst-153.vcproj", "{0B6BB53C-BF2E-E4FE-51BE-04B7135F1604}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "juce-standalone-vst-153", "./juce-standalone-vst-153.vcproj", "{CBAC4CA3-C37C-D06D-A995-94B3CD60E7B2}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
@@ -10,10 +10,10 @@ Global
 		Debug|Win32 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{0B6BB53C-BF2E-E4FE-51BE-04B7135F1604}.Release|Win32.ActiveCfg = Release|Win32
-		{0B6BB53C-BF2E-E4FE-51BE-04B7135F1604}.Release|Win32.Build.0 = Release|Win32
-		{0B6BB53C-BF2E-E4FE-51BE-04B7135F1604}.Debug|Win32.ActiveCfg = Debug|Win32
-		{0B6BB53C-BF2E-E4FE-51BE-04B7135F1604}.Debug|Win32.Build.0 = Debug|Win32
+		{CBAC4CA3-C37C-D06D-A995-94B3CD60E7B2}.Release|Win32.ActiveCfg = Release|Win32
+		{CBAC4CA3-C37C-D06D-A995-94B3CD60E7B2}.Release|Win32.Build.0 = Release|Win32
+		{CBAC4CA3-C37C-D06D-A995-94B3CD60E7B2}.Debug|Win32.ActiveCfg = Debug|Win32
+		{CBAC4CA3-C37C-D06D-A995-94B3CD60E7B2}.Debug|Win32.Build.0 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
