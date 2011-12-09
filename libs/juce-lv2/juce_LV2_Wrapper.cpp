@@ -53,22 +53,22 @@ String nameToSymbol(const String& name, const uint32 portIndex)
 /** Returns the URI of the plugin */
 String getURI()
 {
-    return String("urn:" JucePlugin_Manufacturer ":" JucePlugin_Name).replace(" ", "_");
+    return String("urn:juce:" JucePlugin_Manufacturer ":" JucePlugin_Name).replace(" ", "_");
 }
 
 /** Returns the URI of the X11 UI */
 String getX11UIURI()
 {
-    return String("urn:" JucePlugin_Manufacturer ":" JucePlugin_Name ":X11-UI").replace(" ", "_");
+    return String("urn:juce:" JucePlugin_Manufacturer ":" JucePlugin_Name ":X11-UI").replace(" ", "_");
 }
 
 /** Returns the URI of the External UI */
 String getExternalUIURI(bool isNew)
 {
     if (isNew)
-      return String("urn:" JucePlugin_Manufacturer ":" JucePlugin_Name ":JUCE-External-UI").replace(" ", "_");
+      return String("urn:juce:" JucePlugin_Manufacturer ":" JucePlugin_Name ":JUCE-External-UI").replace(" ", "_");
     else
-      return String("urn:" JucePlugin_Manufacturer ":" JucePlugin_Name ":JUCE-OldExternal-UI").replace(" ", "_");
+      return String("urn:juce:" JucePlugin_Manufacturer ":" JucePlugin_Name ":JUCE-OldExternal-UI").replace(" ", "_");
 }
 
 /** Returns the name of the plugin binary file */
