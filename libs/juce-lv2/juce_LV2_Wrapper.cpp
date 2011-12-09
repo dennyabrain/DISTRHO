@@ -571,7 +571,11 @@ public:
             writeFunction(controller, index+parameterPortOffset, sizeof(float), 0, &newValue);
     }
 
-    void audioProcessorChanged (AudioProcessor*) {}
+    void audioProcessorChanged (AudioProcessor*)
+    {
+        // reload_programs();
+        // set_program(filter->getCurrentProgram());
+    }
 
     //==============================================================================
     void resetExternalUIIfNeeded(LV2UI_Write_Function writeFunction_, LV2UI_Controller controller_, LV2UI_Widget* widget)

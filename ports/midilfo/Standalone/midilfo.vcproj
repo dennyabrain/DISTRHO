@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="midilfo"
-	ProjectGUID="{F652BFD8-11C9-A9C6-4C49-C412F73CB110}"
+	ProjectGUID="{F5C9F054-AB8B-B540-838E-AC03C42FEA96}"
 	RootNamespace="midilfo"
 	Keyword="Win32Proj"
 	>
@@ -63,15 +63,15 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="freetype.lib pthread.lib asound.lib dl.lib rt.lib X11.lib Xext.lib juce-standalone-153.lib"
+				AdditionalDependencies="juce-standalone-153.lib"
 				OutputFile="$(OutDir)/midilfo.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="../../../bin;../../../libs"
 				GenerateDebugInformation="false"
-				SubSystem="1"
+				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				EntryPointSymbol="mainCRTStartup"
+
 				TargetMachine="1"
 			/>
 			<Tool
@@ -148,14 +148,14 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="freetype.lib pthread.lib asound.lib dl.lib rt.lib X11.lib Xext.lib juce-standalone-153_debug.lib"
+				AdditionalDependencies="juce-standalone-153_debug.lib"
 				OutputFile="$(OutDir)/midilfo_debug.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="../../../bin;../../../libs"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/midilfo_debug.pdb"
-				SubSystem="1"
-				EntryPointSymbol="mainCRTStartup"
+				SubSystem="2"
+
 				TargetMachine="1"
 			/>
 			<Tool

@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="sDelay.lv2/sDelay_Plugin"
-	ProjectGUID="{760B5CF2-50F2-F1E6-2D1B-5D15CB0E3AF3}"
+	ProjectGUID="{F1118705-28E4-B488-3BB8-D2A7A3720D8B}"
 	RootNamespace="sDelay.lv2/sDelay_Plugin"
 	Keyword="Win32Proj"
 	>
@@ -63,7 +63,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="freetype.lib pthread.lib rt.lib X11.lib Xext.lib juce-plugin-153.lib"
+				AdditionalDependencies="juce-plugin-153.lib"
 				OutputFile="$(OutDir)/sDelay_Plugin.dll"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="../../../bin;../../../libs"
@@ -148,7 +148,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="freetype.lib pthread.lib rt.lib X11.lib Xext.lib juce-plugin-153_debug.lib"
+				AdditionalDependencies="juce-plugin-153_debug.lib"
 				OutputFile="$(OutDir)/sDelay_Plugin_debug.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="../../../bin;../../../libs"

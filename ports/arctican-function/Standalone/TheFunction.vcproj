@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="TheFunction"
-	ProjectGUID="{630E4E53-5E5D-14A9-9DEF-C6539A8A6FFA}"
+	ProjectGUID="{72812883-D7E7-168C-4875-3B314E2D2E2D}"
 	RootNamespace="TheFunction"
 	Keyword="Win32Proj"
 	>
@@ -63,15 +63,15 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="freetype.lib pthread.lib asound.lib dl.lib rt.lib X11.lib Xext.lib juce-standalone-153.lib"
+				AdditionalDependencies="juce-standalone-153.lib"
 				OutputFile="$(OutDir)/TheFunction.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="../../../bin;../../../libs"
 				GenerateDebugInformation="false"
-				SubSystem="1"
+				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				EntryPointSymbol="mainCRTStartup"
+
 				TargetMachine="1"
 			/>
 			<Tool
@@ -148,14 +148,14 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="freetype.lib pthread.lib asound.lib dl.lib rt.lib X11.lib Xext.lib juce-standalone-153_debug.lib"
+				AdditionalDependencies="juce-standalone-153_debug.lib"
 				OutputFile="$(OutDir)/TheFunction_debug.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="../../../bin;../../../libs"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/TheFunction_debug.pdb"
-				SubSystem="1"
-				EntryPointSymbol="mainCRTStartup"
+				SubSystem="2"
+
 				TargetMachine="1"
 			/>
 			<Tool

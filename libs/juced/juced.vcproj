@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="juced"
-	ProjectGUID="{A81F2F9D-199D-5B99-6421-7B65158EE7E1}"
+	ProjectGUID="{C376BEB2-43E2-615E-8757-1B3E7B5246C7}"
 	RootNamespace="juced"
 	Keyword="Win32Proj"
 	>
@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="2"
-				AdditionalIncludeDirectories="source;../juce-153/source"
+				AdditionalIncludeDirectories="source;../juce-153/plugin;../juce-153/source"
 				PreprocessorDefinitions="WINDOWS=1;NDEBUG=1"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -56,7 +56,7 @@
 			<Tool
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="WINDOWS=1;NDEBUG=1"
-				AdditionalIncludeDirectories="source;../juce-153/source"
+				AdditionalIncludeDirectories="source;../juce-153/plugin;../juce-153/source"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
@@ -115,7 +115,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="source;../juce-153/source"
+				AdditionalIncludeDirectories="source;../juce-153/plugin;../juce-153/source"
 				PreprocessorDefinitions="WINDOWS=1;DEBUG=1;_DEBUG=1"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -132,7 +132,7 @@
 			<Tool
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="WINDOWS=1;DEBUG=1;_DEBUG=1"
-				AdditionalIncludeDirectories="source;../juce-153/source"
+				AdditionalIncludeDirectories="source;../juce-153/plugin;../juce-153/source"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"

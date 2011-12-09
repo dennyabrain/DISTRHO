@@ -1,24 +1,24 @@
 
-project.name = "juce-standalone-vst-153"
-project.bindir = "../.."
-project.libdir = project.bindir
+project.name    = "juce-standalone-vst-153"
+project.bindir  = "../.."
+project.libdir  = project.bindir
 project.configs = { "Release", "Debug" }
 
 package = newpackage()
 package.name = project.name
 package.kind = "lib"
-package.language = "c++"
+package.language  = "c++"
 package.linkflags = { "static-runtime" }
-package.defines = { "JUCE_USE_VSTSDK_2_4=1", "JUCE_PLUGINHOST_VST=1" }
+package.defines   = { "JUCE_USE_VSTSDK_2_4=1", "JUCE_PLUGINHOST_VST=1" }
 
-package.config["Release"].target       = project.name
-package.config["Release"].objdir       = "intermediate/Release"
-package.config["Release"].defines      = { "NDEBUG=1" }
-package.config["Release"].buildflags   = { "optimize-speed" }
+package.config["Release"].target     = project.name
+package.config["Release"].objdir     = "intermediate/Release"
+package.config["Release"].defines    = { "NDEBUG=1" }
+package.config["Release"].buildflags = { "optimize-speed" }
 
-package.config["Debug"].target         = project.name .. "_debug"
-package.config["Debug"].objdir         = "intermediate/Debug"
-package.config["Debug"].defines        = { "DEBUG=1", "_DEBUG=1" }
+package.config["Debug"].target       = project.name .. "_debug"
+package.config["Debug"].objdir       = "intermediate/Debug"
+package.config["Debug"].defines      = { "DEBUG=1", "_DEBUG=1" }
 
 if (windows) then
   package.defines = { package.defines, "WINDOWS=1" }
@@ -90,15 +90,29 @@ package.files = {
     "../source/src/text/*.cpp",
     "../source/src/threads/*.cpp",
     "../source/src/utilities/*.cpp"
-    )
+  )
 }
 
 if (windows) then
-  package.files = { package.files, matchfiles ("../source/src/native/windows/*.cpp") }
+  package.files = {
+    package.files,
+    matchfiles (
+      "../source/src/native/windows/*.cpp",
+      "../source/src/native/linux/juce_linux_JackAudio.cpp"
+    )
+  }
 elseif (macosx) then
-  package.files = { package.files, matchfiles ("../source/src/native/mac/*.cpp") }
+  package.files = {
+    package.files,
+    matchfiles (
+      "../source/src/native/mac/*.cpp"
+    )
+  }
 else
-  package.files = { package.files, matchfiles ("../source/src/native/linux/*.cpp") }
+  package.files = {
+    package.files,
+    matchfiles (
+      "../source/src/native/linux/*.cpp"
+    )
+  }
 end
-
--- Missing android -> "../source/src/native/android/*.cpp"

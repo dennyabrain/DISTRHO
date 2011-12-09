@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="TAL-Vocoder-II.lv2/TAL_Vocoder_II_Plugin"
-	ProjectGUID="{3CE7D103-0AE5-FC47-0B94-ABF890C43D3D}"
+	ProjectGUID="{7D6C9593-C976-55FD-57C1-99F549B50972}"
 	RootNamespace="TAL-Vocoder-II.lv2/TAL_Vocoder_II_Plugin"
 	Keyword="Win32Proj"
 	>
@@ -63,7 +63,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="freetype.lib pthread.lib rt.lib X11.lib Xext.lib juce-plugin-153.lib"
+				AdditionalDependencies="juce-plugin-153.lib"
 				OutputFile="$(OutDir)/TAL_Vocoder_II_Plugin.dll"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="../../../bin;../../../libs"
@@ -148,7 +148,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="freetype.lib pthread.lib rt.lib X11.lib Xext.lib juce-plugin-153_debug.lib"
+				AdditionalDependencies="juce-plugin-153_debug.lib"
 				OutputFile="$(OutDir)/TAL_Vocoder_II_Plugin_debug.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="../../../bin;../../../libs"

@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="HybridReverb2.lv2/HybridReverb2"
-	ProjectGUID="{51AF5AD6-1727-D53C-92DF-0F0B53F31E64}"
+	ProjectGUID="{44B411B7-94D9-D276-BC83-16AC6F24331F}"
 	RootNamespace="HybridReverb2.lv2/HybridReverb2"
 	Keyword="Win32Proj"
 	>
@@ -63,7 +63,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="freetype.lib pthread.lib rt.lib X11.lib Xext.lib gomp.lib juce-plugin-153.lib"
+				AdditionalDependencies="juce-plugin-153.lib"
 				OutputFile="$(OutDir)/HybridReverb2.dll"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="../../../bin;../../../libs"
@@ -148,7 +148,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="freetype.lib pthread.lib rt.lib X11.lib Xext.lib gomp.lib juce-plugin-153_debug.lib"
+				AdditionalDependencies="juce-plugin-153_debug.lib"
 				OutputFile="$(OutDir)/HybridReverb2_debug.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="../../../bin;../../../libs"

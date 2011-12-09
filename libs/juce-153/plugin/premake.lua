@@ -1,33 +1,33 @@
 
-project.name = "juce-plugin-153"
-project.bindir = "../.."
-project.libdir = project.bindir
+project.name    = "juce-plugin-153"
+project.bindir  = "../.."
+project.libdir  = project.bindir
 project.configs = { "Release", "Debug" }
 
 package = newpackage()
 package.name = project.name
 package.kind = "lib"
-package.language = "c++"
+package.language  = "c++"
 package.linkflags = { "static-runtime" }
 
-package.config["Release"].target       = project.name
-package.config["Release"].objdir       = "intermediate/Release"
-package.config["Release"].defines      = { "NDEBUG=1" };
-package.config["Release"].buildflags   = { "optimize-speed" }
+package.config["Release"].target     = project.name
+package.config["Release"].objdir     = "intermediate/Release"
+package.config["Release"].defines    = { "NDEBUG=1" }
+package.config["Release"].buildflags = { "optimize-speed" }
 
-package.config["Debug"].target         = project.name .. "_debug"
-package.config["Debug"].objdir         = "intermediate/Debug"
-package.config["Debug"].defines        = { "DEBUG=1", "_DEBUG=1" };
+package.config["Debug"].target       = project.name .. "_debug"
+package.config["Debug"].objdir       = "intermediate/Debug"
+package.config["Debug"].defines      = { "DEBUG=1", "_DEBUG=1" }
 
 if (windows) then
-  package.defines = { "WINDOWS=1" };
+  package.defines = { "WINDOWS=1" }
 else
   package.config["Release"].buildoptions = { "-O2 -mtune=generic -ffast-math -fomit-frame-pointer -fvisibility=hidden -fPIC" }
   package.config["Debug"].buildoptions   = { "-O0 -ggdb -fPIC" }
   if (macosx) then
-    package.defines = { "MAC=1" };
+    package.defines = { "MAC=1" }
   else
-    package.defines = { "LINUX=1" };
+    package.defines = { "LINUX=1" }
     package.buildoptions = { "`pkg-config --cflags freetype2`" }
   end
 end
@@ -87,15 +87,28 @@ package.files = {
     "../source/src/text/*.cpp",
     "../source/src/threads/*.cpp",
     "../source/src/utilities/*.cpp"
-    )
+  )
 }
 
 if (windows) then
-  package.files = { package.files, matchfiles ("../source/src/native/windows/*.cpp") }
+  package.files = {
+    package.files,
+    matchfiles (
+      "../source/src/native/windows/*.cpp"
+    )
+  }
 elseif (macosx) then
-  package.files = { package.files, matchfiles ("../source/src/native/mac/*.cpp") }
+  package.files = {
+    package.files,
+    matchfiles (
+      "../source/src/native/mac/*.cpp"
+    )
+  }
 else
-  package.files = { package.files, matchfiles ("../source/src/native/linux/*.cpp") }
+  package.files = {
+    package.files,
+    matchfiles (
+      "../source/src/native/linux/*.cpp"
+    )
+  }
 end
-
--- Missing android -> "../source/src/native/android/*.cpp"

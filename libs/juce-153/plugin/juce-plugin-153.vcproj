@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="juce-plugin-153"
-	ProjectGUID="{434F732B-5A00-9BC0-6323-28B46CB02698}"
+	ProjectGUID="{0CF4BBAC-FBAF-CFD8-33A7-46B71301D6FB}"
 	RootNamespace="juce-plugin-153"
 	Keyword="Win32Proj"
 	>

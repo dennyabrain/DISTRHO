@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="TAL-Reverb-3"
-	ProjectGUID="{4E89C3B3-A2D6-75C5-1E1F-E759ED3D3D67}"
+	ProjectGUID="{2B290003-8FD0-C7D6-F972-BAC1D4CAE865}"
 	RootNamespace="TAL-Reverb-3"
 	Keyword="Win32Proj"
 	>
@@ -63,7 +63,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="freetype.lib pthread.lib rt.lib X11.lib Xext.lib juce-plugin-153.lib"
+				AdditionalDependencies="juce-plugin-153.lib"
 				OutputFile="$(OutDir)/TAL-Reverb-3.dll"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="../../../bin;../../../libs"
@@ -148,7 +148,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="freetype.lib pthread.lib rt.lib X11.lib Xext.lib juce-plugin-153_debug.lib"
+				AdditionalDependencies="juce-plugin-153_debug.lib"
 				OutputFile="$(OutDir)/TAL-Reverb-3_debug.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="../../../bin;../../../libs"

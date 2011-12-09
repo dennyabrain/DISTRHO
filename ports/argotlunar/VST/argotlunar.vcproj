@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="argotlunar"
-	ProjectGUID="{F2BB7D73-D6F7-C8AE-0B87-41B9D732057E}"
+	ProjectGUID="{03FB1344-078D-5FBD-BD1D-78107A6E6D4C}"
 	RootNamespace="argotlunar"
 	Keyword="Win32Proj"
 	>
@@ -63,7 +63,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="freetype.lib pthread.lib rt.lib X11.lib Xext.lib juce-plugin-153.lib"
+				AdditionalDependencies="juce-plugin-153.lib"
 				OutputFile="$(OutDir)/argotlunar.dll"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="../../../bin;../../../libs"
@@ -148,7 +148,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="freetype.lib pthread.lib rt.lib X11.lib Xext.lib juce-plugin-153_debug.lib"
+				AdditionalDependencies="juce-plugin-153_debug.lib"
 				OutputFile="$(OutDir)/argotlunar_debug.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="../../../bin;../../../libs"

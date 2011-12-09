@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="ThePilgrim"
-	ProjectGUID="{006F61C2-D81B-E13D-56B3-2EC7EA738DBD}"
+	ProjectGUID="{1B03231C-C139-F02C-B153-432E127FFD63}"
 	RootNamespace="ThePilgrim"
 	Keyword="Win32Proj"
 	>
@@ -63,15 +63,15 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="freetype.lib pthread.lib asound.lib dl.lib rt.lib X11.lib Xext.lib juce-standalone-153.lib"
+				AdditionalDependencies="juce-standalone-153.lib"
 				OutputFile="$(OutDir)/ThePilgrim.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="../../../bin;../../../libs"
 				GenerateDebugInformation="false"
-				SubSystem="1"
+				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				EntryPointSymbol="mainCRTStartup"
+
 				TargetMachine="1"
 			/>
 			<Tool
@@ -148,14 +148,14 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="freetype.lib pthread.lib asound.lib dl.lib rt.lib X11.lib Xext.lib juce-standalone-153_debug.lib"
+				AdditionalDependencies="juce-standalone-153_debug.lib"
 				OutputFile="$(OutDir)/ThePilgrim_debug.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="../../../bin;../../../libs"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/ThePilgrim_debug.pdb"
-				SubSystem="1"
-				EntryPointSymbol="mainCRTStartup"
+				SubSystem="2"
+
 				TargetMachine="1"
 			/>
 			<Tool

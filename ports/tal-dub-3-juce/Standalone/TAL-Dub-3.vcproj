@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="TAL-Dub-3"
-	ProjectGUID="{82BBCD8F-7078-FB2F-F334-7C75D8237148}"
+	ProjectGUID="{97BBAA2A-7C56-CB58-3C2A-1180DFC7BE88}"
 	RootNamespace="TAL-Dub-3"
 	Keyword="Win32Proj"
 	>
@@ -63,15 +63,15 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="freetype.lib pthread.lib asound.lib dl.lib rt.lib X11.lib Xext.lib juce-standalone-153.lib"
+				AdditionalDependencies="juce-standalone-153.lib"
 				OutputFile="$(OutDir)/TAL-Dub-3.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="../../../bin;../../../libs"
 				GenerateDebugInformation="false"
-				SubSystem="1"
+				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				EntryPointSymbol="mainCRTStartup"
+
 				TargetMachine="1"
 			/>
 			<Tool
@@ -148,14 +148,14 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="freetype.lib pthread.lib asound.lib dl.lib rt.lib X11.lib Xext.lib juce-standalone-153_debug.lib"
+				AdditionalDependencies="juce-standalone-153_debug.lib"
 				OutputFile="$(OutDir)/TAL-Dub-3_debug.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="../../../bin;../../../libs"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/TAL-Dub-3_debug.pdb"
-				SubSystem="1"
-				EntryPointSymbol="mainCRTStartup"
+				SubSystem="2"
+
 				TargetMachine="1"
 			/>
 			<Tool

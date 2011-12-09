@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="TAL-Reverb-2"
-	ProjectGUID="{0EC36D9A-981C-7D92-4B63-205358323005}"
+	ProjectGUID="{21F94C58-8078-1472-5422-6C8895F849A3}"
 	RootNamespace="TAL-Reverb-2"
 	Keyword="Win32Proj"
 	>
@@ -63,15 +63,15 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="freetype.lib pthread.lib asound.lib dl.lib rt.lib X11.lib Xext.lib juce-standalone-153.lib"
+				AdditionalDependencies="juce-standalone-153.lib"
 				OutputFile="$(OutDir)/TAL-Reverb-2.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="../../../bin;../../../libs"
 				GenerateDebugInformation="false"
-				SubSystem="1"
+				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				EntryPointSymbol="mainCRTStartup"
+
 				TargetMachine="1"
 			/>
 			<Tool
@@ -148,14 +148,14 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="freetype.lib pthread.lib asound.lib dl.lib rt.lib X11.lib Xext.lib juce-standalone-153_debug.lib"
+				AdditionalDependencies="juce-standalone-153_debug.lib"
 				OutputFile="$(OutDir)/TAL-Reverb-2_debug.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="../../../bin;../../../libs"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/TAL-Reverb-2_debug.pdb"
-				SubSystem="1"
-				EntryPointSymbol="mainCRTStartup"
+				SubSystem="2"
+
 				TargetMachine="1"
 			/>
 			<Tool

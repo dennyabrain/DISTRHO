@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bitmangler", "./bitmangler.vcproj", "{9F168B22-7BF4-0AC6-B781-A401ABBC7D71}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bitmangler", "./bitmangler.vcproj", "{09ABD275-85EE-3358-CBBE-C9222FD1D09C}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
@@ -10,10 +10,10 @@ Global
 		Debug|Win32 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{9F168B22-7BF4-0AC6-B781-A401ABBC7D71}.Release|Win32.ActiveCfg = Release|Win32
-		{9F168B22-7BF4-0AC6-B781-A401ABBC7D71}.Release|Win32.Build.0 = Release|Win32
-		{9F168B22-7BF4-0AC6-B781-A401ABBC7D71}.Debug|Win32.ActiveCfg = Debug|Win32
-		{9F168B22-7BF4-0AC6-B781-A401ABBC7D71}.Debug|Win32.Build.0 = Debug|Win32
+		{09ABD275-85EE-3358-CBBE-C9222FD1D09C}.Release|Win32.ActiveCfg = Release|Win32
+		{09ABD275-85EE-3358-CBBE-C9222FD1D09C}.Release|Win32.Build.0 = Release|Win32
+		{09ABD275-85EE-3358-CBBE-C9222FD1D09C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{09ABD275-85EE-3358-CBBE-C9222FD1D09C}.Debug|Win32.Build.0 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

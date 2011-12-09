@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ThePilgrim.lv2/The_Pilgrim", "./ThePilgrim.lv2/The_Pilgrim.vcproj", "{470D2E59-8F4C-34F0-D576-9B35F7C40718}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ThePilgrim.lv2/The_Pilgrim", "./ThePilgrim.lv2/The_Pilgrim.vcproj", "{2D467180-EFCD-02B5-2FCC-7BD116741E1C}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
@@ -10,10 +10,10 @@ Global
 		Debug|Win32 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{470D2E59-8F4C-34F0-D576-9B35F7C40718}.Release|Win32.ActiveCfg = Release|Win32
-		{470D2E59-8F4C-34F0-D576-9B35F7C40718}.Release|Win32.Build.0 = Release|Win32
-		{470D2E59-8F4C-34F0-D576-9B35F7C40718}.Debug|Win32.ActiveCfg = Debug|Win32
-		{470D2E59-8F4C-34F0-D576-9B35F7C40718}.Debug|Win32.Build.0 = Debug|Win32
+		{2D467180-EFCD-02B5-2FCC-7BD116741E1C}.Release|Win32.ActiveCfg = Release|Win32
+		{2D467180-EFCD-02B5-2FCC-7BD116741E1C}.Release|Win32.Build.0 = Release|Win32
+		{2D467180-EFCD-02B5-2FCC-7BD116741E1C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{2D467180-EFCD-02B5-2FCC-7BD116741E1C}.Debug|Win32.Build.0 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

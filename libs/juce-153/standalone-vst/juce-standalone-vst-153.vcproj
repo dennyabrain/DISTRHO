@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="juce-standalone-vst-153"
-	ProjectGUID="{D4ADB87D-563A-AD6D-5FD8-4ABC31DB4965}"
+	ProjectGUID="{0B6BB53C-BF2E-E4FE-51BE-04B7135F1604}"
 	RootNamespace="juce-standalone-vst-153"
 	Keyword="Win32Proj"
 	>
@@ -1252,6 +1252,14 @@
 						</File>
 						<File
 							RelativePath="..\source\src\native\windows\juce_win32_PlatformUtils.cpp">
+						</File>
+					</Filter>
+					<Filter
+						Name="linux"
+						Filter=""
+						>
+						<File
+							RelativePath="..\source\src\native\linux\juce_linux_JackAudio.cpp">
 						</File>
 					</Filter>
 				</Filter>

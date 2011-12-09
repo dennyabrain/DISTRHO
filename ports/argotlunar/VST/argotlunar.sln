@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "argotlunar", "./argotlunar.vcproj", "{F2BB7D73-D6F7-C8AE-0B87-41B9D732057E}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "argotlunar", "./argotlunar.vcproj", "{03FB1344-078D-5FBD-BD1D-78107A6E6D4C}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
@@ -10,10 +10,10 @@ Global
 		Debug|Win32 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{F2BB7D73-D6F7-C8AE-0B87-41B9D732057E}.Release|Win32.ActiveCfg = Release|Win32
-		{F2BB7D73-D6F7-C8AE-0B87-41B9D732057E}.Release|Win32.Build.0 = Release|Win32
-		{F2BB7D73-D6F7-C8AE-0B87-41B9D732057E}.Debug|Win32.ActiveCfg = Debug|Win32
-		{F2BB7D73-D6F7-C8AE-0B87-41B9D732057E}.Debug|Win32.Build.0 = Debug|Win32
+		{03FB1344-078D-5FBD-BD1D-78107A6E6D4C}.Release|Win32.ActiveCfg = Release|Win32
+		{03FB1344-078D-5FBD-BD1D-78107A6E6D4C}.Release|Win32.Build.0 = Release|Win32
+		{03FB1344-078D-5FBD-BD1D-78107A6E6D4C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{03FB1344-078D-5FBD-BD1D-78107A6E6D4C}.Debug|Win32.Build.0 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

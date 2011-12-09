@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TAL-NoiseMaker", "./TAL-NoiseMaker.vcproj", "{3DE5F59D-E24B-2524-9F6A-8C9E736598BE}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TAL-NoiseMaker", "./TAL-NoiseMaker.vcproj", "{2C78AC4D-948E-F907-3C7D-91E7ADA1D15C}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
@@ -10,10 +10,10 @@ Global
 		Debug|Win32 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{3DE5F59D-E24B-2524-9F6A-8C9E736598BE}.Release|Win32.ActiveCfg = Release|Win32
-		{3DE5F59D-E24B-2524-9F6A-8C9E736598BE}.Release|Win32.Build.0 = Release|Win32
-		{3DE5F59D-E24B-2524-9F6A-8C9E736598BE}.Debug|Win32.ActiveCfg = Debug|Win32
-		{3DE5F59D-E24B-2524-9F6A-8C9E736598BE}.Debug|Win32.Build.0 = Debug|Win32
+		{2C78AC4D-948E-F907-3C7D-91E7ADA1D15C}.Release|Win32.ActiveCfg = Release|Win32
+		{2C78AC4D-948E-F907-3C7D-91E7ADA1D15C}.Release|Win32.Build.0 = Release|Win32
+		{2C78AC4D-948E-F907-3C7D-91E7ADA1D15C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{2C78AC4D-948E-F907-3C7D-91E7ADA1D15C}.Debug|Win32.Build.0 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

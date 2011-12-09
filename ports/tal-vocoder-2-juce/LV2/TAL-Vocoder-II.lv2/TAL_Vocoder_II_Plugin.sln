@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TAL-Vocoder-II.lv2/TAL_Vocoder_II_Plugin", "./TAL-Vocoder-II.lv2/TAL_Vocoder_II_Plugin.vcproj", "{3CE7D103-0AE5-FC47-0B94-ABF890C43D3D}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TAL-Vocoder-II.lv2/TAL_Vocoder_II_Plugin", "./TAL-Vocoder-II.lv2/TAL_Vocoder_II_Plugin.vcproj", "{7D6C9593-C976-55FD-57C1-99F549B50972}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
@@ -10,10 +10,10 @@ Global
 		Debug|Win32 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{3CE7D103-0AE5-FC47-0B94-ABF890C43D3D}.Release|Win32.ActiveCfg = Release|Win32
-		{3CE7D103-0AE5-FC47-0B94-ABF890C43D3D}.Release|Win32.Build.0 = Release|Win32
-		{3CE7D103-0AE5-FC47-0B94-ABF890C43D3D}.Debug|Win32.ActiveCfg = Debug|Win32
-		{3CE7D103-0AE5-FC47-0B94-ABF890C43D3D}.Debug|Win32.Build.0 = Debug|Win32
+		{7D6C9593-C976-55FD-57C1-99F549B50972}.Release|Win32.ActiveCfg = Release|Win32
+		{7D6C9593-C976-55FD-57C1-99F549B50972}.Release|Win32.Build.0 = Release|Win32
+		{7D6C9593-C976-55FD-57C1-99F549B50972}.Debug|Win32.ActiveCfg = Debug|Win32
+		{7D6C9593-C976-55FD-57C1-99F549B50972}.Debug|Win32.Build.0 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

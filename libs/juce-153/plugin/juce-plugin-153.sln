@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "juce-plugin-153", "./juce-plugin-153.vcproj", "{434F732B-5A00-9BC0-6323-28B46CB02698}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "juce-plugin-153", "./juce-plugin-153.vcproj", "{0CF4BBAC-FBAF-CFD8-33A7-46B71301D6FB}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
@@ -10,10 +10,10 @@ Global
 		Debug|Win32 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{434F732B-5A00-9BC0-6323-28B46CB02698}.Release|Win32.ActiveCfg = Release|Win32
-		{434F732B-5A00-9BC0-6323-28B46CB02698}.Release|Win32.Build.0 = Release|Win32
-		{434F732B-5A00-9BC0-6323-28B46CB02698}.Debug|Win32.ActiveCfg = Debug|Win32
-		{434F732B-5A00-9BC0-6323-28B46CB02698}.Debug|Win32.Build.0 = Debug|Win32
+		{0CF4BBAC-FBAF-CFD8-33A7-46B71301D6FB}.Release|Win32.ActiveCfg = Release|Win32
+		{0CF4BBAC-FBAF-CFD8-33A7-46B71301D6FB}.Release|Win32.Build.0 = Release|Win32
+		{0CF4BBAC-FBAF-CFD8-33A7-46B71301D6FB}.Debug|Win32.ActiveCfg = Debug|Win32
+		{0CF4BBAC-FBAF-CFD8-33A7-46B71301D6FB}.Debug|Win32.Build.0 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

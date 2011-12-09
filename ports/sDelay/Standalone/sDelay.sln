@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sDelay", "./sDelay.vcproj", "{CC8C2198-16E4-4F22-6B7D-B5D92F4B7967}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sDelay", "./sDelay.vcproj", "{C68C6779-B636-88F8-285B-196E9B213838}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
@@ -10,10 +10,10 @@ Global
 		Debug|Win32 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{CC8C2198-16E4-4F22-6B7D-B5D92F4B7967}.Release|Win32.ActiveCfg = Release|Win32
-		{CC8C2198-16E4-4F22-6B7D-B5D92F4B7967}.Release|Win32.Build.0 = Release|Win32
-		{CC8C2198-16E4-4F22-6B7D-B5D92F4B7967}.Debug|Win32.ActiveCfg = Debug|Win32
-		{CC8C2198-16E4-4F22-6B7D-B5D92F4B7967}.Debug|Win32.Build.0 = Debug|Win32
+		{C68C6779-B636-88F8-285B-196E9B213838}.Release|Win32.ActiveCfg = Release|Win32
+		{C68C6779-B636-88F8-285B-196E9B213838}.Release|Win32.Build.0 = Release|Win32
+		{C68C6779-B636-88F8-285B-196E9B213838}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C68C6779-B636-88F8-285B-196E9B213838}.Debug|Win32.Build.0 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
