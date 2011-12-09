@@ -31,7 +31,7 @@ extern "C" {
    Programs Extension Data.
 
    When the plugin's extension_data is called with argument LV2_PROGRAMS_EXTENSION_DATA_URI,
-   the plugin MUST return an LV2_Programs_Feature structure, which remains valid for the
+   the plugin MUST return an LV2_Programs_ExtensionData structure, which remains valid for the
    lifetime of the plugin.
 */
 typedef struct {
