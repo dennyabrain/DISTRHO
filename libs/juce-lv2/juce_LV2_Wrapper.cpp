@@ -135,8 +135,12 @@ String makePluginTtl(const String& uri, const String& binary)
 
     plugin += "<" + uri + ">\n";
     plugin += "    a " + getPluginType() + " ;\n";
+#if JucePlugin_WantsLV2Chunks
     plugin += "    lv2:extensionData <http://lv2plug.in/ns/ext/state#Interface> ;\n";
+#endif
+#if JucePlugin_WantsLV2Programs
     plugin += "    lv2:extensionData <http://kxstudio.sourceforge.net/ns/lv2_programs#extensionData> ;\n";
+#endif
 
     if (filter->hasEditor())
     {
@@ -220,8 +224,7 @@ String makePluginTtl(const String& uri, const String& binary)
         else
             plugin += "    [\n";
 
-        plugin += "      a lv2:InputPort ;\n";
-        plugin += "      a lv2:ControlPort ;\n";
+        plugin += "      a lv2:InputPort, lv2:ControlPort ;\n";
         plugin += "      lv2:index " + String(portIndex++) + " ;\n";
         plugin += "      lv2:symbol \"" + nameToSymbol(filter->getParameterName(i), i) + "\" ;\n";
         plugin += "      lv2:name \"" + filter->getParameterName(i) + "\" ;\n";
@@ -573,8 +576,10 @@ public:
 
     void audioProcessorChanged (AudioProcessor*)
     {
+#ifdef JucePlugin_WantsLV2Programs
         // reload_programs();
         // set_program(filter->getCurrentProgram());
+#endif
     }
 
     //==============================================================================
@@ -1236,12 +1241,18 @@ int juceLV2SetProgram(LV2_Handle instance, unsigned int program)
 
 const void* juceLV2ExtensionData(const char* uri)
 {
+#ifdef JucePlugin_WantsLV2Chunks
     static const LV2_State_Interface state = { juceLV2Save, juceLV2Restore };
-    static const LV2_Programs_Feature programs = { juceLV2GetProgramCount, juceLV2GetProgramName, juceLV2SetProgram };
     if (strcmp(uri, LV2_STATE_INTERFACE_URI) == 0)
         return &state;
-    else if (strcmp(uri, LV2_PROGRAMS_EXTENSION_DATA_URI) == 0)
+#endif
+
+#ifdef JucePlugin_WantsLV2Programs
+    static const LV2_Programs_Feature programs = { juceLV2GetProgramCount, juceLV2GetProgramName, juceLV2SetProgram };
+    if (strcmp(uri, LV2_PROGRAMS_EXTENSION_DATA_URI) == 0)
         return &programs;
+#endif
+
     return nullptr;
 }
 
@@ -1313,6 +1324,10 @@ public:
         cleanup        = juceLV2Cleanup;
         extension_data = juceLV2ExtensionData;
     }
+    ~NewLv2Plugin()
+    {
+        free(URI);
+    }
 };
 
 class NewLv2UI_X11 : public LV2UI_Descriptor
@@ -1325,6 +1340,10 @@ public:
         cleanup        = juceLV2UICleanup;
         port_event     = juceLV2UIPortEvent;
         extension_data = juceLV2ExtensionData;
+    }
+    ~NewLv2UI_X11()
+    {
+        free(URI);
     }
 };
 
@@ -1339,6 +1358,10 @@ public:
         port_event     = juceLV2UIPortEvent;
         extension_data = juceLV2ExtensionData;
     }
+    ~NewLv2UI_external()
+    {
+        free(URI);
+    }
 };
 
 class NewLv2UI_externalOld : public LV2UI_Descriptor
@@ -1351,6 +1374,10 @@ public:
         cleanup        = juceLV2UICleanup;
         port_event     = juceLV2UIPortEvent;
         extension_data = juceLV2ExtensionData;
+    }
+    ~NewLv2UI_externalOld()
+    {
+        free(URI);
     }
 };
 
