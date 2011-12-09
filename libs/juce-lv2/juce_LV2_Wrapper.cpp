@@ -1326,7 +1326,7 @@ public:
     }
     ~NewLv2Plugin()
     {
-        free(URI);
+        free((void*)URI);
     }
 };
 
@@ -1343,7 +1343,7 @@ public:
     }
     ~NewLv2UI_X11()
     {
-        free(URI);
+        free((void*)URI);
     }
 };
 
@@ -1360,7 +1360,7 @@ public:
     }
     ~NewLv2UI_external()
     {
-        free(URI);
+        free((void*)URI);
     }
 };
 
@@ -1377,7 +1377,7 @@ public:
     }
     ~NewLv2UI_externalOld()
     {
-        free(URI);
+        free((void*)URI);
     }
 };
 
