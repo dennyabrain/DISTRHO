@@ -17,8 +17,11 @@
 #include "lv2/lv2plug.in/ns/lv2core/lv2.h"
 
 /** LV2 extension ... */
-#define LV2_PROGRAMS_URI                        "http://kxstudio.sourceforge.net/ns/lv2_programs"
-#define LV2_PROGRAMS_EXTENSION_DATA_URI         "http://kxstudio.sourceforge.net/ns/lv2_programs#extensionData"
+#define LV2_PROGRAMS_URI                    "http://kxstudio.sourceforge.net/ns/lv2_programs"
+#define LV2_PROGRAMS_FEATURE_URI            "http://kxstudio.sourceforge.net/ns/lv2_programs#feature"
+#define LV2_PROGRAMS_EXTENSION_DATA_URI     "http://kxstudio.sourceforge.net/ns/lv2_programs#extensionData"
+
+typedef void* LV2_Programs_Feature_Data;
 
 #ifdef __cplusplus
 extern "C" {
@@ -46,6 +49,31 @@ typedef struct {
    * TODO
    */
   int (*set_program)(LV2_Handle instance, unsigned int program);
+} LV2_Programs_ExtensionData;
+
+/**
+   Programs Feature.
+
+   TODO
+*/
+typedef struct {
+
+  LV2_Programs_Feature_Data data;
+
+  /**
+   * TODO
+   */
+  void (*programs_changed)(LV2_Programs_Feature_Data data);
+
+  /**
+   * TODO
+   */
+  void (*program_name_changed)(LV2_Programs_Feature_Data data, unsigned int program, const char* new_program_name);
+
+  /**
+   * TODO
+   */
+  void (*current_program_changed)(LV2_Programs_Feature_Data data, unsigned int program);
 } LV2_Programs_Feature;
 
 #ifdef __cplusplus

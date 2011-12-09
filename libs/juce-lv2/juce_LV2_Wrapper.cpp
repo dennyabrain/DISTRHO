@@ -459,11 +459,23 @@ public:
             externalUI(nullptr),
             externalUIHost(nullptr),
             uiResizeFeature(nullptr),
+            programsFeature(nullptr),
             uiDescriptor(uiDescriptor_),
             writeFunction(writeFunction_),
             controller(controller_),
             uiType(uiType_)
     {
+#ifdef JucePlugin_WantsLV2Programs
+        for (uint16 j = 0; features[j]; j++)
+        {
+            if (strcmp(features[j]->URI, LV2_PROGRAMS_FEATURE_URI) == 0 && features[j]->data)
+            {
+                programsFeature = (LV2_Programs_Feature*)features[j]->data;
+                break;
+            }
+        }
+#endif
+
         filter->addListener(this);
 
         if (filter->hasEditor())
@@ -577,8 +589,11 @@ public:
     void audioProcessorChanged (AudioProcessor*)
     {
 #ifdef JucePlugin_WantsLV2Programs
-        // reload_programs();
-        // set_program(filter->getCurrentProgram());
+        if (programsFeature && programsFeature->programs_changed && programsFeature->current_program_changed)
+        {
+            programsFeature->programs_changed(programsFeature->data);
+            programsFeature->current_program_changed(programsFeature->data, filter->getCurrentProgram());
+        }
 #endif
     }
 
@@ -617,6 +632,7 @@ private:
     JuceLv2ExternalUI* externalUI;
     lv2_external_ui_host* externalUIHost;
     LV2_UI_Resize_Feature* uiResizeFeature;
+    LV2_Programs_Feature* programsFeature;
 
     const LV2UI_Descriptor* uiDescriptor;
     LV2UI_Write_Function writeFunction;
@@ -1248,7 +1264,7 @@ const void* juceLV2ExtensionData(const char* uri)
 #endif
 
 #ifdef JucePlugin_WantsLV2Programs
-    static const LV2_Programs_Feature programs = { juceLV2GetProgramCount, juceLV2GetProgramName, juceLV2SetProgram };
+    static const LV2_Programs_ExtensionData programs = { juceLV2GetProgramCount, juceLV2GetProgramName, juceLV2SetProgram };
     if (strcmp(uri, LV2_PROGRAMS_EXTENSION_DATA_URI) == 0)
         return &programs;
 #endif
