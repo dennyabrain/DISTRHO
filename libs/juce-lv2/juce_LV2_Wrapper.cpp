@@ -6,6 +6,9 @@
 
 #if JucePlugin_Build_LV2
 
+#include <X11/Xlib.h>
+#undef KeyPress
+
 #include <fstream>
 #include <iostream>
 #include <stdint.h>
@@ -270,6 +273,10 @@ BEGIN_JUCE_NAMESPACE
  #if JUCE_MAC
   extern void initialiseMac();
  #endif
+
+ #if JUCE_LINUX
+  extern Display* display;
+ #endif
 END_JUCE_NAMESPACE
 
 //==============================================================================
@@ -489,17 +496,34 @@ public:
             {
             case LV2_UI_X11:
                 editor->setOpaque (true);
+                editor->setVisible (false);
                 editor->addToDesktop (0);
-                *widget = editor->getWindowHandle();
+
+                *widget = nullptr;
+
                 for (uint16 j = 0; features[j]; j++)
                 {
                     if (strcmp(features[j]->URI, LV2_UI_RESIZE_URI "#UIResize") == 0 && features[j]->data)
                     {
                         uiResizeFeature = (LV2_UI_Resize_Feature*)features[j]->data;
-                        uiResizeFeature->ui_resize(uiResizeFeature->data, editor->getWidth(), editor->getHeight());
-                        break;
+                    }
+                    else if (strcmp(features[j]->URI, "http://example.org/winid") == 0 && features[j]->data)
+                    {
+                        *widget = features[j]->data;
+
+                        Window hostWindow = (Window) features[j]->data;
+                        Window editorWnd  = (Window) editor->getWindowHandle();
+                        XReparentWindow (display, editorWnd, hostWindow, 0, 0);
+                        editor->setVisible (true);
+
+                        std::cout << "Plugin UI reparented to " << features[j]->data << std::endl;
                     }
                 }
+
+                // Call resize after reparenting
+                if (uiResizeFeature)
+                  uiResizeFeature->ui_resize(uiResizeFeature->data, editor->getWidth(), editor->getHeight());
+
                 break;
 
             case LV2_UI_EXTERNAL:
