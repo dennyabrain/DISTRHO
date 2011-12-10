@@ -126,13 +126,21 @@ String makePluginTtl(const String& uri, const String& binary)
     {
         plugin += "<" + getX11UIURI() + ">\n";
         plugin += "    a lv2ui:X11UI ;\n";
-        plugin += "    lv2ui:binary <" + binary + ".so> .\n";
+        plugin += "    lv2ui:binary <" + binary + ".so> ;\n";
+        plugin += "    lv2ui:requiredFeature <http://lv2plug.in/ns/ext/instance-access> ;\n";
+        plugin += "    lv2ui:optionalFeature lv2ui:noUserResize .\n";
+        plugin += "\n";
         plugin += "<" + getExternalUIURI(true) + ">\n";
         plugin += "    a <http://nedko.arnaudov.name/lv2/external_ui/> ;\n";
-        plugin += "    lv2ui:binary <" + binary + ".so> .\n";
+        plugin += "    lv2ui:binary <" + binary + ".so> ;\n";
+        plugin += "    lv2ui:requiredFeature <http://lv2plug.in/ns/ext/instance-access> ;\n";
+        plugin += "    lv2ui:optionalFeature lv2ui:noUserResize .\n";
+        plugin += "\n";
         plugin += "<" + getExternalUIURI(false) + ">\n";
         plugin += "    a lv2ui:external ;\n";
-        plugin += "    lv2ui:binary <" + binary + ".so> .\n";
+        plugin += "    lv2ui:binary <" + binary + ".so> ;\n";
+        plugin += "    lv2ui:requiredFeature <http://lv2plug.in/ns/ext/instance-access> ;\n";
+        plugin += "    lv2ui:optionalFeature lv2ui:noUserResize .\n";
         plugin += "\n";
     }
 
