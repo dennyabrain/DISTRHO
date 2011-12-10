@@ -14,7 +14,7 @@
 #ifndef LV2_PROGRAMS_H
 #define LV2_PROGRAMS_H
 
-#include "lv2/lv2plug.in/ns/lv2core/lv2.h"
+#include "lv2.h"
 
 /** LV2 extension ... */
 #define LV2_PROGRAMS_URI                    "http://kxstudio.sourceforge.net/ns/lv2_programs"
