@@ -80,7 +80,7 @@ void StandaloneFilterApplication::initialise (const String& commandLine)
 
     // create the window
     window = new StandaloneFilterWindow (pluginWindowName,
-                                          Colour (32, 32, 32));
+                                          Colour (32, 32, 32), commandLine);
 
     window->toFront (true);
     window->setVisible (true);

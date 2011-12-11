@@ -36,7 +36,8 @@ extern AudioProcessor* JUCE_CALLTYPE createPluginFilter();
 
 //==============================================================================
 StandaloneFilterWindow::StandaloneFilterWindow (const String& title,
-                                                const Colour& backgroundColour)
+                                                const Colour& backgroundColour,
+                                                const String& commandLine)
     : DocumentWindow (title, backgroundColour,
                       DocumentWindow::minimiseButton
                        | DocumentWindow::closeButton, false),
@@ -92,7 +93,28 @@ StandaloneFilterWindow::StandaloneFilterWindow (const String& title,
                                savedState,
                                true);
 
-    if (globalSettings != nullptr)
+    if (commandLine.isNotEmpty())
+    {
+        File saveFile(commandLine);
+
+        if (saveFile.existsAsFile())
+        {
+            saveFileName = commandLine;
+            MemoryBlock data;
+
+            if (saveFile.loadFileAsData (data))
+            {
+                filter->setStateInformation (data.getData(), data.getSize());
+            }
+            else
+            {
+                AlertWindow::showMessageBox (AlertWindow::WarningIcon,
+                                            TRANS("Error whilst loading"),
+                                            TRANS("Couldn't read from the specified file!"));
+            }
+        }
+    }
+    else if (globalSettings != nullptr)
     {
         MemoryBlock data;
 
@@ -166,11 +188,12 @@ const PopupMenu StandaloneFilterWindow::getMenuForIndex (int topLevelMenuIndex, 
     if (topLevelMenuIndex == 0)
     {
         menu.addItem (1, TRANS("Load a saved state..."));
-        menu.addItem (2, TRANS("Save current state..."));
+        menu.addItem (2, TRANS("Save current state"));
+        menu.addItem (3, TRANS("Save current state as..."));
         menu.addSeparator();
-        menu.addItem (3, TRANS("Reset to default state"));
+        menu.addItem (4, TRANS("Reset to default state"));
         menu.addSeparator();
-        menu.addItem (4, TRANS("Quit"));
+        menu.addItem (5, TRANS("Quit"));
     }
     else if (topLevelMenuIndex == 1)
     {
@@ -185,35 +208,38 @@ const PopupMenu StandaloneFilterWindow::getMenuForIndex (int topLevelMenuIndex, 
     else if (topLevelMenuIndex == 2)
     {
         // "Plugins" menu
-        menu.addItem (5, TRANS("Audio Settings..."));
+        menu.addItem (6, TRANS("Audio Settings..."));
         menu.addSeparator();
         if (isUsingNativeTitleBar())
-            menu.addItem (6, "Use JUCE Titlebar");
+            menu.addItem (7, "Use JUCE Titlebar");
         else
-            menu.addItem (6, "Use Native Titlebar");
+            menu.addItem (7, "Use Native Titlebar");
     }
     return menu;
 }
 
 void StandaloneFilterWindow::menuItemSelected (int menuItemID, int /*topLevelMenuIndex*/)
 {
-    if (menuItemID== 1)
+    if (menuItemID == 1)
       loadState();
-    else if (menuItemID== 2)
+    else if (menuItemID == 2)
       saveState();
-    else if (menuItemID== 3)
+    else if (menuItemID == 3)
+      saveStateAs();
+    else if (menuItemID == 4)
       resetFilter();
-    else if (menuItemID== 4)
+    else if (menuItemID == 5)
       JUCEApplication::quit();
-    else if (menuItemID== 5)
+    else if (menuItemID == 6)
       showAudioSettingsDialog();
-    else if (menuItemID== 6) {
+    else if (menuItemID == 7)
+    {
       nativeTitleBarCheck = true;
       getGlobalSettings()->setValue("nativeTitleBar", !isUsingNativeTitleBar());
       AlertWindow::showMessageBoxAsync(AlertWindow::InfoIcon, "Need restart", "You need to restart this plugin to apply the changes", TRANS("Ok"), this);
-    } else if (menuItemID > 10) {
-      filter->setCurrentProgram(menuItemID-11);
     }
+    else if (menuItemID >= 11)
+      filter->setCurrentProgram(menuItemID-11);
 }
 
 //==============================================================================
@@ -252,6 +278,24 @@ void StandaloneFilterWindow::resetFilter()
 
 //==============================================================================
 void StandaloneFilterWindow::saveState()
+{
+    std::cout << "saveState" << std::endl;
+
+    if (saveFileName.isNotEmpty())
+    {
+        MemoryBlock data;
+        filter->getStateInformation (data);
+
+        //if (! fc.getResult().replaceWithData (data.getData(), data.getSize()))
+        //{
+        //    AlertWindow::showMessageBox (AlertWindow::WarningIcon,
+        //                                 TRANS("Error whilst saving"),
+        //                                 TRANS("Couldn't write to the specified file!"));
+        //}
+    }
+}
+
+void StandaloneFilterWindow::saveStateAs()
 {
     PropertySet* const globalSettings = getGlobalSettings();
 

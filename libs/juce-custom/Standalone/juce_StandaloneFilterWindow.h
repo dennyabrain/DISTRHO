@@ -43,7 +43,8 @@ class StandaloneFilterWindow    : public DocumentWindow,
 public:
     //==============================================================================
     StandaloneFilterWindow (const String& title,
-                            const Colour& backgroundColour);
+                            const Colour& backgroundColour,
+                            const String& commandLine);
 
     ~StandaloneFilterWindow();
 
@@ -56,8 +57,11 @@ public:
     /** Deletes and re-creates the filter and its UI. */
     void resetFilter();
 
-    /** Pops up a dialog letting the user save the filter's state to a file. */
+    /** Save state replacing old file. */
     void saveState();
+
+    /** Pops up a dialog letting the user save the filter's state to a file. */
+    void saveStateAs();
 
     /** Pops up a dialog letting the user re-load the filter's state from a file. */
     void loadState();
@@ -83,6 +87,7 @@ private:
     AudioProcessorPlayer player;
     bool nativeTitleBarCheck;
     //Image windowIcon;
+    String saveFileName;
 
     void deleteFilter();
 
