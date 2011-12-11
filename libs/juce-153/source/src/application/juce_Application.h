@@ -196,6 +196,8 @@ public:
     */
     virtual void systemRequestedQuit();
 
+    virtual void ladishSaveRequested();
+
     /** If any unhandled exceptions make it through to the message dispatch loop, this
         callback will be triggered, in case you want to log them or do some other
         type of error-handling.

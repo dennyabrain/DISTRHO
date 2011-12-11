@@ -300,6 +300,15 @@ namespace LinuxErrorHandling
             keyboardBreakOccurred = true;
     }
 
+    static void ladishSignalHandler (int sig)
+    {
+        if (sig == SIGUSR1)
+        {
+            if (JUCEApplication::isStandaloneApp())
+                JUCEApplication::getInstance()->ladishSaveRequested();
+        }
+    }
+
     static void installKeyboardBreakHandler()
     {
         struct sigaction saction;
@@ -309,6 +318,14 @@ namespace LinuxErrorHandling
         saction.sa_mask = maskSet;
         saction.sa_flags = 0;
         sigaction (SIGINT, &saction, 0);
+
+        struct sigaction slaction;
+        sigset_t maskSetL;
+        sigemptyset (&maskSetL);
+        slaction.sa_handler = ladishSignalHandler;
+        slaction.sa_mask = maskSetL;
+        slaction.sa_flags = 0;
+        sigaction (SIGUSR1, &slaction, 0);
     }
 }
 

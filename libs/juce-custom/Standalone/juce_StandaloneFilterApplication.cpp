@@ -23,6 +23,7 @@ public:
 
     //==============================================================================
     void systemRequestedQuit();
+    void ladishSaveRequested();
     void unhandledException (const std::exception* e,
                              const String& sourceFilename,
                              const int lineNumber);
@@ -108,6 +109,11 @@ void StandaloneFilterApplication::systemRequestedQuit()
     DBG ("StandaloneFilterApplication::systemRequestedQuit");
 
     quit ();
+}
+
+void StandaloneFilterApplication::ladishSaveRequested()
+{
+    window->saveState();
 }
 
 void StandaloneFilterApplication::unhandledException (const std::exception* e,

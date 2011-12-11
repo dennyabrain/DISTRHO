@@ -93,6 +93,10 @@ void JUCEApplication::systemRequestedQuit()
     quit();
 }
 
+void JUCEApplication::ladishSaveRequested()
+{
+}
+
 void JUCEApplication::quit()
 {
     MessageManager::getInstance()->stopDispatchLoop();
