@@ -274,24 +274,35 @@ void StandaloneFilterWindow::resetFilter()
 
     if (globalSettings != nullptr)
         globalSettings->removeValue ("filterState");
+
+    //saveFileName = String::empty;
 }
 
 //==============================================================================
 void StandaloneFilterWindow::saveState()
 {
-    std::cout << "saveState" << std::endl;
-
     if (saveFileName.isNotEmpty())
     {
-        MemoryBlock data;
-        filter->getStateInformation (data);
+        File saveFile(saveFileName);
 
-        //if (! fc.getResult().replaceWithData (data.getData(), data.getSize()))
-        //{
-        //    AlertWindow::showMessageBox (AlertWindow::WarningIcon,
-        //                                 TRANS("Error whilst saving"),
-        //                                 TRANS("Couldn't write to the specified file!"));
-        //}
+        if (saveFile.existsAsFile())
+        {
+            MemoryBlock data;
+            filter->getStateInformation (data);
+
+            if (! saveFile.replaceWithData (data.getData(), data.getSize()))
+            {
+                AlertWindow::showMessageBox (AlertWindow::WarningIcon,
+                                            TRANS("Error whilst saving"),
+                                            TRANS("Couldn't write to the current save file!"));
+            }
+        }
+    }
+    else
+    {
+        AlertWindow::showMessageBox (AlertWindow::WarningIcon,
+                                    TRANS("Error whilst saving"),
+                                    TRANS("Please load or save-as a file first"));
     }
 }
 
@@ -305,6 +316,8 @@ void StandaloneFilterWindow::saveStateAs()
 
     if (fc.browseForFileToSave (true))
     {
+        saveFileName = fc.getResult().getFileName();
+
         MemoryBlock data;
         filter->getStateInformation (data);
 
@@ -327,6 +340,8 @@ void StandaloneFilterWindow::loadState()
 
     if (fc.browseForFileToOpen())
     {
+        saveFileName = fc.getResult().getFileName();
+
         MemoryBlock data;
 
         if (fc.getResult().loadFileAsData (data))
