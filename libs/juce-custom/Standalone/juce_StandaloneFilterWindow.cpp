@@ -300,9 +300,7 @@ void StandaloneFilterWindow::saveState()
     }
     else
     {
-        AlertWindow::showMessageBox (AlertWindow::WarningIcon,
-                                    TRANS("Error whilst saving"),
-                                    TRANS("Please load or save-as a file first"));
+        saveStateAs();
     }
 }
 
