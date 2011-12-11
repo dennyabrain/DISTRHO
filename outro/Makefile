@@ -55,6 +55,7 @@ vst: libs_plugin libs_plugin_vst
 	$(MAKE) -C hybridreverb2/VST
 	$(MAKE) -C juce-demo-plugin/VST
 # 	$(MAKE) -C mr-alias2/VST
+	$(MAKE) -C pizmidi/VST
 	$(MAKE) -C sDelay/VST
 	$(MAKE) -C sorollet/VST
 	$(MAKE) -C wolpertinger/VST
@@ -87,6 +88,7 @@ clean:
 	$(MAKE) clean -C hybridreverb2/VST
 	$(MAKE) clean -C juce-demo-plugin/VST
 # 	$(MAKE) clean -C mr-alias2/VST
+	$(MAKE) clean -C pizmidi/VST
 	$(MAKE) clean -C sDelay/VST
 	$(MAKE) clean -C sorollet/VST
 	$(MAKE) clean -C wolpertinger/VST
@@ -94,3 +96,4 @@ clean:
 	rm -rf */Standalone/intermediate
 	rm -rf */LV2/intermediate
 	rm -rf */VST/intermediate
+	rm -rf */VST/*/intermediate
