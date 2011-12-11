@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="TheFunction.lv2/The_Function"
-	ProjectGUID="{F7EBAB34-F39E-C1B7-1FCA-A9F12572B40F}"
+	ProjectGUID="{49776FE5-CBC3-C540-EB54-859C890E0A6F}"
 	RootNamespace="TheFunction.lv2/The_Function"
 	Keyword="Win32Proj"
 	>
@@ -149,13 +149,13 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="juce-plugin-153_debug.lib"
-				OutputFile="$(OutDir)/The_Function_debug.dll"
+				OutputFile="$(OutDir)/The_Function.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="../../../bin;../../../libs"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(OutDir)/The_Function_debug.pdb"
+				ProgramDatabaseFile="$(OutDir)/The_Function.pdb"
 				SubSystem="2"
-				ImportLibrary="../../../bin/TheFunction.lv2/The_Function_debug.lib"
+				ImportLibrary="../../../bin/TheFunction.lv2/The_Function.lib"
 				TargetMachine="1"
 			/>
 			<Tool

@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="juce_pitcher.lv2/Juce_Pitcher"
-	ProjectGUID="{51BBC243-4519-0AFF-2316-46693FF507DB}"
+	ProjectGUID="{D3648866-0FFA-066F-B5C1-E693D3D6DFE7}"
 	RootNamespace="juce_pitcher.lv2/Juce_Pitcher"
 	Keyword="Win32Proj"
 	>
@@ -149,13 +149,13 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="juce-plugin-153_debug.lib"
-				OutputFile="$(OutDir)/Juce_Pitcher_debug.dll"
+				OutputFile="$(OutDir)/Juce_Pitcher.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="../../../bin;../../../libs"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(OutDir)/Juce_Pitcher_debug.pdb"
+				ProgramDatabaseFile="$(OutDir)/Juce_Pitcher.pdb"
 				SubSystem="2"
-				ImportLibrary="../../../bin/juce_pitcher.lv2/Juce_Pitcher_debug.lib"
+				ImportLibrary="../../../bin/juce_pitcher.lv2/Juce_Pitcher.lib"
 				TargetMachine="1"
 			/>
 			<Tool

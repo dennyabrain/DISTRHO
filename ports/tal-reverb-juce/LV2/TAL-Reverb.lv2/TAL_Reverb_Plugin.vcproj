@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="TAL-Reverb.lv2/TAL_Reverb_Plugin"
-	ProjectGUID="{07244570-96D1-611F-F2B1-C9DA5CC3A89D}"
+	ProjectGUID="{50FB3E07-B318-1686-8F60-6BCB66E868B9}"
 	RootNamespace="TAL-Reverb.lv2/TAL_Reverb_Plugin"
 	Keyword="Win32Proj"
 	>
@@ -149,13 +149,13 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="juce-plugin-153_debug.lib"
-				OutputFile="$(OutDir)/TAL_Reverb_Plugin_debug.dll"
+				OutputFile="$(OutDir)/TAL_Reverb_Plugin.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="../../../bin;../../../libs"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(OutDir)/TAL_Reverb_Plugin_debug.pdb"
+				ProgramDatabaseFile="$(OutDir)/TAL_Reverb_Plugin.pdb"
 				SubSystem="2"
-				ImportLibrary="../../../bin/TAL-Reverb.lv2/TAL_Reverb_Plugin_debug.lib"
+				ImportLibrary="../../../bin/TAL-Reverb.lv2/TAL_Reverb_Plugin.lib"
 				TargetMachine="1"
 			/>
 			<Tool

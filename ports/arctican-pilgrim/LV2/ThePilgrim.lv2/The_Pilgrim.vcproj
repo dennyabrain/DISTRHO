@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="ThePilgrim.lv2/The_Pilgrim"
-	ProjectGUID="{2D467180-EFCD-02B5-2FCC-7BD116741E1C}"
+	ProjectGUID="{0D5F5C76-3120-0E6F-8526-0BD017FA22AF}"
 	RootNamespace="ThePilgrim.lv2/The_Pilgrim"
 	Keyword="Win32Proj"
 	>
@@ -149,13 +149,13 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="juce-plugin-153_debug.lib"
-				OutputFile="$(OutDir)/The_Pilgrim_debug.dll"
+				OutputFile="$(OutDir)/The_Pilgrim.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="../../../bin;../../../libs"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(OutDir)/The_Pilgrim_debug.pdb"
+				ProgramDatabaseFile="$(OutDir)/The_Pilgrim.pdb"
 				SubSystem="2"
-				ImportLibrary="../../../bin/ThePilgrim.lv2/The_Pilgrim_debug.lib"
+				ImportLibrary="../../../bin/ThePilgrim.lv2/The_Pilgrim.lib"
 				TargetMachine="1"
 			/>
 			<Tool

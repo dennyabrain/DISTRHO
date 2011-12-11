@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "3BandEQ", "./3BandEQ.vcproj", "{DB3A47F1-D651-3DCE-B62E-92D845673E36}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "3BandEQ", "./3BandEQ.vcproj", "{7FE0269F-F309-A973-DCE1-AA2E213777F9}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
@@ -10,10 +10,10 @@ Global
 		Debug|Win32 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{DB3A47F1-D651-3DCE-B62E-92D845673E36}.Release|Win32.ActiveCfg = Release|Win32
-		{DB3A47F1-D651-3DCE-B62E-92D845673E36}.Release|Win32.Build.0 = Release|Win32
-		{DB3A47F1-D651-3DCE-B62E-92D845673E36}.Debug|Win32.ActiveCfg = Debug|Win32
-		{DB3A47F1-D651-3DCE-B62E-92D845673E36}.Debug|Win32.Build.0 = Debug|Win32
+		{7FE0269F-F309-A973-DCE1-AA2E213777F9}.Release|Win32.ActiveCfg = Release|Win32
+		{7FE0269F-F309-A973-DCE1-AA2E213777F9}.Release|Win32.Build.0 = Release|Win32
+		{7FE0269F-F309-A973-DCE1-AA2E213777F9}.Debug|Win32.ActiveCfg = Debug|Win32
+		{7FE0269F-F309-A973-DCE1-AA2E213777F9}.Debug|Win32.Build.0 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

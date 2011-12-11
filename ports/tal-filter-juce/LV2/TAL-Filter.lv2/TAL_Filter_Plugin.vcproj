@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="TAL-Filter.lv2/TAL_Filter_Plugin"
-	ProjectGUID="{A70494F4-392D-E6BD-26AE-EED3D4F6BE4B}"
+	ProjectGUID="{C1699E9C-77F0-66CC-3F61-772A60787F5F}"
 	RootNamespace="TAL-Filter.lv2/TAL_Filter_Plugin"
 	Keyword="Win32Proj"
 	>
@@ -149,13 +149,13 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="juce-plugin-153_debug.lib"
-				OutputFile="$(OutDir)/TAL_Filter_Plugin_debug.dll"
+				OutputFile="$(OutDir)/TAL_Filter_Plugin.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="../../../bin;../../../libs"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(OutDir)/TAL_Filter_Plugin_debug.pdb"
+				ProgramDatabaseFile="$(OutDir)/TAL_Filter_Plugin.pdb"
 				SubSystem="2"
-				ImportLibrary="../../../bin/TAL-Filter.lv2/TAL_Filter_Plugin_debug.lib"
+				ImportLibrary="../../../bin/TAL-Filter.lv2/TAL_Filter_Plugin.lib"
 				TargetMachine="1"
 			/>
 			<Tool

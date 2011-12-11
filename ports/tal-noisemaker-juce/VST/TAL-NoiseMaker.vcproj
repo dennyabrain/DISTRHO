@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="TAL-NoiseMaker"
-	ProjectGUID="{2C78AC4D-948E-F907-3C7D-91E7ADA1D15C}"
+	ProjectGUID="{DD2C38C0-6CB1-5124-667B-E6A9327A049F}"
 	RootNamespace="TAL-NoiseMaker"
 	Keyword="Win32Proj"
 	>

@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "juce_pitcher", "./juce_pitcher.vcproj", "{4C0F45FC-733D-1BE5-A03A-CEF2026BA494}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "juce_pitcher", "./juce_pitcher.vcproj", "{4A673320-5BFE-10CE-DBF6-1C1CCE4A9290}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
@@ -10,10 +10,10 @@ Global
 		Debug|Win32 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{4C0F45FC-733D-1BE5-A03A-CEF2026BA494}.Release|Win32.ActiveCfg = Release|Win32
-		{4C0F45FC-733D-1BE5-A03A-CEF2026BA494}.Release|Win32.Build.0 = Release|Win32
-		{4C0F45FC-733D-1BE5-A03A-CEF2026BA494}.Debug|Win32.ActiveCfg = Debug|Win32
-		{4C0F45FC-733D-1BE5-A03A-CEF2026BA494}.Debug|Win32.Build.0 = Debug|Win32
+		{4A673320-5BFE-10CE-DBF6-1C1CCE4A9290}.Release|Win32.ActiveCfg = Release|Win32
+		{4A673320-5BFE-10CE-DBF6-1C1CCE4A9290}.Release|Win32.Build.0 = Release|Win32
+		{4A673320-5BFE-10CE-DBF6-1C1CCE4A9290}.Debug|Win32.ActiveCfg = Debug|Win32
+		{4A673320-5BFE-10CE-DBF6-1C1CCE4A9290}.Debug|Win32.Build.0 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

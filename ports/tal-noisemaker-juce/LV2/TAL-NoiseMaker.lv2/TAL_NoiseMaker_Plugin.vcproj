@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="TAL-NoiseMaker.lv2/TAL_NoiseMaker_Plugin"
-	ProjectGUID="{F37D4391-B9B0-B803-0D1C-55B0C363A98E}"
+	ProjectGUID="{C72A089C-AFDC-0A14-4349-26D0E4C7B9D3}"
 	RootNamespace="TAL-NoiseMaker.lv2/TAL_NoiseMaker_Plugin"
 	Keyword="Win32Proj"
 	>
@@ -149,13 +149,13 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="juce-plugin-153_debug.lib"
-				OutputFile="$(OutDir)/TAL_NoiseMaker_Plugin_debug.dll"
+				OutputFile="$(OutDir)/TAL_NoiseMaker_Plugin.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="../../../bin;../../../libs"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(OutDir)/TAL_NoiseMaker_Plugin_debug.pdb"
+				ProgramDatabaseFile="$(OutDir)/TAL_NoiseMaker_Plugin.pdb"
 				SubSystem="2"
-				ImportLibrary="../../../bin/TAL-NoiseMaker.lv2/TAL_NoiseMaker_Plugin_debug.lib"
+				ImportLibrary="../../../bin/TAL-NoiseMaker.lv2/TAL_NoiseMaker_Plugin.lib"
 				TargetMachine="1"
 			/>
 			<Tool

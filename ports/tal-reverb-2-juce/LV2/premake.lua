@@ -19,7 +19,7 @@ package.config["Release"].defines    = { "NDEBUG=1" }
 package.config["Release"].buildflags = { "no-symbols", "optimize-speed" }
 package.config["Release"].links      = { "juce-plugin-153" }
 
-package.config["Debug"].target       = project.name .. "_debug"
+package.config["Debug"].target       = project.name
 package.config["Debug"].objdir       = "intermediate/Debug"
 package.config["Debug"].defines      = { "DEBUG=1", "_DEBUG=1" }
 package.config["Debug"].links        = { "juce-plugin-153_debug" }

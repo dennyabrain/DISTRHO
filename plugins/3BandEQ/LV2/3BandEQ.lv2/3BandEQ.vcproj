@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="3BandEQ.lv2/3BandEQ"
-	ProjectGUID="{2F966DCC-7AEE-7CF9-C46D-A6019569C821}"
+	ProjectGUID="{C1E1519F-1340-C203-8A77-8D2AE4A5B183}"
 	RootNamespace="3BandEQ.lv2/3BandEQ"
 	Keyword="Win32Proj"
 	>
@@ -149,13 +149,13 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="juce-plugin-153_debug.lib"
-				OutputFile="$(OutDir)/3BandEQ_debug.dll"
+				OutputFile="$(OutDir)/3BandEQ.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="../../../bin;../../../libs"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(OutDir)/3BandEQ_debug.pdb"
+				ProgramDatabaseFile="$(OutDir)/3BandEQ.pdb"
 				SubSystem="2"
-				ImportLibrary="../../../bin/3BandEQ.lv2/3BandEQ_debug.lib"
+				ImportLibrary="../../../bin/3BandEQ.lv2/3BandEQ.lib"
 				TargetMachine="1"
 			/>
 			<Tool

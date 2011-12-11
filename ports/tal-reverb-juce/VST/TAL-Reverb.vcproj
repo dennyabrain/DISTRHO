@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="TAL-Reverb"
-	ProjectGUID="{05336C82-A4D7-0446-5787-0B22E9998F5C}"
+	ProjectGUID="{584D60C4-C964-740F-5DBE-996525162CE3}"
 	RootNamespace="TAL-Reverb"
 	Keyword="Win32Proj"
 	>

@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="TAL-Filter"
-	ProjectGUID="{9584992F-8289-A0C4-D63E-FB3856E9F06C}"
+	ProjectGUID="{65A74C11-1618-8506-F20E-806866B74F50}"
 	RootNamespace="TAL-Filter"
 	Keyword="Win32Proj"
 	>
