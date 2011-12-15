@@ -151,7 +151,7 @@ String makePluginTtl(const String& uri, const String& binary)
     plugin += "<" + uri + ">\n";
     plugin += "    a " + getPluginType() + " ;\n";
 #if (JucePlugin_WantsMidiInput || JucePlugin_ProducesMidiOutput || JucePlugin_WantsLV2TimePos || JucePlugin_WantsLV2State)
-    plugin += "    lv2ui:requiredFeature <http://lv2plug.in/ns/ext/uri-map> ;\n";
+    plugin += "    lv2:requiredFeature <http://lv2plug.in/ns/ext/uri-map> ;\n";
 #endif
 #if JucePlugin_WantsLV2State
     plugin += "    lv2:extensionData <http://lv2plug.in/ns/ext/state#Interface> ;\n";
@@ -159,6 +159,7 @@ String makePluginTtl(const String& uri, const String& binary)
 
     if (filter->hasEditor())
     {
+        plugin += "\n";
         plugin += "    lv2ui:ui <" + getX11UIURI() + "> ,\n";
         plugin += "             <" + getExternalUIURI(true) + "> ,\n";
         plugin += "             <" + getExternalUIURI(false) + "> ;\n";

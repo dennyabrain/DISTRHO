@@ -259,9 +259,9 @@
 */
 #define JucePlugin_RTASProductId            JucePlugin_PluginCode
 
-#define JucePlugin_LV2Category               "UtilityPlugin"
+#define JucePlugin_LV2Category              "UtilityPlugin"
 
-#define JucePlugin_WantsLV2Chunks            1
+#define JucePlugin_WantsLV2State            1
 
 //==============================================================================
 

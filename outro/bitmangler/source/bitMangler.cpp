@@ -187,6 +187,57 @@ void DemoJuceFilter::setStateInformation (const void* data, int sizeInBytes)
 	sendChangeMessage ();
 }
 
+void DemoJuceFilter::setStateInformationString (const String& data)
+{
+    XmlElement* const xmlState = XmlDocument::parse(data);
+    if (xmlState != 0)
+    {
+        if (xmlState->hasTagName (T("BITMUNGLER")))
+        {
+//                      Logger::writeToLog (xmlState->createDocument (String::empty));
+
+                        xorProcessing = xmlState->getBoolAttribute (T("xorProcessing"));
+                        andProcessing = xmlState->getBoolAttribute (T("andProcessing"));
+                        clearProcessing = xmlState->getBoolAttribute (T("clearProcessing"));
+                        setProcessing = xmlState->getBoolAttribute (T("setProcessing"));
+
+                        unserializeArray (xmlState->getStringAttribute (T("xorBits")), xorBits);
+                        xorWith = xmlState->getBoolAttribute (T("xorWith"));
+
+                        unserializeArray (xmlState->getStringAttribute (T("andBits")), andBits);
+                        andWith = xmlState->getBoolAttribute (T("andWith"));
+
+                        unserializeArray (xmlState->getStringAttribute (T("setBits")), setBits);
+                        unserializeArray (xmlState->getStringAttribute (T("clearBits")), clearBits);
+        }
+        delete xmlState;
+    }
+
+    sendChangeMessage ();
+}
+
+String DemoJuceFilter::getStateInformationString ()
+{
+    XmlElement xmlState (T("BITMUNGLER"));
+    xmlState.setAttribute (T("pluginVersion"), 1);
+
+    xmlState.setAttribute (T("xorBits"), serializeArray (xorBits));
+    xmlState.setAttribute (T("xorWith"), xorWith);
+    xmlState.setAttribute (T("xorProcessing"), xorProcessing);
+
+    xmlState.setAttribute (T("andBits"), serializeArray (andBits));
+    xmlState.setAttribute (T("andWith"), andWith);
+    xmlState.setAttribute (T("andProcessing"), andProcessing);
+
+    xmlState.setAttribute (T("clearBits"), serializeArray (clearBits));
+    xmlState.setAttribute (T("clearProcessing"), clearProcessing);
+
+    xmlState.setAttribute (T("setBits"), serializeArray (setBits));
+    xmlState.setAttribute (T("setProcessing"), setProcessing);
+
+    return xmlState.createDocument (String::empty);
+}
+
 float DemoJuceFilter::getCurrentSample()
 {
 	return (currentSample);

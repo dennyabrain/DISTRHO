@@ -9,17 +9,17 @@ endif
 
 export CONFIG
 
-.PHONY: all clean bitmangler.lv2/bitmangler
+.PHONY: all clean BitMangler.lv2/BitMangler
 
-all: bitmangler.lv2/bitmangler
+all: BitMangler.lv2/BitMangler
 
 Makefile: premake.lua
 	@echo ==== Regenerating Makefiles ====
 	@premake --file $^ --os linux --target gnu --cc gcc
 
-bitmangler.lv2/bitmangler:
-	@echo ==== Building bitmangler.lv2/bitmangler ====
-	@$(MAKE) --no-print-directory -C . -f bitmangler.lv2/bitmangler.make
+BitMangler.lv2/BitMangler:
+	@echo ==== Building BitMangler.lv2/BitMangler ====
+	@$(MAKE) --no-print-directory -C . -f BitMangler.lv2/BitMangler.make
 
 clean:
-	@$(MAKE) --no-print-directory -C . -f bitmangler.lv2/bitmangler.make clean
+	@$(MAKE) --no-print-directory -C . -f BitMangler.lv2/BitMangler.make clean

@@ -1,5 +1,5 @@
 
-project.name    = "bitmangler.lv2/bitmangler"
+project.name    = "BitMangler.lv2/BitMangler"
 project.bindir  = "../../../bin"
 project.libdir  = project.bindir
 project.configs = { "Release", "Debug" }

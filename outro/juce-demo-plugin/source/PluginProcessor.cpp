@@ -333,6 +333,40 @@ void JuceDemoPluginAudioProcessor::setStateInformation (const void* data, int si
     }
 }
 
+void JuceDemoPluginAudioProcessor::setStateInformationString (const String& data)
+{
+    XmlElement* const xmlState = XmlDocument::parse(data);
+
+    if (xmlState != 0)
+    {
+        // make sure that it's actually our type of XML object..
+        if (xmlState->hasTagName ("MYPLUGINSETTINGS"))
+        {
+            // ok, now pull out our parameters..
+            lastUIWidth  = xmlState->getIntAttribute ("uiWidth", lastUIWidth);
+            lastUIHeight = xmlState->getIntAttribute ("uiHeight", lastUIHeight);
+
+            gain  = (float) xmlState->getDoubleAttribute ("gain", gain);
+            delay = (float) xmlState->getDoubleAttribute ("delay", delay);
+        }
+        delete xmlState;
+    }
+}
+
+String JuceDemoPluginAudioProcessor::getStateInformationString ()
+{
+    // Create an outer XML element..
+    XmlElement xml ("MYPLUGINSETTINGS");
+
+    // add some attributes to it..
+    xml.setAttribute ("uiWidth", lastUIWidth);
+    xml.setAttribute ("uiHeight", lastUIHeight);
+    xml.setAttribute ("gain", gain);
+    xml.setAttribute ("delay", delay);
+
+    return xml.createDocument (String::empty);
+}
+
 const String JuceDemoPluginAudioProcessor::getInputChannelName (const int channelIndex) const
 {
     return String (channelIndex + 1);
