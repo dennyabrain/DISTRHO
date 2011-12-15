@@ -479,6 +479,112 @@ void TalCore::setStateInformation (const void* data, int sizeInBytes)
 	}
 }
 
+//==============================================================================
+String TalCore::getStateInformationString ()
+{
+    // header
+    XmlElement tal("tal");
+    tal.setAttribute (T("curprogram"), curProgram);
+    tal.setAttribute (T("version"), 1);
+
+    // programs
+    XmlElement *programList = new XmlElement ("programs");
+
+    for (int i = 0; i < NUMPROGRAMS; i++)
+    {
+            XmlElement* program = new XmlElement ("program");
+            program->setAttribute (T("programname"), talPresets[i]->name);
+            program->setAttribute (T("cutoff"), talPresets[i]->programData[CUTOFF]);
+            program->setAttribute (T("resonance"), talPresets[i]->programData[RESONANCE]);
+            program->setAttribute (T("inputdrive"), talPresets[i]->programData[INPUTDRIVE]);
+            program->setAttribute (T("delaytime"), talPresets[i]->programData[DELAYTIME]);
+            program->setAttribute (T("delaytimesync"), talPresets[i]->programData[DELAYTIMESYNC]);
+            program->setAttribute (T("delaytwice_l"), talPresets[i]->programData[DELAYTWICE_L]);
+            program->setAttribute (T("delaytwice_r"), talPresets[i]->programData[DELAYTWICE_R]);
+            program->setAttribute (T("feedback"), talPresets[i]->programData[FEEDBACK]);
+            program->setAttribute (T("highcut"), talPresets[i]->programData[HIGHCUT]);
+            program->setAttribute (T("dry"), talPresets[i]->programData[DRY]);
+            program->setAttribute (T("wet"), talPresets[i]->programData[WET]);
+            program->setAttribute (T("livemode"), talPresets[i]->programData[LIVEMODE]);
+            programList->addChildElement(program);
+    }
+    tal.addChildElement(programList);
+
+    // midi params
+    XmlElement *midiMapList = new XmlElement ("midimap");
+    for (int i = 0; i < 255; i++)
+    {
+            if (talPresets[0]->midiMap[i] != 0)
+            {
+                    XmlElement* map = new XmlElement ("map");
+                    map->setAttribute (T("param"), talPresets[0]->midiMap[i]);
+                    map->setAttribute (T("controllernumber"), i);
+                    midiMapList->addChildElement(map);
+            }
+    }
+    tal.addChildElement(midiMapList);
+
+    // Reset midi learn
+    setParameter(MIDILEARN, 0.0f);
+
+    return tal.createDocument (String::empty);
+}
+
+void TalCore::setStateInformationString (const String& data)
+{
+    XmlElement* const xmlState = new XmlElement(data);
+
+    curProgram = 0;
+    if (xmlState != 0 && xmlState->hasTagName(T("tal")))
+    {
+            curProgram = (int)xmlState->getIntAttribute (T("curprogram"), 1);
+            XmlElement* programs = xmlState->getFirstChildElement();
+            if (programs->hasTagName(T("programs")))
+            {
+                    int i = 0;
+                    forEachXmlChildElement (*programs, e)
+                    {
+                            if (e->hasTagName(T("program")) && i < NUMPROGRAMS)
+                            {
+                                    talPresets[i]->name = e->getStringAttribute (T("programname"), T("Not Saved"));
+                                    talPresets[i]->programData[CUTOFF] = (float) e->getDoubleAttribute (T("cutoff"), 0.8f);
+                                    talPresets[i]->programData[RESONANCE] = (float) e->getDoubleAttribute (T("resonance"), 0.8f);
+                                    talPresets[i]->programData[INPUTDRIVE] = (float) e->getDoubleAttribute (T("inputdrive"), 0.8f);
+                                    talPresets[i]->programData[DELAYTIME] = (float) e->getDoubleAttribute (T("delaytime"), 0.8f);
+                                    talPresets[i]->programData[DELAYTIMESYNC] = (float) e->getDoubleAttribute (T("delaytimesync"), 1.0f);
+                                    talPresets[i]->programData[DELAYTWICE_L] = (float) e->getDoubleAttribute (T("delaytwice_l"), 0.8f);
+                                    talPresets[i]->programData[DELAYTWICE_R] = (float) e->getDoubleAttribute (T("delaytwice_r"), 0.8f);
+                                    talPresets[i]->programData[FEEDBACK] = (float) e->getDoubleAttribute (T("feedback"), 0.8f);
+                                    talPresets[i]->programData[HIGHCUT] = (float) e->getDoubleAttribute (T("highcut"), 0.8f);
+                                    talPresets[i]->programData[DRY] = (float) e->getDoubleAttribute (T("dry"), 0.8f);
+                                    talPresets[i]->programData[WET] = (float) e->getDoubleAttribute (T("wet"), 0.8f);
+                                    talPresets[i]->programData[LIVEMODE] = (float) e->getDoubleAttribute (T("livemode"), 0.0f);
+                                    i++;
+                            }
+                    }
+            }
+            // restore midi mapping
+            XmlElement* midiMap = xmlState->getChildByName(T("midimap"));
+            if (midiMap != 0 && midiMap->hasTagName(T("midimap")))
+            {
+                    forEachXmlChildElement (*midiMap, e)
+                    {
+                            for (int j = 0; j < NUMPROGRAMS; j++) 
+                            {
+                                    int controller = e->getIntAttribute(T("controllernumber"), 0);
+                                    if (controller < 255 && controller > 0)
+                                    {
+                                            talPresets[j]->midiMap[controller] = e->getIntAttribute(T("param"), 0);
+                                    }
+                            }
+                    }
+            }
+            delete xmlState;
+            setCurrentProgram(curProgram);
+            sendChangeMessage ();
+    }
+}
+
 int TalCore::getNumPrograms ()
 {
 	return NUMPROGRAMS;

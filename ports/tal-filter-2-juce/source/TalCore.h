@@ -98,6 +98,9 @@ public:
     void setXmlPrograms(XmlElement* programList, int programNumber, float version);
     void setStateInformationFromXml(XmlElement* xmlState);
 
+    String getStateInformationString ();
+    void setStateInformationString (const String& data);
+
 	void handleController (const int controllerNumber,
                            const int controllerValue);
 

@@ -530,6 +530,13 @@ public:
 
 
     //==============================================================================
+    /** LV2 specific calls, saving/restoring state as string. */
+
+    virtual String getStateInformationString ();
+
+    virtual void setStateInformationString (const String& data);
+
+    //==============================================================================
     /** Adds a listener that will be called when an aspect of this processor changes. */
     void addListener (AudioProcessorListener* newListener);
 

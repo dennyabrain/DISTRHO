@@ -150,7 +150,10 @@ String makePluginTtl(const String& uri, const String& binary)
 
     plugin += "<" + uri + ">\n";
     plugin += "    a " + getPluginType() + " ;\n";
-#if JucePlugin_WantsLV2Chunks
+#if (JucePlugin_WantsMidiInput || JucePlugin_ProducesMidiOutput || JucePlugin_WantsLV2TimePos || JucePlugin_WantsLV2State)
+    plugin += "    lv2ui:requiredFeature <http://lv2plug.in/ns/ext/uri-map> ;\n";
+#endif
+#if JucePlugin_WantsLV2State
     plugin += "    lv2:extensionData <http://lv2plug.in/ns/ext/state#Interface> ;\n";
 #endif
 
@@ -1133,20 +1136,20 @@ public:
     AudioProcessor* getFilter() { return filter; }
 
     //==============================================================================
-    void getChunk (MemoryBlock& data)
+    String getState ()
     {
         if (filter == nullptr)
-            return;
-        data.setSize (0);
-        if (filter)
-            filter->getStateInformation(data);
+            return String::empty;
+
+        return filter->getStateInformationString();
     }
 
-    void setChunk (const MemoryBlock& data)
+    void setState (const String& data)
     {
         if (filter == nullptr)
             return;
-        filter->setStateInformation(data.getData(), data.getSize());
+
+        filter->setStateInformationString(data);
     }
 
     LV2_URI_Map_Feature* getURIMap()
@@ -1256,22 +1259,21 @@ void juceLV2Cleanup(LV2_Handle instance)
 }
 
 //==============================================================================
+#ifdef JucePlugin_WantsLV2State
 void juceLV2Save(LV2_Handle instance, LV2_State_Store_Function store, LV2_State_Handle handle, uint32_t flags, const LV2_Feature* const* features)
 {
     JuceLV2Wrapper* wrapper = (JuceLV2Wrapper*)instance;
     jassert(wrapper);
 
-    const String juceChunkURI = getURI() + "#chunk";
-    MemoryBlock chunkMemory;
-    wrapper->getChunk(chunkMemory);
+    String stateData = wrapper->getState();
 
     LV2_URI_Map_Feature* uriMap = wrapper->getURIMap();
     store(handle,
-          uriMap->uri_to_id(uriMap->callback_data, 0, juceChunkURI.toUTF8().getAddress()),
-          chunkMemory.getData(),
-          chunkMemory.getSize(),
-          uriMap->uri_to_id(uriMap->callback_data, 0, "juce_binary_chunk"),
-          LV2_STATE_IS_POD);
+          uriMap->uri_to_id(uriMap->callback_data, 0, "juce_string"),
+          stateData.toUTF8().getAddress(),
+          stateData.toUTF8().sizeInBytes(),
+          uriMap->uri_to_id(uriMap->callback_data, 0, "http://lv2plug.in/ns/ext/atom#String"),
+          LV2_STATE_IS_POD|LV2_STATE_IS_PORTABLE);
 }
 
 void juceLV2Restore(LV2_Handle instance, LV2_State_Retrieve_Function retrieve, LV2_State_Handle handle, uint32_t flags, const LV2_Feature* const* features)
@@ -1279,22 +1281,25 @@ void juceLV2Restore(LV2_Handle instance, LV2_State_Retrieve_Function retrieve, L
     JuceLV2Wrapper* wrapper = (JuceLV2Wrapper*)instance;
     jassert(wrapper);
 
-    const String juceChunkURI = getURI() + "#chunk";
     LV2_URI_Map_Feature* uriMap = wrapper->getURIMap();
 
     size_t size;
     uint32 type;
     const void *data = retrieve(handle,
-                                uriMap->uri_to_id(uriMap->callback_data, 0, juceChunkURI.toUTF8().getAddress()),
+                                uriMap->uri_to_id(uriMap->callback_data, 0, "juce_string"),
                                 &size, &type, &flags);
 
-    MemoryBlock chunkMemory(data, size);
-    wrapper->setChunk(chunkMemory);
+    if (type == uriMap->uri_to_id(uriMap->callback_data, 0, "http://lv2plug.in/ns/ext/atom#String"))
+    {
+        String stateData = String(CharPointer_UTF8(static_cast<const char*>(data)));
+        wrapper->setState(stateData);
+    }
 }
+#endif
 
 const void* juceLV2ExtensionData(const char* uri)
 {
-#ifdef JucePlugin_WantsLV2Chunks
+#ifdef JucePlugin_WantsLV2State
     static const LV2_State_Interface state = { juceLV2Save, juceLV2Restore };
     if (strcmp(uri, LV2_STATE_INTERFACE_URI) == 0)
         return &state;

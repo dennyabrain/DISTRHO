@@ -377,6 +377,33 @@ void TalCore::setXmlPrograms(XmlElement* program, int programNumber, float versi
     }
 }
 
+String TalCore::getStateInformationString ()
+{
+    // header
+    XmlElement tal("tal");
+    tal.setAttribute (T("curprogram"), curProgram);
+    tal.setAttribute (T("version"), 1.0);
+
+    // programs
+    XmlElement *programList = new XmlElement ("programs");
+    for (int i = 0; i < NUMPROGRAMS; i++)
+    {
+        getXmlPrograms(programList, i);
+    }
+    tal.addChildElement(programList);
+
+    return tal.createDocument (String::empty);
+}
+
+void TalCore::setStateInformationString (const String& data)
+{
+    std::cout << "---------------------TEST TEST\n" << (const char*)data.toUTF8() << std::endl;
+
+    // use this helper function to get the XML from this binary blob..
+    XmlElement* const xmlState = new XmlElement(data);
+    setStateInformationFromXml(xmlState);
+}
+
 int TalCore::getNumPrograms ()
 {
 	return NUMPROGRAMS;

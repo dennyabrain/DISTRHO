@@ -251,7 +251,7 @@ void DistrhoPluginAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiB
 
     float *buf1 = buffer.getSampleData(0);
     float *buf2 = buffer.getSampleData(1);
-    
+
     int sampleFrames = buffer.getNumSamples();
 
     while (--sampleFrames >= 0)

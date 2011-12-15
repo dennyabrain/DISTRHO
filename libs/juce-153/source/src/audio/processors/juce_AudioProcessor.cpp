@@ -254,6 +254,16 @@ void AudioProcessor::setCurrentProgramStateInformation (const void* data, int si
 }
 
 //==============================================================================
+String AudioProcessor::getStateInformationString ()
+{
+    return String::empty;
+}
+
+void AudioProcessor::setStateInformationString (const String& data)
+{
+}
+
+//==============================================================================
 // magic number to identify memory blocks that we've stored as XML
 const uint32 magicXmlNumber = 0x21324356;
 
