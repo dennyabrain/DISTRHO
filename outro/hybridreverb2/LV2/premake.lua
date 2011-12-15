@@ -10,7 +10,7 @@ package.kind = "dll"
 package.language = "c++"
 package.targetprefix = ""
 
-package.defines   = { "JucePlugin_Build_AU=0", "JucePlugin_Build_LV2=1", "JucePlugin_Build_RTAS=0", "JucePlugin_Build_VST=1", "JucePlugin_Build_Standalone=0" }
+package.defines   = { "JucePlugin_Build_AU=0", "JucePlugin_Build_LV2=1", "JucePlugin_Build_RTAS=0", "JucePlugin_Build_VST=0", "JucePlugin_Build_Standalone=0" }
 package.linkflags = { "no-symbols", "static-runtime" }
 
 package.config["Release"].target     = project.name

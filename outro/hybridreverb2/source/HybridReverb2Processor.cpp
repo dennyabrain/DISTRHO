@@ -59,6 +59,11 @@ HybridReverb2Processor::HybridReverb2Processor()
     partitioner = new Partitioner(paramPartitionWisdom);
 
     setLatencySamples(paramPreferences.sflen);
+
+#ifdef JucePlugin_Build_LV2
+    // needs UI to work (load presets)
+    createEditorIfNeeded();
+#endif
 }
 
 HybridReverb2Processor::~HybridReverb2Processor()
@@ -77,7 +82,12 @@ const String HybridReverb2Processor::getName() const
 
 int HybridReverb2Processor::getNumParameters()
 {
+#ifdef JucePlugin_Build_LV2
+    // Useless for LV2, also causes issues
+    return 0;
+#else
     return 1;
+#endif
 }
 
 float HybridReverb2Processor::getParameter (int index)
@@ -270,6 +280,51 @@ void HybridReverb2Processor::setStateInformation (const void* data, int sizeInBy
     }
 }
 
+String HybridReverb2Processor::getStateInformationString ()
+{
+      // create a root element..
+    XmlElement xmlState (T("HybridReverb2Settings"));
+
+    // add some attributes to it..
+    xmlState.setAttribute (T("pluginVersion"), 2);
+    xmlState.setAttribute (T("presetNum"), currentPreset);
+    xmlState.setAttribute (T("uiWidth"), lastUIWidth);
+    xmlState.setAttribute (T("uiHeight"), lastUIHeight);
+
+    master->print(String("saving preset: ") +
+                  String(currentPreset) +
+                  String(" [HybridReverb2Processor::getStateInformation()]\n"));
+
+    return xmlState.createDocument (String::empty);
+}
+
+void HybridReverb2Processor::setStateInformationString (const String& data)
+{
+    XmlElement* const xmlState = XmlDocument::parse(data);
+
+    if (xmlState != 0)
+    {
+        // check that it's the right type of xml..
+        if (xmlState->hasTagName (T("HybridReverb2Settings")))
+        {
+            std::cout << "-------------------------------------- 003" << std::endl;
+            // ok, now pull out our parameters..
+            currentPreset = xmlState->getIntAttribute (T("presetNum"), currentPreset);
+
+            lastUIWidth = xmlState->getIntAttribute (T("uiWidth"), lastUIWidth);
+            lastUIHeight = xmlState->getIntAttribute (T("uiHeight"), lastUIHeight);
+
+            master->print(String("restoring preset: ") +
+                          String(currentPreset) +
+                          String(" [HybridReverb2Processor::setStateInformation()]\n"));
+
+            sendChangeMessage ();
+            std::cout << "-------------------------------------- 004" << std::endl;
+        }
+
+        delete xmlState;
+    }
+}
 
 //==============================================================================
 void HybridReverb2Processor::setNewFilterSet(SampleData *impulses)
