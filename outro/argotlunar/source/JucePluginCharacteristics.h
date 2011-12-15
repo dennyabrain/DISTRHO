@@ -12,7 +12,6 @@
 #define JucePlugin_IsSynth              0
 #define JucePlugin_WantsMidiInput       0
 #define JucePlugin_ProducesMidiOutput   0
-#define JucePlugin_WantsLV2TimePos      1
 #define JucePlugin_SilenceInProducesSilenceOut  0
 #define JucePlugin_TailLengthSeconds    0
 #define JucePlugin_EditorRequiresKeyboardFocus  1
@@ -32,7 +31,8 @@
 #define JucePlugin_RTASManufacturerCode JucePlugin_ManufacturerCode
 #define JucePlugin_RTASProductId        JucePlugin_PluginCode
 #define JUCE_USE_VSTSDK_2_4             1
+#define JucePlugin_WantsLV2TimePos      1
 #define JucePlugin_WantsLV2Chunks       1
-#define JucePlugin_WantsLV2Programs     1
+#define JucePlugin_WantsLV2Presets      1
 
 #endif   // __PLUGINCHARACTERISTICS_D4EFFF1A__

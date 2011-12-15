@@ -289,7 +289,7 @@
 #define JucePlugin_LV2Category              "InstrumentPlugin"
 
 #define JucePlugin_WantsLV2Chunks           1
-#define JucePlugin_WantsLV2Programs         1
+#define JucePlugin_WantsLV2Presets          1
 
 //==============================================================================
 

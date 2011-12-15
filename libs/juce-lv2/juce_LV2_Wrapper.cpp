@@ -20,7 +20,6 @@
 #include "lv2/event.h"
 #include "lv2/event-helpers.h"
 #include "lv2/instance-access.h"
-#include "lv2/programs.h"
 #include "lv2/state.h"
 #include "lv2/uri-map.h"
 #include "lv2/time.h"
@@ -104,7 +103,12 @@ String makeManifestTtl(const String& uri, const String& binary)
     manifest += "<" + uri + ">\n";
     manifest += "    a lv2:Plugin ;\n";
     manifest += "    lv2:binary <" + binary + ".so> ;\n";
+#ifdef JucePlugin_WantsLV2Presets
+    manifest += "    rdfs:seeAlso <" + binary +".ttl> ,\n";
+    manifest += "                 <presets.ttl> .\n";
+#else
     manifest += "    rdfs:seeAlso <" + binary +".ttl> .\n";
+#endif
     return manifest;
 }
 
@@ -148,9 +152,6 @@ String makePluginTtl(const String& uri, const String& binary)
     plugin += "    a " + getPluginType() + " ;\n";
 #if JucePlugin_WantsLV2Chunks
     plugin += "    lv2:extensionData <http://lv2plug.in/ns/ext/state#Interface> ;\n";
-#endif
-#if JucePlugin_WantsLV2Programs
-    plugin += "    lv2:extensionData <http://kxstudio.sourceforge.net/ns/lv2_programs#extensionData> ;\n";
 #endif
 
     if (filter->hasEditor())
@@ -255,6 +256,43 @@ String makePluginTtl(const String& uri, const String& binary)
     return plugin;
 }
 
+/** Create the presets.ttl contents */
+String makePresetsTtl(const String& uri)
+{
+    uint32 portIndex = 0;
+    ScopedPointer<AudioProcessor> filter (createPluginFilter());
+
+    String presets;
+    presets += "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\n";
+    presets += "@prefix lv2:  <http://lv2plug.in/ns/lv2core#> .\n";
+    presets += "@prefix pset: <http://lv2plug.in/ns/ext/presets#> .\n";
+    presets += "\n";
+
+    for (int i = 0; i < filter->getNumPrograms(); i++)
+    {
+        filter->setCurrentProgram(i);
+        presets += "<" + uri + "/preset" + String(i) + "> a pset:Preset ;\n";
+        presets += "    rdfs:label \"" + filter->getProgramName(i) + "\" ;\n";
+        presets += "    pset:appliesTo <" + uri + "> ;\n";
+
+        for (int j=0; j < filter->getNumParameters(); j++)
+        {
+            presets += "    lv2:port [\n";
+
+            presets += "        lv2:symbol \"" + nameToSymbol(filter->getParameterName(j), j) + "\" ;\n";
+            presets += "        pset:value " + String(filter->getParameter(j)) + " ;\n";
+
+            if (j+1 == filter->getNumParameters())
+                presets += "    ] ";
+            else
+                presets += "    ] ;\n";
+        }
+        presets += ".\n\n";
+    }
+
+    return presets;
+}
+
 /** Creates the manifest.ttl and plugin.ttl files */
 void createTtlFiles()
 {
@@ -274,6 +312,14 @@ void createTtlFiles()
     plugin << makePluginTtl(URI, Binary) << std::endl;
     plugin.close();
     std::cout << " done!" << std::endl;
+
+#ifdef JucePlugin_WantsLV2Presets
+    std::cout << "Writing presets.ttl...";
+    std::fstream presets("presets.ttl", std::ios::out);
+    presets << makePresetsTtl(URI) << std::endl;
+    presets.close();
+    std::cout << " done!" << std::endl;
+#endif
 }
 
 //==============================================================================
@@ -474,23 +520,11 @@ public:
             externalUI(nullptr),
             externalUIHost(nullptr),
             uiResizeFeature(nullptr),
-            programsFeature(nullptr),
             uiDescriptor(uiDescriptor_),
             writeFunction(writeFunction_),
             controller(controller_),
             uiType(uiType_)
     {
-#ifdef JucePlugin_WantsLV2Programs
-        for (uint16 j = 0; features[j]; j++)
-        {
-            if (strcmp(features[j]->URI, LV2_PROGRAMS_FEATURE_URI) == 0 && features[j]->data)
-            {
-                programsFeature = (LV2_Programs_Feature*)features[j]->data;
-                break;
-            }
-        }
-#endif
-
         filter->addListener(this);
 
         if (filter->hasEditor())
@@ -620,13 +654,6 @@ public:
 
     void audioProcessorChanged (AudioProcessor*)
     {
-#ifdef JucePlugin_WantsLV2Programs
-        if (programsFeature && programsFeature->programs_changed && programsFeature->current_program_changed)
-        {
-            programsFeature->programs_changed(programsFeature->data);
-            programsFeature->current_program_changed(programsFeature->data, filter->getCurrentProgram());
-        }
-#endif
     }
 
     //==============================================================================
@@ -664,7 +691,6 @@ private:
     JuceLv2ExternalUI* externalUI;
     lv2_external_ui_host* externalUIHost;
     LV2_UI_Resize_Feature* uiResizeFeature;
-    LV2_Programs_Feature* programsFeature;
 
     const LV2UI_Descriptor* uiDescriptor;
     LV2UI_Write_Function writeFunction;
@@ -692,6 +718,7 @@ public:
             bufferSize (512),
             uriMap (nullptr),
             midiURIId (0),
+            timeURIId (0),
             portCount (0)
     {
         JUCE_AUTORELEASEPOOL;
@@ -747,6 +774,7 @@ public:
             {
                 uriMap = (LV2_URI_Map_Feature*)features[j]->data;
                 midiURIId = uriMap->uri_to_id(uriMap->callback_data, LV2_EVENT_URI, "http://lv2plug.in/ns/ext/midi#MidiEvent");
+                timeURIId = uriMap->uri_to_id(uriMap->callback_data, LV2_EVENT_URI, "http://lv2plug.in/ns/ext/time#Position");
                 break;
             }
         }
@@ -925,7 +953,7 @@ public:
 #if JucePlugin_WantsLV2TimePos
         if (timePosPort != nullptr)
         {
-            LV2_Event* event = nullptr;
+            const LV2_Event* event = nullptr;
             LV2_Event_Iterator iter;
             lv2_event_begin(&iter, timePosPort);
             uint8* data = nullptr;
@@ -933,16 +961,13 @@ public:
             while (lv2_event_is_valid(&iter))
             {
                 event = lv2_event_get(&iter, &data);
+
+                if (event != nullptr && event->type == timeURIId && event->size == sizeof(LV2_Time_Position))
+                  memcpy(&timePos, data, sizeof(LV2_Time_Position));
+
                 lv2_event_increment(&iter);
             }
-
-            if (event != nullptr && event->size == sizeof(LV2_Time_Position))
-              memcpy(&timePos, data, sizeof(LV2_Time_Position));
-            else
-              memset(&timePos, 0, sizeof(LV2_Time_Position));
         }
-        else
-          memset(&timePos, 0, sizeof(LV2_Time_Position));
 #endif
 
         // Check for updated parameters
@@ -1017,8 +1042,13 @@ public:
                     while (sampleFrame < numSamples && lv2_event_is_valid(&iter))
                     {
                         const LV2_Event* event = lv2_event_get(&iter, &data);
-                        sampleFrame = event->frames;
-                        midiEvents.addEvent(data, event->size, event->frames);
+
+                        if (event != nullptr && event->type == midiURIId)
+                        {
+                            sampleFrame = event->frames;
+                            midiEvents.addEvent(data, event->size, event->frames);
+                        }
+
                         lv2_event_increment(&iter);
                     }
                 }
@@ -1159,6 +1189,7 @@ private:
     uint32 bufferSize;
     LV2_Time_Position timePos;
     LV2_URI_Map_Feature* uriMap;
+    uint16 timeURIId;
     uint16 midiURIId;
     uint32 portCount;
 
@@ -1261,32 +1292,6 @@ void juceLV2Restore(LV2_Handle instance, LV2_State_Retrieve_Function retrieve, L
     wrapper->setChunk(chunkMemory);
 }
 
-//==============================================================================
-unsigned int juceLV2GetProgramCount(LV2_Handle instance)
-{
-    JuceLV2Wrapper* wrapper = (JuceLV2Wrapper*)instance;
-    jassert(wrapper);
-
-    return wrapper->getFilter()->getNumPrograms();
-}
-
-const char* juceLV2GetProgramName(LV2_Handle instance, unsigned int program)
-{
-    JuceLV2Wrapper* wrapper = (JuceLV2Wrapper*)instance;
-    jassert(wrapper);
-
-    return wrapper->getFilter()->getProgramName(program).toUTF8().getAddress();
-}
-
-int juceLV2SetProgram(LV2_Handle instance, unsigned int program)
-{
-    JuceLV2Wrapper* wrapper = (JuceLV2Wrapper*)instance;
-    jassert(wrapper);
-
-    wrapper->getFilter()->setCurrentProgram(program);
-    return 0;
-}
-
 const void* juceLV2ExtensionData(const char* uri)
 {
 #ifdef JucePlugin_WantsLV2Chunks
@@ -1294,13 +1299,6 @@ const void* juceLV2ExtensionData(const char* uri)
     if (strcmp(uri, LV2_STATE_INTERFACE_URI) == 0)
         return &state;
 #endif
-
-#ifdef JucePlugin_WantsLV2Programs
-    static const LV2_Programs_ExtensionData programs = { juceLV2GetProgramCount, juceLV2GetProgramName, juceLV2SetProgram };
-    if (strcmp(uri, LV2_PROGRAMS_EXTENSION_DATA_URI) == 0)
-        return &programs;
-#endif
-
     return nullptr;
 }
 

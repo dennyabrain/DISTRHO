@@ -41,6 +41,6 @@
 #define JucePlugin_RTASManufacturerCode JucePlugin_ManufacturerCode
 #define JucePlugin_RTASProductId        JucePlugin_PluginCode
 #define JucePlugin_WantsLV2Chunks       1
-#define JucePlugin_WantsLV2Programs     1
+#define JucePlugin_WantsLV2Presets      1
 
 #endif   // __PLUGINCHARACTERISTICS_D4EFFF1A__
