@@ -39,6 +39,8 @@ public:
   void setCurrentProgramStateInformation(const void* data, int sizeInBytes);
   void getStateInformation (MemoryBlock& destData);
   void setStateInformation (const void* data, int sizeInBytes);
+  String getStateInformationString ();
+  void setStateInformationString (const String& data);
   void setCurrentProgram(int index);
   void setPlayHead(AudioPlayHead *const newPlayHead);
   int getNumParameters();

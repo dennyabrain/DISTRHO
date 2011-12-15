@@ -250,3 +250,25 @@ void Plugin::setStateInformation (const void* data, int sizeInBytes)
   }
 }
 
+void Plugin::setStateInformationString (const String& data)
+{
+  XmlElement* const xml_state = XmlDocument::parse(data);
+  if (xml_state != 0) {
+    program_bank->setBank(xml_state);
+    setCurrentProgram(current_program);
+    delete xml_state;
+  }
+}
+
+String Plugin::getStateInformationString ()
+{
+  // save current program
+  program_bank->saveParametersToProgram(current_program);
+  setSavedState(true);
+  // output program_bank to host
+  XmlElement* bank = program_bank->getBank();
+  String data = bank->createDocument (String::empty);
+  delete bank;
+  return data;
+}
+

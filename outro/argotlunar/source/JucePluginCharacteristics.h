@@ -32,7 +32,6 @@
 #define JucePlugin_RTASProductId        JucePlugin_PluginCode
 #define JUCE_USE_VSTSDK_2_4             1
 #define JucePlugin_WantsLV2TimePos      1
-#define JucePlugin_WantsLV2Chunks       1
-#define JucePlugin_WantsLV2Presets      1
+#define JucePlugin_WantsLV2State        1
 
 #endif   // __PLUGINCHARACTERISTICS_D4EFFF1A__
