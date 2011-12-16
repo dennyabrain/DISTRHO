@@ -46,6 +46,7 @@ package.includepaths = {
   ".", --fake
   "./intermediate", --fake
   "./intermediate/Release", --fake
+  "./intermediate/Debug", --fake
   "../../../libs/juce-153/plugin",
   "../../../libs/juce-153/source"
 }

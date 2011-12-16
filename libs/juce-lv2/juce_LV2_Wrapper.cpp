@@ -1113,7 +1113,7 @@ public:
 
             while (i.getNextEvent (midiEventData, midiEventSize, midiEventPosition))
             {
-                jassert (midiEventPosition >= 0 && midiEventPosition < sample_count);
+                jassert (midiEventPosition >= 0 && midiEventPosition < numSamples);
 
                 lv2_event_write(&iter, midiEventPosition, 0, midiURIId, midiEventSize, midiEventData);
             }
