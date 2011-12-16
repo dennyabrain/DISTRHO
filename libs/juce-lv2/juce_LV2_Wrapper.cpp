@@ -255,7 +255,10 @@ String makePluginTtl(const String& uri, const String& binary)
         plugin += "      a lv2:InputPort, lv2:ControlPort ;\n";
         plugin += "      lv2:index " + String(portIndex++) + " ;\n";
         plugin += "      lv2:symbol \"" + nameToSymbol(filter->getParameterName(i), i) + "\" ;\n";
-        plugin += "      lv2:name \"" + filter->getParameterName(i) + "\" ;\n";
+        if (filter->getParameterName(i).isNotEmpty())
+          plugin += "      lv2:name \"" + filter->getParameterName(i) + "\" ;\n";
+        else
+          plugin += "      lv2:name \"" + String(i) + "\" ;\n";
         plugin += "      lv2:default " + String(filter->getParameter(i)) + " ;\n";
         plugin += "      lv2:minimum 0.0 ;\n";
         plugin += "      lv2:maximum 1.0 ;\n";
@@ -279,9 +282,15 @@ String makePresetsTtl(const String& uri)
     ScopedPointer<AudioProcessor> filter (createPluginFilter());
 
     String presets;
-    presets += "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\n";
-    presets += "@prefix lv2:  <http://lv2plug.in/ns/lv2core#> .\n";
-    presets += "@prefix pset: <http://lv2plug.in/ns/ext/presets#> .\n";
+    presets += "@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .\n";
+#if !JucePlugin_WantsLV2State
+    presets += "@prefix lv2:   <http://lv2plug.in/ns/lv2core#> .\n";
+#endif
+    presets += "@prefix pset:  <http://lv2plug.in/ns/ext/presets#> .\n";
+#if JucePlugin_WantsLV2State
+    presets += "@prefix atom:  <http://lv2plug.in/ns/ext/atom#> .\n";
+    presets += "@prefix state: <http://lv2plug.in/ns/ext/state#> .\n";
+#endif
     presets += "\n";
 
     for (int i = 0; i < filter->getNumPrograms(); i++)
@@ -290,6 +299,17 @@ String makePresetsTtl(const String& uri)
         presets += "<" + uri + "/preset" + String(i) + "> a pset:Preset ;\n";
         presets += "    rdfs:label \"" + filter->getProgramName(i) + "\" ;\n";
 
+#if JucePlugin_WantsLV2State
+        presets += "    state:instanceState [\n";
+        presets += "        <urn:juce:stateString> [\n";
+        presets += "            a state:Value ;\n";
+        presets += "            atom:String\n";
+        presets += "\"\"\"\n";
+        presets += filter->getStateInformationString().replace("\r\n","\n");
+        presets += "\"\"\"\n" ;;
+        presets += "        ] ;\n";
+        presets += "    ] .\n\n";
+#else
         for (int j=0; j < filter->getNumParameters(); j++)
         {
             presets += "    lv2:port [\n";
@@ -303,6 +323,7 @@ String makePresetsTtl(const String& uri)
                 presets += "    ] ;\n";
         }
         presets += ".\n\n";
+#endif
     }
 
     return presets;
