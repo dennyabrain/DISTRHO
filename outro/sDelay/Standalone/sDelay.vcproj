@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="sDelay"
-	ProjectGUID="{2BA05F6A-C53C-3665-EB1F-0BDF9AB1FD50}"
+	ProjectGUID="{B9AFC411-C8CD-75C3-08E8-4D992D7A22EC}"
 	RootNamespace="sDelay"
 	Keyword="Win32Proj"
 	>

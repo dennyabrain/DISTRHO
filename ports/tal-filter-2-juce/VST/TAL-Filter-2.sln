@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TAL-Filter-2", "./TAL-Filter-2.vcproj", "{C5D55A40-14E3-4B82-BAD8-15FD7C14099A}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TAL-Filter-2", "./TAL-Filter-2.vcproj", "{4EFFA061-6CCC-BDE2-409E-068610D79402}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
@@ -10,10 +10,10 @@ Global
 		Debug|Win32 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{C5D55A40-14E3-4B82-BAD8-15FD7C14099A}.Release|Win32.ActiveCfg = Release|Win32
-		{C5D55A40-14E3-4B82-BAD8-15FD7C14099A}.Release|Win32.Build.0 = Release|Win32
-		{C5D55A40-14E3-4B82-BAD8-15FD7C14099A}.Debug|Win32.ActiveCfg = Debug|Win32
-		{C5D55A40-14E3-4B82-BAD8-15FD7C14099A}.Debug|Win32.Build.0 = Debug|Win32
+		{4EFFA061-6CCC-BDE2-409E-068610D79402}.Release|Win32.ActiveCfg = Release|Win32
+		{4EFFA061-6CCC-BDE2-409E-068610D79402}.Release|Win32.Build.0 = Release|Win32
+		{4EFFA061-6CCC-BDE2-409E-068610D79402}.Debug|Win32.ActiveCfg = Debug|Win32
+		{4EFFA061-6CCC-BDE2-409E-068610D79402}.Debug|Win32.Build.0 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

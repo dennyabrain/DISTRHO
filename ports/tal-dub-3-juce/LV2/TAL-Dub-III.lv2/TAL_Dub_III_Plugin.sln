@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TAL-Dub-III.lv2/TAL_Dub_III_Plugin", "./TAL-Dub-III.lv2/TAL_Dub_III_Plugin.vcproj", "{0B425B15-4927-B374-C70F-06F0763F7133}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TAL-Dub-III.lv2/TAL_Dub_III_Plugin", "./TAL-Dub-III.lv2/TAL_Dub_III_Plugin.vcproj", "{1CE833CA-D5DD-5774-CFA3-CF1808E1FF56}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
@@ -10,10 +10,10 @@ Global
 		Debug|Win32 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{0B425B15-4927-B374-C70F-06F0763F7133}.Release|Win32.ActiveCfg = Release|Win32
-		{0B425B15-4927-B374-C70F-06F0763F7133}.Release|Win32.Build.0 = Release|Win32
-		{0B425B15-4927-B374-C70F-06F0763F7133}.Debug|Win32.ActiveCfg = Debug|Win32
-		{0B425B15-4927-B374-C70F-06F0763F7133}.Debug|Win32.Build.0 = Debug|Win32
+		{1CE833CA-D5DD-5774-CFA3-CF1808E1FF56}.Release|Win32.ActiveCfg = Release|Win32
+		{1CE833CA-D5DD-5774-CFA3-CF1808E1FF56}.Release|Win32.Build.0 = Release|Win32
+		{1CE833CA-D5DD-5774-CFA3-CF1808E1FF56}.Debug|Win32.ActiveCfg = Debug|Win32
+		{1CE833CA-D5DD-5774-CFA3-CF1808E1FF56}.Debug|Win32.Build.0 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HybridReverb2", "./HybridReverb2.vcproj", "{1F4CEFB2-F7F5-CF99-46DA-67536E81181C}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HybridReverb2", "./HybridReverb2.vcproj", "{61693ECA-8263-8E99-5A86-4DDC410E585A}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
@@ -10,10 +10,10 @@ Global
 		Debug|Win32 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{1F4CEFB2-F7F5-CF99-46DA-67536E81181C}.Release|Win32.ActiveCfg = Release|Win32
-		{1F4CEFB2-F7F5-CF99-46DA-67536E81181C}.Release|Win32.Build.0 = Release|Win32
-		{1F4CEFB2-F7F5-CF99-46DA-67536E81181C}.Debug|Win32.ActiveCfg = Debug|Win32
-		{1F4CEFB2-F7F5-CF99-46DA-67536E81181C}.Debug|Win32.Build.0 = Debug|Win32
+		{61693ECA-8263-8E99-5A86-4DDC410E585A}.Release|Win32.ActiveCfg = Release|Win32
+		{61693ECA-8263-8E99-5A86-4DDC410E585A}.Release|Win32.Build.0 = Release|Win32
+		{61693ECA-8263-8E99-5A86-4DDC410E585A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{61693ECA-8263-8E99-5A86-4DDC410E585A}.Debug|Win32.Build.0 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

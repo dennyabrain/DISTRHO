@@ -15,14 +15,14 @@ for i in $FILES; do
   echo cd $FOLDER
   cd $FOLDER
 
-#   echo premake --os windows --target vs2005
-#   premake --os windows --target vs2005
+  echo premake --os windows --target vs2005
+  premake --os windows --target vs2005
 
-#   echo sed "s/SubSystem=\\\"1\\\"/SubSystem=\\\"2\\\"/" -i `find . -name \*.vcproj`
-#   sed "s/SubSystem=\"1\"/SubSystem=\"2\"/" -i `find . -name \*.vcproj`
+  echo sed "s/SubSystem=\\\"1\\\"/SubSystem=\\\"2\\\"/" -i `find . -name \*.vcproj`
+  sed "s/SubSystem=\"1\"/SubSystem=\"2\"/" -i `find . -name \*.vcproj`
 
-#   echo sed "s/\t\t\t\tEntryPointSymbol=\\\"mainCRTStartup\\\"//" -i `find . -name \*.vcproj`
-#   sed "s/\t\t\t\tEntryPointSymbol=\"mainCRTStartup\"//" -i `find . -name \*.vcproj`
+  echo sed "s/\t\t\t\tEntryPointSymbol=\\\"mainCRTStartup\\\"//" -i `find . -name \*.vcproj`
+  sed "s/\t\t\t\tEntryPointSymbol=\"mainCRTStartup\"//" -i `find . -name \*.vcproj`
 
   echo premake --os linux --target gnu --cc gcc
   premake --os linux --target gnu --cc gcc

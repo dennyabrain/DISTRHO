@@ -96,19 +96,31 @@ const String getPluginType()
 /** Create the manifest.ttl contents */
 String makeManifestTtl(const String& uri, const String& binary)
 {
+    ScopedPointer<AudioProcessor> filter (createPluginFilter());
+
     String manifest;
     manifest += "@prefix lv2:  <http://lv2plug.in/ns/lv2core#> .\n";
+#ifdef JucePlugin_WantsLV2Presets
+    manifest += "@prefix pset: <http://lv2plug.in/ns/ext/presets#> .\n";
+#endif
     manifest += "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\n";
     manifest += "\n";
     manifest += "<" + uri + ">\n";
     manifest += "    a lv2:Plugin ;\n";
     manifest += "    lv2:binary <" + binary + ".so> ;\n";
-#ifdef JucePlugin_WantsLV2Presets
-    manifest += "    rdfs:seeAlso <" + binary +".ttl> ,\n";
-    manifest += "                 <presets.ttl> .\n";
-#else
     manifest += "    rdfs:seeAlso <" + binary +".ttl> .\n";
+
+#ifdef JucePlugin_WantsLV2Presets
+    for (int i = 0; i < filter->getNumPrograms(); i++)
+    {
+        filter->setCurrentProgram(i);
+        manifest += "\n<" + uri + "/preset" + String(i) + ">\n";
+        manifest += "    a pset:Preset ;\n";
+        manifest += "    lv2:appliesTo <" + uri + "> ;\n";
+        manifest += "    rdfs:seeAlso <presets.ttl> .\n";
+    }
 #endif
+
     return manifest;
 }
 
@@ -277,7 +289,6 @@ String makePresetsTtl(const String& uri)
         filter->setCurrentProgram(i);
         presets += "<" + uri + "/preset" + String(i) + "> a pset:Preset ;\n";
         presets += "    rdfs:label \"" + filter->getProgramName(i) + "\" ;\n";
-        presets += "    pset:appliesTo <" + uri + "> ;\n";
 
         for (int j=0; j < filter->getNumParameters(); j++)
         {
@@ -305,20 +316,20 @@ void createTtlFiles()
     String Binary = getBinaryName();
     String BinaryTtl = Binary + ".ttl";
 
-    std::cout << "Writing manifest.ttl...";
+    std::cout << "Writing manifest.ttl..."; std::cout.flush();
     std::fstream manifest("manifest.ttl", std::ios::out);
     manifest << makeManifestTtl(URI, Binary) << std::endl;
     manifest.close();
     std::cout << " done!" << std::endl;
 
-    std::cout << "Writing " << BinaryTtl << "...";
+    std::cout << "Writing " << BinaryTtl << "..."; std::cout.flush();
     std::fstream plugin(BinaryTtl.toUTF8(), std::ios::out);
     plugin << makePluginTtl(URI, Binary) << std::endl;
     plugin.close();
     std::cout << " done!" << std::endl;
 
 #ifdef JucePlugin_WantsLV2Presets
-    std::cout << "Writing presets.ttl...";
+    std::cout << "Writing presets.ttl..."; std::cout.flush();
     std::fstream presets("presets.ttl", std::ios::out);
     presets << makePresetsTtl(URI) << std::endl;
     presets.close();

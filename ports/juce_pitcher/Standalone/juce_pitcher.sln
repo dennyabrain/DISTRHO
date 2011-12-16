@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "juce_pitcher", "./juce_pitcher.vcproj", "{9C1FD3CD-4EC3-0D4B-52F2-EB998D852C4E}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "juce_pitcher", "./juce_pitcher.vcproj", "{D4E3140C-AD91-8C74-CF6B-79AAA11B5A14}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
@@ -10,10 +10,10 @@ Global
 		Debug|Win32 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{9C1FD3CD-4EC3-0D4B-52F2-EB998D852C4E}.Release|Win32.ActiveCfg = Release|Win32
-		{9C1FD3CD-4EC3-0D4B-52F2-EB998D852C4E}.Release|Win32.Build.0 = Release|Win32
-		{9C1FD3CD-4EC3-0D4B-52F2-EB998D852C4E}.Debug|Win32.ActiveCfg = Debug|Win32
-		{9C1FD3CD-4EC3-0D4B-52F2-EB998D852C4E}.Debug|Win32.Build.0 = Debug|Win32
+		{D4E3140C-AD91-8C74-CF6B-79AAA11B5A14}.Release|Win32.ActiveCfg = Release|Win32
+		{D4E3140C-AD91-8C74-CF6B-79AAA11B5A14}.Release|Win32.Build.0 = Release|Win32
+		{D4E3140C-AD91-8C74-CF6B-79AAA11B5A14}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D4E3140C-AD91-8C74-CF6B-79AAA11B5A14}.Debug|Win32.Build.0 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="Wolpertinger.lv2/Wolpertinger"
-	ProjectGUID="{8EF176B9-1302-D85E-935B-EC836A10EDE5}"
+	ProjectGUID="{7267199D-1A0D-8F30-688F-E50045B5E0ED}"
 	RootNamespace="Wolpertinger.lv2/Wolpertinger"
 	Keyword="Win32Proj"
 	>

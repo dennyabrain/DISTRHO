@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="JuceDemoHost"
-	ProjectGUID="{06AC7CFE-B3F8-0F84-CEB1-42428BBC870B}"
+	ProjectGUID="{3ED53C0D-0E87-9770-32AA-F4E9B3099C64}"
 	RootNamespace="JuceDemoHost"
 	Keyword="Win32Proj"
 	>

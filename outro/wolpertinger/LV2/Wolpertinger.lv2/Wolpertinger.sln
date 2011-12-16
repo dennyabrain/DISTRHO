@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Wolpertinger.lv2/Wolpertinger", "./Wolpertinger.lv2/Wolpertinger.vcproj", "{8EF176B9-1302-D85E-935B-EC836A10EDE5}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Wolpertinger.lv2/Wolpertinger", "./Wolpertinger.lv2/Wolpertinger.vcproj", "{7267199D-1A0D-8F30-688F-E50045B5E0ED}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
@@ -10,10 +10,10 @@ Global
 		Debug|Win32 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{8EF176B9-1302-D85E-935B-EC836A10EDE5}.Release|Win32.ActiveCfg = Release|Win32
-		{8EF176B9-1302-D85E-935B-EC836A10EDE5}.Release|Win32.Build.0 = Release|Win32
-		{8EF176B9-1302-D85E-935B-EC836A10EDE5}.Debug|Win32.ActiveCfg = Debug|Win32
-		{8EF176B9-1302-D85E-935B-EC836A10EDE5}.Debug|Win32.Build.0 = Debug|Win32
+		{7267199D-1A0D-8F30-688F-E50045B5E0ED}.Release|Win32.ActiveCfg = Release|Win32
+		{7267199D-1A0D-8F30-688F-E50045B5E0ED}.Release|Win32.Build.0 = Release|Win32
+		{7267199D-1A0D-8F30-688F-E50045B5E0ED}.Debug|Win32.ActiveCfg = Debug|Win32
+		{7267199D-1A0D-8F30-688F-E50045B5E0ED}.Debug|Win32.Build.0 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

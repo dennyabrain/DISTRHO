@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="HybridReverb2.lv2/HybridReverb2"
-	ProjectGUID="{D134E568-1332-99B0-7484-8E9FA85D9372}"
+	ProjectGUID="{364CE229-FD0B-0611-D718-ECD98DCF319F}"
 	RootNamespace="HybridReverb2.lv2/HybridReverb2"
 	Keyword="Win32Proj"
 	>
@@ -41,7 +41,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				AdditionalIncludeDirectories="../source;../../../libs/juce-153/plugin;../../../libs/juce-153/source"
-				PreprocessorDefinitions="JucePlugin_Build_AU=0;JucePlugin_Build_LV2=1;JucePlugin_Build_RTAS=0;JucePlugin_Build_VST=1;JucePlugin_Build_Standalone=0;WINDOWS=1;NDEBUG=1"
+				PreprocessorDefinitions="JucePlugin_Build_AU=0;JucePlugin_Build_LV2=1;JucePlugin_Build_RTAS=0;JucePlugin_Build_VST=0;JucePlugin_Build_Standalone=0;WINDOWS=1;NDEBUG=1"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -55,7 +55,7 @@
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="JucePlugin_Build_AU=0;JucePlugin_Build_LV2=1;JucePlugin_Build_RTAS=0;JucePlugin_Build_VST=1;JucePlugin_Build_Standalone=0;WINDOWS=1;NDEBUG=1"
+				PreprocessorDefinitions="JucePlugin_Build_AU=0;JucePlugin_Build_LV2=1;JucePlugin_Build_RTAS=0;JucePlugin_Build_VST=0;JucePlugin_Build_Standalone=0;WINDOWS=1;NDEBUG=1"
 				AdditionalIncludeDirectories="../source;../../../libs/juce-153/plugin;../../../libs/juce-153/source"
 			/>
 			<Tool
@@ -125,7 +125,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="../source;../../../libs/juce-153/plugin;../../../libs/juce-153/source"
-				PreprocessorDefinitions="JucePlugin_Build_AU=0;JucePlugin_Build_LV2=1;JucePlugin_Build_RTAS=0;JucePlugin_Build_VST=1;JucePlugin_Build_Standalone=0;WINDOWS=1;DEBUG=1;_DEBUG=1"
+				PreprocessorDefinitions="JucePlugin_Build_AU=0;JucePlugin_Build_LV2=1;JucePlugin_Build_RTAS=0;JucePlugin_Build_VST=0;JucePlugin_Build_Standalone=0;WINDOWS=1;DEBUG=1;_DEBUG=1"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -140,7 +140,7 @@
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="JucePlugin_Build_AU=0;JucePlugin_Build_LV2=1;JucePlugin_Build_RTAS=0;JucePlugin_Build_VST=1;JucePlugin_Build_Standalone=0;WINDOWS=1;DEBUG=1;_DEBUG=1"
+				PreprocessorDefinitions="JucePlugin_Build_AU=0;JucePlugin_Build_LV2=1;JucePlugin_Build_RTAS=0;JucePlugin_Build_VST=0;JucePlugin_Build_Standalone=0;WINDOWS=1;DEBUG=1;_DEBUG=1"
 				AdditionalIncludeDirectories="../source;../../../libs/juce-153/plugin;../../../libs/juce-153/source"
 			/>
 			<Tool

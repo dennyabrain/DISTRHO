@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ThePilgrim.lv2/The_Pilgrim", "./ThePilgrim.lv2/The_Pilgrim.vcproj", "{0D5F5C76-3120-0E6F-8526-0BD017FA22AF}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ThePilgrim.lv2/The_Pilgrim", "./ThePilgrim.lv2/The_Pilgrim.vcproj", "{5F756A36-9027-AEDC-D08A-9EA5F0D19285}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
@@ -10,10 +10,10 @@ Global
 		Debug|Win32 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{0D5F5C76-3120-0E6F-8526-0BD017FA22AF}.Release|Win32.ActiveCfg = Release|Win32
-		{0D5F5C76-3120-0E6F-8526-0BD017FA22AF}.Release|Win32.Build.0 = Release|Win32
-		{0D5F5C76-3120-0E6F-8526-0BD017FA22AF}.Debug|Win32.ActiveCfg = Debug|Win32
-		{0D5F5C76-3120-0E6F-8526-0BD017FA22AF}.Debug|Win32.Build.0 = Debug|Win32
+		{5F756A36-9027-AEDC-D08A-9EA5F0D19285}.Release|Win32.ActiveCfg = Release|Win32
+		{5F756A36-9027-AEDC-D08A-9EA5F0D19285}.Release|Win32.Build.0 = Release|Win32
+		{5F756A36-9027-AEDC-D08A-9EA5F0D19285}.Debug|Win32.ActiveCfg = Debug|Win32
+		{5F756A36-9027-AEDC-D08A-9EA5F0D19285}.Debug|Win32.Build.0 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="juce_pitcher"
-	ProjectGUID="{4A673320-5BFE-10CE-DBF6-1C1CCE4A9290}"
+	ProjectGUID="{0EF50F0D-2309-1250-160B-1C7F83D16C9A}"
 	RootNamespace="juce_pitcher"
 	Keyword="Win32Proj"
 	>
