@@ -1118,6 +1118,32 @@ void TalCore::restoreMidiMapping(XmlElement* xmlState)
     }
 }
 
+void TalCore::setStateInformationString (const String& data)
+{
+    XmlElement* const xmlState = XmlDocument::parse(data);
+    setStateInformationFromXml(xmlState);
+}
+
+String TalCore::getStateInformationString ()
+{
+    // header
+    XmlElement tal("tal");
+    tal.setAttribute (T("curprogram"), curProgram);
+    tal.setAttribute (T("version"), 1.6);
+
+    // programs
+    XmlElement *programList = new XmlElement ("programs");
+    for (int i = 0; i < this->numPrograms; i++)
+    {
+        getXmlPrograms(programList, i);
+    }
+    tal.addChildElement(programList);
+
+    storeMidiMapping(&tal);
+
+    return tal.createDocument (String::empty);
+}
+
 int TalCore::getNumPrograms ()
 {
     return this->numPrograms;

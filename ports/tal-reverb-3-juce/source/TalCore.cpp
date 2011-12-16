@@ -419,6 +419,105 @@ void TalCore::setStateInformation (const void* data, int sizeInBytes)
 	}
 }
 
+void TalCore::setStateInformationString (const String& data)
+{
+    XmlElement* const xmlState = XmlDocument::parse(data);
+
+    curProgram = 0;
+    if (xmlState != 0 && xmlState->hasTagName(T("tal")))
+    {
+            curProgram = (int)xmlState->getIntAttribute (T("curprogram"), 1);
+            XmlElement* programs = xmlState->getFirstChildElement();
+            if (programs->hasTagName(T("programs")))
+            {
+                    int i = 0;
+                    forEachXmlChildElement (*programs, e)
+                    {
+                            if (e->hasTagName(T("program")) && i < NUMPROGRAMS)
+                            {
+                                    talPresets[i]->name = e->getStringAttribute (T("programname"), T("Not Saved"));
+                                    talPresets[i]->programData[DRY] = (float) e->getDoubleAttribute (T("dry"), 0.8f);
+                                    talPresets[i]->programData[WET] = (float) e->getDoubleAttribute (T("wet"), 0.8f);
+                                    talPresets[i]->programData[DECAYTIME] = (float) e->getDoubleAttribute (T("roomsize"), 0.8f);
+                                    talPresets[i]->programData[PREDELAY] = (float) e->getDoubleAttribute (T("predelay"), 0.0f);
+                                    talPresets[i]->programData[LOWSHELFGAIN] = (float) e->getDoubleAttribute (T("lowshelfgain"), 1.0f);
+                                    talPresets[i]->programData[HIGHSHELFGAIN] = (float) e->getDoubleAttribute (T("highshelfgain"), 1.0f);
+
+                                    talPresets[i]->programData[STEREO] = (float) e->getDoubleAttribute (T("stereowidth"), 1.0f);
+                                    talPresets[i]->programData[REALSTEREOMODE] = (float) e->getDoubleAttribute (T("realstereomode"), 0.0f);
+                                    talPresets[i]->programData[POWER] = (float) e->getDoubleAttribute (T("power"), 1.0f);
+                                    i++;
+                            }
+                    }
+            }
+            // restore midi mapping
+            XmlElement* midiMap = xmlState->getChildByName(T("midimap"));
+            if (midiMap != 0 && midiMap->hasTagName(T("midimap")))
+            {
+                    forEachXmlChildElement (*midiMap, e)
+                    {
+                            for (int j = 0; j < NUMPROGRAMS; j++) 
+                            {
+                                    int controller = e->getIntAttribute(T("controllernumber"), 0);
+                                    if (controller < 255 && controller > 0)
+                                    {
+                                            talPresets[j]->midiMap[controller] = e->getIntAttribute(T("param"), 0);
+                                    }
+                            }
+                    }
+            }
+
+            delete xmlState;
+            setCurrentProgram(curProgram);
+            sendChangeMessage ();
+    }
+}
+
+String TalCore::getStateInformationString ()
+{
+
+    // header
+    XmlElement tal("tal");
+    tal.setAttribute (T("curprogram"), curProgram);
+    tal.setAttribute (T("version"), 1);
+
+    // programs
+    XmlElement *programList = new XmlElement ("programs");
+    for (int i = 0; i < NUMPROGRAMS; i++)
+    {
+            XmlElement* program = new XmlElement ("program");
+            program->setAttribute (T("programname"), talPresets[i]->name);
+            program->setAttribute (T("dry"), talPresets[i]->programData[DRY]);
+            program->setAttribute (T("wet"), talPresets[i]->programData[WET]);
+            program->setAttribute (T("roomsize"), talPresets[i]->programData[DECAYTIME]);
+            program->setAttribute (T("predelay"), talPresets[i]->programData[PREDELAY]);
+            program->setAttribute (T("lowshelfgain"), talPresets[i]->programData[LOWSHELFGAIN]);
+            program->setAttribute (T("highshelfgain"), talPresets[i]->programData[HIGHSHELFGAIN]);
+
+            program->setAttribute (T("stereowidth"), talPresets[i]->programData[STEREO]);
+            program->setAttribute (T("realstereomode"), talPresets[i]->programData[REALSTEREOMODE]);
+            program->setAttribute (T("power"), talPresets[i]->programData[POWER]);
+            programList->addChildElement(program);
+    }
+    tal.addChildElement(programList);
+
+    // midi params
+    XmlElement *midiMapList = new XmlElement ("midimap");
+    for (int i = 0; i < 255; i++)
+    {
+            if (talPresets[0]->midiMap[i] != 0)
+            {
+                    XmlElement* map = new XmlElement ("map");
+                    map->setAttribute (T("param"), talPresets[0]->midiMap[i]);
+                    map->setAttribute (T("controllernumber"), i);
+                    midiMapList->addChildElement(map);
+            }
+    }
+    tal.addChildElement(midiMapList);
+
+    return tal.createDocument (String::empty);
+}
+
 float* TalCore::getCurrentVolume()
 {
     return engine->getCurrentVolume();

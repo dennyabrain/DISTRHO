@@ -532,7 +532,7 @@ String TalCore::getStateInformationString ()
 
 void TalCore::setStateInformationString (const String& data)
 {
-    XmlElement* const xmlState = new XmlElement(data);
+    XmlElement* const xmlState = XmlDocument::parse(data);
 
     curProgram = 0;
     if (xmlState != 0 && xmlState->hasTagName(T("tal")))

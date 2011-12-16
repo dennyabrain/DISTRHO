@@ -397,10 +397,7 @@ String TalCore::getStateInformationString ()
 
 void TalCore::setStateInformationString (const String& data)
 {
-    std::cout << "---------------------TEST TEST\n" << (const char*)data.toUTF8() << std::endl;
-
-    // use this helper function to get the XML from this binary blob..
-    XmlElement* const xmlState = new XmlElement(data);
+    XmlElement* const xmlState = XmlDocument::parse(data);
     setStateInformationFromXml(xmlState);
 }
 

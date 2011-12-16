@@ -104,7 +104,10 @@ public:
     void setXmlPrograms(XmlElement *programList, int programNumber, float version);
     void restoreMidiMapping(XmlElement* e);
     void storeMidiMapping(XmlElement* tal);
-	
+
+    String getStateInformationString ();
+    void setStateInformationString (const String& data);
+
 	void handleController (const int controllerNumber,
                            const int controllerValue);
 

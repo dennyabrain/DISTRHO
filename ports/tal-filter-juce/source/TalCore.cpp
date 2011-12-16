@@ -464,6 +464,112 @@ void TalCore::setStateInformation (const void* data, int sizeInBytes)
 	}
 }
 
+void TalCore::setStateInformationString (const String& data)
+{
+    XmlElement* const xmlState = XmlDocument::parse(data);
+
+    curProgram = 0;
+    if (xmlState != 0 && xmlState->hasTagName(T("tal")))
+    {
+            curProgram = xmlState->getIntAttribute (T("curprogram"), 0.8f);
+            XmlElement* programs = xmlState->getFirstChildElement();
+            if (programs->hasTagName(T("programs")))
+            {
+                    int i = 0;
+                    forEachXmlChildElement (*programs, e)
+                    {
+                            if (e->hasTagName(T("program")) && i < NUMPROGRAMS)
+                            {
+                                    talPresets[i]->name = e->getStringAttribute (T("programname"), T("Not Saved"));
+                                    talPresets[i]->programData[CUTOFF] = (float) e->getDoubleAttribute (T("cutoff"), 0.8f);
+                                    talPresets[i]->programData[RESONANCE] = (float) e->getDoubleAttribute (T("resonance"), 0.8f);
+                                    talPresets[i]->programData[FILTERTYPE] = (float) e->getDoubleAttribute (T("filtertype"), 1.0f);
+                                    talPresets[i]->programData[LFOINTENSITY] = (float) e->getDoubleAttribute (T("lfointensity"), 1.0f);
+                                    talPresets[i]->programData[LFORATE] = (float) e->getDoubleAttribute (T("lforate"), 1.0f);
+                                    talPresets[i]->programData[LFOSYNC] = (float) e->getDoubleAttribute (T("lfosync"), 1.0f);
+                                    talPresets[i]->programData[LFOWAVEFORM] = (float) e->getDoubleAttribute (T("lfowaveform"), 1.0f);
+                                    talPresets[i]->programData[VOLUME] = (float) e->getDoubleAttribute (T("volume"), 0.5f);
+                                    talPresets[i]->programData[INPUTDRIVE] = (float) e->getDoubleAttribute (T("inputdrive"), 1.0f);
+                                    talPresets[i]->programData[ENVELOPEINTENSITY] = (float) e->getDoubleAttribute (T("envelopeintensity"), 0.5f);
+                                    talPresets[i]->programData[ENVELOPESPEED] = (float) e->getDoubleAttribute (T("envelopespeed"), 1.0f);
+                                    talPresets[i]->programData[LFOWIDTH] = (float) e->getDoubleAttribute (T("lfowidth"), 1.0f);
+                                    talPresets[i]->programData[MIDITRIGGER] = (float) e->getDoubleAttribute (T("miditrigger"), 0.0f);
+                                    i++;
+                            }
+                    }
+            }
+
+            // restore midi mapping
+            XmlElement* midiMap = xmlState->getChildByName(T("midimap"));
+            if (midiMap != 0 && midiMap->hasTagName(T("midimap")))
+            {
+                    forEachXmlChildElement (*midiMap, e)
+                    {
+                            for (int j = 0; j < NUMPROGRAMS; j++) 
+                            {
+                                    int controller = e->getIntAttribute(T("controllernumber"), 0);
+                                    if (controller < 255 && controller > 0)
+                                    {
+                                            talPresets[j]->midiMap[controller] = e->getIntAttribute(T("param"), 0);
+                                    }
+                            }
+                    }
+            }
+
+            delete xmlState;
+            setCurrentProgram(curProgram);
+            sendChangeMessage ();
+    }
+}
+
+String TalCore::getStateInformationString ()
+{
+    // header
+    XmlElement tal("tal");
+    tal.setAttribute (T("curprogram"), curProgram);
+    tal.setAttribute (T("version"), 1);
+
+    // programs
+    XmlElement *programList = new XmlElement ("programs");
+    for (int i = 0; i < NUMPROGRAMS; i++)
+    {
+            XmlElement* program = new XmlElement ("program");
+            program->setAttribute (T("programname"), talPresets[i]->name);
+            program->setAttribute (T("cutoff"), talPresets[i]->programData[CUTOFF]);
+            program->setAttribute (T("resonance"), talPresets[i]->programData[RESONANCE]);
+            program->setAttribute (T("filtertype"), talPresets[i]->programData[FILTERTYPE]);
+            program->setAttribute (T("lfointensity"), talPresets[i]->programData[LFOINTENSITY]);
+            program->setAttribute (T("lforate"), talPresets[i]->programData[LFORATE]);
+            program->setAttribute (T("lfosync"), talPresets[i]->programData[LFOSYNC]);
+            program->setAttribute (T("lfowaveform"), talPresets[i]->programData[LFOWAVEFORM]);
+            program->setAttribute (T("volume"), talPresets[i]->programData[VOLUME]);
+            program->setAttribute (T("inputdrive"), talPresets[i]->programData[INPUTDRIVE]);
+            program->setAttribute (T("envelopeintensity"), talPresets[i]->programData[ENVELOPEINTENSITY]);
+            program->setAttribute (T("envelopespeed"), talPresets[i]->programData[ENVELOPESPEED]);
+            program->setAttribute (T("lfowidth"), talPresets[i]->programData[LFOWIDTH]);
+            program->setAttribute (T("miditrigger"), talPresets[i]->programData[MIDITRIGGER]);
+
+            programList->addChildElement(program);
+    }
+    tal.addChildElement(programList);
+
+    // midi params
+    XmlElement *midiMapList = new XmlElement ("midimap");
+    for (int i = 0; i < 255; i++)
+    {
+            if (talPresets[0]->midiMap[i] != 0)
+            {
+                    XmlElement* map = new XmlElement ("map");
+                    map->setAttribute (T("param"), talPresets[0]->midiMap[i]);
+                    map->setAttribute (T("controllernumber"), i);
+                    midiMapList->addChildElement(map);
+            }
+    }
+    tal.addChildElement(midiMapList);
+
+    return tal.createDocument (String::empty);
+}
+
 int TalCore::getNumPrograms ()
 {
 	return NUMPROGRAMS;

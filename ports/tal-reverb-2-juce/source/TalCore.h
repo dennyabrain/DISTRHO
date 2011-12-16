@@ -92,7 +92,10 @@ public:
     //==============================================================================
     void getStateInformation (MemoryBlock& destData);
     void setStateInformation (const void* data, int sizeInBytes);
-	
+
+    String getStateInformationString ();
+    void setStateInformationString (const String& data);
+
 	void handleController (const int controllerNumber,
                            const int controllerValue);
 

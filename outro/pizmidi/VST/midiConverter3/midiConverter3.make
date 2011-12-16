@@ -20,7 +20,7 @@ ifeq ($(CONFIG),Release)
   LDDEPS :=
   RESFLAGS := -D "LINUX=1" -D "__cdecl=""" -D "NDEBUG=1" -I "../../source/midiConverter3" -I "../../../../sdks/vstsdk2.4"
   TARGET := midiConverter3.so
- BLDCMD = $(CXX) -o $(OUTDIR)/$(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(TARGET_ARCH)
+ BLDCMD = $(CXX) -o $(OUTDIR)/$(TARGET) $(OBJECTS) $(LDFLAGS) $(LDFLAGS) $(RESOURCES) $(TARGET_ARCH)
 endif
 
 ifeq ($(CONFIG),Debug)
@@ -35,7 +35,7 @@ ifeq ($(CONFIG),Debug)
   LDDEPS :=
   RESFLAGS := -D "LINUX=1" -D "__cdecl=""" -D "DEBUG=1" -D "_DEBUG=1" -I "../../source/midiConverter3" -I "../../../../sdks/vstsdk2.4"
   TARGET := midiConverter3_debug.so
- BLDCMD = $(CXX) -o $(OUTDIR)/$(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(TARGET_ARCH)
+ BLDCMD = $(CXX) -o $(OUTDIR)/$(TARGET) $(OBJECTS) $(LDFLAGS) $(LDFLAGS) $(RESOURCES) $(TARGET_ARCH)
 endif
 
 OBJECTS := \
