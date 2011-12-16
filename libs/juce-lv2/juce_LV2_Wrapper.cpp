@@ -674,7 +674,9 @@ public:
 
     void doPortEvent(const uint32 portIndex, const float value)
     {
-        filter->setParameter(portIndex-parameterPortOffset, value);
+        // We need to tell the UI about these changes, not the plugin
+        // (which has probably already been updated)
+        //filter->setParameter(portIndex-parameterPortOffset, value);
     }
 
     void doCleanup()
@@ -809,8 +811,12 @@ public:
             if (strcmp(features[j]->URI, LV2_URI_MAP_URI) == 0)
             {
                 uriMap = (LV2_URI_Map_Feature*)features[j]->data;
+#if (JucePlugin_WantsMidiInput || JucePlugin_ProducesMidiOutput)
                 midiURIId = uriMap->uri_to_id(uriMap->callback_data, LV2_EVENT_URI, "http://lv2plug.in/ns/ext/midi#MidiEvent");
+#endif
+#if JucePlugin_WantsLV2TimePos
                 timeURIId = uriMap->uri_to_id(uriMap->callback_data, LV2_EVENT_URI, "http://lv2plug.in/ns/ext/time#Position");
+#endif
                 break;
             }
         }
@@ -1124,8 +1130,6 @@ public:
 
     void doCleanup()
     {
-        if (lv2Editor)
-            lv2Editor->doCleanup();
     }
 
     //==============================================================================
@@ -1147,7 +1151,7 @@ public:
         }
         else
         {
-            info.bpm = 130.0;
+            info.bpm = 120.0;
             info.timeSigNumerator = 4;
             info.timeSigDenominator = 4;
             info.ppqPosition = 0;
@@ -1198,9 +1202,7 @@ public:
     JuceLV2Editor* getLV2Editor(LV2UI_Write_Function writeFunction, LV2UI_Controller controller, LV2UI_Widget* widget)
     {
         if (lv2Editor)
-        {
             lv2Editor->resetExternalUIIfNeeded(writeFunction, controller, widget);
-        }
         return lv2Editor;
     }
 

@@ -71,6 +71,13 @@ DistrhoPluginAudioProcessorEditor::DistrhoPluginAudioProcessorEditor (DistrhoPlu
 DistrhoPluginAudioProcessorEditor::~DistrhoPluginAudioProcessorEditor()
 {
     stopTimer ();
+
+    delete sLow;
+    delete sMid;
+    delete sHigh;
+    delete sMaster;
+    delete sLowMidFreq;
+    delete sMidHighFreq;
 }
 
 //==============================================================================
