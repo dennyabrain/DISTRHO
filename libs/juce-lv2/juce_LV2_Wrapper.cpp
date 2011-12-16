@@ -1281,7 +1281,7 @@ void juceLV2Save(LV2_Handle instance, LV2_State_Store_Function store, LV2_State_
 
     LV2_URI_Map_Feature* uriMap = wrapper->getURIMap();
     store(handle,
-          uriMap->uri_to_id(uriMap->callback_data, 0, "juce_string"),
+          uriMap->uri_to_id(uriMap->callback_data, 0, "urn:juce:stateString"),
           stateData.toUTF8().getAddress(),
           stateData.toUTF8().sizeInBytes(),
           uriMap->uri_to_id(uriMap->callback_data, 0, "http://lv2plug.in/ns/ext/atom#String"),
@@ -1298,7 +1298,7 @@ void juceLV2Restore(LV2_Handle instance, LV2_State_Retrieve_Function retrieve, L
     size_t size;
     uint32 type;
     const void *data = retrieve(handle,
-                                uriMap->uri_to_id(uriMap->callback_data, 0, "juce_string"),
+                                uriMap->uri_to_id(uriMap->callback_data, 0, "urn:juce:stateString"),
                                 &size, &type, &flags);
 
     if (type == uriMap->uri_to_id(uriMap->callback_data, 0, "http://lv2plug.in/ns/ext/atom#String"))
