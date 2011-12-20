@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="midiCCReset"
-	ProjectGUID="{9442F202-DDA2-A800-14CA-D848F8557573}"
+	ProjectGUID="{F3F84270-2A71-D5A8-66C2-6B6309F7309C}"
 	RootNamespace="midiCCReset"
 	Keyword="Win32Proj"
 	>

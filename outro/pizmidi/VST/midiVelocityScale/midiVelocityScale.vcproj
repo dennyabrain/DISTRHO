@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="midiVelocityScale"
-	ProjectGUID="{68C5357F-4C92-B0D2-35C3-499AF172B182}"
+	ProjectGUID="{9749168A-F3D8-E774-5658-678BA99052B5}"
 	RootNamespace="midiVelocityScale"
 	Keyword="Win32Proj"
 	>

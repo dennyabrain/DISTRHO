@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TAL-Reverb-III.lv2/TAL_Reverb_III_Plugin", "./TAL-Reverb-III.lv2/TAL_Reverb_III_Plugin.vcproj", "{E6E11E74-EBAC-005C-9885-F8E27371CD08}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TAL-Reverb-III.lv2/TAL_Reverb_III_Plugin", "./TAL-Reverb-III.lv2/TAL_Reverb_III_Plugin.vcproj", "{5CF3737C-1136-FC0D-B3D0-CF15D27BCA37}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
@@ -10,10 +10,10 @@ Global
 		Debug|Win32 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{E6E11E74-EBAC-005C-9885-F8E27371CD08}.Release|Win32.ActiveCfg = Release|Win32
-		{E6E11E74-EBAC-005C-9885-F8E27371CD08}.Release|Win32.Build.0 = Release|Win32
-		{E6E11E74-EBAC-005C-9885-F8E27371CD08}.Debug|Win32.ActiveCfg = Debug|Win32
-		{E6E11E74-EBAC-005C-9885-F8E27371CD08}.Debug|Win32.Build.0 = Debug|Win32
+		{5CF3737C-1136-FC0D-B3D0-CF15D27BCA37}.Release|Win32.ActiveCfg = Release|Win32
+		{5CF3737C-1136-FC0D-B3D0-CF15D27BCA37}.Release|Win32.Build.0 = Release|Win32
+		{5CF3737C-1136-FC0D-B3D0-CF15D27BCA37}.Debug|Win32.ActiveCfg = Debug|Win32
+		{5CF3737C-1136-FC0D-B3D0-CF15D27BCA37}.Debug|Win32.Build.0 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

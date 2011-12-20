@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="midiChs_noGUI"
-	ProjectGUID="{ADBA0904-F6C7-6063-53CB-1CB0C5CE5061}"
+	ProjectGUID="{025ED96E-A0F3-F402-0210-69AF696513FC}"
 	RootNamespace="midiChs_noGUI"
 	Keyword="Win32Proj"
 	>

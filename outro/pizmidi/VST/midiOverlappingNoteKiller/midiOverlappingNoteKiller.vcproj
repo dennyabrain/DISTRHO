@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="midiOverlappingNoteKiller"
-	ProjectGUID="{6307A9D9-97DA-0FB8-9A55-4B4F5E1AA438}"
+	ProjectGUID="{1BD86A70-0CB5-7396-22C0-710A666DB56C}"
 	RootNamespace="midiOverlappingNoteKiller"
 	Keyword="Win32Proj"
 	>

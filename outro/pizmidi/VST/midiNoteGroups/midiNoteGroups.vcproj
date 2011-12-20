@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="midiNoteGroups"
-	ProjectGUID="{B165418A-F537-4119-7AB4-41B053148245}"
+	ProjectGUID="{06FFBF15-7D0F-FF06-24EE-2F4CA9E00466}"
 	RootNamespace="midiNoteGroups"
 	Keyword="Win32Proj"
 	>

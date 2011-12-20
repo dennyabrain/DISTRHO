@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "midiProbability", "./midiProbability.vcproj", "{53575B8A-C1FF-FD3A-4455-01C210C607D1}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "midiProbability", "./midiProbability.vcproj", "{44BC976C-123F-F384-B458-C856E3C74BFF}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
@@ -10,10 +10,10 @@ Global
 		Debug|Win32 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{53575B8A-C1FF-FD3A-4455-01C210C607D1}.Release|Win32.ActiveCfg = Release|Win32
-		{53575B8A-C1FF-FD3A-4455-01C210C607D1}.Release|Win32.Build.0 = Release|Win32
-		{53575B8A-C1FF-FD3A-4455-01C210C607D1}.Debug|Win32.ActiveCfg = Debug|Win32
-		{53575B8A-C1FF-FD3A-4455-01C210C607D1}.Debug|Win32.Build.0 = Debug|Win32
+		{44BC976C-123F-F384-B458-C856E3C74BFF}.Release|Win32.ActiveCfg = Release|Win32
+		{44BC976C-123F-F384-B458-C856E3C74BFF}.Release|Win32.Build.0 = Release|Win32
+		{44BC976C-123F-F384-B458-C856E3C74BFF}.Debug|Win32.ActiveCfg = Debug|Win32
+		{44BC976C-123F-F384-B458-C856E3C74BFF}.Debug|Win32.Build.0 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="midiConverter3"
-	ProjectGUID="{A3AE862D-A57B-7C7A-24DA-C6B16E91ADAB}"
+	ProjectGUID="{DFB909C3-454B-55BF-D90A-84FA74C0DFF6}"
 	RootNamespace="midiConverter3"
 	Keyword="Win32Proj"
 	>

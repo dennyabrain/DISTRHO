@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="midiDuplicateBlocker"
-	ProjectGUID="{1B4D40AF-568E-9930-5DB0-5099D338192E}"
+	ProjectGUID="{4DCAC15A-77B9-96FC-6DCD-D079110CEAB4}"
 	RootNamespace="midiDuplicateBlocker"
 	Keyword="Win32Proj"
 	>

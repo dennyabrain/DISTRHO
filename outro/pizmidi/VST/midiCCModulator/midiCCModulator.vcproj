@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="midiCCModulator"
-	ProjectGUID="{04144006-310C-09C9-C814-8DAEE191EA24}"
+	ProjectGUID="{46AAE673-6AF0-1A57-332C-77D88EEDC9D1}"
 	RootNamespace="midiCCModulator"
 	Keyword="Win32Proj"
 	>

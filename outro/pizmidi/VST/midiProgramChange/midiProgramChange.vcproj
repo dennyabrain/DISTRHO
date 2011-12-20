@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="midiProgramChange"
-	ProjectGUID="{553854F7-B7BB-BECE-B71D-FCFDE8026643}"
+	ProjectGUID="{7F4C4815-2DD4-6172-0EE8-A07139A0ACFF}"
 	RootNamespace="midiProgramChange"
 	Keyword="Win32Proj"
 	>

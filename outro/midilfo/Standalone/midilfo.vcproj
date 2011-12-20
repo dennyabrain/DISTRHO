@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="midilfo"
-	ProjectGUID="{E2E44DE0-1D58-3E5B-8F81-37CC0D7A370A}"
+	ProjectGUID="{29087813-4679-6B77-48B8-EDC95ED70FF9}"
 	RootNamespace="midilfo"
 	Keyword="Win32Proj"
 	>

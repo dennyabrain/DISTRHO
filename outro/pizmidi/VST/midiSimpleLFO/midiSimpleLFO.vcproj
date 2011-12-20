@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="midiSimpleLFO"
-	ProjectGUID="{A50FF0A1-E635-01CC-F661-5D28ABEC05F8}"
+	ProjectGUID="{D33AED09-7DCE-1458-04A7-F07058BAB891}"
 	RootNamespace="midiSimpleLFO"
 	Keyword="Win32Proj"
 	>

@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="midiPitchBendQuantize"
-	ProjectGUID="{840556F0-505A-0092-4750-4B04E236A828}"
+	ProjectGUID="{D31E04CA-A352-761A-C28E-29594C03F4D6}"
 	RootNamespace="midiPitchBendQuantize"
 	Keyword="Win32Proj"
 	>

@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="midiCCToggle"
-	ProjectGUID="{BB745FD0-382F-433A-6A0F-7AD36F1E1506}"
+	ProjectGUID="{8A4BA10F-47A7-4B87-97C0-83ACED79B935}"
 	RootNamespace="midiCCToggle"
 	Keyword="Win32Proj"
 	>

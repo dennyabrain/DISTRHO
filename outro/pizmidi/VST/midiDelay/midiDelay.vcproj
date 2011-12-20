@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="midiDelay"
-	ProjectGUID="{3E9CA77E-119C-D431-5670-48BF76FC94AA}"
+	ProjectGUID="{60C3809C-6F77-018C-3A62-43A0987524D6}"
 	RootNamespace="midiDelay"
 	Keyword="Win32Proj"
 	>

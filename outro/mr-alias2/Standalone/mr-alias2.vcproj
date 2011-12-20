@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="mr-alias2"
-	ProjectGUID="{B5004D62-3000-4A9E-D8A7-C2E323C27BCA}"
+	ProjectGUID="{36FFD681-F252-8BF3-4619-2D6225578B40}"
 	RootNamespace="mr-alias2"
 	Keyword="Win32Proj"
 	>

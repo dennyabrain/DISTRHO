@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="midiKeySplit4"
-	ProjectGUID="{EF593998-82E5-31C1-9CB2-980B13D8B61E}"
+	ProjectGUID="{2D1A04CC-BCBC-6827-FF87-36C0C9C9AAA8}"
 	RootNamespace="midiKeySplit4"
 	Keyword="Win32Proj"
 	>

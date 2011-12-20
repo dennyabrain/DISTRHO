@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="midiScaleChanger"
-	ProjectGUID="{34F330FC-BB76-51B6-7725-A490E396A365}"
+	ProjectGUID="{7CE593AE-46E9-C34D-40D2-5D0C0D7857A0}"
 	RootNamespace="midiScaleChanger"
 	Keyword="Win32Proj"
 	>

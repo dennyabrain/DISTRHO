@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="midiNRPNConverter"
-	ProjectGUID="{3E5EA825-2737-62AA-619A-CFABC29200B5}"
+	ProjectGUID="{A69E3244-95A9-A0CC-9C86-1AFDDCD8DC46}"
 	RootNamespace="midiNRPNConverter"
 	Keyword="Win32Proj"
 	>

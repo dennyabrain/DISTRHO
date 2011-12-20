@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "midiCCModulator", "./midiCCModulator.vcproj", "{04144006-310C-09C9-C814-8DAEE191EA24}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "midiCCModulator", "./midiCCModulator.vcproj", "{46AAE673-6AF0-1A57-332C-77D88EEDC9D1}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
@@ -10,10 +10,10 @@ Global
 		Debug|Win32 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{04144006-310C-09C9-C814-8DAEE191EA24}.Release|Win32.ActiveCfg = Release|Win32
-		{04144006-310C-09C9-C814-8DAEE191EA24}.Release|Win32.Build.0 = Release|Win32
-		{04144006-310C-09C9-C814-8DAEE191EA24}.Debug|Win32.ActiveCfg = Debug|Win32
-		{04144006-310C-09C9-C814-8DAEE191EA24}.Debug|Win32.Build.0 = Debug|Win32
+		{46AAE673-6AF0-1A57-332C-77D88EEDC9D1}.Release|Win32.ActiveCfg = Release|Win32
+		{46AAE673-6AF0-1A57-332C-77D88EEDC9D1}.Release|Win32.Build.0 = Release|Win32
+		{46AAE673-6AF0-1A57-332C-77D88EEDC9D1}.Debug|Win32.ActiveCfg = Debug|Win32
+		{46AAE673-6AF0-1A57-332C-77D88EEDC9D1}.Debug|Win32.Build.0 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

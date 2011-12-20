@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="juce-standalone-vst-153"
-	ProjectGUID="{8F351287-E0D4-07C4-9C0D-5C0D56CD62AB}"
+	ProjectGUID="{E2C298FC-2FCD-30CD-C953-1D1E4F345308}"
 	RootNamespace="juce-standalone-vst-153"
 	Keyword="Win32Proj"
 	>

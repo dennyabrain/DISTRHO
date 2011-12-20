@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="midiNotchFilter"
-	ProjectGUID="{83CA469B-6CF0-76AB-3577-9F2178B700D4}"
+	ProjectGUID="{F0F1205D-2599-AE7A-465B-02308CA58201}"
 	RootNamespace="midiNotchFilter"
 	Keyword="Win32Proj"
 	>

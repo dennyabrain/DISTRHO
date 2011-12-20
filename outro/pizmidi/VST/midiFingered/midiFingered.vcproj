@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="midiFingered"
-	ProjectGUID="{EDA17FB9-1018-959C-9CEA-BF1390540070}"
+	ProjectGUID="{578F6C80-0B0D-6081-4B82-98C68BA7420C}"
 	RootNamespace="midiFingered"
 	Keyword="Win32Proj"
 	>

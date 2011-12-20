@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="midiTranspose"
-	ProjectGUID="{B214B0AA-3252-EDAA-D522-8422F8A339E8}"
+	ProjectGUID="{DB916E90-A4F7-BA5E-BE9A-18C0513B5823}"
 	RootNamespace="midiTranspose"
 	Keyword="Win32Proj"
 	>

@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="midiPolyphony"
-	ProjectGUID="{8C1F2B6C-7D36-C24A-89C8-949A5275F701}"
+	ProjectGUID="{5FB49C6A-29E8-14DE-936D-E5C6897833E7}"
 	RootNamespace="midiPolyphony"
 	Keyword="Win32Proj"
 	>

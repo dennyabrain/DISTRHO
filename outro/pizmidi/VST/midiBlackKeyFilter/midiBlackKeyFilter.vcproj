@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="midiBlackKeyFilter"
-	ProjectGUID="{6EC99C9A-5699-A57F-BA9E-CF392F315901}"
+	ProjectGUID="{6D46EFC9-844F-B465-C001-006F39D69975}"
 	RootNamespace="midiBlackKeyFilter"
 	Keyword="Win32Proj"
 	>

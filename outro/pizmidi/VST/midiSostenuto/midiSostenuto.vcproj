@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="midiSostenuto"
-	ProjectGUID="{C47ED5B5-FF47-1A87-AC27-0539A244B06B}"
+	ProjectGUID="{802361FB-406A-9F6D-6BD0-FAB12166D0CB}"
 	RootNamespace="midiSostenuto"
 	Keyword="Win32Proj"
 	>

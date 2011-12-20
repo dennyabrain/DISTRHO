@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="midiSwing"
-	ProjectGUID="{61CF2C55-23DB-EE26-D4B9-4EECB407294A}"
+	ProjectGUID="{CA782ECF-22CB-7C02-A0DE-F7250926DFBF}"
 	RootNamespace="midiSwing"
 	Keyword="Win32Proj"
 	>

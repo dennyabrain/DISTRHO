@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="midiChannelize"
-	ProjectGUID="{B0CBEC95-EAE2-B038-7DF7-7F5C3401956C}"
+	ProjectGUID="{D075F3C1-3CCF-AC97-49A5-0DB6CF22C5DE}"
 	RootNamespace="midiChannelize"
 	Keyword="Win32Proj"
 	>

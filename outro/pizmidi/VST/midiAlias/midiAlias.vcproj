@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="midiAlias"
-	ProjectGUID="{112F93FE-F11F-F902-070C-5140D5493FB1}"
+	ProjectGUID="{AAEBE895-FF2A-5BC2-7F2A-AA921B8F2511}"
 	RootNamespace="midiAlias"
 	Keyword="Win32Proj"
 	>

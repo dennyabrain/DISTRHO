@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="midiInvertNotes"
-	ProjectGUID="{A3D17E9D-49B0-6D67-A6FD-829D00D3F33C}"
+	ProjectGUID="{F7E0CC4C-5FE2-1865-BF8A-EC3CD294EBF4}"
 	RootNamespace="midiInvertNotes"
 	Keyword="Win32Proj"
 	>

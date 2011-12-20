@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="midiForceToRange"
-	ProjectGUID="{AC72C01B-7CAF-7D9E-5FFE-8C46F513FCF8}"
+	ProjectGUID="{6D877EDA-6BC0-72BF-87BB-AF95634200D7}"
 	RootNamespace="midiForceToRange"
 	Keyword="Win32Proj"
 	>

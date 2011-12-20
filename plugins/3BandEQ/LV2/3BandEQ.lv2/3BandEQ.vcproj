@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="3BandEQ.lv2/3BandEQ"
-	ProjectGUID="{AA594BF6-97D9-DAF5-7949-2C0800FECA44}"
+	ProjectGUID="{47DFD548-7373-B952-1EEE-E40E6E314705}"
 	RootNamespace="3BandEQ.lv2/3BandEQ"
 	Keyword="Win32Proj"
 	>

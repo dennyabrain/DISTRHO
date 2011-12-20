@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="TAL-Dub-III.lv2/TAL_Dub_III_Plugin"
-	ProjectGUID="{1CE833CA-D5DD-5774-CFA3-CF1808E1FF56}"
+	ProjectGUID="{639B615E-39CF-1404-1CD8-BCDA75B463E6}"
 	RootNamespace="TAL-Dub-III.lv2/TAL_Dub_III_Plugin"
 	Keyword="Win32Proj"
 	>

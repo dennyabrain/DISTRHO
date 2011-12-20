@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="midi16CCRouter"
-	ProjectGUID="{928AE206-5239-2671-E67A-8B28C351401E}"
+	ProjectGUID="{16C568C7-A4D1-9769-711B-D4150C68166F}"
 	RootNamespace="midi16CCRouter"
 	Keyword="Win32Proj"
 	>

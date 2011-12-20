@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "midiStuckNoteKiller", "./midiStuckNoteKiller.vcproj", "{88E09DEA-B43A-829C-DEA2-2B59FC076439}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "midiStuckNoteKiller", "./midiStuckNoteKiller.vcproj", "{0B0CAD19-FFBA-B9A2-93A8-39545F071D7D}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
@@ -10,10 +10,10 @@ Global
 		Debug|Win32 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{88E09DEA-B43A-829C-DEA2-2B59FC076439}.Release|Win32.ActiveCfg = Release|Win32
-		{88E09DEA-B43A-829C-DEA2-2B59FC076439}.Release|Win32.Build.0 = Release|Win32
-		{88E09DEA-B43A-829C-DEA2-2B59FC076439}.Debug|Win32.ActiveCfg = Debug|Win32
-		{88E09DEA-B43A-829C-DEA2-2B59FC076439}.Debug|Win32.Build.0 = Debug|Win32
+		{0B0CAD19-FFBA-B9A2-93A8-39545F071D7D}.Release|Win32.ActiveCfg = Release|Win32
+		{0B0CAD19-FFBA-B9A2-93A8-39545F071D7D}.Release|Win32.Build.0 = Release|Win32
+		{0B0CAD19-FFBA-B9A2-93A8-39545F071D7D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{0B0CAD19-FFBA-B9A2-93A8-39545F071D7D}.Debug|Win32.Build.0 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

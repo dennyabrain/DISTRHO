@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="midiPitchBendToNotes"
-	ProjectGUID="{89111D14-C60B-7CC3-EA7E-993FD19CF3CB}"
+	ProjectGUID="{90798678-3DCA-4616-CDBB-2AE2F8476275}"
 	RootNamespace="midiPitchBendToNotes"
 	Keyword="Win32Proj"
 	>

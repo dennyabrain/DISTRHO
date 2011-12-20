@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "midiInvertNotes", "./midiInvertNotes.vcproj", "{A3D17E9D-49B0-6D67-A6FD-829D00D3F33C}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "midiInvertNotes", "./midiInvertNotes.vcproj", "{F7E0CC4C-5FE2-1865-BF8A-EC3CD294EBF4}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
@@ -10,10 +10,10 @@ Global
 		Debug|Win32 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{A3D17E9D-49B0-6D67-A6FD-829D00D3F33C}.Release|Win32.ActiveCfg = Release|Win32
-		{A3D17E9D-49B0-6D67-A6FD-829D00D3F33C}.Release|Win32.Build.0 = Release|Win32
-		{A3D17E9D-49B0-6D67-A6FD-829D00D3F33C}.Debug|Win32.ActiveCfg = Debug|Win32
-		{A3D17E9D-49B0-6D67-A6FD-829D00D3F33C}.Debug|Win32.Build.0 = Debug|Win32
+		{F7E0CC4C-5FE2-1865-BF8A-EC3CD294EBF4}.Release|Win32.ActiveCfg = Release|Win32
+		{F7E0CC4C-5FE2-1865-BF8A-EC3CD294EBF4}.Release|Win32.Build.0 = Release|Win32
+		{F7E0CC4C-5FE2-1865-BF8A-EC3CD294EBF4}.Debug|Win32.ActiveCfg = Debug|Win32
+		{F7E0CC4C-5FE2-1865-BF8A-EC3CD294EBF4}.Debug|Win32.Build.0 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

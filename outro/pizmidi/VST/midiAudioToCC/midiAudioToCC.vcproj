@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="midiAudioToCC"
-	ProjectGUID="{EABB2F8B-2BF7-76AD-7022-F2FA0AD51030}"
+	ProjectGUID="{F726CD52-4AE9-FD1E-87CF-07580C8DD7DC}"
 	RootNamespace="midiAudioToCC"
 	Keyword="Win32Proj"
 	>

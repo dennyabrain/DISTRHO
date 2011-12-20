@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="midiStrum"
-	ProjectGUID="{3812A79C-BE5E-9CE5-7A06-FB925E3739AA}"
+	ProjectGUID="{F554DCCD-4E97-38AB-84EA-33B5F682B504}"
 	RootNamespace="midiStrum"
 	Keyword="Win32Proj"
 	>

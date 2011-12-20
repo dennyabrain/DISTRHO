@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="midiChordSplit"
-	ProjectGUID="{99BFF613-C636-8AD4-6B1C-EDA98A82ED22}"
+	ProjectGUID="{F7D76A1B-E64D-8093-11A6-814BE4F0963E}"
 	RootNamespace="midiChordSplit"
 	Keyword="Win32Proj"
 	>

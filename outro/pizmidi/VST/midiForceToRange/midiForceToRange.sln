@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "midiForceToRange", "./midiForceToRange.vcproj", "{AC72C01B-7CAF-7D9E-5FFE-8C46F513FCF8}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "midiForceToRange", "./midiForceToRange.vcproj", "{6D877EDA-6BC0-72BF-87BB-AF95634200D7}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
@@ -10,10 +10,10 @@ Global
 		Debug|Win32 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{AC72C01B-7CAF-7D9E-5FFE-8C46F513FCF8}.Release|Win32.ActiveCfg = Release|Win32
-		{AC72C01B-7CAF-7D9E-5FFE-8C46F513FCF8}.Release|Win32.Build.0 = Release|Win32
-		{AC72C01B-7CAF-7D9E-5FFE-8C46F513FCF8}.Debug|Win32.ActiveCfg = Debug|Win32
-		{AC72C01B-7CAF-7D9E-5FFE-8C46F513FCF8}.Debug|Win32.Build.0 = Debug|Win32
+		{6D877EDA-6BC0-72BF-87BB-AF95634200D7}.Release|Win32.ActiveCfg = Release|Win32
+		{6D877EDA-6BC0-72BF-87BB-AF95634200D7}.Release|Win32.Build.0 = Release|Win32
+		{6D877EDA-6BC0-72BF-87BB-AF95634200D7}.Debug|Win32.ActiveCfg = Debug|Win32
+		{6D877EDA-6BC0-72BF-87BB-AF95634200D7}.Debug|Win32.Build.0 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

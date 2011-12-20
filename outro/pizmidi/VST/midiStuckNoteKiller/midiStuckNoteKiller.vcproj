@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="midiStuckNoteKiller"
-	ProjectGUID="{88E09DEA-B43A-829C-DEA2-2B59FC076439}"
+	ProjectGUID="{0B0CAD19-FFBA-B9A2-93A8-39545F071D7D}"
 	RootNamespace="midiStuckNoteKiller"
 	Keyword="Win32Proj"
 	>

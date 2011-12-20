@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mr-alias2", "./mr-alias2.vcproj", "{B5004D62-3000-4A9E-D8A7-C2E323C27BCA}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mr-alias2", "./mr-alias2.vcproj", "{36FFD681-F252-8BF3-4619-2D6225578B40}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
@@ -10,10 +10,10 @@ Global
 		Debug|Win32 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{B5004D62-3000-4A9E-D8A7-C2E323C27BCA}.Release|Win32.ActiveCfg = Release|Win32
-		{B5004D62-3000-4A9E-D8A7-C2E323C27BCA}.Release|Win32.Build.0 = Release|Win32
-		{B5004D62-3000-4A9E-D8A7-C2E323C27BCA}.Debug|Win32.ActiveCfg = Debug|Win32
-		{B5004D62-3000-4A9E-D8A7-C2E323C27BCA}.Debug|Win32.Build.0 = Debug|Win32
+		{36FFD681-F252-8BF3-4619-2D6225578B40}.Release|Win32.ActiveCfg = Release|Win32
+		{36FFD681-F252-8BF3-4619-2D6225578B40}.Release|Win32.Build.0 = Release|Win32
+		{36FFD681-F252-8BF3-4619-2D6225578B40}.Debug|Win32.ActiveCfg = Debug|Win32
+		{36FFD681-F252-8BF3-4619-2D6225578B40}.Debug|Win32.Build.0 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

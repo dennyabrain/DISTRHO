@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JuceDemoHost", "./JuceDemoHost.vcproj", "{3ED53C0D-0E87-9770-32AA-F4E9B3099C64}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JuceDemoHost", "./JuceDemoHost.vcproj", "{8F51E5BC-CD5D-FFFF-41EE-DA9BF1CFB532}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
@@ -10,10 +10,10 @@ Global
 		Debug|Win32 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{3ED53C0D-0E87-9770-32AA-F4E9B3099C64}.Release|Win32.ActiveCfg = Release|Win32
-		{3ED53C0D-0E87-9770-32AA-F4E9B3099C64}.Release|Win32.Build.0 = Release|Win32
-		{3ED53C0D-0E87-9770-32AA-F4E9B3099C64}.Debug|Win32.ActiveCfg = Debug|Win32
-		{3ED53C0D-0E87-9770-32AA-F4E9B3099C64}.Debug|Win32.Build.0 = Debug|Win32
+		{8F51E5BC-CD5D-FFFF-41EE-DA9BF1CFB532}.Release|Win32.ActiveCfg = Release|Win32
+		{8F51E5BC-CD5D-FFFF-41EE-DA9BF1CFB532}.Release|Win32.Build.0 = Release|Win32
+		{8F51E5BC-CD5D-FFFF-41EE-DA9BF1CFB532}.Debug|Win32.ActiveCfg = Debug|Win32
+		{8F51E5BC-CD5D-FFFF-41EE-DA9BF1CFB532}.Debug|Win32.Build.0 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

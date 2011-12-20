@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="midiProbability"
-	ProjectGUID="{53575B8A-C1FF-FD3A-4455-01C210C607D1}"
+	ProjectGUID="{44BC976C-123F-F384-B458-C856E3C74BFF}"
 	RootNamespace="midiProbability"
 	Keyword="Win32Proj"
 	>

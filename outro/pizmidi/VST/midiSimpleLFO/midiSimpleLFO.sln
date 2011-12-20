@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "midiSimpleLFO", "./midiSimpleLFO.vcproj", "{A50FF0A1-E635-01CC-F661-5D28ABEC05F8}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "midiSimpleLFO", "./midiSimpleLFO.vcproj", "{D33AED09-7DCE-1458-04A7-F07058BAB891}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
@@ -10,10 +10,10 @@ Global
 		Debug|Win32 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{A50FF0A1-E635-01CC-F661-5D28ABEC05F8}.Release|Win32.ActiveCfg = Release|Win32
-		{A50FF0A1-E635-01CC-F661-5D28ABEC05F8}.Release|Win32.Build.0 = Release|Win32
-		{A50FF0A1-E635-01CC-F661-5D28ABEC05F8}.Debug|Win32.ActiveCfg = Debug|Win32
-		{A50FF0A1-E635-01CC-F661-5D28ABEC05F8}.Debug|Win32.Build.0 = Debug|Win32
+		{D33AED09-7DCE-1458-04A7-F07058BAB891}.Release|Win32.ActiveCfg = Release|Win32
+		{D33AED09-7DCE-1458-04A7-F07058BAB891}.Release|Win32.Build.0 = Release|Win32
+		{D33AED09-7DCE-1458-04A7-F07058BAB891}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D33AED09-7DCE-1458-04A7-F07058BAB891}.Debug|Win32.Build.0 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

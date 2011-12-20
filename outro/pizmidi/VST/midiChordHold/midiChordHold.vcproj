@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="midiChordHold"
-	ProjectGUID="{3FFD6CAF-66DE-C7E9-5618-44E43D18D86D}"
+	ProjectGUID="{24B69389-4EB3-86E0-30A6-B0DC47AA368D}"
 	RootNamespace="midiChordHold"
 	Keyword="Win32Proj"
 	>

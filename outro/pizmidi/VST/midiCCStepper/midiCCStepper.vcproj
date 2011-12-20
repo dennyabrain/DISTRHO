@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="midiCCStepper"
-	ProjectGUID="{BEB2B092-E0A9-F0F2-D2DB-A1432E6BF9B8}"
+	ProjectGUID="{FB337CB5-00C9-B4FF-A3F0-0F039B5F2CBD}"
 	RootNamespace="midiCCStepper"
 	Keyword="Win32Proj"
 	>

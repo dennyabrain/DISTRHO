@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="midiExactDelay"
-	ProjectGUID="{DEAAEC90-1F7B-0FF5-7437-F9D6AEA1C568}"
+	ProjectGUID="{C78F00FC-E45F-07DD-72AE-BEBE5F98612C}"
 	RootNamespace="midiExactDelay"
 	Keyword="Win32Proj"
 	>

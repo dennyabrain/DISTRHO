@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="midi2qwerty16"
-	ProjectGUID="{8D01DA75-4A0D-0700-BCEC-28A0FFE032BC}"
+	ProjectGUID="{26CCAED5-708F-B808-D21F-78428E4AA698}"
 	RootNamespace="midi2qwerty16"
 	Keyword="Win32Proj"
 	>

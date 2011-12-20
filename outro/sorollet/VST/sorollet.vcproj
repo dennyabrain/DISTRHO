@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="sorollet"
-	ProjectGUID="{919D8D9B-DB1F-7D3B-C4DE-5474FAD8D10C}"
+	ProjectGUID="{10806612-CD0E-E0D4-54B6-703FA875268D}"
 	RootNamespace="sorollet"
 	Keyword="Win32Proj"
 	>

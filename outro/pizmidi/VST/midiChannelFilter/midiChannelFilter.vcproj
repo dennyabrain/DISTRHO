@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="midiChannelFilter"
-	ProjectGUID="{B6E15814-B5C4-1363-DE6A-B5D1482C1781}"
+	ProjectGUID="{48A923C8-8002-3053-0CB2-B83F3925636F}"
 	RootNamespace="midiChannelFilter"
 	Keyword="Win32Proj"
 	>

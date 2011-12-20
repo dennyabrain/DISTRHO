@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="midiGain"
-	ProjectGUID="{122BB85C-20DA-9C5C-BF03-B13A12D80C10}"
+	ProjectGUID="{9ECFCF87-4D79-8D79-4400-F96849C03DA8}"
 	RootNamespace="midiGain"
 	Keyword="Win32Proj"
 	>
