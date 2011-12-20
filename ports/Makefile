@@ -32,7 +32,6 @@ standalone: libs_standalone
 	$(MAKE) -C hybridreverb2/Standalone
 	$(MAKE) -C juce-demo-plugin/Standalone
 	$(MAKE) -C juce_pitcher/Standalone
-# 	$(MAKE) -C mr-alias2/Standalone
 	$(MAKE) -C sDelay/Standalone
 	$(MAKE) -C tal-dub-3-juce/Standalone
 	$(MAKE) -C tal-filter-juce/Standalone
@@ -55,7 +54,6 @@ lv2: libs_plugin libs_lv2
 	$(MAKE) -C hybridreverb2/LV2
 	$(MAKE) -C juce-demo-plugin/LV2
 	$(MAKE) -C juce_pitcher/LV2
-# 	$(MAKE) -C mr-alias2/LV2
 	$(MAKE) -C sDelay/LV2
 	$(MAKE) -C tal-dub-3-juce/LV2
 	$(MAKE) -C tal-filter-juce/LV2
@@ -78,7 +76,6 @@ vst: libs_plugin libs_plugin_vst
 	$(MAKE) -C hybridreverb2/VST
 	$(MAKE) -C juce-demo-plugin/VST
 	$(MAKE) -C juce_pitcher/VST
-# 	$(MAKE) -C mr-alias2/VST
 	$(MAKE) -C sDelay/VST
 	$(MAKE) -C tal-dub-3-juce/VST
 	$(MAKE) -C tal-filter-juce/VST
@@ -100,7 +97,6 @@ clean:
 	$(MAKE) clean -C hybridreverb2/Standalone
 	$(MAKE) clean -C juce-demo-plugin/Standalone
 	$(MAKE) clean -C juce_pitcher/Standalone
-# 	$(MAKE) clean -C mr-alias2/Standalone
 	$(MAKE) clean -C sDelay/Standalone
 	$(MAKE) clean -C tal-dub-3-juce/Standalone
 	$(MAKE) clean -C tal-filter-juce/Standalone
@@ -120,7 +116,6 @@ clean:
 	$(MAKE) clean -C hybridreverb2/LV2
 	$(MAKE) clean -C juce-demo-plugin/LV2
 	$(MAKE) clean -C juce_pitcher/LV2
-# 	$(MAKE) clean -C mr-alias2/LV2
 	$(MAKE) clean -C sDelay/LV2
 	$(MAKE) clean -C tal-dub-3-juce/LV2
 	$(MAKE) clean -C tal-filter-juce/LV2
@@ -140,7 +135,6 @@ clean:
 	$(MAKE) clean -C hybridreverb2/VST
 	$(MAKE) clean -C juce-demo-plugin/VST
 	$(MAKE) clean -C juce_pitcher/VST
-# 	$(MAKE) clean -C mr-alias2/VST
 	$(MAKE) clean -C sDelay/VST
 	$(MAKE) clean -C tal-dub-3-juce/VST
 	$(MAKE) clean -C tal-filter-juce/VST
