@@ -54,6 +54,7 @@ package.libpaths = {
 package.files = {
   matchfiles (
     "../source/*.cpp",
+    "../../common/DistrhoIconArtwork.cpp",
     "../../../libs/juce-153/source/src/audio/plugin_client/VST/juce_VST_Wrapper.cpp"
   )
 }

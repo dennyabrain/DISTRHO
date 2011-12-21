@@ -39,9 +39,10 @@ ifeq ($(CONFIG),Debug)
 endif
 
 OBJECTS := \
-	$(OBJDIR)/PluginEditor.o \
 	$(OBJDIR)/DistrhoArtwork.o \
-	$(OBJDIR)/PluginProcessor.o \
+	$(OBJDIR)/DistrhoPluginEditor.o \
+	$(OBJDIR)/DistrhoPluginProcessor.o \
+	$(OBJDIR)/DistrhoIconArtwork.o \
 	$(OBJDIR)/juce_StandaloneFilterApplication.o \
 	$(OBJDIR)/juce_StandaloneFilterWindow.o \
 
@@ -85,17 +86,22 @@ else
 	-@if exist $(subst /,\,$(OBJDIR)) rmdir /s /q $(subst /,\,$(OBJDIR))
 endif
 
-$(OBJDIR)/PluginEditor.o: ../source/PluginEditor.cpp
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
 $(OBJDIR)/DistrhoArtwork.o: ../source/DistrhoArtwork.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
-$(OBJDIR)/PluginProcessor.o: ../source/PluginProcessor.cpp
+$(OBJDIR)/DistrhoPluginEditor.o: ../source/DistrhoPluginEditor.cpp
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/DistrhoPluginProcessor.o: ../source/DistrhoPluginProcessor.cpp
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/DistrhoIconArtwork.o: ../../common/DistrhoIconArtwork.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"

@@ -8,8 +8,8 @@
 
 */
 
-#ifndef __PLUGINCHARACTERISTICS_994478FA__
-#define __PLUGINCHARACTERISTICS_994478FA__
+#ifndef __JUCEPLUGINCHARACTERISTICS_H__
+#define __JUCEPLUGINCHARACTERISTICS_H__
 
 #define JucePlugin_Name                 "3BandEQ"
 #define JucePlugin_Desc                 "3BandEQ"
@@ -42,4 +42,4 @@
 #define JucePlugin_RTASProductId        JucePlugin_PluginCode
 #define JUCE_USE_VSTSDK_2_4             1
 
-#endif   // __PLUGINCHARACTERISTICS_994478FA__
+#endif   // __JUCEPLUGINCHARACTERISTICS_H__

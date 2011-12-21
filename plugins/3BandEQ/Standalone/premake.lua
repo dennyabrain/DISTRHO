@@ -52,6 +52,7 @@ package.libpaths = {
 package.files = {
   matchfiles (
     "../source/*.cpp",
+    "../../common/DistrhoIconArtwork.cpp",
     "../../../libs/juce-custom/Standalone/*.cpp"
   )
 }
