@@ -8,11 +8,11 @@ namespace DistrhoArtwork
     extern const char*  knob_png;
     const int           knob_pngSize = 89623;
 
-    extern const char*  background_png;
-    const int           background_pngSize = 720830;
-
     extern const char*  slider_png;
     const int           slider_pngSize = 3458;
+
+    extern const char*  background_png;
+    const int           background_pngSize = 685656;
 
 };
 
