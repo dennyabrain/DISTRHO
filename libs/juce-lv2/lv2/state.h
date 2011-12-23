@@ -55,7 +55,7 @@ typedef enum {
 	/**
 	   Plain Old Data.
 
-	   Values with this flag contain no references to non-stateent or
+	   Values with this flag contain no references to non-persistent or
 	   non-global resources (e.g. pointers, handles, local paths, etc.). It is
 	   safe to copy POD values with a simple memcpy and store them for use at
 	   any time in the future on a machine with a compatible architecture
@@ -220,7 +220,6 @@ typedef struct _LV2_State_Interface {
 	             LV2_State_Handle           handle,
 	             uint32_t                   flags,
 	             const LV2_Feature *const * features);
-
 
 	/**
 	   Restore plugin state using a host-provided @c retrieve callback.
