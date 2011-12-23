@@ -303,7 +303,7 @@ String makePresetsTtl(const String& uri)
         presets += "    state:state [\n";
         presets += "        <urn:juce:stateString>\n";
         presets += "\"\"\"\n";
-        presets += filter->getStateInformationString().replace("\r\n","\n");
+        presets += filter->getStateInformationString();
         presets += "\"\"\"\n" ;
         presets += "    ] .\n\n";
 #else
@@ -1175,7 +1175,7 @@ public:
         if (filter == nullptr)
             return String::empty;
 
-        return filter->getStateInformationString();
+        return filter->getStateInformationString().replace("\r\n","\n");
     }
 
     void setState (const String& data)
