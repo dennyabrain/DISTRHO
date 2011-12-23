@@ -255,8 +255,9 @@ void SystemConfig::readPartitionWisdomFile()
         String message = JUCE_T("Error: Partition wisdom file \"") +
                          filename +
                          JUCE_T("\" does not exist!");
-        AlertWindow::showMessageBox(AlertWindow::WarningIcon,
-                                    JUCE_T("Error"), message);
+        //AlertWindow::showMessageBox(AlertWindow::WarningIcon,
+        //                            JUCE_T("Error"), message);
+        std::cerr << (const char*)message.toUTF8() << std::endl;
         return;
     }
 
@@ -346,8 +347,9 @@ void SystemConfig::extractBasedirUnix()
         String message = JUCE_T("Error: Global configuration file \"") +
                          configFilename +
                          JUCE_T("\" does not exist!");
-        AlertWindow::showMessageBox(AlertWindow::WarningIcon,
-                                    JUCE_T("Error"), message);
+        //AlertWindow::showMessageBox(AlertWindow::WarningIcon,
+        //                            JUCE_T("Error"), message);
+        std::cerr << (const char*)message.toUTF8() << std::endl;
         return;
     }
 
