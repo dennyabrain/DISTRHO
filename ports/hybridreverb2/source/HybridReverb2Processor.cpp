@@ -165,7 +165,12 @@ bool HybridReverb2Processor::producesMidi() const
 
 int HybridReverb2Processor::getNumPrograms()
 {
-    return 1; 
+#ifdef JucePlugin_Build_LV2
+    // Useless for LV2
+    return 0;
+#else
+    return 1;
+#endif
 }
 
 int HybridReverb2Processor::getCurrentProgram()

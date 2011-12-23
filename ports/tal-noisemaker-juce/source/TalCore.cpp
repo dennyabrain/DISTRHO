@@ -1133,10 +1133,8 @@ String TalCore::getStateInformationString ()
 
     // programs
     XmlElement *programList = new XmlElement ("programs");
-    for (int i = 0; i < this->numPrograms; i++)
-    {
-        getXmlPrograms(programList, i);
-    }
+
+    getXmlPrograms(programList, this->curProgram);
     tal.addChildElement(programList);
 
     storeMidiMapping(&tal);

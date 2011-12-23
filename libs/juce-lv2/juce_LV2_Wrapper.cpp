@@ -300,14 +300,11 @@ String makePresetsTtl(const String& uri)
         presets += "    rdfs:label \"" + filter->getProgramName(i) + "\" ;\n";
 
 #if JucePlugin_WantsLV2State
-        presets += "    state:instanceState [\n";
-        presets += "        <urn:juce:stateString> [\n";
-        presets += "            a state:Value ;\n";
-        presets += "            atom:String\n";
+        presets += "    state:state [\n";
+        presets += "        <urn:juce:stateString>\n";
         presets += "\"\"\"\n";
         presets += filter->getStateInformationString().replace("\r\n","\n");
-        presets += "\"\"\"\n" ;;
-        presets += "        ] ;\n";
+        presets += "\"\"\"\n" ;
         presets += "    ] .\n\n";
 #else
         for (int j=0; j < filter->getNumParameters(); j++)
