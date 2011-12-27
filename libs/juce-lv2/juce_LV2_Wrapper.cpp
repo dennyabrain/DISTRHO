@@ -143,19 +143,25 @@ String makePluginTtl(const String& uri, const String& binary)
         plugin += "<" + getX11UIURI() + ">\n";
         plugin += "    a lv2ui:X11UI ;\n";
         plugin += "    lv2ui:binary <" + binary + ".so> ;\n";
+#ifdef JucePlugin_WantsLV2InstanceAccess
         plugin += "    lv2ui:requiredFeature <http://lv2plug.in/ns/ext/instance-access> ;\n";
+#endif
         plugin += "    lv2ui:optionalFeature lv2ui:noUserResize .\n";
         plugin += "\n";
         plugin += "<" + getExternalUIURI(true) + ">\n";
         plugin += "    a <http://nedko.arnaudov.name/lv2/external_ui/> ;\n";
         plugin += "    lv2ui:binary <" + binary + ".so> ;\n";
+#ifdef JucePlugin_WantsLV2InstanceAccess
         plugin += "    lv2ui:requiredFeature <http://lv2plug.in/ns/ext/instance-access> ;\n";
+#endif
         plugin += "    lv2ui:optionalFeature lv2ui:noUserResize .\n";
         plugin += "\n";
         plugin += "<" + getExternalUIURI(false) + ">\n";
         plugin += "    a lv2ui:external ;\n";
         plugin += "    lv2ui:binary <" + binary + ".so> ;\n";
+#ifdef JucePlugin_WantsLV2InstanceAccess
         plugin += "    lv2ui:requiredFeature <http://lv2plug.in/ns/ext/instance-access> ;\n";
+#endif
         plugin += "    lv2ui:optionalFeature lv2ui:noUserResize .\n";
         plugin += "\n";
     }
@@ -283,12 +289,9 @@ String makePresetsTtl(const String& uri)
 
     String presets;
     presets += "@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .\n";
-#if !JucePlugin_WantsLV2State
     presets += "@prefix lv2:   <http://lv2plug.in/ns/lv2core#> .\n";
-#endif
     presets += "@prefix pset:  <http://lv2plug.in/ns/ext/presets#> .\n";
 #if JucePlugin_WantsLV2State
-    presets += "@prefix atom:  <http://lv2plug.in/ns/ext/atom#> .\n";
     presets += "@prefix state: <http://lv2plug.in/ns/ext/state#> .\n";
 #endif
     presets += "\n";
@@ -303,10 +306,14 @@ String makePresetsTtl(const String& uri)
         presets += "    state:state [\n";
         presets += "        <urn:juce:stateString>\n";
         presets += "\"\"\"\n";
-        presets += filter->getStateInformationString();
-        presets += "\"\"\"\n" ;
-        presets += "    ] .\n\n";
-#else
+        presets += filter->getStateInformationString().replace("\r\n","\n");
+        presets += "\"\"\"\n";
+        if (filter->getNumParameters() > 0)
+          presets += "    ] ;\n\n";
+        else
+          presets += "    ] .\n\n";
+#endif
+
         for (int j=0; j < filter->getNumParameters(); j++)
         {
             presets += "    lv2:port [\n";
@@ -320,7 +327,6 @@ String makePresetsTtl(const String& uri)
                 presets += "    ] ;\n";
         }
         presets += ".\n\n";
-#endif
     }
 
     return presets;
@@ -411,6 +417,7 @@ juce_ImplementSingleton (SharedMessageThread)
 #endif
 
 static Array<void*> activePlugins;
+static Array<void*> activeUIs;
 
 enum Lv2UiType {
   LV2_UI_X11 = 1,
@@ -558,6 +565,13 @@ public:
             controller(controller_),
             uiType(uiType_)
     {
+        JUCE_AUTORELEASEPOOL;
+        initialiseJuce_GUI();
+
+#if JUCE_LINUX
+        MessageManagerLock mmLock;
+#endif
+
         filter->addListener(this);
 
         if (filter->hasEditor())
@@ -648,32 +662,57 @@ public:
 #endif
         parameterPortOffset += JucePlugin_MaxNumInputChannels;
         parameterPortOffset += JucePlugin_MaxNumOutputChannels;
+
+        activeUIs.add (this);
     }
 
     ~JuceLV2Editor()
     {
         JUCE_AUTORELEASEPOOL
-        PopupMenu::dismissAllActiveMenus();
 
-        stopTimer();
-
-        filter->removeListener(this);
-
-        if (externalUI)
-            delete externalUI;
-
-        if (editor)
         {
-          filter->editorBeingDeleted(editor);
-          delete editor;
+#if JUCE_LINUX
+            MessageManagerLock mmLock;
+#endif
+            PopupMenu::dismissAllActiveMenus();
+
+            stopTimer();
+
+            filter->removeListener(this);
+
+            if (externalUI)
+                delete externalUI;
+
+            if (editor)
+            {
+                filter->editorBeingDeleted(editor);
+                delete editor;
+            }
+
+#ifndef JucePlugin_WantsLV2InstanceAccess
+            // fake filter, created for UI
+            delete filter;
+#endif
+
+            jassert (activeUIs.contains (this));
+            activeUIs.removeValue (this);
+        }
+
+        if (activePlugins.size() == 0 && activeUIs.size() == 0)
+        {
+#if JUCE_LINUX
+            SharedMessageThread::deleteInstance();
+#endif
+            shutdownJuce_GUI();
         }
     }
 
     void doPortEvent(const uint32 portIndex, const float value)
     {
-        // We need to tell the UI about these changes, not the plugin
-        // (which has probably already been updated)
-        //filter->setParameter(portIndex-parameterPortOffset, value);
+#ifndef JucePlugin_WantsLV2InstanceAccess
+        // With instance access, plugin has already been updated
+        filter->setParameter(portIndex-parameterPortOffset, value);
+#endif
     }
 
     void doCleanup()
@@ -742,13 +781,12 @@ private:
 class JuceLV2Wrapper : public AudioPlayHead
 {
 public:
-    JuceLV2Wrapper(const LV2_Descriptor* descriptor_, double sampleRate_, const LV2_Feature* const* features) :
+    JuceLV2Wrapper(double sampleRate_, const LV2_Feature* const* features) :
             lv2Editor (nullptr),
             numInChans (JucePlugin_MaxNumInputChannels),
             numOutChans (JucePlugin_MaxNumOutputChannels),
             isProcessing (false),
             firstProcessCallback (true),
-            descriptor (descriptor_),
             sampleRate (sampleRate_),
             bufferSize (512),
             uriMap (nullptr),
@@ -756,13 +794,6 @@ public:
             timeURIId (0),
             portCount (0)
     {
-        JUCE_AUTORELEASEPOOL;
-        initialiseJuce_GUI();
-
-#if JUCE_LINUX
-        MessageManagerLock mmLock;
-#endif
-
         filter = createPluginFilter();
         jassert(filter != nullptr);
 
@@ -830,7 +861,7 @@ public:
             MessageManagerLock mmLock;
 #endif
             if (lv2Editor)
-              delete lv2Editor;
+                delete lv2Editor;
 
             delete filter;
             filter = nullptr;
@@ -1218,8 +1249,6 @@ private:
     HeapBlock<float*> channels;
     Array<float*> tempChannels;  // see note in doRun()
 
-    const LV2_Descriptor* descriptor;
-
     double sampleRate;
     uint32 bufferSize;
     LV2_Time_Position timePos;
@@ -1255,7 +1284,7 @@ private:
 // LV2 descriptor functions
 LV2_Handle juceLV2Instantiate(const LV2_Descriptor* descriptor, double sampleRate, const char* bundlePath, const LV2_Feature* const* features)
 {
-    JuceLV2Wrapper* wrapper = new JuceLV2Wrapper(descriptor, sampleRate, features);
+    JuceLV2Wrapper* wrapper = new JuceLV2Wrapper(sampleRate, features);
     return wrapper;
 }
 
@@ -1344,6 +1373,7 @@ LV2UI_Handle juceLV2UIInstantiate(const LV2UI_Descriptor* uiDescriptor, LV2UI_Wr
 {
     const MessageManagerLock mmLock;
 
+#ifdef JucePlugin_WantsLV2InstanceAccess
     for (uint16 i = 0; features[i]; i++)
     {
         if (strcmp(features[i]->URI, LV2_INSTANCE_ACCESS_URI) == 0 && features[i]->data)
@@ -1358,9 +1388,13 @@ LV2UI_Handle juceLV2UIInstantiate(const LV2UI_Descriptor* uiDescriptor, LV2UI_Wr
             return wrapper->getLV2Editor(writeFunction, controller, widget);
         }
     }
-
     std::cerr << "Host does not support instance-access, cannot use UI" << std::endl;
     return nullptr;
+#else
+    AudioProcessor* filter = createPluginFilter();
+    JuceLV2Editor* editor = new JuceLV2Editor(filter, uiDescriptor, writeFunction, controller, widget, features, uiType);
+    return editor;
+#endif
 }
 
 LV2UI_Handle juceLV2UIInstantiateX11(const LV2UI_Descriptor* descriptor, const char* plugin_uri, const char* bundle_path, LV2UI_Write_Function writeFunction, LV2UI_Controller controller, LV2UI_Widget* widget, const LV2_Feature* const* features)
@@ -1387,7 +1421,11 @@ void juceLV2UIPortEvent(LV2UI_Handle instance, uint32 portIndex, uint32 bufferSi
 
 void juceLV2UICleanup(LV2UI_Handle instance)
 {
+#ifdef JucePlugin_WantsLV2InstanceAccess
      // UI is kept open and only closes on plugin cleanup
+#else
+    delete (JuceLV2Editor*)instance;
+#endif
 }
 
 //==============================================================================
@@ -1521,6 +1559,7 @@ extern "C" __attribute__ ((visibility("default"))) const LV2_Descriptor* lv2_des
 
 extern "C" __attribute__ ((visibility("default"))) const LV2UI_Descriptor* lv2ui_descriptor(uint32 index)
 {
+    SharedMessageThread::getInstance();
     return (index <= 2) ? getNewLv2UI(index) : nullptr;
 }
 

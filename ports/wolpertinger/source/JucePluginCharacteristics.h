@@ -287,6 +287,7 @@
 #define JUCE_ObjCExtraSuffix 3
 
 #define JucePlugin_LV2Category              "InstrumentPlugin"
+#define JucePlugin_WantsLV2InstanceAccess    1
 
 //==============================================================================
 
