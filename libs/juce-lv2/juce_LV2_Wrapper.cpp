@@ -1428,6 +1428,11 @@ void juceLV2UICleanup(LV2UI_Handle instance)
 #endif
 }
 
+const void* juceLV2UIExtensionData(const char* uri)
+{
+    return nullptr;
+}
+
 //==============================================================================
 // static LV2 Descriptor objects
 
@@ -1460,7 +1465,7 @@ public:
         instantiate    = juceLV2UIInstantiateX11;
         cleanup        = juceLV2UICleanup;
         port_event     = juceLV2UIPortEvent;
-        extension_data = juceLV2ExtensionData;
+        extension_data = juceLV2UIExtensionData;
     }
     ~NewLv2UI_X11()
     {
