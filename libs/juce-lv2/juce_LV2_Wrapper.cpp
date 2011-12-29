@@ -749,6 +749,7 @@ public:
 #ifndef JucePlugin_WantsLV2InstanceAccess
             // fake filter, created for UI
             delete filter;
+            filter = nullptr;
 #endif
 
             jassert (activeUIs.contains (this));
@@ -934,7 +935,7 @@ public:
             activePlugins.removeValue (this);
         }
 
-        if (activePlugins.size() == 0)
+        if (activePlugins.size() == 0 && activeUIs.size() == 0)
         {
 #if JUCE_LINUX
             SharedMessageThread::deleteInstance();
