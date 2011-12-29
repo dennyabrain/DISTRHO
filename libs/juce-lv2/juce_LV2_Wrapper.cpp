@@ -587,41 +587,39 @@ public:
             case LV2_UI_X11:
                 *widget = nullptr;
 
+                // Try to get ui-resize feature first
                 for (uint16 j = 0; features[j]; j++)
                 {
                     if (strcmp(features[j]->URI, LV2_UI_RESIZE_URI "#UIResize") == 0 && features[j]->data)
                     {
                         uiResizeFeature = (LV2_UI_Resize_Feature*)features[j]->data;
+                        break;
                     }
-                    else
+                }
+
+                // Now get the X11 parent feature with ui-resize support
+                for (uint16 j = 0; features[j]; j++)
+                {
                     if (strcmp(features[j]->URI, LV2_UI_URI "#parent") == 0 && features[j]->data)
                     {
                         *widget = features[j]->data;
 
-                        x11Wrapper = new X11EditorWrapper(editor, (Window) features[j]->data);
-                        x11Wrapper->addToDesktop (0);
+                        x11Wrapper = new X11EditorWrapper(editor, uiResizeFeature);
                         x11Wrapper->setVisible (false);
+                        x11Wrapper->addToDesktop (0);
 
                         Window hostWindow = (Window) features[j]->data;
                         Window editorWnd  = (Window) x11Wrapper->getWindowHandle();
                         XReparentWindow (display, editorWnd, hostWindow, 0, 0);
-                        //XMoveResizeWindow (display, hostWindow, 0, 0, x11Wrapper->getWidth(), x11Wrapper->getHeight());
-                        //XResizeWindow (display, hostWindow, 500, 500);
-                        //XResizeWindow (display, hostWindow, x11Wrapper->getWidth(), x11Wrapper->getHeight());
-                        //XSync(display, false);
-                        //XFlush(display);
 
                         x11Wrapper->setVisible (true);
-
-                        std::cout << "Plugin UI reparented to " << features[j]->data << std::endl;
+                        break;
                     }
                 }
 
                 // Call resize after reparenting
                 if (uiResizeFeature)
                   uiResizeFeature->ui_resize(uiResizeFeature->data, x11Wrapper->getWidth(), x11Wrapper->getHeight());
-
-                std::cout << "TEST w/h " << x11Wrapper->getWidth() << " : " << x11Wrapper->getHeight() << std::endl;
 
                 break;
 
@@ -777,8 +775,8 @@ public:
     class X11EditorWrapper  : public Component
     {
     public:
-        X11EditorWrapper (AudioProcessorEditor* editor, Window hostWindow_)
-            : hostWindow (hostWindow_)
+        X11EditorWrapper (AudioProcessorEditor* editor, LV2_UI_Resize_Feature* uiResizeFeature_)
+            : uiResizeFeature(uiResizeFeature_)
         {
             setOpaque (true);
             editor->setOpaque (true);
@@ -790,7 +788,6 @@ public:
 
         ~X11EditorWrapper()
         {
-            //deleteAllChildren();
         }
 
         void childBoundsChanged (Component* child)
@@ -798,16 +795,15 @@ public:
             const int cw = child->getWidth();
             const int ch = child->getHeight();
 
-            int error = XResizeWindow (display, hostWindow, cw, ch);
-            //XFlush(display);
-            XSync(display, false);
+            XResizeWindow (display, (Window) getWindowHandle(), cw, ch);
 
-            std::cout << "childBoundsChanged() - " << error << " -> " << cw << " : " << ch << std::endl;
+            if (uiResizeFeature)
+                uiResizeFeature->ui_resize(uiResizeFeature->data, cw, ch);
         }
 
     private:
         //==============================================================================
-        Window hostWindow;
+        LV2_UI_Resize_Feature* uiResizeFeature;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (X11EditorWrapper);
     };
