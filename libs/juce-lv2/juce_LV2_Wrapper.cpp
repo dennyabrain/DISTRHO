@@ -549,6 +549,44 @@ private:
 };
 
 //==============================================================================
+/** Component that holds the AudioProcessorEditor to listen for resize events */
+class X11EditorWrapper  : public Component
+{
+public:
+    X11EditorWrapper (AudioProcessorEditor* editor, LV2_UI_Resize_Feature* uiResizeFeature_)
+        : uiResizeFeature(uiResizeFeature_)
+    {
+        setOpaque (true);
+        editor->setOpaque (true);
+        setBounds (editor->getBounds());
+
+        editor->setTopLeftPosition (0, 0);
+        addAndMakeVisible (editor);
+    }
+
+    ~X11EditorWrapper()
+    {
+    }
+
+    void childBoundsChanged (Component* child)
+    {
+        const int cw = child->getWidth();
+        const int ch = child->getHeight();
+
+        XResizeWindow (display, (Window) getWindowHandle(), cw, ch);
+
+        if (uiResizeFeature)
+            uiResizeFeature->ui_resize(uiResizeFeature->data, cw, ch);
+    }
+
+private:
+    //==============================================================================
+    LV2_UI_Resize_Feature* uiResizeFeature;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (X11EditorWrapper);
+};
+
+//==============================================================================
 /** Create a new JUCE Editor */
 class JuceLV2Editor : public AudioProcessorListener,
                       public Timer
@@ -602,24 +640,24 @@ public:
                 {
                     if (strcmp(features[j]->URI, LV2_UI_URI "#parent") == 0 && features[j]->data)
                     {
-                        *widget = features[j]->data;
-
                         x11Wrapper = new X11EditorWrapper(editor, uiResizeFeature);
                         x11Wrapper->setVisible (false);
                         x11Wrapper->addToDesktop (0);
+
+                        *widget = x11Wrapper->getWindowHandle();
 
                         Window hostWindow = (Window) features[j]->data;
                         Window editorWnd  = (Window) x11Wrapper->getWindowHandle();
                         XReparentWindow (display, editorWnd, hostWindow, 0, 0);
 
                         x11Wrapper->setVisible (true);
+
+                        if (uiResizeFeature)
+                          uiResizeFeature->ui_resize(uiResizeFeature->data, x11Wrapper->getWidth(), x11Wrapper->getHeight());
+
                         break;
                     }
                 }
-
-                // Call resize after reparenting
-                if (uiResizeFeature)
-                  uiResizeFeature->ui_resize(uiResizeFeature->data, x11Wrapper->getWidth(), x11Wrapper->getHeight());
 
                 break;
 
@@ -769,44 +807,6 @@ public:
             stopTimer();
         }
     }
-
-    //==============================================================================
-    // A component that holds the AudioProcessorEditor to listen for resize events
-    class X11EditorWrapper  : public Component
-    {
-    public:
-        X11EditorWrapper (AudioProcessorEditor* editor, LV2_UI_Resize_Feature* uiResizeFeature_)
-            : uiResizeFeature(uiResizeFeature_)
-        {
-            setOpaque (true);
-            editor->setOpaque (true);
-            setBounds (editor->getBounds());
-
-            editor->setTopLeftPosition (0, 0);
-            addAndMakeVisible (editor);
-        }
-
-        ~X11EditorWrapper()
-        {
-        }
-
-        void childBoundsChanged (Component* child)
-        {
-            const int cw = child->getWidth();
-            const int ch = child->getHeight();
-
-            XResizeWindow (display, (Window) getWindowHandle(), cw, ch);
-
-            if (uiResizeFeature)
-                uiResizeFeature->ui_resize(uiResizeFeature->data, cw, ch);
-        }
-
-    private:
-        //==============================================================================
-        LV2_UI_Resize_Feature* uiResizeFeature;
-
-        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (X11EditorWrapper);
-    };
 
 private:
     AudioProcessor* filter;
