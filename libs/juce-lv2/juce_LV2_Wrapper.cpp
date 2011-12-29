@@ -557,6 +557,7 @@ public:
     JuceLV2Editor (AudioProcessor* filter_, const LV2UI_Descriptor* uiDescriptor_, LV2UI_Write_Function writeFunction_, LV2UI_Controller controller_, LV2UI_Widget* widget, const LV2_Feature* const* features, Lv2UiType uiType_) :
             filter(filter_),
             editor(nullptr),
+            x11Wrapper(nullptr),
             externalUI(nullptr),
             externalUIHost(nullptr),
             uiResizeFeature(nullptr),
@@ -584,10 +585,6 @@ public:
             switch(uiType)
             {
             case LV2_UI_X11:
-                editor->setOpaque (true);
-                editor->setVisible (false);
-                editor->addToDesktop (0);
-
                 *widget = nullptr;
 
                 for (uint16 j = 0; features[j]; j++)
@@ -596,14 +593,25 @@ public:
                     {
                         uiResizeFeature = (LV2_UI_Resize_Feature*)features[j]->data;
                     }
-                    else if (strcmp(features[j]->URI, LV2_UI_URI "#parent") == 0 && features[j]->data)
+                    else
+                    if (strcmp(features[j]->URI, LV2_UI_URI "#parent") == 0 && features[j]->data)
                     {
                         *widget = features[j]->data;
 
+                        x11Wrapper = new X11EditorWrapper(editor, (Window) features[j]->data);
+                        x11Wrapper->addToDesktop (0);
+                        x11Wrapper->setVisible (false);
+
                         Window hostWindow = (Window) features[j]->data;
-                        Window editorWnd  = (Window) editor->getWindowHandle();
+                        Window editorWnd  = (Window) x11Wrapper->getWindowHandle();
                         XReparentWindow (display, editorWnd, hostWindow, 0, 0);
-                        editor->setVisible (true);
+                        //XMoveResizeWindow (display, hostWindow, 0, 0, x11Wrapper->getWidth(), x11Wrapper->getHeight());
+                        //XResizeWindow (display, hostWindow, 500, 500);
+                        //XResizeWindow (display, hostWindow, x11Wrapper->getWidth(), x11Wrapper->getHeight());
+                        //XSync(display, false);
+                        //XFlush(display);
+
+                        x11Wrapper->setVisible (true);
 
                         std::cout << "Plugin UI reparented to " << features[j]->data << std::endl;
                     }
@@ -611,7 +619,9 @@ public:
 
                 // Call resize after reparenting
                 if (uiResizeFeature)
-                  uiResizeFeature->ui_resize(uiResizeFeature->data, editor->getWidth(), editor->getHeight());
+                  uiResizeFeature->ui_resize(uiResizeFeature->data, x11Wrapper->getWidth(), x11Wrapper->getHeight());
+
+                std::cout << "TEST w/h " << x11Wrapper->getWidth() << " : " << x11Wrapper->getHeight() << std::endl;
 
                 break;
 
@@ -680,6 +690,9 @@ public:
 
             filter->removeListener(this);
 
+            if (x11Wrapper)
+              delete x11Wrapper;
+
             if (externalUI)
                 delete externalUI;
 
@@ -731,7 +744,7 @@ public:
     }
 
     //==============================================================================
-    void resetExternalUIIfNeeded(LV2UI_Write_Function writeFunction_, LV2UI_Controller controller_, LV2UI_Widget* widget)
+    void resetUIIfNeeded(LV2UI_Write_Function writeFunction_, LV2UI_Controller controller_, LV2UI_Widget* widget)
     {
         writeFunction = writeFunction_;
         controller = controller_;
@@ -759,9 +772,50 @@ public:
         }
     }
 
+    //==============================================================================
+    // A component that holds the AudioProcessorEditor to listen for resize events
+    class X11EditorWrapper  : public Component
+    {
+    public:
+        X11EditorWrapper (AudioProcessorEditor* editor, Window hostWindow_)
+            : hostWindow (hostWindow_)
+        {
+            setOpaque (true);
+            editor->setOpaque (true);
+            setBounds (editor->getBounds());
+
+            editor->setTopLeftPosition (0, 0);
+            addAndMakeVisible (editor);
+        }
+
+        ~X11EditorWrapper()
+        {
+            //deleteAllChildren();
+        }
+
+        void childBoundsChanged (Component* child)
+        {
+            const int cw = child->getWidth();
+            const int ch = child->getHeight();
+
+            int error = XResizeWindow (display, hostWindow, cw, ch);
+            //XFlush(display);
+            XSync(display, false);
+
+            std::cout << "childBoundsChanged() - " << error << " -> " << cw << " : " << ch << std::endl;
+        }
+
+    private:
+        //==============================================================================
+        Window hostWindow;
+
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (X11EditorWrapper);
+    };
+
 private:
     AudioProcessor* filter;
     AudioProcessorEditor* editor;
+    X11EditorWrapper* x11Wrapper;
     JuceLv2ExternalUI* externalUI;
     lv2_external_ui_host* externalUIHost;
     LV2_UI_Resize_Feature* uiResizeFeature;
@@ -1230,7 +1284,7 @@ public:
     JuceLV2Editor* getLV2Editor(LV2UI_Write_Function writeFunction, LV2UI_Controller controller, LV2UI_Widget* widget)
     {
         if (lv2Editor)
-            lv2Editor->resetExternalUIIfNeeded(writeFunction, controller, widget);
+            lv2Editor->resetUIIfNeeded(writeFunction, controller, widget);
         return lv2Editor;
     }
 
