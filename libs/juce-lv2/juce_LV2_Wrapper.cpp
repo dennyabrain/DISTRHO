@@ -6,7 +6,7 @@
 
 #if JucePlugin_Build_LV2
 
-#if JUCE_LINUX
+#if defined (LINUX)
 #include <X11/Xlib.h>
 #undef KeyPress
 #endif
