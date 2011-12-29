@@ -596,7 +596,7 @@ public:
                     {
                         uiResizeFeature = (LV2_UI_Resize_Feature*)features[j]->data;
                     }
-                    else if (strcmp(features[j]->URI, "http://example.org/winid") == 0 && features[j]->data)
+                    else if (strcmp(features[j]->URI, LV2_UI_URI "#parent") == 0 && features[j]->data)
                     {
                         *widget = features[j]->data;
 
