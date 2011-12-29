@@ -6,8 +6,10 @@
 
 #if JucePlugin_Build_LV2
 
+#if JUCE_LINUX
 #include <X11/Xlib.h>
 #undef KeyPress
+#endif
 
 #include <fstream>
 #include <iostream>
@@ -140,6 +142,7 @@ String makePluginTtl(const String& uri, const String& binary)
 
     if (filter->hasEditor())
     {
+#if JUCE_LINUX
         plugin += "<" + getX11UIURI() + ">\n";
         plugin += "    a lv2ui:X11UI ;\n";
         plugin += "    lv2ui:binary <" + binary + ".so> ;\n";
@@ -148,6 +151,7 @@ String makePluginTtl(const String& uri, const String& binary)
 #endif
         plugin += "    lv2ui:optionalFeature lv2ui:noUserResize .\n";
         plugin += "\n";
+#endif
         plugin += "<" + getExternalUIURI(true) + ">\n";
         plugin += "    a <http://nedko.arnaudov.name/lv2/external_ui/> ;\n";
         plugin += "    lv2ui:binary <" + binary + ".so> ;\n";
@@ -550,6 +554,7 @@ private:
 
 //==============================================================================
 /** Component that holds the AudioProcessorEditor to listen for resize events */
+#if JUCE_LINUX
 class X11EditorWrapper  : public Component
 {
 public:
@@ -585,6 +590,7 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (X11EditorWrapper);
 };
+#endif
 
 //==============================================================================
 /** Create a new JUCE Editor */
@@ -622,6 +628,7 @@ public:
         {
             switch(uiType)
             {
+#if JUCE_LINUX
             case LV2_UI_X11:
                 *widget = nullptr;
 
@@ -660,6 +667,7 @@ public:
                 }
 
                 break;
+#endif
 
             case LV2_UI_EXTERNAL:
                 for (uint16 j = 0; features[j]; j++)
@@ -1567,11 +1575,11 @@ LV2UI_Descriptor* getNewLv2UI(uint32 index)
     switch (index)
     {
       case 0:
-        return &NewLv2UI_X11_Obj;
-      case 1:
         return &NewLv2UI_external_Obj;
-      case 2:
+      case 1:
         return &NewLv2UI_externalOld_Obj;
+      case 2:
+        return &NewLv2UI_X11_Obj;
       default:
         return nullptr;
     }
@@ -1594,7 +1602,7 @@ extern "C" __attribute__ ((visibility("default"))) const LV2_Descriptor* lv2_des
 
 extern "C" __attribute__ ((visibility("default"))) const LV2UI_Descriptor* lv2ui_descriptor(uint32 index)
 {
-    return (index <= 2) ? getNewLv2UI(index) : nullptr;
+    return (index <= 1) ? getNewLv2UI(index) : nullptr;
 }
 
 //==============================================================================
@@ -1638,7 +1646,7 @@ extern "C" __declspec (dllexport) const LV2_Descriptor* lv2_descriptor(uint32 in
 
 extern "C" __declspec (dllexport) const LV2UI_Descriptor* lv2ui_descriptor(uint32 index)
 {
-    return (index <= 2) ? getNewLv2UI(index) : nullptr;
+    return (index <= 1) ? getNewLv2UI(index) : nullptr;
 }
 
 #endif
