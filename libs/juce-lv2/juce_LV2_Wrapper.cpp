@@ -633,35 +633,23 @@ public:
                 *widget = nullptr;
 
                 // Try to get ui-resize feature first
-                for (uint16 j = 0; features[j]; j++)
+                for (uint16 i = 0; features[i]; i++)
                 {
-                    if (strcmp(features[j]->URI, LV2_UI_RESIZE_URI "#UIResize") == 0 && features[j]->data)
+                    if (strcmp(features[i]->URI, LV2_UI_RESIZE_URI "#UIResize") == 0 && features[i]->data)
                     {
-                        uiResizeFeature = (LV2_UI_Resize_Feature*)features[j]->data;
+                        uiResizeFeature = (LV2_UI_Resize_Feature*)features[i]->data;
                         break;
                     }
                 }
 
                 // Now get the X11 parent feature with ui-resize support
-                for (uint16 j = 0; features[j]; j++)
+                for (uint16 i = 0; features[i]; i++)
                 {
-                    if (strcmp(features[j]->URI, LV2_UI_URI "#parent") == 0 && features[j]->data)
+                    if (strcmp(features[i]->URI, LV2_UI_URI "#parent") == 0 && features[i]->data)
                     {
                         x11Wrapper = new X11EditorWrapper(editor, uiResizeFeature);
-                        x11Wrapper->setVisible (false);
-                        x11Wrapper->addToDesktop (0);
-
+                        resetX11UI(features[i]->data);
                         *widget = x11Wrapper->getWindowHandle();
-
-                        Window hostWindow = (Window) features[j]->data;
-                        Window editorWnd  = (Window) x11Wrapper->getWindowHandle();
-                        XReparentWindow (display, editorWnd, hostWindow, 0, 0);
-
-                        x11Wrapper->setVisible (true);
-
-                        if (uiResizeFeature)
-                          uiResizeFeature->ui_resize(uiResizeFeature->data, x11Wrapper->getWidth(), x11Wrapper->getHeight());
-
                         break;
                     }
                 }
@@ -670,11 +658,11 @@ public:
 #endif
 
             case LV2_UI_EXTERNAL:
-                for (uint16 j = 0; features[j]; j++)
+                for (uint16 i = 0; features[i]; i++)
                 {
-                    if ((strcmp(features[j]->URI, LV2_EXTERNAL_UI_URI) == 0 || strcmp(features[j]->URI, LV2_EXTERNAL_UI_DEPRECATED_URI) == 0) && features[j]->data)
+                    if ((strcmp(features[i]->URI, LV2_EXTERNAL_UI_URI) == 0 || strcmp(features[i]->URI, LV2_EXTERNAL_UI_DEPRECATED_URI) == 0) && features[i]->data)
                     {
-                        externalUIHost = (lv2_external_ui_host*)features[j]->data;
+                        externalUIHost = (lv2_external_ui_host*)features[i]->data;
                         break;
                     }
                 }
@@ -775,6 +763,10 @@ public:
 
     void doCleanup()
     {
+#if JUCE_LINUX
+        if (x11Wrapper)
+            x11Wrapper->removeFromDesktop ();
+#endif
     }
 
     //==============================================================================
@@ -789,12 +781,46 @@ public:
     }
 
     //==============================================================================
-    void resetUIIfNeeded(LV2UI_Write_Function writeFunction_, LV2UI_Controller controller_, LV2UI_Widget* widget)
+#if JUCE_LINUX
+    void resetX11UI(const void* parent)
+    {
+        x11Wrapper->setVisible (false);
+        x11Wrapper->addToDesktop (0);
+
+        Window hostWindow = (Window) parent;
+        Window editorWnd  = (Window) x11Wrapper->getWindowHandle();
+        XReparentWindow (display, editorWnd, hostWindow, 0, 0);
+
+        x11Wrapper->setVisible (true);
+
+        if (uiResizeFeature)
+            uiResizeFeature->ui_resize(uiResizeFeature->data, x11Wrapper->getWidth(), x11Wrapper->getHeight());
+    }
+#endif
+
+    void resetUIIfNeeded(LV2UI_Write_Function writeFunction_, LV2UI_Controller controller_, LV2UI_Widget* widget, const LV2_Feature* const* features)
     {
         writeFunction = writeFunction_;
         controller = controller_;
 
-        if (uiType == LV2_UI_EXTERNAL)
+        if (uiType == LV2_UI_X11)
+        {
+#if JUCE_LINUX
+            if (x11Wrapper && x11Wrapper->isOnDesktop() == false)
+            {
+                for (uint16 i = 0; features[i]; i++)
+                {
+                    if (strcmp(features[i]->URI, LV2_UI_URI "#parent") == 0 && features[i]->data)
+                    {
+                        resetX11UI(features[i]->data);
+                        *widget = x11Wrapper->getWindowHandle();
+                        break;
+                    }
+                }
+            }
+#endif
+        }
+        else if (uiType == LV2_UI_EXTERNAL)
         {
             *widget = externalUI;
 
@@ -1286,10 +1312,10 @@ public:
         return lv2Editor != nullptr;
     }
 
-    JuceLV2Editor* getLV2Editor(LV2UI_Write_Function writeFunction, LV2UI_Controller controller, LV2UI_Widget* widget)
+    JuceLV2Editor* getLV2Editor(LV2UI_Write_Function writeFunction, LV2UI_Controller controller, LV2UI_Widget* widget, const LV2_Feature* const* features)
     {
         if (lv2Editor)
-            lv2Editor->resetUIIfNeeded(writeFunction, controller, widget);
+            lv2Editor->resetUIIfNeeded(writeFunction, controller, widget, features);
         return lv2Editor;
     }
 
@@ -1444,7 +1470,7 @@ LV2UI_Handle juceLV2UIInstantiate(const LV2UI_Descriptor* uiDescriptor, LV2UI_Wr
                 wrapper->createLV2Editor(uiDescriptor, writeFunction, controller, widget, features, uiType);
             }
 
-            return wrapper->getLV2Editor(writeFunction, controller, widget);
+            return wrapper->getLV2Editor(writeFunction, controller, widget, features);
         }
     }
     std::cerr << "Host does not support instance-access, cannot use UI" << std::endl;
@@ -1481,7 +1507,9 @@ void juceLV2UIPortEvent(LV2UI_Handle instance, uint32 portIndex, uint32 bufferSi
 void juceLV2UICleanup(LV2UI_Handle instance)
 {
 #ifdef JucePlugin_WantsLV2InstanceAccess
-     // UI is kept open and only closes on plugin cleanup
+    // UI is kept open and only closes on plugin cleanup
+    JuceLV2Editor* editor = (JuceLV2Editor*)instance;
+    editor->doCleanup();
 #else
     delete (JuceLV2Editor*)instance;
 #endif
