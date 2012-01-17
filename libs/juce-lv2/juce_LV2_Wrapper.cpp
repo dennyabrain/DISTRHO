@@ -302,6 +302,9 @@ String makePresetsTtl(const String& uri)
 
     for (int i = 0; i < filter->getNumPrograms(); i++)
     {
+        std::cout << "\nSaving preset #" << i+1 << "...";
+        std::cout.flush();
+
         filter->setCurrentProgram(i);
         presets += "<" + uri + "/preset" + String(i) + "> a pset:Preset ;\n";
         presets += "    rdfs:label \"" + filter->getProgramName(i) + "\" ;\n";
