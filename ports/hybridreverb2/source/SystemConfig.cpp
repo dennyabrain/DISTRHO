@@ -61,8 +61,9 @@ SystemConfig::SystemConfig()
             String message = JUCE_T("Error: Preferences template file \"") +
                              filenameSrc +
                              JUCE_T("\" does not exist!");
-            AlertWindow::showMessageBox(AlertWindow::WarningIcon,
-                                        JUCE_T("Error"), message);
+            //AlertWindow::showMessageBox(AlertWindow::WarningIcon,
+            //                            JUCE_T("Error"), message);
+            std::cerr << (const char*)message.toUTF8() << std::endl;
             return;
         }
         String content = preferencesSrc.loadFileAsString();
@@ -86,8 +87,9 @@ SystemConfig::SystemConfig()
             String message = JUCE_T("Error: Preset template file \"") +
                              filenameSrc +
                              JUCE_T("\" does not exist!");
-            AlertWindow::showMessageBox(AlertWindow::WarningIcon,
-                                        JUCE_T("Error"), message);
+            //AlertWindow::showMessageBox(AlertWindow::WarningIcon,
+            //                            JUCE_T("Error"), message);
+            std::cerr << (const char*)message.toUTF8() << std::endl;
             return;
         }
         String content = presetsSrc.loadFileAsString();
@@ -375,7 +377,7 @@ void SystemConfig::extractBasedirUnix()
 
 void SystemConfig::extractUserdirUnix()
 {
-    userdir = String(getenv("HOME")) + JUCE_T("/.HybridReverb2");
+    userdir = String(getenv("HOME")) + JUCE_T("/.distrho/HybridReverb2");
 }
 
 #endif

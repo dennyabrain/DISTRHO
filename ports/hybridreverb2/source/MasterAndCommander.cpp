@@ -82,7 +82,9 @@ MasterAndCommander::MasterAndCommander (HybridReverb2Processor *ap)
     String presetFilename = systemConfig->getPresetFilename();
     presetManager = new PresetManager();
     currentPreset = presetManager->readFile(presetFilename);
-    while (currentPreset < 0)
+
+    int tries = 0;
+    while (currentPreset < 0 && tries >= 2)
     {
         FileChooser fc(JUCE_T("Invalid preset file. Please choose another file to open..."),
                        systemConfig->getUserdir(),
@@ -95,6 +97,7 @@ MasterAndCommander::MasterAndCommander (HybridReverb2Processor *ap)
             currentPreset = presetManager->readFile(paramPreferences.presetFile);
             systemConfig->setPreferences(paramPreferences);
         }
+        tries++;
     }
 }
 
@@ -189,6 +192,9 @@ void MasterAndCommander::onValueChangedPresetNum(int value, bool force)
     currentPreset = value;
     presetManager->setCurrentPresetNum(value);
     printf("Master :    new PRESET NUM value : %d\n", value);
+
+    if (currentPreset < 0)
+      return;
 
     preset = presetManager->getPreset(value);
     paramGainDelay = &preset.gainDelay;

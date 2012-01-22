@@ -136,8 +136,9 @@ int PresetManager::readFile(const String &presetFile)
         String message = JUCE_T("Error: Preset file \"") +
                          presetFile +
                          JUCE_T("\" does not exist!");
-        AlertWindow::showMessageBox(AlertWindow::WarningIcon,
-                                    JUCE_T("Error"), message);
+        //AlertWindow::showMessageBox(AlertWindow::WarningIcon,
+        //                            JUCE_T("Error"), message);
+        std::cerr << (const char*)message.toUTF8() << std::endl;
         return -1;
     }
     filename = presetFile;
@@ -151,8 +152,9 @@ int PresetManager::readFile(const String &presetFile)
                          presetFile +
                          JUCE_T("\" :\n") +
                          xmlDoc->getLastParseError();
-        AlertWindow::showMessageBox(AlertWindow::WarningIcon,
-                                    JUCE_T("Error"), message);
+        //AlertWindow::showMessageBox(AlertWindow::WarningIcon,
+        //                            JUCE_T("Error"), message);
+        std::cerr << (const char*)message.toUTF8() << std::endl;
         if (xmlDoc != 0)
         {
             delete xmlDoc;
