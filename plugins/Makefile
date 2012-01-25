@@ -38,6 +38,7 @@ lv2_vst: libs_plugin_vst libs_lv2
 
 vst: libs_plugin libs_plugin_vst
 	$(MAKE) -C 3BandEQ/VST
+	$(MAKE) -C JackAss/VST
 
 
 clean:
@@ -49,6 +50,7 @@ clean:
 
 	# VST
 	$(MAKE) clean -C 3BandEQ/VST
+	$(MAKE) clean -C JackAss/VST
 
 	rm -rf */Standalone/intermediate
 	rm -rf */LV2/intermediate
