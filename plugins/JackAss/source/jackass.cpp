@@ -165,7 +165,7 @@ public:
 
         // make a copy of the events, so we can unlock the mutex asap
         midi_data_t midi_data_tmp[MAX_MIDI_EVENTS];
-        
+
         pthread_mutex_lock(&ass->midi_mutex);
         memcpy(&midi_data_tmp, &ass->midi_data, sizeof(midi_data_t)*MAX_MIDI_EVENTS);
         memset(&ass->midi_data, 0, sizeof(midi_data_t)*MAX_MIDI_EVENTS);

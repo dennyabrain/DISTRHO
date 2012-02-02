@@ -37,19 +37,23 @@ extern AudioProcessor* JUCE_CALLTYPE createPluginFilter();
 /** Converts a parameter name to an LV2 compatible symbol. */
 String nameToSymbol(const String& name, const uint32 portIndex)
 {
-    String trimmedName = name.trimStart().trimEnd().toLowerCase();
+    String symbol, trimmedName = name.trimStart().trimEnd().toLowerCase();
 
     if (trimmedName.isEmpty())
-        return String(portIndex);
-
-    String symbol;
-    for (int i=0; i < trimmedName.length(); i++)
     {
-        const juce_wchar c = trimmedName[i];
-        if (std::isalpha(c) || std::isdigit(c))
-            symbol += c;
-        else
-            symbol += '_';
+        symbol += "port";
+        symbol += String(portIndex+1);
+    }
+    else
+    {
+        for (int i=0; i < trimmedName.length(); i++)
+        {
+            const juce_wchar c = trimmedName[i];
+            if (std::isalpha(c) || std::isdigit(c))
+                symbol += c;
+            else
+                symbol += '_';
+        }
     }
     return symbol;
 }
@@ -268,7 +272,7 @@ String makePluginTtl(const String& uri, const String& binary)
         if (filter->getParameterName(i).isNotEmpty())
           plugin += "      lv2:name \"" + filter->getParameterName(i) + "\" ;\n";
         else
-          plugin += "      lv2:name \"" + String(i) + "\" ;\n";
+          plugin += "      lv2:name \"Port " + String(i+1) + "\" ;\n";
         plugin += "      lv2:default " + String(filter->getParameter(i)) + " ;\n";
         plugin += "      lv2:minimum 0.0 ;\n";
         plugin += "      lv2:maximum 1.0 ;\n";
