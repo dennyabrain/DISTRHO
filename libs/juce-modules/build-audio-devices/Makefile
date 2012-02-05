@@ -15,7 +15,7 @@ all: juce-audio-devices
 
 Makefile: premake.lua
 	@echo ==== Regenerating Makefiles ====
-	@premake --file $^ --os linux --target gnu
+	@premake --file $^ --os linux --target gnu --cc gcc
 
 juce-audio-devices:
 	@echo ==== Building juce-audio-devices ====

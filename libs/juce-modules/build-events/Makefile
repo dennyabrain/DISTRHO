@@ -15,7 +15,7 @@ all: juce-events
 
 Makefile: premake.lua
 	@echo ==== Regenerating Makefiles ====
-	@premake --file $^ --os linux --target gnu
+	@premake --file $^ --os linux --target gnu --cc gcc
 
 juce-events:
 	@echo ==== Building juce-events ====

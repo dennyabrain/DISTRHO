@@ -15,7 +15,7 @@ all: juce-gui-basics
 
 Makefile: premake.lua
 	@echo ==== Regenerating Makefiles ====
-	@premake --file $^ --os linux --target gnu
+	@premake --file $^ --os linux --target gnu --cc gcc
 
 juce-gui-basics:
 	@echo ==== Building juce-gui-basics ====
