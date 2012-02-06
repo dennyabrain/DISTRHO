@@ -10,14 +10,14 @@ package.kind = "dll"
 package.language = "c++"
 package.targetprefix = ""
 
-package.defines   = { "JucePlugin_Build_AU=0", "JucePlugin_Build_LV2=0", "JucePlugin_Build_RTAS=0", "JucePlugin_Build_VST=1", "JucePlugin_Build_Standalone=0", "JUCE_USE_VSTSDK_2_4=1" }
+package.defines   = { "JucePlugin_Build_AU=0", "JucePlugin_Build_LV2=0", "JucePlugin_Build_RTAS=0", "JucePlugin_Build_VST=1", "JucePlugin_Build_Standalone=0" }
 package.linkflags = { "no-symbols", "static-runtime" }
 
 package.config["Release"].target     = project.name
 package.config["Release"].objdir     = "intermediate/Release"
 package.config["Release"].defines    = { "NDEBUG=1" }
 package.config["Release"].buildflags = { "no-symbols", "optimize-speed" }
-package.config["Release"].links      = { "juce-plugin-153" }
+package.config["Release"].links      = { "juce-core", "juce-audio-basics", "juce-audio-processors", "juce-data-structures", "juce-events", "juce-graphics", "juce-gui-basics" }
 
 package.config["Debug"].target       = project.name .. "_debug"
 package.config["Debug"].objdir       = "intermediate/Debug"
@@ -42,8 +42,8 @@ end
 
 package.includepaths = {
   "../source",
-  "../../../libs/juce-153/plugin",
-  "../../../libs/juce-153/source",
+  "../../../libs/juce-modules/source",
+  "../../../libs/juce-modules/build-audio-plugin-client",
   "../../../sdks/vstsdk2.4"
 }
 
@@ -59,6 +59,6 @@ package.files = {
     "../source/Headers/Binary Data/Backgrounds/thefunctionbackground.cpp",
     "../source/Headers/Binary Data/UI/button.cpp",
     "../source/Headers/Binary Data/UI/knobs.cpp",
-    "../../../libs/juce-153/source/src/audio/plugin_client/VST/juce_VST_Wrapper.cpp"
+    "../../../libs/JucePluginMain.cpp"
   )
 }

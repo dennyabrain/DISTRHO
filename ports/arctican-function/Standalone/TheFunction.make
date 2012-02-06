@@ -13,12 +13,12 @@ ifeq ($(CONFIG),Release)
   LIBDIR := ../../../bin
   OBJDIR := intermediate/Release
   OUTDIR := ../../../bin
-  CPPFLAGS := $(DEPFLAGS) -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=0" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_Standalone=1" -D "LINUX=1" -D "NDEBUG=1" -I "../source" -I "../../../libs/juce-modules" -I "../../../libs/juce-modules/source"
+  CPPFLAGS := $(DEPFLAGS) -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=0" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_Standalone=1" -D "LINUX=1" -D "NDEBUG=1" -I "../source" -I "../../../libs/juce-modules/source"
   CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -O3 `pkg-config --cflags freetype2` -O2 -mtune=generic -msse -ffast-math -fomit-frame-pointer -fvisibility=hidden -fPIC
   CXXFLAGS += $(CFLAGS)
   LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -s `pkg-config --libs freetype2` -L"../../../libs" -lfreetype -lpthread -lasound -ldl -lrt -lX11 -lXext -ljuce-core -ljuce-audio-basics -ljuce-audio-processors -ljuce-gui-basics -ljuce-audio-devices -ljuce-audio-formats -ljuce-audio-utils -ljuce-data-structures -ljuce-events -ljuce-graphics
   LDDEPS :=
-  RESFLAGS := -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=0" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_Standalone=1" -D "LINUX=1" -D "NDEBUG=1" -I "../source" -I "../../../libs/juce-modules" -I "../../../libs/juce-modules/source"
+  RESFLAGS := -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=0" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_Standalone=1" -D "LINUX=1" -D "NDEBUG=1" -I "../source" -I "../../../libs/juce-modules/source"
   TARGET := TheFunction
  BLDCMD = $(CXX) -o $(OUTDIR)/$(TARGET) $(OBJECTS) $(LDFLAGS) $(LDFLAGS) $(RESOURCES) $(TARGET_ARCH)
 endif
@@ -28,12 +28,12 @@ ifeq ($(CONFIG),Debug)
   LIBDIR := ../../../bin
   OBJDIR := intermediate/Debug
   OUTDIR := ../../../bin
-  CPPFLAGS := $(DEPFLAGS) -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=0" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_Standalone=1" -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -I "../source" -I "../../../libs/juce-modules" -I "../../../libs/juce-modules/source"
+  CPPFLAGS := $(DEPFLAGS) -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=0" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_Standalone=1" -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -I "../source" -I "../../../libs/juce-modules/source"
   CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -g `pkg-config --cflags freetype2` -O0 -ggdb -fPIC
   CXXFLAGS += $(CFLAGS)
   LDFLAGS += -L$(BINDIR) -L$(LIBDIR) `pkg-config --libs freetype2` -L"../../../libs" -lfreetype -lpthread -lasound -ldl -lrt -lX11 -lXext -ljuce-core_debug
   LDDEPS :=
-  RESFLAGS := -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=0" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_Standalone=1" -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -I "../source" -I "../../../libs/juce-modules" -I "../../../libs/juce-modules/source"
+  RESFLAGS := -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=0" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_Standalone=1" -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -I "../source" -I "../../../libs/juce-modules/source"
   TARGET := TheFunction_debug
  BLDCMD = $(CXX) -o $(OUTDIR)/$(TARGET) $(OBJECTS) $(LDFLAGS) $(LDFLAGS) $(RESOURCES) $(TARGET_ARCH)
 endif

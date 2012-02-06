@@ -14,4 +14,6 @@
 #include "../build-audio-basics/AppConfig.h"
 #include "../build-audio-processors/AppConfig.h"
 
+#include "JucePluginCharacteristics.h"
+
 #endif // __DISTRHO_JUCE_AUDIO_PLUGIN_CLIENT_APPCONFIG_H__
