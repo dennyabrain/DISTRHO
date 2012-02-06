@@ -17,7 +17,7 @@
     flash in a random colour, so that you can see exactly which bits of your
     components are being drawn.
 */
-#ifdef DEBUG
+#if DEBUG
  #define JUCE_ENABLE_REPAINT_DEBUGGING 1
 #else
  #define JUCE_ENABLE_REPAINT_DEBUGGING 0

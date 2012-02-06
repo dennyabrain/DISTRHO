@@ -72,7 +72,7 @@ void FilmStripSlider::drawFrame (Graphics &g, int x, int y, int width, int heigh
 
 }*/
 
-const String Knob::getTextFromValue (double value)
+String Knob::getTextFromValue (double value)
 {
 	String displayText;
 

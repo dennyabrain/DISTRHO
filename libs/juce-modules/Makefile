@@ -3,7 +3,7 @@
 all: build
 
 
-build: audio-basics audio-devices audio-formats audio-processors audio-utils \
+build: audio-basics audio-devices audio-formats audio-processors audio-processors-full audio-utils \
 	core cryptography data-structures events graphics gui-basics gui-extra opengl video
 
 
@@ -17,7 +17,11 @@ audio-formats:
 	$(MAKE) -C build-audio-formats
 
 audio-processors:
-# 	$(MAKE) -C build-audio-processors
+	$(MAKE) -C build-audio-processors
+
+audio-processors-full:
+	# FIXME - doesn't build
+# 	$(MAKE) -C build-audio-processors-full
 
 audio-utils:
 	$(MAKE) -C build-audio-utils
@@ -57,7 +61,8 @@ clean:
 	$(MAKE) clean -C build-audio-basics
 	$(MAKE) clean -C build-audio-devices
 	$(MAKE) clean -C build-audio-formats
-# 	$(MAKE) clean -C build-audio-processors
+	$(MAKE) clean -C build-audio-processors
+	$(MAKE) clean -C build-audio-processors-full
 	$(MAKE) clean -C build-audio-utils
 	$(MAKE) clean -C build-core
 	$(MAKE) clean -C build-cryptography

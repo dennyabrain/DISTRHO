@@ -1,3 +1,10 @@
+/*
+  ==============================================================================
+
+   Custom Standalone Window
+
+  ==============================================================================
+*/
 
 #include "juce_StandaloneFilterWindow.h"
 
@@ -14,136 +21,115 @@ class StandaloneFilterApplication : public JUCEApplication
 public:
 
     //==============================================================================
-    StandaloneFilterApplication();
-    ~StandaloneFilterApplication();
+    StandaloneFilterApplication()
+        : window (nullptr),
+          appProperties (nullptr)
+    {
+    }
+
+    ~StandaloneFilterApplication()
+    {
+    }
 
     //==============================================================================
-    void initialise (const String& commandLine);
-    void shutdown();
+    void initialise (const String& commandLine)
+    {
+        DBG ("StandaloneFilterApplication::initialise");
+
+        // set-up options
+        PropertiesFile::Options options;
+        options.applicationName = getApplicationName();
+        options.filenameSuffix = "xml";
+        options.folderName = ".distrho";
+        options.osxLibrarySubFolder = "Application Support";
+        options.commonToAllUsers = false;
+        options.ignoreCaseOfKeyNames = true;
+
+        // open up config
+        appProperties = new ApplicationProperties();
+        appProperties->setStorageParameters (options);
+
+        // setup window name
+        String pluginWindowName;
+        pluginWindowName << JucePlugin_Name << " v" << JucePlugin_VersionString;
+#ifdef JUCE_DEBUG
+        pluginWindowName << " (DEBUG)";
+#endif
+
+        // create the window
+        window = new StandaloneFilterWindow (pluginWindowName, Colour (32, 32, 32), appProperties->getUserSettings(), commandLine);
+
+        window->toFront (true);
+        window->setVisible (true);
+
+        Process::setPriority (Process::HighPriority);
+    }
+
+    void shutdown()
+    {
+        DBG ("StandaloneFilterApplication::shutdown");
+
+        if (window)
+        {
+            window->setVisible (false);
+            deleteAndZero (window);
+        }
+
+        if (appProperties)
+        {
+            appProperties->saveIfNeeded ();
+            appProperties->closeFiles ();
+        }
+    }
 
     //==============================================================================
-    void systemRequestedQuit();
-    void ladishSaveRequested();
+    void systemRequestedQuit()
+    {
+        DBG ("StandaloneFilterApplication::systemRequestedQuit");
+
+        quit ();
+    }
+
+    void ladishSaveRequested()
+    {
+        window->saveState();
+    }
+
     void unhandledException (const std::exception* e,
                              const String& sourceFilename,
-                             const int lineNumber);
+                             const int lineNumber)
+    {
+    #ifndef JUCE_DEBUG
+        AlertWindow::showMessageBox (AlertWindow::WarningIcon,
+                                    "Unhandled Exception",
+                                    "Something bad happened to the application.");
+        quit ();
+    #endif
+    }
 
     //==============================================================================
-    const String getApplicationName();
-    const String getApplicationVersion();
+    const String getApplicationName()
+    {
+        return JucePlugin_Name;
+    }
+
+    const String getApplicationVersion()
+    {
+        return JucePlugin_VersionString;
+    }
 
     //==============================================================================
-    bool moreThanOneInstanceAllowed();
+    bool moreThanOneInstanceAllowed()
+    {
+        return true;
+    }
 
 private:
-
     StandaloneFilterWindow* window;
+    ApplicationProperties* appProperties;
 
     StandaloneFilterApplication (const StandaloneFilterApplication&);
     const StandaloneFilterApplication& operator= (const StandaloneFilterApplication&);
 };
-
-//==============================================================================
-StandaloneFilterApplication::StandaloneFilterApplication()
-  : window (0)
-{
-}
-
-StandaloneFilterApplication::~StandaloneFilterApplication()
-{
-}
-
-
-//==============================================================================
-void StandaloneFilterApplication::initialise (const String& commandLine)
-{
-    DBG ("StandaloneFilterApplication::initialise");
-
-    // set-up options
-    PropertiesFile::Options options;
-    options.applicationName = getApplicationName();
-    options.filenameSuffix = "xml";
-    options.folderName = ".distrho";
-    options.osxLibrarySubFolder = "Application Support";
-    options.commonToAllUsers = false;
-    options.ignoreCaseOfKeyNames = true;
-
-    // open up config
-    ApplicationProperties* appProperties = ApplicationProperties::getInstance();
-    appProperties->setStorageParameters (options);
-
-    // setup window name
-    String pluginWindowName;
-    pluginWindowName << JucePlugin_Name << " v" << JucePlugin_VersionString;
-#ifdef JUCE_DEBUG
-    pluginWindowName << " (DEBUG)";
-#endif
-
-    // create the window
-    window = new StandaloneFilterWindow (pluginWindowName,
-                                          Colour (32, 32, 32), commandLine);
-
-    window->toFront (true);
-    window->setVisible (true);
-
-    Process::setPriority (Process::HighPriority);
-}
-
-void StandaloneFilterApplication::shutdown()
-{
-    DBG ("StandaloneFilterApplication::shutdown");
-
-    if (window)
-    {
-        window->setVisible (false);
-        deleteAndZero (window);
-    }
-
-    ApplicationProperties::getInstance()->closeFiles ();
-    ApplicationProperties::deleteInstance();
-}
-
-//==============================================================================
-void StandaloneFilterApplication::systemRequestedQuit()
-{
-    DBG ("StandaloneFilterApplication::systemRequestedQuit");
-
-    quit ();
-}
-
-void StandaloneFilterApplication::ladishSaveRequested()
-{
-    window->saveState();
-}
-
-void StandaloneFilterApplication::unhandledException (const std::exception* e,
-                                                      const String& sourceFilename,
-                                                      const int lineNumber)
-{
-#ifndef JUCE_DEBUG
-    AlertWindow::showMessageBox (AlertWindow::WarningIcon,
-                                 T("Unhandled Exception"),
-                                 T("Something bad happened to the application.") );
-    quit ();
-#endif
-}
-
-//==============================================================================
-const String StandaloneFilterApplication::getApplicationName()
-{
-    return JucePlugin_Name;
-}
-
-const String StandaloneFilterApplication::getApplicationVersion()
-{
-    return JucePlugin_VersionString;
-}
-
-//==============================================================================
-bool StandaloneFilterApplication::moreThanOneInstanceAllowed()
-{
-    return true;
-}
-
 
 START_JUCE_APPLICATION(StandaloneFilterApplication)

@@ -33,8 +33,7 @@ else
 end
 
 package.includepaths = {
-    ".",
-    "../../../sdks/vstsdk2.4"
+  "."
 }
 
 package.files = {

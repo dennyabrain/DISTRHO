@@ -13,12 +13,12 @@ ifeq ($(CONFIG),Release)
   LIBDIR := ../..
   OBJDIR := intermediate/Release
   OUTDIR := ../..
-  CPPFLAGS := $(DEPFLAGS) -D "LINUX=1" -D "NDEBUG=1" -I "." -I "../../../sdks/vstsdk2.4"
+  CPPFLAGS := $(DEPFLAGS) -D "LINUX=1" -D "NDEBUG=1" -I "."
   CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -g -O3 `pkg-config --cflags freetype2` -O2 -mtune=generic -ffast-math -fomit-frame-pointer -fvisibility=hidden -fPIC
   CXXFLAGS += $(CFLAGS)
   LDFLAGS += -L$(BINDIR) -L$(LIBDIR)
   LDDEPS :=
-  RESFLAGS := -D "LINUX=1" -D "NDEBUG=1" -I "." -I "../../../sdks/vstsdk2.4"
+  RESFLAGS := -D "LINUX=1" -D "NDEBUG=1" -I "."
   TARGET := libjuce-audio-processors.a
  BLDCMD = ar -rcs $(OUTDIR)/$(TARGET) $(OBJECTS) $(TARGET_ARCH)
 endif
@@ -28,12 +28,12 @@ ifeq ($(CONFIG),Debug)
   LIBDIR := ../..
   OBJDIR := intermediate/Debug
   OUTDIR := ../..
-  CPPFLAGS := $(DEPFLAGS) -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -I "." -I "../../../sdks/vstsdk2.4"
+  CPPFLAGS := $(DEPFLAGS) -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -I "."
   CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -g `pkg-config --cflags freetype2` -O0 -ggdb -fPIC
   CXXFLAGS += $(CFLAGS)
   LDFLAGS += -L$(BINDIR) -L$(LIBDIR)
   LDDEPS :=
-  RESFLAGS := -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -I "." -I "../../../sdks/vstsdk2.4"
+  RESFLAGS := -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -I "."
   TARGET := libjuce-audio-processors_debug.a
  BLDCMD = ar -rcs $(OUTDIR)/$(TARGET) $(OBJECTS) $(TARGET_ARCH)
 endif

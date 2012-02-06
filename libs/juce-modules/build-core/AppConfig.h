@@ -96,7 +96,4 @@
 #define JUCE_MODULE_AVAILABLE_juce_opengl                1
 #define JUCE_MODULE_AVAILABLE_juce_video                 1
 
-//#define JUCE_MODULE_AVAILABLE_juce_gui_basics 1
-//#define JUCE_MODULE_AVAILABLE_juce_opengl     1
-
 #endif // __DISTRHO_JUCE_CORE_APPCONFIG_H__

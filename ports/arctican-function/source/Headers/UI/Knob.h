@@ -27,7 +27,7 @@ public:
     Knob();
     ~Knob();
 
-	const String getTextFromValue (double value);
+	String getTextFromValue (double value);
 	void setReadoutType(String type);
 	//void Slider::PopupDisplayComponent::BubbleComponent::paint(Graphics& g);
 
