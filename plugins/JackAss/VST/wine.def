@@ -1,4 +1,0 @@
-LIBRARY     JackAss
-DESCRIPTION 'JackAss VST Plugin'
-EXPORTS VSTPluginMain
-main=VSTPluginMain
