@@ -19,7 +19,7 @@ ifeq ($(CONFIG),Release)
   LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -s `pkg-config --libs freetype2` -L"../../../libs" -lfreetype -lpthread -lasound -ldl -lrt -lX11 -lXext -ljuce-core -ljuce-audio-basics -ljuce-audio-devices -ljuce-audio-formats -ljuce-audio-processors -ljuce-audio-utils -ljuce-data-structures -ljuce-events -ljuce-graphics -ljuce-gui-basics
   LDDEPS :=
   RESFLAGS := -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=0" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_Standalone=1" -D "LINUX=1" -D "NDEBUG=1" -I "../source" -I "../../../libs/juce-2.0/source" -I "../../../libs/juce-2.0/plugin"
-  TARGET := TheFunction
+  TARGET := ThePilgrim
  BLDCMD = $(CXX) -o $(OUTDIR)/$(TARGET) $(OBJECTS) $(LDFLAGS) $(LDFLAGS) $(RESOURCES) $(TARGET_ARCH)
 endif
 
@@ -34,7 +34,7 @@ ifeq ($(CONFIG),Debug)
   LDFLAGS += -L$(BINDIR) -L$(LIBDIR) `pkg-config --libs freetype2` -L"../../../libs" -lfreetype -lpthread -lasound -ldl -lrt -lX11 -lXext -ljuce-core_debug -ljuce-audio-basics_debug -ljuce-audio-devices_debug -ljuce-audio-formats_debug -ljuce-audio-processors_debug -ljuce-audio-utils_debug -ljuce-data-structures_debug -ljuce-events_debug -ljuce-graphics_debug -ljuce-gui-basics_debug
   LDDEPS :=
   RESFLAGS := -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=0" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=0" -D "JucePlugin_Build_Standalone=1" -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -I "../source" -I "../../../libs/juce-2.0/source" -I "../../../libs/juce-2.0/plugin"
-  TARGET := TheFunction_debug
+  TARGET := ThePilgrim_debug
  BLDCMD = $(CXX) -o $(OUTDIR)/$(TARGET) $(OBJECTS) $(LDFLAGS) $(LDFLAGS) $(RESOURCES) $(TARGET_ARCH)
 endif
 
@@ -42,9 +42,7 @@ OBJECTS := \
 	$(OBJDIR)/PluginEditor.o \
 	$(OBJDIR)/PluginProcessor.o \
 	$(OBJDIR)/Knob.o \
-	$(OBJDIR)/FancyButton.o \
-	$(OBJDIR)/thefunctionbackground.o \
-	$(OBJDIR)/button.o \
+	$(OBJDIR)/thepilgrimbackground.o \
 	$(OBJDIR)/knobs.o \
 	$(OBJDIR)/JucePluginMain.o \
 
@@ -71,14 +69,14 @@ endif
 .PHONY: clean
 
 $(OUTDIR)/$(TARGET): $(OBJECTS) $(LDDEPS) $(RESOURCES)
-	@echo Linking TheFunction
+	@echo Linking ThePilgrim
 	-@$(CMD_MKBINDIR)
 	-@$(CMD_MKLIBDIR)
 	-@$(CMD_MKOUTDIR)
 	@$(BLDCMD)
 
 clean:
-	@echo Cleaning TheFunction
+	@echo Cleaning ThePilgrim
 ifeq ($(MKDIR_TYPE),posix)
 	-@rm -f $(OUTDIR)/$(TARGET)
 	-@rm -rf $(OBJDIR)
@@ -103,17 +101,7 @@ $(OBJDIR)/Knob.o: ../source/Headers/UI/Knob.cpp
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
-$(OBJDIR)/FancyButton.o: ../source/Headers/UI/FancyButton.cpp
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/thefunctionbackground.o: ../source/Headers/Binary\ Data/Backgrounds/thefunctionbackground.cpp
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/button.o: ../source/Headers/Binary\ Data/UI/button.cpp
+$(OBJDIR)/thepilgrimbackground.o: ../source/Headers/Binary\ Data/Backgrounds/thepilgrimbackground.cpp
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
