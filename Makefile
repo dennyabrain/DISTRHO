@@ -5,9 +5,10 @@ all: build
 
 build:
 	$(MAKE) -C libs/juce-2.0
-# 	$(MAKE) -C libs/juce-lv2
+	$(MAKE) -C libs/juce-lv2
 # 	$(MAKE) plugins -C plugins
 	$(MAKE) plugins -C ports
+	@./scripts/generate-ttl.sh
 
 
 clean:

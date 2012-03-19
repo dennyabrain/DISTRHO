@@ -10,7 +10,7 @@ plugins: standalone lv2 vst
 
 libs:
 	$(MAKE) -C ../libs/juce-2.0
-# 	$(MAKE) -C ../libs/juce-lv2
+	$(MAKE) -C ../libs/juce-lv2
 
 standalone:
 	$(MAKE) -C arctican-function/Standalone
@@ -32,8 +32,8 @@ standalone:
 # 	$(MAKE) -C wolpertinger/Standalone
 
 lv2:
-# 	$(MAKE) -C arctican-function/LV2
-# 	$(MAKE) -C arctican-pilgrim/LV2
+	$(MAKE) -C arctican-function/LV2
+	$(MAKE) -C arctican-pilgrim/LV2
 # 	$(MAKE) -C argotlunar/LV2
 # 	$(MAKE) -C bitmangler/LV2
 # 	$(MAKE) -C hybridreverb2/LV2

@@ -17,18 +17,17 @@ package.config["Release"].target     = project.name
 package.config["Release"].objdir     = "intermediate/Release"
 package.config["Release"].defines    = { "NDEBUG=1" }
 package.config["Release"].buildflags = { "no-symbols", "optimize-speed" }
-package.config["Release"].links      = { "juce-plugin-153" }
+package.config["Release"].links      = { "juce-core", "juce-audio-basics", "juce-audio-processors", "juce-data-structures", "juce-events", "juce-graphics", "juce-gui-basics" }
 
 package.config["Debug"].target       = project.name
 package.config["Debug"].objdir       = "intermediate/Debug"
 package.config["Debug"].defines      = { "DEBUG=1", "_DEBUG=1" }
-package.config["Debug"].links        = { "juce-plugin-153_debug" }
+package.config["Debug"].links        = { "juce-core_debug", "juce-audio-basics_debug", "juce-audio-processors_debug", "juce-data-structures_debug", "juce-events_debug", "juce-graphics_debug", "juce-gui-basics_debug" }
 
 if (windows) then
   package.defines = { package.defines, "WINDOWS=1" }
 else
   package.config["Release"].buildoptions = { "-O2 -mtune=generic -msse -ffast-math -fomit-frame-pointer -fvisibility=hidden -fPIC" }
---   package.config["Release"].linkoptions  = { "-Wl,-O1 -Wl,--as-needed" }
   package.config["Debug"].buildoptions   = { "-O0 -ggdb -fPIC" }
   if (macosx) then
     package.defines = { package.defines, "MAC=1" }
@@ -42,8 +41,8 @@ end
 
 package.includepaths = {
   "../source",
-  "../../../libs/juce-153/plugin",
-  "../../../libs/juce-153/source"
+  "../../../libs/juce-2.0/source",
+  "../../../libs/juce-2.0/plugin"
 }
 
 package.libpaths = {
@@ -56,6 +55,6 @@ package.files = {
     "../source/Headers/UI/Knob.cpp",
     "../source/Headers/Binary Data/Backgrounds/thepilgrimbackground.cpp",
     "../source/Headers/Binary Data/UI/knobs.cpp",
-    "../../../libs/juce-lv2/juce_LV2_Wrapper.cpp"
+    "../../../libs/juce-2.0/plugin/JucePluginMain.cpp"
   )
 }

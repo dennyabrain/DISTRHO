@@ -9,6 +9,7 @@
 #ifndef __DISTRHO_PLUGIN_MAIN_H__
 #define __DISTRHO_PLUGIN_MAIN_H__
 
+#include "AppConfig.h"
 #include "JucePluginCharacteristics.h"
 
 #include "../source/modules/juce_core/juce_core.h"

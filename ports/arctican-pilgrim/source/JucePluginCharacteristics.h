@@ -39,7 +39,9 @@
 #define JucePlugin_RTASCategory         ePlugInCategory_None
 #define JucePlugin_RTASManufacturerCode JucePlugin_ManufacturerCode
 #define JucePlugin_RTASProductId        JucePlugin_PluginCode
-//#define JucePlugin_LV2Category          "PhaserPlugin"
-//#define JucePlugin_WantsLV2Presets      1
+
+#define JucePlugin_LV2URI               "http://arcticanaudio.com/plugins/thepilgrim"
+#define JucePlugin_LV2Category          "PhaserPlugin"
+#define JucePlugin_WantsLV2Presets      1
 
 #endif   // __PLUGINCHARACTERISTICS_D4EFFF1A__
