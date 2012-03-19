@@ -1,0 +1,5 @@
+# TODO for DISTRHO
+
+libs/juce-2.0/audio-devices         - check if JUCE_WASAPI is valid on Windows XP
+libs/juce-2.0/audio-processors_full - fails to build on linux
+
