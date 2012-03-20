@@ -62,8 +62,8 @@
  #include "includes/time.h"
  #include "includes/ui-resize.h"
 #else
- #include "lv2/event.h"
- #include "lv2/event-helpers.h"
+ #include "includes/event.h"
+ #include "includes/event-helpers.h"
 #endif
 
 #include "modules/juce_audio_plugin_client/utility/juce_IncludeModuleHeaders.h"

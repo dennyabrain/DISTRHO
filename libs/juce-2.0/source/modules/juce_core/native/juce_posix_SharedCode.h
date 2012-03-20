@@ -73,12 +73,16 @@ public:
     {
         pthread_cond_init (&condition, 0);
 
+      #if JUCE_LINUX
+        pthread_mutex_init (&mutex, 0);
+      #else
         pthread_mutexattr_t atts;
         pthread_mutexattr_init (&atts);
        #if ! JUCE_ANDROID
         pthread_mutexattr_setprotocol (&atts, PTHREAD_PRIO_INHERIT);
        #endif
         pthread_mutex_init (&mutex, &atts);
+      #endif
     }
 
     ~WaitableEventImpl()
