@@ -42,7 +42,7 @@ end
 package.includepaths = {
   "../source",
   "../../../libs/juce-2.0/source",
-  "../../../libs/juce-2.0/plugin",
+  "../../../libs/juce-plugin",
   "../../../sdks/vstsdk2.4"
 }
 
@@ -58,6 +58,6 @@ package.files = {
     "../source/Headers/Binary Data/Backgrounds/thefunctionbackground.cpp",
     "../source/Headers/Binary Data/UI/button.cpp",
     "../source/Headers/Binary Data/UI/knobs.cpp",
-    "../../../libs/juce-2.0/plugin/JucePluginMain.cpp"
+    "../../../libs/juce-plugin/JucePluginMain.cpp"
   )
 }

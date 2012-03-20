@@ -42,7 +42,7 @@ end
 package.includepaths = {
   "../source",
   "../../../libs/juce-2.0/source",
-  "../../../libs/juce-2.0/plugin"
+  "../../../libs/juce-plugin"
 }
 
 package.libpaths = {
@@ -55,6 +55,6 @@ package.files = {
     "../source/Headers/UI/Knob.cpp",
     "../source/Headers/Binary Data/Backgrounds/thepilgrimbackground.cpp",
     "../source/Headers/Binary Data/UI/knobs.cpp",
-    "../../../libs/juce-2.0/plugin/JucePluginMain.cpp"
+    "../../../libs/juce-plugin/JucePluginMain.cpp"
   )
 }

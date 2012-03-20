@@ -1,0 +1,44 @@
+@prefix lv2:  <http://lv2plug.in/ns/lv2core#> .
+@prefix pset: <http://lv2plug.in/ns/ext/presets#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix ui:   <http://lv2plug.in/ns/extensions/ui#> .
+
+<http://arcticanaudio.com/plugins/thepilgrim>
+    a lv2:Plugin ;
+    lv2:binary <The_Pilgrim.so> ;
+    rdfs:seeAlso <The_Pilgrim.ttl> .
+
+<http://arcticanaudio.com/plugins/thepilgrim#ExternalUI>
+    a <http://nedko.arnaudov.name/lv2/external_ui/> ;
+    ui:binary <The_Pilgrim.so> .
+
+<http://arcticanaudio.com/plugins/thepilgrim#ExternalOldUI>
+    a ui:external ;
+    ui:binary <The_Pilgrim.so> .
+
+<http://arcticanaudio.com/plugins/thepilgrim#preset1>
+    a pset:Preset ;
+    lv2:appliesTo <http://arcticanaudio.com/plugins/thepilgrim> ;
+    rdfs:seeAlso <presets.ttl> .
+
+<http://arcticanaudio.com/plugins/thepilgrim#preset2>
+    a pset:Preset ;
+    lv2:appliesTo <http://arcticanaudio.com/plugins/thepilgrim> ;
+    rdfs:seeAlso <presets.ttl> .
+
+<http://arcticanaudio.com/plugins/thepilgrim#preset3>
+    a pset:Preset ;
+    lv2:appliesTo <http://arcticanaudio.com/plugins/thepilgrim> ;
+    rdfs:seeAlso <presets.ttl> .
+
+<http://arcticanaudio.com/plugins/thepilgrim#preset4>
+    a pset:Preset ;
+    lv2:appliesTo <http://arcticanaudio.com/plugins/thepilgrim> ;
+    rdfs:seeAlso <presets.ttl> .
+
+<http://arcticanaudio.com/plugins/thepilgrim#preset5>
+    a pset:Preset ;
+    lv2:appliesTo <http://arcticanaudio.com/plugins/thepilgrim> ;
+    rdfs:seeAlso <presets.ttl> .
+
+

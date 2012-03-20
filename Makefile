@@ -16,6 +16,7 @@ clean:
 	$(MAKE) clean -C libs/juce-lv2
 # 	$(MAKE) clean -C plugins
 	$(MAKE) clean -C ports
+	rm -rf bin/*.lv2
 
 
 # Custom build types

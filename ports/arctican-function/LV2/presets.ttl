@@ -1,0 +1,160 @@
+@prefix lv2:   <http://lv2plug.in/ns/lv2core#> .
+@prefix pset:  <http://lv2plug.in/ns/ext/presets#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+
+<http://arcticanaudio.com/plugins/thefunction#preset1> a pset:Preset ;
+    rdfs:label "Blank Canvas" ;
+    lv2:port [
+        lv2:symbol "gain" ;
+        pset:value 1 ;
+    ] ;
+    lv2:port [
+        lv2:symbol "gain_l" ;
+        pset:value 1 ;
+    ] ;
+    lv2:port [
+        lv2:symbol "gain_r" ;
+        pset:value 1 ;
+    ] ;
+    lv2:port [
+        lv2:symbol "phase_l" ;
+        pset:value 0 ;
+    ] ;
+    lv2:port [
+        lv2:symbol "phase_r" ;
+        pset:value 0 ;
+    ] ;
+    lv2:port [
+        lv2:symbol "pan_l" ;
+        pset:value 0 ;
+    ] ;
+    lv2:port [
+        lv2:symbol "pan_r" ;
+        pset:value 1 ;
+    ] .
+
+<http://arcticanaudio.com/plugins/thefunction#preset2> a pset:Preset ;
+    rdfs:label "Phased" ;
+    lv2:port [
+        lv2:symbol "gain" ;
+        pset:value 1 ;
+    ] ;
+    lv2:port [
+        lv2:symbol "gain_l" ;
+        pset:value 1 ;
+    ] ;
+    lv2:port [
+        lv2:symbol "gain_r" ;
+        pset:value 1 ;
+    ] ;
+    lv2:port [
+        lv2:symbol "phase_l" ;
+        pset:value 1 ;
+    ] ;
+    lv2:port [
+        lv2:symbol "phase_r" ;
+        pset:value 0 ;
+    ] ;
+    lv2:port [
+        lv2:symbol "pan_l" ;
+        pset:value 0 ;
+    ] ;
+    lv2:port [
+        lv2:symbol "pan_r" ;
+        pset:value 1 ;
+    ] .
+
+<http://arcticanaudio.com/plugins/thefunction#preset3> a pset:Preset ;
+    rdfs:label "Stereo->Mono" ;
+    lv2:port [
+        lv2:symbol "gain" ;
+        pset:value 0.5 ;
+    ] ;
+    lv2:port [
+        lv2:symbol "gain_l" ;
+        pset:value 1 ;
+    ] ;
+    lv2:port [
+        lv2:symbol "gain_r" ;
+        pset:value 1 ;
+    ] ;
+    lv2:port [
+        lv2:symbol "phase_l" ;
+        pset:value 0 ;
+    ] ;
+    lv2:port [
+        lv2:symbol "phase_r" ;
+        pset:value 0 ;
+    ] ;
+    lv2:port [
+        lv2:symbol "pan_l" ;
+        pset:value 0.5 ;
+    ] ;
+    lv2:port [
+        lv2:symbol "pan_r" ;
+        pset:value 0.5 ;
+    ] .
+
+<http://arcticanaudio.com/plugins/thefunction#preset4> a pset:Preset ;
+    rdfs:label "Mono Blocker" ;
+    lv2:port [
+        lv2:symbol "gain" ;
+        pset:value 1 ;
+    ] ;
+    lv2:port [
+        lv2:symbol "gain_l" ;
+        pset:value 1 ;
+    ] ;
+    lv2:port [
+        lv2:symbol "gain_r" ;
+        pset:value 1 ;
+    ] ;
+    lv2:port [
+        lv2:symbol "phase_l" ;
+        pset:value 0 ;
+    ] ;
+    lv2:port [
+        lv2:symbol "phase_r" ;
+        pset:value 1 ;
+    ] ;
+    lv2:port [
+        lv2:symbol "pan_l" ;
+        pset:value 0.5 ;
+    ] ;
+    lv2:port [
+        lv2:symbol "pan_r" ;
+        pset:value 0.5 ;
+    ] .
+
+<http://arcticanaudio.com/plugins/thefunction#preset5> a pset:Preset ;
+    rdfs:label "Gain Reduction" ;
+    lv2:port [
+        lv2:symbol "gain" ;
+        pset:value 0.300000012 ;
+    ] ;
+    lv2:port [
+        lv2:symbol "gain_l" ;
+        pset:value 1 ;
+    ] ;
+    lv2:port [
+        lv2:symbol "gain_r" ;
+        pset:value 1 ;
+    ] ;
+    lv2:port [
+        lv2:symbol "phase_l" ;
+        pset:value 0 ;
+    ] ;
+    lv2:port [
+        lv2:symbol "phase_r" ;
+        pset:value 0 ;
+    ] ;
+    lv2:port [
+        lv2:symbol "pan_l" ;
+        pset:value 0 ;
+    ] ;
+    lv2:port [
+        lv2:symbol "pan_r" ;
+        pset:value 1 ;
+    ] .
+
+
