@@ -21,7 +21,7 @@
 * - atom based MIDI and Time-Pos
 * - X11 UI
 */
-#define JUCE_LV2_ENABLE_DEV_FEATURES 0
+#define JUCE_LV2_ENABLE_DEV_FEATURES 1
 
 /*
  * Available macros:
@@ -51,7 +51,6 @@
 
 // LV2 includes
 #include "includes/lv2.h"
-#include "includes/atom.h"
 #include "includes/instance-access.h"
 #include "includes/midi.h"
 #include "includes/state.h"
@@ -60,9 +59,12 @@
 #include "includes/lv2_external_ui.h"
 
 #if JUCE_LV2_ENABLE_DEV_FEATURES
+ #include "includes/atom.h"
+ #include "includes/atom-util.h"
  #include "includes/time.h"
  #include "includes/ui-resize.h"
 #else
+ #define LV2_ATOM__String LV2_ATOM_PREFIX "String"
  #include "includes/event.h"
  #include "includes/event-helpers.h"
 #endif
@@ -389,8 +391,6 @@ String makePluginTtl(AudioProcessor* const filter, const String& binary)
 /** Create the presets.ttl contents */
 String makePresetsTtl(AudioProcessor* const filter)
 {
-    uint32 portIndex = 0;
-
     String presets;
     presets += "@prefix lv2:   <http://lv2plug.in/ns/lv2core#> .\n";
     presets += "@prefix pset:  <http://lv2plug.in/ns/ext/presets#> .\n";
@@ -400,10 +400,12 @@ String makePresetsTtl(AudioProcessor* const filter)
 #endif
     presets += "\n";
 
+    uint32 portIndex = 0;
     const int numPrograms = filter->getNumPrograms();
+
     for (int i = 0; i < numPrograms; i++)
     {
-        std::cout << "\nSaving preset #" << i+1 << "/" << numPrograms+1 << "...";
+        std::cout << "\nSaving preset " << i+1 << "/" << numPrograms+1 << "...";
         std::cout.flush();
 
         filter->setCurrentProgram(i);
@@ -537,9 +539,19 @@ public:
     void closeButtonPressed()
     {
         std::cout << "close button pressed" << std::endl;
-        lastPos = getScreenPosition();
+        saveLastPos();
         removeFromDesktop();
         closed = true;
+    }
+
+    void saveLastPos()
+    {
+        lastPos = getScreenPosition();
+    }
+
+    void restoreLastPos()
+    {
+        setTopLeftPosition(lastPos.getX(), lastPos.getY());
     }
 
     Point<int> getLastPos()
@@ -652,7 +664,9 @@ public:
 
         if (externalUI->window && ! externalUI->window->isClosed ())
         {
-            if (! externalUI->window->isOnDesktop ())
+            if (externalUI->window->isOnDesktop ())
+                externalUI->window->restoreLastPos ();
+            else
                 externalUI->window->addToDesktop ();
 
             externalUI->window->setVisible (true);
@@ -665,7 +679,10 @@ public:
         JuceLV2ExternalUIWrapper* externalUI = (JuceLV2ExternalUIWrapper*) _this_;
 
         if (externalUI->window && ! externalUI->window->isClosed())
+        {
+            externalUI->window->saveLastPos ();
             externalUI->window->setVisible (false); //closeButtonPressed ();
+        }
     }
 
 private:
@@ -1330,6 +1347,19 @@ public:
                     midiEvents.clear();
 
  #if JUCE_LV2_ENABLE_DEV_FEATURES
+                    LV2_SEQUENCE_FOREACH(portEventIn, j)
+                    {
+                        LV2_Atom_Event* const event = lv2_sequence_iter_get(j);
+
+                        if (event != nullptr && event->body.type == uridIdMidi)
+                        {
+                            if (event->time.frames >= numSamples)
+                               break;
+
+                            uint8* const data = (uint8* const)(event + 1);
+                            midiEvents.addEvent(data, event->body.size, event->time.frames);
+                        }
+                    }
  #else
                     LV2_Event_Iterator iter;
                     lv2_event_begin(&iter, portEventIn);
@@ -1338,7 +1368,7 @@ public:
 
                     while (sampleFrame < numSamples && lv2_event_is_valid(&iter))
                     {
-                        const LV2_Event* event = lv2_event_get(&iter, &data);
+                        LV2_Event* const event = lv2_event_get(&iter, &data);
 
                         if (event != nullptr && event->type == uridIdMidi)
                         {
@@ -1377,16 +1407,34 @@ public:
             if (portEventOut != nullptr)
             {
                 const int numEvents = midiEvents.getNumEvents();
+                const uint8* midiEventData;
+                int midiEventSize, midiEventPosition;
+                MidiBuffer::Iterator i (midiEvents);
 
  #if JUCE_LV2_ENABLE_DEV_FEATURES
+                while (i.getNextEvent (midiEventData, midiEventSize, midiEventPosition))
+                {
+                    jassert (midiEventPosition >= 0 && midiEventPosition < numSamples);
+                    //lv2_event_write(&iter, midiEventPosition, 0, uridIdMidi, midiEventSize, midiEventData);
+                }
+
+//                 LV2_SEQUENCE_FOREACH(portEventIn, j)
+//                 {
+//                     LV2_Atom_Event* const event = lv2_sequence_iter_get(j);
+// 
+//                     if (event != nullptr && event->body.type == uridIdMidi)
+//                     {
+//                         if (event->time.frames >= numSamples)
+//                             break;
+// 
+//                         uint8* const data = (uint8* const)(event + 1);
+//                         midiEvents.addEvent(data, event->body.size, event->time.frames);
+//                     }
+//                 }
  #else
                 LV2_Event_Iterator iter;
                 lv2_event_buffer_reset(portEventOut, LV2_EVENT_AUDIO_STAMP, (uint8*)(portEventOut + 1));
                 lv2_event_begin(&iter, portEventOut);
-
-                const uint8* midiEventData;
-                int midiEventSize, midiEventPosition;
-                MidiBuffer::Iterator i (midiEvents);
 
                 while (i.getNextEvent (midiEventData, midiEventSize, midiEventPosition))
                 {
@@ -1493,18 +1541,18 @@ private:
 
     // LV2 Port data
 #if JucePlugin_WantsMidiInput
-#if JUCE_LV2_ENABLE_DEV_FEATURES
+ #if JUCE_LV2_ENABLE_DEV_FEATURES
     LV2_Atom_Sequence* portEventIn;
-#else
+ #else
     LV2_Event_Buffer* portEventIn;
-#endif
+ #endif
 #endif
 #if JucePlugin_ProducesMidiOutput
-#if JUCE_LV2_ENABLE_DEV_FEATURES
+ #if JUCE_LV2_ENABLE_DEV_FEATURES
     LV2_Atom_Sequence* portEventOut;
-#else
+ #else
     LV2_Event_Buffer* portEventOut;
-#endif
+ #endif
 #endif
     float* portAudioIns[JucePlugin_MaxNumInputChannels];
     float* portAudioOuts[JucePlugin_MaxNumOutputChannels];
@@ -1690,65 +1738,40 @@ const void* juceLV2UI_ExtensionData(const char* uri)
 
 //==============================================================================
 // static LV2 Descriptor objects
-class JuceLv2Plugin : public LV2_Descriptor
-{
-public:
-    JuceLv2Plugin()
-    {
-        URI            = JucePlugin_LV2URI;
-        instantiate    = juceLV2_Instantiate;
-        connect_port   = juceLV2_ConnectPort;
-        activate       = juceLV2_Activate;
-        run            = juceLV2_Run;
-        deactivate     = juceLV2_Deactivate;
-        cleanup        = juceLV2_Cleanup;
-        extension_data = juceLV2_ExtensionData;
-    }
+static const LV2_Descriptor JuceLv2Plugin = {
+    JucePlugin_LV2URI,
+    juceLV2_Instantiate,
+    juceLV2_ConnectPort,
+    juceLV2_Activate,
+    juceLV2_Run,
+    juceLV2_Deactivate,
+    juceLV2_Cleanup,
+    juceLV2_ExtensionData
 };
 
-class JuceLv2UI_External : public LV2UI_Descriptor
-{
-public:
-    JuceLv2UI_External()
-    {
-        URI            = JucePlugin_LV2URI "#ExternalUI";
-        instantiate    = juceLV2UI_InstantiateExternal;
-        cleanup        = juceLV2UI_Cleanup;
-        port_event     = juceLV2UI_PortEvent;
-        extension_data = juceLV2UI_ExtensionData;
-    }
+static const LV2UI_Descriptor JuceLv2UI_External = {
+    JucePlugin_LV2URI "#ExternalUI",
+    juceLV2UI_InstantiateExternal,
+    juceLV2UI_Cleanup,
+    juceLV2UI_PortEvent,
+    juceLV2UI_ExtensionData
 };
 
-class JuceLv2UI_ExternalOld : public LV2UI_Descriptor
-{
-public:
-    JuceLv2UI_ExternalOld()
-    {
-        URI            = JucePlugin_LV2URI "#ExternalOldUI";
-        instantiate    = juceLV2UI_InstantiateExternal;
-        cleanup        = juceLV2UI_Cleanup;
-        port_event     = juceLV2UI_PortEvent;
-        extension_data = juceLV2UI_ExtensionData;
-    }
+static const LV2UI_Descriptor JuceLv2UI_ExternalOld = {
+    JucePlugin_LV2URI "#ExternalOldUI",
+    juceLV2UI_InstantiateExternal,
+    juceLV2UI_Cleanup,
+    juceLV2UI_PortEvent,
+    juceLV2UI_ExtensionData
 };
 
-class JuceLv2UI_X11 : public LV2UI_Descriptor
-{
-public:
-    JuceLv2UI_X11()
-    {
-        URI            = JucePlugin_LV2URI "#X11UI";
-        instantiate    = juceLV2UI_InstantiateX11;
-        cleanup        = juceLV2UI_Cleanup;
-        port_event     = juceLV2UI_PortEvent;
-        extension_data = juceLV2UI_ExtensionData;
-    }
+static const LV2UI_Descriptor JuceLv2UI_X11 = {
+    JucePlugin_LV2URI "#X11UI",
+    juceLV2UI_InstantiateExternal,
+    juceLV2UI_Cleanup,
+    juceLV2UI_PortEvent,
+    juceLV2UI_ExtensionData
 };
-
-static JuceLv2Plugin         JuceLv2Plugin_Obj;
-static JuceLv2UI_External    JuceLv2UI_External_Obj;
-static JuceLv2UI_ExternalOld JuceLv2UI_ExternalOld_Obj;
-static JuceLv2UI_X11         JuceLv2UI_X11_Obj;
 
 //==============================================================================
 // Mac startup code..
@@ -1762,7 +1785,7 @@ static JuceLv2UI_X11         JuceLv2UI_X11_Obj;
     extern "C" __attribute__ ((visibility("default"))) const LV2_Descriptor* lv2_descriptor(uint32 index)
     {
         initialiseMac();
-        return (index == 0) ? &JuceLv2Plugin_Obj : nullptr;
+        return (index == 0) ? &JuceLv2Plugin : nullptr;
     }
 
     extern "C" __attribute__ ((visibility("default"))) const LV2UI_Descriptor* lv2ui_descriptor(uint32 index)
@@ -1771,9 +1794,9 @@ static JuceLv2UI_X11         JuceLv2UI_X11_Obj;
         switch (index)
         {
           case 0:
-            return &JuceLv2UI_External_Obj;
+            return &JuceLv2UI_External;
           case 1:
-            return &JuceLv2UI_ExternalOld_Obj;
+            return &JuceLv2UI_ExternalOld;
           default:
             return nullptr;
         }
@@ -1791,7 +1814,7 @@ static JuceLv2UI_X11         JuceLv2UI_X11_Obj;
     extern "C" __attribute__ ((visibility("default"))) const LV2_Descriptor* lv2_descriptor(uint32 index)
     {
         SharedMessageThread::getInstance();
-        return (index == 0) ? &JuceLv2Plugin_Obj : nullptr;
+        return (index == 0) ? &JuceLv2Plugin : nullptr;
     }
 
     extern "C" __attribute__ ((visibility("default"))) const LV2UI_Descriptor* lv2ui_descriptor(uint32 index)
@@ -1800,12 +1823,12 @@ static JuceLv2UI_X11         JuceLv2UI_X11_Obj;
         switch (index)
         {
           case 0:
-            return &JuceLv2UI_External_Obj;
+            return &JuceLv2UI_External;
           case 1:
-            return &JuceLv2UI_ExternalOld_Obj;
+            return &JuceLv2UI_ExternalOld;
 #if JucePlugin_WantsLV2X11UI
           case 2:
-            return &JuceLv2UI_X11_Obj;
+            return &JuceLv2UI_X11;
 #endif
           default:
             return nullptr;
@@ -1827,7 +1850,7 @@ static JuceLv2UI_X11         JuceLv2UI_X11_Obj;
 
     extern "C" __declspec (dllexport) const LV2_Descriptor* lv2_descriptor(uint32 index)
     {
-        return (index == 0) ? &JuceLv2Plugin_Obj : nullptr;
+        return (index == 0) ? &JuceLv2Plugin : nullptr;
     }
 
     extern "C" __declspec (dllexport) const LV2UI_Descriptor* lv2ui_descriptor(uint32 index)
@@ -1835,9 +1858,9 @@ static JuceLv2UI_X11         JuceLv2UI_X11_Obj;
         switch (index)
         {
           case 0:
-            return &JuceLv2UI_External_Obj;
+            return &JuceLv2UI_External;
           case 1:
-            return &JuceLv2UI_ExternalOld_Obj;
+            return &JuceLv2UI_ExternalOld;
           default:
             return nullptr;
         }
