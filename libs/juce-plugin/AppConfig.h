@@ -1,7 +1,7 @@
 /*
   ==============================================================================
 
-   Build options for juce-audio-plugin-client static library
+   Build options for juce based plugins
 
   ==============================================================================
 */

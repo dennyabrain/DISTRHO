@@ -1,24 +1,7 @@
 /*
   ==============================================================================
 
-   This file is part of the JUCE library - "Jules' Utility Class Extensions"
-   Copyright 2004-11 by Raw Material Software Ltd.
-
-  ------------------------------------------------------------------------------
-
-   JUCE can be redistributed and/or modified under the terms of the GNU General
-   Public License (Version 2), as published by the Free Software Foundation.
-   A copy of the license is included in the JUCE distribution, or can be found
-   online at www.gnu.org/licenses.
-
-   JUCE is distributed in the hope that it will be useful, but WITHOUT ANY
-   WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-   A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
-
-  ------------------------------------------------------------------------------
-
-   To release a closed-source product which uses JUCE, commercial licenses are
-   available: visit www.rawmaterialsoftware.com/juce for more information.
+   Juce LV2 Wrapper, based on VST Wrapper code
 
   ==============================================================================
 */
@@ -38,7 +21,7 @@
 * - atom based MIDI and Time-Pos
 * - X11 UI
 */
-#define JUCE_LV2_ENABLE_DEV_FEATURES 1
+#define JUCE_LV2_ENABLE_DEV_FEATURES 0
 
 /*
  * Available macros:
@@ -75,12 +58,12 @@
 #include "includes/lv2_external_ui.h"
 
 #if JUCE_LV2_ENABLE_DEV_FEATURES
-#include "includes/atom.h"
-#include "includes/time.h"
-#include "includes/ui-resize.h"
+ #include "includes/atom.h"
+ #include "includes/time.h"
+ #include "includes/ui-resize.h"
 #else
-#include "lv2/event.h"
-#include "lv2/event-helpers.h"
+ #include "lv2/event.h"
+ #include "lv2/event-helpers.h"
 #endif
 
 #include "modules/juce_audio_plugin_client/utility/juce_IncludeModuleHeaders.h"
@@ -108,9 +91,9 @@ extern AudioProcessor* JUCE_CALLTYPE createPluginFilter();
 // Various helper functions for creating the ttl files
 
 #ifdef JUCE_WINDOWS
-#define PLUGIN_EXT ".dll"
+ #define PLUGIN_EXT ".dll"
 #else
-#define PLUGIN_EXT ".so"
+ #define PLUGIN_EXT ".so"
 #endif
 
 /** Returns the name of the plugin binary file */
@@ -204,9 +187,9 @@ String makeManifestTtl(AudioProcessor* const filter, const String& binary)
         manifest += "<" JucePlugin_LV2URI "#X11UI>\n";
         manifest += "    a ui:X11UI ;\n";
         manifest += "    ui:binary <" + binary + PLUGIN_EXT "> ;\n";
-#ifdef JucePlugin_WantsLV2InstanceAccess
+ #ifdef JucePlugin_WantsLV2InstanceAccess
         manifest += "    ui:requiredFeature <http://lv2plug.in/ns/ext/instance-access> ;\n";
-#endif
+ #endif
         manifest += "    ui:optionalFeature ui:noUserResize .\n";
         manifest += "\n";
 #endif
@@ -242,14 +225,15 @@ String makePluginTtl(AudioProcessor* const filter, const String& binary)
 #if JucePlugin_WantsLV2TimePos
     plugin += "@prefix ue:   <http://lv2plug.in/ns/extensions/units#> .\n";
 #endif
-    plugin += "@prefix ui:   <http://lv2plug.in/ns/extensions/ui#> .\n";
+    if (filter->hasEditor())
+        plugin += "@prefix ui:   <http://lv2plug.in/ns/extensions/ui#> .\n";
     plugin += "\n";
 
     plugin += "<" JucePlugin_LV2URI ">\n";
     plugin += "    a " + getPluginType() + " ;\n";
 #if JucePlugin_IsSynth
     plugin += "    lv2:requiredFeature <http://lv2plug.in/ns/ext/urid#map> ;\n";
-#elif (JucePlugin_WantsMidiInput || JucePlugin_ProducesMidiOutput || JucePlugin_WantsLV2State)
+#elif (JucePlugin_WantsMidiInput || JucePlugin_ProducesMidiOutput || JucePlugin_WantsLV2State || JucePlugin_WantsLV2TimePos)
     plugin += "    lv2:optionalFeature <http://lv2plug.in/ns/ext/urid#map> ;\n";
 #endif
 #if JucePlugin_WantsLV2State
@@ -274,33 +258,38 @@ String makePluginTtl(AudioProcessor* const filter, const String& binary)
 
 #if (JucePlugin_WantsMidiInput || (JUCE_LV2_ENABLE_DEV_FEATURES && JucePlugin_WantsLV2TimePos))
     plugin += "    lv2:port [\n";
-#if JUCE_LV2_ENABLE_DEV_FEATURES
+ #if JUCE_LV2_ENABLE_DEV_FEATURES
     plugin += "      a lv2:InputPort, atom:MessagePort ;\n";
     plugin += "      atom:bufferType atom:Sequence ;\n";
-    plugin += "      atom:supports <http://lv2plug.in/ns/ext/midi#MidiEvent> ;\n"; // TODO - report timePos as supported event
-#else
+  #if JucePlugin_WantsLV2TimePos
+    plugin += "      atom:supports <http://lv2plug.in/ns/ext/midi#MidiEvent> ,\n";
+    plugin += "                    <http://lv2plug.in/ns/ext/time#Position> ;\n";
+  #else
+    plugin += "      atom:supports <http://lv2plug.in/ns/ext/midi#MidiEvent> ;\n";
+  #endif
+ #else
     plugin += "      a lv2:InputPort, ev:EventPort ;\n";
     plugin += "      ev:supportsEvent <http://lv2plug.in/ns/ext/midi#MidiEvent> ;\n";
-#endif
+ #endif
     plugin += "      lv2:index " + String(portIndex++) + " ;\n";
     plugin += "      lv2:symbol \"lv2_events_in\" ;\n";
     plugin += "      lv2:name \"Events Input\" ;\n";
-#if ! JucePlugin_IsSynth
+ #if ! JucePlugin_IsSynth
     plugin += "      lv2:portProperty lv2:connectionOptional ;\n";
-#endif
+ #endif
     plugin += "    ] ;\n\n";
 #endif
 
 #if JucePlugin_ProducesMidiOutput
     plugin += "    lv2:port [\n";
-#if JUCE_LV2_ENABLE_DEV_FEATURES
+ #if JUCE_LV2_ENABLE_DEV_FEATURES
     plugin += "      a lv2:OutputPort, atom:MessagePort ;\n";
     plugin += "      atom:bufferType atom:Sequence ;\n";
     plugin += "      atom:supports <http://lv2plug.in/ns/ext/midi#MidiEvent> ;\n";
-#else
+ #else
     plugin += "      a lv2:OutputPort, ev:EventPort ;\n";
     plugin += "      ev:supportsEvent <http://lv2plug.in/ns/ext/midi#MidiEvent> ;\n";
-#endif
+ #endif
     plugin += "      lv2:index " + String(portIndex++) + " ;\n";
     plugin += "      lv2:symbol \"lv2_events_out\" ;\n";
     plugin += "      lv2:name \"Events Output\" ;\n";
