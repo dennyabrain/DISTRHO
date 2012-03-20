@@ -21,7 +21,7 @@
 * - atom based MIDI and Time-Pos
 * - X11 UI
 */
-#define JUCE_LV2_ENABLE_DEV_FEATURES 0
+#define JUCE_LV2_ENABLE_DEV_FEATURES 1
 
 /*
  * Available macros:
@@ -34,6 +34,9 @@
 #if (JUCE_LINUX && JUCE_LV2_ENABLE_DEV_FEATURES)
  #define JucePlugin_WantsLV2X11UI 1
 #endif
+
+// force instance-access on UIs, TESTING
+#define JucePlugin_WantsLV2InstanceAccess 1
 
 #ifdef _WIN32
  #include <windows.h>
@@ -525,7 +528,7 @@ class JuceLV2ExternalUIWindow : public DocumentWindow
 public:
     /** Creates a Document Window wrapper */
     JuceLV2ExternalUIWindow (const String& title) :
-            DocumentWindow (title, Colours::white, DocumentWindow::minimiseButton | DocumentWindow::closeButton, true),
+            DocumentWindow (title, Colours::white, DocumentWindow::minimiseButton | DocumentWindow::closeButton, false),
             closed (false),
             lastPos (100, 100)
     {
@@ -534,6 +537,7 @@ public:
     /** Close button handler */
     void closeButtonPressed()
     {
+        std::cout << "close button pressed" << std::endl;
         lastPos = getScreenPosition();
         removeFromDesktop();
         closed = true;
@@ -541,7 +545,8 @@ public:
 
     Point<int> getLastPos()
     {
-      return lastPos;
+        std::cout << "getLastPos - " << lastPos.getX() << " : " << lastPos.getY() << std::endl;
+        return lastPos;
     }
 
     bool isClosed()
@@ -569,8 +574,8 @@ class JuceLV2ExternalUIWrapper : public lv2_external_ui
 {
 public:
     JuceLV2ExternalUIWrapper (AudioProcessorEditor* const editor_, const String& title) :
-            editor(editor_),
-            window(nullptr)
+            editor (editor_),
+            window (nullptr)
     {
         const MessageManagerLock mmLock;
         window = new JuceLV2ExternalUIWindow (title);
@@ -606,11 +611,37 @@ public:
             window->reset();
     }
 
+    Point<int> getScreenPosition()
+    {
+        std::cerr << "getScreenPos" << std::endl;
+        if (window)
+        {
+            if (window->isClosed())
+                return window->getLastPos();
+            else
+                return window->getScreenPosition();
+        }
+
+        std::cerr << "getScreenPos NO" << std::endl;
+        return Point<int> (100, 100);
+    }
+
+    void setScreenPos(int x, int y)
+    {
+        std::cerr << "setScreenPos " << x << " :" << y << std::endl;
+        if (window && ! window->isClosed())
+        {
+            std::cerr << "setScreenPos YES" << std::endl;
+            window->setTopLeftPosition(x, y);
+        }
+    }
+
     //==============================================================================
     static void doRun(lv2_external_ui* _this_)
     {
         const MessageManagerLock mmLock;
-        JuceLV2ExternalUIWrapper* externalUI = (JuceLV2ExternalUIWrapper*)_this_;
+        JuceLV2ExternalUIWrapper* externalUI = (JuceLV2ExternalUIWrapper*) _this_;
+
         if (externalUI->window && ! externalUI->window->isClosed())
             externalUI->window->repaint();
     }
@@ -618,25 +649,24 @@ public:
     static void doShow(lv2_external_ui* _this_)
     {
         const MessageManagerLock mmLock;
-        JuceLV2ExternalUIWrapper* externalUI = (JuceLV2ExternalUIWrapper*)_this_;
-        if (externalUI->window && ! externalUI->window->isClosed())
+        JuceLV2ExternalUIWrapper* externalUI = (JuceLV2ExternalUIWrapper*) _this_;
+
+        if (externalUI->window && ! externalUI->window->isClosed ())
         {
-            if (! externalUI->window->isOnDesktop())
-            {
-                Point<int> lastPos = externalUI->window->getLastPos();
-                externalUI->window->setTopLeftPosition(lastPos.getX(), lastPos.getY());
-                externalUI->window->addToDesktop();
-            }
-            externalUI->window->setVisible(true);
+            if (! externalUI->window->isOnDesktop ())
+                externalUI->window->addToDesktop ();
+
+            externalUI->window->setVisible (true);
         }
     }
 
     static void doHide(lv2_external_ui* _this_)
     {
         const MessageManagerLock mmLock;
-        JuceLV2ExternalUIWrapper* externalUI = (JuceLV2ExternalUIWrapper*)_this_;
+        JuceLV2ExternalUIWrapper* externalUI = (JuceLV2ExternalUIWrapper*) _this_;
+
         if (externalUI->window && ! externalUI->window->isClosed())
-            externalUI->window->setVisible(false);
+            externalUI->window->closeButtonPressed ();
     }
 
 private:
@@ -720,11 +750,9 @@ public:
             uiResizeFeature (nullptr),
 #endif
             externalUI (nullptr),
-            externalUIHost (nullptr)
+            externalUIHost (nullptr),
+            externalUIPos (100, 100)
     {
-        if (activeUIs.size() == 0)
-            initialiseJuce_GUI();
-
 #if JUCE_LINUX
         MessageManagerLock mmLock;
 #endif
@@ -854,10 +882,17 @@ public:
 
     void doCleanup()
     {
+        if (uiType == UI_X11)
+        {
 #if JucePlugin_WantsLV2X11UI
-        if (x11Editor)
-            x11Editor->removeFromDesktop();
+            if (x11Editor && x11Editor->isOnDesktop())
+                x11Editor->removeFromDesktop();
 #endif
+        }
+        else if (uiType == UI_EXTERNAL)
+        {
+            externalUIPos = externalUI->getScreenPosition();
+        }
     }
 
     //==============================================================================
@@ -924,6 +959,7 @@ private:
 #endif
     JuceLV2ExternalUIWrapper* externalUI;
     lv2_external_ui_host* externalUIHost;
+    Point<int> externalUIPos;
 
     uint32 controlPortOffset;
 
@@ -966,6 +1002,7 @@ private:
 
     void resetExternalUI(const LV2_Feature* const* features)
     {
+        std::cout << " resetExternalUI" << externalUI << std::endl;
         externalUIHost = nullptr;
 
         for (uint16 i = 0; features[i]; i++)
@@ -976,6 +1013,9 @@ private:
                 break;
             }
         }
+
+        if (externalUI)
+            externalUI->setScreenPos(externalUIPos.getX(), externalUIPos.getY());
     }
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (JuceLV2UIWrapper);
@@ -1584,6 +1624,9 @@ LV2UI_Handle juceLV2UI_Instantiate(const LV2UI_Descriptor* uiDescriptor, LV2UI_W
 {
     const MessageManagerLock mmLock;
 
+    if (activePlugins.size() == 0 && activeUIs.size() == 0)
+        initialiseJuce_GUI();
+
 #ifdef JucePlugin_WantsLV2InstanceAccess
     for (uint16 i = 0; features[i]; i++)
     {
@@ -1621,10 +1664,10 @@ LV2UI_Handle juceLV2UI_InstantiateX11(const LV2UI_Descriptor* descriptor, const 
 
 void juceLV2UI_Cleanup(LV2UI_Handle instance)
 {
-#ifdef JucePlugin_WantsLV2InstanceAccess
+    const MessageManagerLock mmLock;
     JuceLV2UIWrapper* uiWrapper = (JuceLV2UIWrapper*)instance;
     uiWrapper->doCleanup();
-#else
+#ifndef JucePlugin_WantsLV2InstanceAccess
     delete (JuceLV2UIWrapper*)instance;
 #endif
 }
@@ -1714,7 +1757,6 @@ static JuceLv2UI_X11         JuceLv2UI_X11_Obj;
 
     extern "C" __attribute__ ((visibility("default"))) void juce_lv2_ttl_generator()
     {
-        initialiseMac();
         createTtlFiles();
     }
 
@@ -1744,7 +1786,6 @@ static JuceLv2UI_X11         JuceLv2UI_X11_Obj;
 
     extern "C" __attribute__ ((visibility("default"))) void juce_lv2_ttl_generator()
     {
-        SharedMessageThread::getInstance();
         createTtlFiles();
     }
 
