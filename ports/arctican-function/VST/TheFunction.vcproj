@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="TheFunction"
-	ProjectGUID="{4F11015B-9ADE-F8E3-97C8-B4B1C5EE2A55}"
+	ProjectGUID="{5D2C1FC6-73BD-8F6D-1E99-F412721DEDA1}"
 	RootNamespace="TheFunction"
 	Keyword="Win32Proj"
 	>
@@ -63,7 +63,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="juce-core.lib juce-audio-basics.lib juce-audio-processors.lib juce-data-structures.lib juce-events.lib juce-graphics.lib juce-gui-basics.lib"
+				AdditionalDependencies="juce-core.lib juce-audio-basics.lib juce-audio-devices.lib juce-audio-formats.lib juce-audio-processors.lib juce-audio-utils.lib juce-data-structures.lib juce-events.lib juce-graphics.lib juce-gui-basics.lib"
 				OutputFile="$(OutDir)/TheFunction.dll"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="../../../bin;../../../libs"
@@ -148,7 +148,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="juce-core_debug.lib juce-audio-basics_debug.lib juce-audio-processors_debug.lib juce-data-structures_debug.lib juce-events_debug.lib juce-graphics_debug.lib juce-gui-basics_debug.lib"
+				AdditionalDependencies="juce-core_debug.lib juce-audio-basics_debug.lib juce-audio-devices_debug.lib juce-audio-formats_debug.lib juce-audio-processors_debug.lib juce-audio-utils_debug.lib juce-data-structures_debug.lib juce-events_debug.lib juce-graphics_debug.lib juce-gui-basics_debug.lib"
 				OutputFile="$(OutDir)/TheFunction_debug.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="../../../bin;../../../libs"

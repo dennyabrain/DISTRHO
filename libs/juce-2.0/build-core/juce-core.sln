@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "juce-core", "./juce-core.vcproj", "{CEFE5BDA-F707-0BC4-35D5-E23BBAA6CD26}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "juce-core", "./juce-core.vcproj", "{B42551EE-B479-9201-E282-002B417A3857}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
@@ -10,10 +10,10 @@ Global
 		Debug|Win32 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{CEFE5BDA-F707-0BC4-35D5-E23BBAA6CD26}.Release|Win32.ActiveCfg = Release|Win32
-		{CEFE5BDA-F707-0BC4-35D5-E23BBAA6CD26}.Release|Win32.Build.0 = Release|Win32
-		{CEFE5BDA-F707-0BC4-35D5-E23BBAA6CD26}.Debug|Win32.ActiveCfg = Debug|Win32
-		{CEFE5BDA-F707-0BC4-35D5-E23BBAA6CD26}.Debug|Win32.Build.0 = Debug|Win32
+		{B42551EE-B479-9201-E282-002B417A3857}.Release|Win32.ActiveCfg = Release|Win32
+		{B42551EE-B479-9201-E282-002B417A3857}.Release|Win32.Build.0 = Release|Win32
+		{B42551EE-B479-9201-E282-002B417A3857}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B42551EE-B479-9201-E282-002B417A3857}.Debug|Win32.Build.0 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

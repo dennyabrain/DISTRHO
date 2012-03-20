@@ -3,7 +3,7 @@
 all: build
 
 
-build: audio-basics audio-devices audio-formats audio-processors audio-processors_full audio-utils \
+build: audio-basics audio-devices audio-devices_full audio-formats audio-processors audio-processors_full audio-utils \
 	core cryptography data-structures events graphics gui-basics gui-extra opengl video
 
 
@@ -12,6 +12,9 @@ audio-basics:
 
 audio-devices:
 	$(MAKE) -C build-audio-devices
+
+audio-devices_full:
+	$(MAKE) -C build-audio-devices_full
 
 audio-formats:
 	$(MAKE) -C build-audio-formats
@@ -60,6 +63,7 @@ video:
 clean:
 	$(MAKE) clean -C build-audio-basics
 	$(MAKE) clean -C build-audio-devices
+	$(MAKE) clean -C build-audio-devices_full
 	$(MAKE) clean -C build-audio-formats
 	$(MAKE) clean -C build-audio-processors
 	$(MAKE) clean -C build-audio-processors_full
@@ -78,3 +82,5 @@ clean:
 distclean: clean
 	rm -f build-*/Makefile
 	rm -f build-*/*.make
+	rm -f build-*/*.sln
+	rm -f build-*/*.vcproj

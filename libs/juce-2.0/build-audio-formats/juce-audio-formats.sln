@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "juce-audio-formats", "./juce-audio-formats.vcproj", "{70725C6A-532B-C54F-F94E-02A62DB8B1C0}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "juce-audio-formats", "./juce-audio-formats.vcproj", "{0011E30A-5D23-0FFE-372B-F2A784C823E2}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
@@ -10,10 +10,10 @@ Global
 		Debug|Win32 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{70725C6A-532B-C54F-F94E-02A62DB8B1C0}.Release|Win32.ActiveCfg = Release|Win32
-		{70725C6A-532B-C54F-F94E-02A62DB8B1C0}.Release|Win32.Build.0 = Release|Win32
-		{70725C6A-532B-C54F-F94E-02A62DB8B1C0}.Debug|Win32.ActiveCfg = Debug|Win32
-		{70725C6A-532B-C54F-F94E-02A62DB8B1C0}.Debug|Win32.Build.0 = Debug|Win32
+		{0011E30A-5D23-0FFE-372B-F2A784C823E2}.Release|Win32.ActiveCfg = Release|Win32
+		{0011E30A-5D23-0FFE-372B-F2A784C823E2}.Release|Win32.Build.0 = Release|Win32
+		{0011E30A-5D23-0FFE-372B-F2A784C823E2}.Debug|Win32.ActiveCfg = Debug|Win32
+		{0011E30A-5D23-0FFE-372B-F2A784C823E2}.Debug|Win32.Build.0 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

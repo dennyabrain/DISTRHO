@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="juce-audio-processors"
-	ProjectGUID="{AEC7749D-F28A-AF0C-53C0-BFA9EA8240CA}"
+	ProjectGUID="{A1B51260-32E4-1EF5-5FCD-2C5CDCCC3B7E}"
 	RootNamespace="juce-audio-processors"
 	Keyword="Win32Proj"
 	>

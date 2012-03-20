@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="juce-cryptography"
-	ProjectGUID="{051E4D72-9C31-234C-E6B2-67483457E6CD}"
+	ProjectGUID="{169A2B4C-C2C1-94B9-4160-526F834E83DE}"
 	RootNamespace="juce-cryptography"
 	Keyword="Win32Proj"
 	>

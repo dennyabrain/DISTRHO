@@ -18,13 +18,13 @@ standalone:
 # 	$(MAKE) -C argotlunar/Standalone
 # 	$(MAKE) -C bitmangler/Standalone
 # 	$(MAKE) -C hybridreverb2/Standalone
-# 	$(MAKE) -C juce-demo-plugin/Standalone
+	$(MAKE) -C juce-demo-plugin/Standalone
 # 	$(MAKE) -C juce_pitcher/Standalone
 # 	$(MAKE) -C sDelay/Standalone
 # 	$(MAKE) -C tal-dub-3-juce/Standalone
 # 	$(MAKE) -C tal-filter-juce/Standalone
 # 	$(MAKE) -C tal-filter-2-juce/Standalone
-# 	$(MAKE) -C tal-noisemaker-juce/Standalone
+	$(MAKE) -C tal-noisemaker/Standalone
 # 	$(MAKE) -C tal-reverb-juce/Standalone
 # 	$(MAKE) -C tal-reverb-2-juce/Standalone
 # 	$(MAKE) -C tal-reverb-3-juce/Standalone
@@ -37,13 +37,13 @@ lv2:
 # 	$(MAKE) -C argotlunar/LV2
 # 	$(MAKE) -C bitmangler/LV2
 # 	$(MAKE) -C hybridreverb2/LV2
-# 	$(MAKE) -C juce-demo-plugin/LV2
+	$(MAKE) -C juce-demo-plugin/LV2
 # 	$(MAKE) -C juce_pitcher/LV2
 # 	$(MAKE) -C sDelay/LV2
 # 	$(MAKE) -C tal-dub-3-juce/LV2
 # 	$(MAKE) -C tal-filter-juce/LV2
 # 	$(MAKE) -C tal-filter-2-juce/LV2
-# 	$(MAKE) -C tal-noisemaker-juce/LV2
+	$(MAKE) -C tal-noisemaker/LV2
 # 	$(MAKE) -C tal-reverb-juce/LV2
 # 	$(MAKE) -C tal-reverb-2-juce/LV2
 # 	$(MAKE) -C tal-reverb-3-juce/LV2
@@ -56,13 +56,13 @@ vst:
 # 	$(MAKE) -C argotlunar/VST
 # 	$(MAKE) -C bitmangler/VST
 # 	$(MAKE) -C hybridreverb2/VST
-# 	$(MAKE) -C juce-demo-plugin/VST
+	$(MAKE) -C juce-demo-plugin/VST
 # 	$(MAKE) -C juce_pitcher/VST
 # 	$(MAKE) -C sDelay/VST
 # 	$(MAKE) -C tal-dub-3-juce/VST
 # 	$(MAKE) -C tal-filter-juce/VST
 # 	$(MAKE) -C tal-filter-2-juce/VST
-# 	$(MAKE) -C tal-noisemaker-juce/VST
+	$(MAKE) -C tal-noisemaker/VST
 # 	$(MAKE) -C tal-reverb-juce/VST
 # 	$(MAKE) -C tal-reverb-2-juce/VST
 # 	$(MAKE) -C tal-reverb-3-juce/VST
@@ -77,13 +77,13 @@ clean:
 # 	$(MAKE) clean -C argotlunar/Standalone
 # 	$(MAKE) clean -C bitmangler/Standalone
 # 	$(MAKE) clean -C hybridreverb2/Standalone
-# 	$(MAKE) clean -C juce-demo-plugin/Standalone
+	$(MAKE) clean -C juce-demo-plugin/Standalone
 # 	$(MAKE) clean -C juce_pitcher/Standalone
 # 	$(MAKE) clean -C sDelay/Standalone
 # 	$(MAKE) clean -C tal-dub-3-juce/Standalone
 # 	$(MAKE) clean -C tal-filter-juce/Standalone
 # 	$(MAKE) clean -C tal-filter-2-juce/Standalone
-# 	$(MAKE) clean -C tal-noisemaker-juce/Standalone
+	$(MAKE) clean -C tal-noisemaker/Standalone
 # 	$(MAKE) clean -C tal-reverb-juce/Standalone
 # 	$(MAKE) clean -C tal-reverb-2-juce/Standalone
 # 	$(MAKE) clean -C tal-reverb-3-juce/Standalone
@@ -96,13 +96,13 @@ clean:
 # 	$(MAKE) clean -C argotlunar/LV2
 # 	$(MAKE) clean -C bitmangler/LV2
 # 	$(MAKE) clean -C hybridreverb2/LV2
-# 	$(MAKE) clean -C juce-demo-plugin/LV2
+	$(MAKE) clean -C juce-demo-plugin/LV2
 # 	$(MAKE) clean -C juce_pitcher/LV2
 # 	$(MAKE) clean -C sDelay/LV2
 # 	$(MAKE) clean -C tal-dub-3-juce/LV2
 # 	$(MAKE) clean -C tal-filter-juce/LV2
 # 	$(MAKE) clean -C tal-filter-2-juce/LV2
-# 	$(MAKE) clean -C tal-noisemaker-juce/LV2
+	$(MAKE) clean -C tal-noisemaker/LV2
 # 	$(MAKE) clean -C tal-reverb-juce/LV2
 # 	$(MAKE) clean -C tal-reverb-2-juce/LV2
 # 	$(MAKE) clean -C tal-reverb-3-juce/LV2
@@ -115,13 +115,13 @@ clean:
 # 	$(MAKE) clean -C argotlunar/VST
 # 	$(MAKE) clean -C bitmangler/VST
 # 	$(MAKE) clean -C hybridreverb2/VST
-# 	$(MAKE) clean -C juce-demo-plugin/VST
+	$(MAKE) clean -C juce-demo-plugin/VST
 # 	$(MAKE) clean -C juce_pitcher/VST
 # 	$(MAKE) clean -C sDelay/VST
 # 	$(MAKE) clean -C tal-dub-3-juce/VST
 # 	$(MAKE) clean -C tal-filter-juce/VST
 # 	$(MAKE) clean -C tal-filter-2-juce/VST
-# 	$(MAKE) clean -C tal-noisemaker-juce/VST
+	$(MAKE) clean -C tal-noisemaker/VST
 # 	$(MAKE) clean -C tal-reverb-juce/VST
 # 	$(MAKE) clean -C tal-reverb-2-juce/VST
 # 	$(MAKE) clean -C tal-reverb-3-juce/VST
@@ -131,3 +131,10 @@ clean:
 	rm -rf */Standalone/intermediate
 	rm -rf */LV2/intermediate
 	rm -rf */VST/intermediate
+
+distclean: clean
+	rm -rf */LV2/*.lv2
+	rm -f */*/Makefile
+	rm -f */*/*.make
+	rm -f */*/*.sln
+	rm -f */*/*.vcproj

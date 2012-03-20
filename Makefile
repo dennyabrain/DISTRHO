@@ -8,8 +8,9 @@ build:
 	$(MAKE) -C libs/juce-lv2
 # 	$(MAKE) plugins -C plugins
 	$(MAKE) plugins -C ports
-	@./scripts/generate-ttl.sh
 
+gen:
+	@./scripts/generate-ttl.sh
 
 clean:
 	$(MAKE) clean -C libs/juce-2.0

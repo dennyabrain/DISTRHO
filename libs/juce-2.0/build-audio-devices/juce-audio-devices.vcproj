@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="juce-audio-devices"
-	ProjectGUID="{9C634B15-5ED9-C786-384C-73670BE694C9}"
+	ProjectGUID="{06906A7B-2625-7A77-A5DB-5EDE15B243EC}"
 	RootNamespace="juce-audio-devices"
 	Keyword="Win32Proj"
 	>

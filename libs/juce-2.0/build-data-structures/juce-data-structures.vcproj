@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="juce-data-structures"
-	ProjectGUID="{F816D2A3-D4FD-2408-AD63-E5E4698E533D}"
+	ProjectGUID="{EAEE274A-DB47-3AC1-79EB-C8701E666395}"
 	RootNamespace="juce-data-structures"
 	Keyword="Win32Proj"
 	>

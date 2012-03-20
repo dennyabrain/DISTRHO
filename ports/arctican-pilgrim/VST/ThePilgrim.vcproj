@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="ThePilgrim"
-	ProjectGUID="{3C39AA38-E7D4-2ED6-93C3-D2710D5EC271}"
+	ProjectGUID="{4025FB6B-059D-0C7C-F997-40CC0CEB14EF}"
 	RootNamespace="ThePilgrim"
 	Keyword="Win32Proj"
 	>
@@ -63,7 +63,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="juce-core.lib juce-audio-basics.lib juce-audio-processors.lib juce-data-structures.lib juce-events.lib juce-graphics.lib juce-gui-basics.lib"
+				AdditionalDependencies="juce-core.lib juce-audio-basics.lib juce-audio-devices.lib juce-audio-formats.lib juce-audio-processors.lib juce-audio-utils.lib juce-data-structures.lib juce-events.lib juce-graphics.lib juce-gui-basics.lib"
 				OutputFile="$(OutDir)/ThePilgrim.dll"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="../../../bin;../../../libs"
@@ -148,7 +148,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="juce-core_debug.lib juce-audio-basics_debug.lib juce-audio-processors_debug.lib juce-data-structures_debug.lib juce-events_debug.lib juce-graphics_debug.lib juce-gui-basics_debug.lib"
+				AdditionalDependencies="juce-core_debug.lib juce-audio-basics_debug.lib juce-audio-devices_debug.lib juce-audio-formats_debug.lib juce-audio-processors_debug.lib juce-audio-utils_debug.lib juce-data-structures_debug.lib juce-events_debug.lib juce-graphics_debug.lib juce-gui-basics_debug.lib"
 				OutputFile="$(OutDir)/ThePilgrim_debug.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="../../../bin;../../../libs"

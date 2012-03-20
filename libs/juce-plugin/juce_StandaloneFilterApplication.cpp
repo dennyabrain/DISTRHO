@@ -46,7 +46,7 @@ public:
         options.ignoreCaseOfKeyNames = true;
 
         // open up config
-        appProperties = new ApplicationProperties();
+        appProperties = new ApplicationProperties;
         appProperties->setStorageParameters (options);
 
         // setup window name
@@ -72,13 +72,14 @@ public:
         if (window)
         {
             window->setVisible (false);
-            deleteAndZero (window);
+            window = nullptr;
         }
 
         if (appProperties)
         {
             appProperties->saveIfNeeded ();
             appProperties->closeFiles ();
+            appProperties = nullptr;
         }
     }
 
@@ -125,8 +126,8 @@ public:
     }
 
 private:
-    StandaloneFilterWindow* window;
-    ApplicationProperties* appProperties;
+    ScopedPointer<StandaloneFilterWindow> window;
+    ScopedPointer<ApplicationProperties> appProperties;
 
     StandaloneFilterApplication (const StandaloneFilterApplication&);
     const StandaloneFilterApplication& operator= (const StandaloneFilterApplication&);
