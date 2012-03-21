@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="juce-events"
-	ProjectGUID="{B8EF029C-A361-E5B7-3E13-222E726AC3D1}"
+	ProjectGUID="{FF7DFA6A-F16B-B420-AA7B-A3FDC24DA137}"
 	RootNamespace="juce-events"
 	Keyword="Win32Proj"
 	>

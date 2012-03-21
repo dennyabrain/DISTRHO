@@ -1,0 +1,21 @@
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TAL-Vocoder-2", "./TAL-Vocoder-2.vcproj", "{476163C7-E2BC-B7FD-7E92-BF3F62C72CA0}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Release|Win32 = Release|Win32
+		Debug|Win32 = Debug|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{476163C7-E2BC-B7FD-7E92-BF3F62C72CA0}.Release|Win32.ActiveCfg = Release|Win32
+		{476163C7-E2BC-B7FD-7E92-BF3F62C72CA0}.Release|Win32.Build.0 = Release|Win32
+		{476163C7-E2BC-B7FD-7E92-BF3F62C72CA0}.Debug|Win32.ActiveCfg = Debug|Win32
+		{476163C7-E2BC-B7FD-7E92-BF3F62C72CA0}.Debug|Win32.Build.0 = Debug|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -9,7 +9,6 @@ package.name = project.name
 package.kind = "exe"
 package.language = "c++"
 
-
 package.defines   = { "JucePlugin_Build_AU=0", "JucePlugin_Build_LV2=0", "JucePlugin_Build_RTAS=0", "JucePlugin_Build_VST=0", "JucePlugin_Build_Standalone=1" }
 package.linkflags = { "no-symbols", "static-runtime" }
 
@@ -45,6 +44,7 @@ package.includepaths = {
   ".", --fake
   "./intermediate", --fake
   "./intermediate/Release", --fake
+  "./intermediate/Debug", --fake
   "../../../libs/juce-2.0/source",
   "../../../libs/juce-plugin"
 }

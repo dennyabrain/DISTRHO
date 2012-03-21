@@ -9,17 +9,17 @@ endif
 
 export CONFIG
 
-.PHONY: all clean loser-3BandEQ.lv2/loser-3BandEQ
+.PHONY: all clean 3-Band_EQ.lv2/3-Band_EQ
 
-all: loser-3BandEQ.lv2/loser-3BandEQ
+all: 3-Band_EQ.lv2/3-Band_EQ
 
 Makefile: premake.lua
 	@echo ==== Regenerating Makefiles ====
 	@premake --file $^ --os linux --target gnu --cc gcc
 
-loser-3BandEQ.lv2/loser-3BandEQ:
-	@echo ==== Building loser-3BandEQ.lv2/loser-3BandEQ ====
-	@$(MAKE) --no-print-directory -C . -f loser-3BandEQ.lv2/loser-3BandEQ.make
+3-Band_EQ.lv2/3-Band_EQ:
+	@echo ==== Building 3-Band_EQ.lv2/3-Band_EQ ====
+	@$(MAKE) --no-print-directory -C . -f 3-Band_EQ.lv2/3-Band_EQ.make
 
 clean:
-	@$(MAKE) --no-print-directory -C . -f loser-3BandEQ.lv2/loser-3BandEQ.make clean
+	@$(MAKE) --no-print-directory -C . -f 3-Band_EQ.lv2/3-Band_EQ.make clean

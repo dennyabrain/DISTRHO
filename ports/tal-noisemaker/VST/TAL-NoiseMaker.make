@@ -13,12 +13,12 @@ ifeq ($(CONFIG),Release)
   LIBDIR := ../../../bin
   OBJDIR := intermediate/Release
   OUTDIR := ../../../bin
-  CPPFLAGS := $(DEPFLAGS) -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=0" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=1" -D "JucePlugin_Build_Standalone=0" -D "LINUX=1" -D "NDEBUG=1" -I "../source" -I "../source/Engine" -I "." -I "./intermediate" -I "./intermediate/Release" -I "../../../libs/juce-2.0/source" -I "../../../libs/juce-plugin" -I "../../../sdks/vstsdk2.4"
+  CPPFLAGS := $(DEPFLAGS) -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=0" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=1" -D "JucePlugin_Build_Standalone=0" -D "LINUX=1" -D "NDEBUG=1" -I "../source" -I "../source/Engine" -I "." -I "./intermediate" -I "./intermediate/Release" -I "./intermediate/Debug" -I "../../../libs/juce-2.0/source" -I "../../../libs/juce-plugin" -I "../../../sdks/vstsdk2.4"
   CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -fPIC -O3 `pkg-config --cflags freetype2` -O2 -mtune=generic -msse -ffast-math -fomit-frame-pointer -fvisibility=hidden -fPIC
   CXXFLAGS += $(CFLAGS)
   LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -shared -s `pkg-config --libs freetype2` -L"../../../libs" -lfreetype -lpthread -lrt -lX11 -lXext -ljuce-core -ljuce-audio-basics -ljuce-audio-devices -ljuce-audio-formats -ljuce-audio-processors -ljuce-audio-utils -ljuce-data-structures -ljuce-events -ljuce-graphics -ljuce-gui-basics
   LDDEPS :=
-  RESFLAGS := -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=0" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=1" -D "JucePlugin_Build_Standalone=0" -D "LINUX=1" -D "NDEBUG=1" -I "../source" -I "../source/Engine" -I "." -I "./intermediate" -I "./intermediate/Release" -I "../../../libs/juce-2.0/source" -I "../../../libs/juce-plugin" -I "../../../sdks/vstsdk2.4"
+  RESFLAGS := -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=0" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=1" -D "JucePlugin_Build_Standalone=0" -D "LINUX=1" -D "NDEBUG=1" -I "../source" -I "../source/Engine" -I "." -I "./intermediate" -I "./intermediate/Release" -I "./intermediate/Debug" -I "../../../libs/juce-2.0/source" -I "../../../libs/juce-plugin" -I "../../../sdks/vstsdk2.4"
   TARGET := TAL-NoiseMaker.so
  BLDCMD = $(CXX) -o $(OUTDIR)/$(TARGET) $(OBJECTS) $(LDFLAGS) $(LDFLAGS) $(RESOURCES) $(TARGET_ARCH)
 endif
@@ -28,12 +28,12 @@ ifeq ($(CONFIG),Debug)
   LIBDIR := ../../../bin
   OBJDIR := intermediate/Debug
   OUTDIR := ../../../bin
-  CPPFLAGS := $(DEPFLAGS) -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=0" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=1" -D "JucePlugin_Build_Standalone=0" -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -I "../source" -I "../source/Engine" -I "." -I "./intermediate" -I "./intermediate/Release" -I "../../../libs/juce-2.0/source" -I "../../../libs/juce-plugin" -I "../../../sdks/vstsdk2.4"
+  CPPFLAGS := $(DEPFLAGS) -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=0" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=1" -D "JucePlugin_Build_Standalone=0" -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -I "../source" -I "../source/Engine" -I "." -I "./intermediate" -I "./intermediate/Release" -I "./intermediate/Debug" -I "../../../libs/juce-2.0/source" -I "../../../libs/juce-plugin" -I "../../../sdks/vstsdk2.4"
   CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -fPIC -g `pkg-config --cflags freetype2` -O0 -ggdb -fPIC
   CXXFLAGS += $(CFLAGS)
   LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -shared `pkg-config --libs freetype2` -L"../../../libs" -lfreetype -lpthread -lrt -lX11 -lXext -ljuce-core_debug -ljuce-audio-basics_debug -ljuce-audio-devices_debug -ljuce-audio-formats_debug -ljuce-audio-processors_debug -ljuce-audio-utils_debug -ljuce-data-structures_debug -ljuce-events_debug -ljuce-graphics_debug -ljuce-gui-basics_debug
   LDDEPS :=
-  RESFLAGS := -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=0" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=1" -D "JucePlugin_Build_Standalone=0" -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -I "../source" -I "../source/Engine" -I "." -I "./intermediate" -I "./intermediate/Release" -I "../../../libs/juce-2.0/source" -I "../../../libs/juce-plugin" -I "../../../sdks/vstsdk2.4"
+  RESFLAGS := -D "JucePlugin_Build_AU=0" -D "JucePlugin_Build_LV2=0" -D "JucePlugin_Build_RTAS=0" -D "JucePlugin_Build_VST=1" -D "JucePlugin_Build_Standalone=0" -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -I "../source" -I "../source/Engine" -I "." -I "./intermediate" -I "./intermediate/Release" -I "./intermediate/Debug" -I "../../../libs/juce-2.0/source" -I "../../../libs/juce-plugin" -I "../../../sdks/vstsdk2.4"
   TARGET := TAL-NoiseMaker_debug.so
  BLDCMD = $(CXX) -o $(OUTDIR)/$(TARGET) $(OBJECTS) $(LDFLAGS) $(LDFLAGS) $(RESOURCES) $(TARGET_ARCH)
 endif

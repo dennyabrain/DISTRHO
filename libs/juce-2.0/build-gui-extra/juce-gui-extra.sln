@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "juce-gui-extra", "./juce-gui-extra.vcproj", "{9CAA3A4E-E501-171C-EA39-39E9569A83BC}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "juce-gui-extra", "./juce-gui-extra.vcproj", "{8FD79F00-F4E8-E00D-C2A1-60A0EBDE7072}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
@@ -10,10 +10,10 @@ Global
 		Debug|Win32 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{9CAA3A4E-E501-171C-EA39-39E9569A83BC}.Release|Win32.ActiveCfg = Release|Win32
-		{9CAA3A4E-E501-171C-EA39-39E9569A83BC}.Release|Win32.Build.0 = Release|Win32
-		{9CAA3A4E-E501-171C-EA39-39E9569A83BC}.Debug|Win32.ActiveCfg = Debug|Win32
-		{9CAA3A4E-E501-171C-EA39-39E9569A83BC}.Debug|Win32.Build.0 = Debug|Win32
+		{8FD79F00-F4E8-E00D-C2A1-60A0EBDE7072}.Release|Win32.ActiveCfg = Release|Win32
+		{8FD79F00-F4E8-E00D-C2A1-60A0EBDE7072}.Release|Win32.Build.0 = Release|Win32
+		{8FD79F00-F4E8-E00D-C2A1-60A0EBDE7072}.Debug|Win32.ActiveCfg = Debug|Win32
+		{8FD79F00-F4E8-E00D-C2A1-60A0EBDE7072}.Debug|Win32.Build.0 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

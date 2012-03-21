@@ -1,5 +1,5 @@
 
-project.name    = "loser-3BandEQ.lv2/loser-3BandEQ"
+project.name    = "3-Band_EQ.lv2/3-Band_EQ"
 project.bindir  = "../../../bin"
 project.libdir  = project.bindir
 project.configs = { "Release", "Debug" }

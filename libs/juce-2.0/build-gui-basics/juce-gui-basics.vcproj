@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="juce-gui-basics"
-	ProjectGUID="{79621D28-B591-933C-9116-306F06CFF08C}"
+	ProjectGUID="{DAD65178-A4BE-D64C-A6E3-D0EE9D112430}"
 	RootNamespace="juce-gui-basics"
 	Keyword="Win32Proj"
 	>

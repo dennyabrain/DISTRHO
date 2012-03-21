@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="TAL-NoiseMaker"
-	ProjectGUID="{A3427C5D-8B54-9024-09E5-69D8A0D304E3}"
+	ProjectGUID="{3A3DAAB2-38A7-A0B8-6807-80E7732FC764}"
 	RootNamespace="TAL-NoiseMaker"
 	Keyword="Win32Proj"
 	>
@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="2"
-				AdditionalIncludeDirectories="../source;../source/Engine;.;./intermediate;./intermediate/Release;../../../libs/juce-2.0/source;../../../libs/juce-plugin"
+				AdditionalIncludeDirectories="../source;../source/Engine;.;./intermediate;./intermediate/Release;./intermediate/Debug;../../../libs/juce-2.0/source;../../../libs/juce-plugin"
 				PreprocessorDefinitions="JucePlugin_Build_AU=0;JucePlugin_Build_LV2=0;JucePlugin_Build_RTAS=0;JucePlugin_Build_VST=0;JucePlugin_Build_Standalone=1;WINDOWS=1;NDEBUG=1"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -56,7 +56,7 @@
 			<Tool
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="JucePlugin_Build_AU=0;JucePlugin_Build_LV2=0;JucePlugin_Build_RTAS=0;JucePlugin_Build_VST=0;JucePlugin_Build_Standalone=1;WINDOWS=1;NDEBUG=1"
-				AdditionalIncludeDirectories="../source;../source/Engine;.;./intermediate;./intermediate/Release;../../../libs/juce-2.0/source;../../../libs/juce-plugin"
+				AdditionalIncludeDirectories="../source;../source/Engine;.;./intermediate;./intermediate/Release;./intermediate/Debug;../../../libs/juce-2.0/source;../../../libs/juce-plugin"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
@@ -124,7 +124,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../source;../source/Engine;.;./intermediate;./intermediate/Release;../../../libs/juce-2.0/source;../../../libs/juce-plugin"
+				AdditionalIncludeDirectories="../source;../source/Engine;.;./intermediate;./intermediate/Release;./intermediate/Debug;../../../libs/juce-2.0/source;../../../libs/juce-plugin"
 				PreprocessorDefinitions="JucePlugin_Build_AU=0;JucePlugin_Build_LV2=0;JucePlugin_Build_RTAS=0;JucePlugin_Build_VST=0;JucePlugin_Build_Standalone=1;WINDOWS=1;DEBUG=1;_DEBUG=1"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -141,7 +141,7 @@
 			<Tool
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="JucePlugin_Build_AU=0;JucePlugin_Build_LV2=0;JucePlugin_Build_RTAS=0;JucePlugin_Build_VST=0;JucePlugin_Build_Standalone=1;WINDOWS=1;DEBUG=1;_DEBUG=1"
-				AdditionalIncludeDirectories="../source;../source/Engine;.;./intermediate;./intermediate/Release;../../../libs/juce-2.0/source;../../../libs/juce-plugin"
+				AdditionalIncludeDirectories="../source;../source/Engine;.;./intermediate;./intermediate/Release;./intermediate/Debug;../../../libs/juce-2.0/source;../../../libs/juce-plugin"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"

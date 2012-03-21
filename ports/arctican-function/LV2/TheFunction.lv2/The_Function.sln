@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TheFunction.lv2/The_Function", "./TheFunction.lv2/The_Function.vcproj", "{AF5E1FA5-44C5-FDE0-457D-3A2B9936ED68}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TheFunction.lv2/The_Function", "./TheFunction.lv2/The_Function.vcproj", "{4CC3D97F-9014-AF2A-BBFE-EC7932EF2777}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
@@ -10,10 +10,10 @@ Global
 		Debug|Win32 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{AF5E1FA5-44C5-FDE0-457D-3A2B9936ED68}.Release|Win32.ActiveCfg = Release|Win32
-		{AF5E1FA5-44C5-FDE0-457D-3A2B9936ED68}.Release|Win32.Build.0 = Release|Win32
-		{AF5E1FA5-44C5-FDE0-457D-3A2B9936ED68}.Debug|Win32.ActiveCfg = Debug|Win32
-		{AF5E1FA5-44C5-FDE0-457D-3A2B9936ED68}.Debug|Win32.Build.0 = Debug|Win32
+		{4CC3D97F-9014-AF2A-BBFE-EC7932EF2777}.Release|Win32.ActiveCfg = Release|Win32
+		{4CC3D97F-9014-AF2A-BBFE-EC7932EF2777}.Release|Win32.Build.0 = Release|Win32
+		{4CC3D97F-9014-AF2A-BBFE-EC7932EF2777}.Debug|Win32.ActiveCfg = Debug|Win32
+		{4CC3D97F-9014-AF2A-BBFE-EC7932EF2777}.Debug|Win32.Build.0 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
