@@ -25,8 +25,8 @@
 #define JucePlugin_SilenceInProducesSilenceOut      0
 #define JucePlugin_TailLengthSeconds                0
 #define JucePlugin_EditorRequiresKeyboardFocus      1
-#define JucePlugin_VersionCode              0x00010100
-#define JucePlugin_VersionString            "1.0"
+#define JucePlugin_VersionCode              0x10001
+#define JucePlugin_VersionString            "1.0.1"
 #define JucePlugin_VSTUniqueID              JucePlugin_PluginCode
 #define JucePlugin_VSTCategory              kPlugCategSynth
 #define JucePlugin_AUMainType               kAudioUnitType_MusicDevice
@@ -34,12 +34,11 @@
 #define JucePlugin_AUExportPrefix           TalNoiseMakerAU
 #define JucePlugin_AUExportPrefixQuoted     "TalNoiseMakerAU"
 #define JucePlugin_AUManufacturerCode       JucePlugin_ManufacturerCode
-#define JucePlugin_CFBundleIdentifier       "ch.toguaudioline.talnoisemaker"
-#define JucePlugin_AUCocoaViewClassName     talnoisemaker_v08
+#define JucePlugin_CFBundleIdentifier       ch.toguaudioline.talnoisemaker
+#define JucePlugin_AUCocoaViewClassName     TalNoiseMakerAU
 #define JucePlugin_RTASCategory             ePlugInCategory_SWGenerators
 #define JucePlugin_RTASManufacturerCode     JucePlugin_ManufacturerCode
 #define JucePlugin_RTASProductId            JucePlugin_PluginCode
-#define JucePlugin_WinBag_path              "C:\\essentials\\PT_73_SDK\\WinBag"
 
 #define JucePlugin_LV2URI                   "http://kunz.corrupt.ch/products/tal-noisemaker"
 #define JucePlugin_LV2Category              "InstrumentPlugin"

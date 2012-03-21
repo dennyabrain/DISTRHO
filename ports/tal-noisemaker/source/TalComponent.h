@@ -260,7 +260,11 @@ private:
 
     // handy wrapper method to avoid having to cast the filter to a DemoJuceFilter
     // every time we need it..
-    TalCore* getFilter() const throw()       { return (TalCore*) getAudioProcessor(); }
+
+    TalCore* getProcessor() const
+    {
+        return static_cast <TalCore*> (getAudioProcessor());
+    }
 };
 
 

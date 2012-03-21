@@ -240,7 +240,7 @@ TalComponent::TalComponent (TalCore* const ownerFilter)
     this->logoPanel = new LogoPanel(internalCachedBackgroundImage, 1100, 60);
 
 	// Version info
-	versionLabel = new Label("Version Info", "V 3.10");
+	versionLabel = new Label("Version Info", "V 3.22");
 	versionLabel->setBounds(235, 15, 200, 20);
 	versionLabel->setColour(Label::textColourId, Colour((juce::uint8)100, (juce::uint8)100, (juce::uint8)100, 0.9f));
     this->logoPanel->addAndMakeVisible(versionLabel);
@@ -265,10 +265,10 @@ TalComponent::TalComponent (TalCore* const ownerFilter)
     panicButton = addNormalButton(this->logoPanel, 620, 5, ownerFilter, buttonImage, true, PANIC);
     this->accordeonTabContainer->add(this->logoPanel);
 
-    this->envelopeEditorAccordeonTab->addButtonListener (this);
-    this->synth1AccordeonTab->addButtonListener (this);
-    this->synth2AccordeonTab->addButtonListener (this);
-    this->controlAccordeonTab->addButtonListener (this);
+    this->envelopeEditorAccordeonTab->addListener (this);
+    this->synth1AccordeonTab->addListener (this);
+    this->synth2AccordeonTab->addListener (this);
+    this->controlAccordeonTab->addListener (this);
 
     this->setBufferedToImage(true);
 
@@ -285,7 +285,7 @@ TalComponent::TalComponent (TalCore* const ownerFilter)
 TalComponent::~TalComponent()
 {
     deleteAllChildren();
-    getFilter()->removeChangeListener (this);
+    getProcessor()->removeChangeListener (this);
 }
 
 FilmStripKnob* TalComponent::addNormalKnob(Component *component, int x, int y, TalCore* const ownerFilter, const Image knobImage, int numOfFrames, int parameter)
@@ -307,7 +307,7 @@ ImageToggleButton* TalComponent::addNormalButton(Component *component, int x, in
 	component->addAndMakeVisible(imageToggleButton = new ImageToggleButton("Toggle Button", buttonImage, false, isKickButton, parameter));
     imageToggleButton->setBounds(x, y + this->synth1AccordeonTab->getTabHeight(), buttonImage.getWidth(), buttonImage.getHeight() / 2);
 	imageToggleButton->setToggleState(ownerFilter->getParameter(parameter) > 0.0f, false);
-	imageToggleButton->addButtonListener(this);
+	imageToggleButton->addListener(this);
 	return imageToggleButton;
 }
 
@@ -367,7 +367,7 @@ void TalComponent::sliderDragStarted (Slider* slider)
     NamedValueSet values = slider->getProperties();
     if (values.contains(Identifier("index")))
     {
-        TalCore* const filter = getFilter();
+        TalCore* const filter = getProcessor();
         filter->beginParameterChangeGesture(values["index"]);
     }
 }
@@ -377,7 +377,7 @@ void TalComponent::sliderDragEnded (Slider* slider)
     NamedValueSet values = slider->getProperties();
     if (values.contains(Identifier("index")))
     {
-        TalCore* const filter = getFilter();
+        TalCore* const filter = getProcessor();
         filter->endParameterChangeGesture(values["index"]);
     }
 }
@@ -387,7 +387,7 @@ void TalComponent::sliderValueChanged (Slider* caller)
     NamedValueSet values = caller->getProperties();
     if (values.contains(Identifier("index")))
     {
-        TalCore* const filter = getFilter();
+        TalCore* const filter = getProcessor();
         filter->setParameterNotifyingHost(values["index"], (float)caller->getValue());
     }
 
@@ -397,7 +397,7 @@ void TalComponent::sliderValueChanged (Slider* caller)
 void TalComponent::updateInfo(Slider* caller)
 {
     // FIXME: Refactor
-    TalCore* const filter = getFilter();
+    TalCore* const filter = getProcessor();
     if (caller == osc1TuneKnob || caller == osc2TuneKnob)
     {
         infoText->setText(juce::String(audioUtils.getOscTuneValue((float)caller->getValue()), 0), false);
@@ -481,7 +481,7 @@ void TalComponent::buttonClicked (Button* caller)
     NamedValueSet values = caller->getProperties();
     if (values.contains(Identifier("index")))
     {
-        TalCore* const filter = getFilter();
+        TalCore* const filter = getProcessor();
         filter->setParameterNotifyingHost((int)values["index"], (float)caller->getToggleState());
 
         // FIXME: Move following code to separate class
@@ -533,7 +533,7 @@ void TalComponent::buttonClicked (Button* caller)
 
 void TalComponent::handleClickedTabs (Button* caller)
 {
-    TalCore* const filter = getFilter();
+    TalCore* const filter = getProcessor();
 
     if (caller == synth1AccordeonTab 
         || caller == synth2AccordeonTab
@@ -582,11 +582,11 @@ void TalComponent::comboBoxChanged(ComboBox* caller)
 {
     TalComboBox* talCaller = (TalComboBox*)caller;
 
-    TalCore* const filter = getFilter();
+    // TalCore* const filter = getProcessor();
     NamedValueSet values = talCaller->getProperties();
     if (values.contains(Identifier("index")))
     {
-        TalCore* const filter = getFilter();
+        TalCore* const filter = getProcessor();
         filter->setParameterNotifyingHost(values["index"], talCaller->getNormalizedSelectedId());
     }
 }
@@ -594,7 +594,7 @@ void TalComponent::comboBoxChanged(ComboBox* caller)
 //==============================================================================
 void TalComponent::updateParametersFromFilter()
 {
-    TalCore* const filter = getFilter();
+    TalCore* const filter = getProcessor();
 
     // we use this lock to make sure the processBlock() method isn't writing to the
     // lastMidiMessage variable while we're trying to read it, but be extra-careful to

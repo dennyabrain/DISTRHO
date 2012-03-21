@@ -24,7 +24,7 @@
 #if !defined(__ReverbEngine_h)
 #define __ReverbEngine_h
 
-#include "Reverb.h"
+#include "TalReverb.h"
 #include "AudioUtils.h"
 #include "Params.h"
 #include "NoiseGenerator.h"

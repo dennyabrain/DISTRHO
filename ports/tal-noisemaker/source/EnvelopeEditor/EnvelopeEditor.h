@@ -54,6 +54,8 @@ private:
     bool oneShot;
     bool fixTempo;
 
+    bool isPlaying;
+
 public:
     EnvelopeEditor(float sampleRate)
     {
@@ -70,6 +72,7 @@ public:
         this->speedFactor = 1.0f;
         this->actualPhase = 0.0f;
         this->bpm = FIX_TEMPO;
+        this->isPlaying = true;
 
         this->initializePoints();
 
@@ -120,12 +123,12 @@ private:
                 float deltaX = points[i + 1]->getX() - points[i]->getX();
 
                 // Havent a better solution for 0 values until now
-                if (deltaX == 0.0f)
+                if (deltaX <= 0.0f)
                 {
                     deltaX = 0.00000000001f;
                 }
 
-                float scaleX = (x - points[i]->getCenterPosition().getX()) * 1.0f / deltaX;
+                float scaleX = (x - points[i]->getX()) * 1.0f / deltaX;
 
                 Point<float> result = su.PointOnCubicBezier(
                     scaleX, 
@@ -352,10 +355,13 @@ public:
     // returns a float [0..1]
     float process()
     {
-        this->actualPhase += this->getPhaseDelta(); 
-        if (this->actualPhase >= 1.0f)
+        if (this->isPlaying)
         {
-            this->actualPhase -= 1.0f;
+            this->actualPhase += this->getPhaseDelta(); 
+            if (this->actualPhase >= 1.0f)
+            {
+                this->actualPhase -= 1.0f;
+            }
         }
 
         return this->getEnvelopeValue(this->actualPhase);
@@ -372,6 +378,8 @@ public:
 
     void setTimeInformation(AudioPlayHead::CurrentPositionInfo pos)
     {
+        this->isPlaying = pos.isPlaying;
+
         if (this->bpm != (float)pos.bpm
             || this->denominator != (float)pos.timeSigDenominator
             || this->numerator != (float)pos.timeSigNumerator)

@@ -629,7 +629,11 @@ inline void TalCore::processMidiPerSample(MidiBuffer::Iterator *midiIterator, co
     // There can be more than one event at the same position
     while (this->getNextEvent(midiIterator, samplePos))
     {
-        if (midiMessage->isController())
+        if (midiMessage->isAllNotesOff() || midiMessage->isAllSoundOff() || midiMessage->isMidiStop())
+        {
+            engine->reset();
+        }
+        else if (midiMessage->isController())
         {
             handleController (midiMessage->getControllerNumber(),
                 midiMessage->getControllerValue());
@@ -647,10 +651,6 @@ inline void TalCore::processMidiPerSample(MidiBuffer::Iterator *midiIterator, co
             // [0..16383] center = 8192;
             engine->setPitchwheelAmount((midiMessage->getPitchWheelValue() - 8192.0f) / (16383.0f * 0.5f));
         }
-        else if (midiMessage->isAllNotesOff() || midiMessage->isAllSoundOff() || midiMessage->isMidiStop())
-        {
-            engine->reset();
-        }       
     }
 }
 
@@ -1057,11 +1057,6 @@ void TalCore::setXmlPrograms(XmlElement* e, int programNumber, float version)
 		    }
         }
 
-        if (talPresets[programNumber]->programData[OSC1WAVEFORM] <= 0.0f)
-        {
-            int i = 1;
-        }
-
         if (version < 1.6f)
         {
             talPresets[programNumber]->programData[VOICES] = audioUtils.calcComboBoxValueNormalized(talPresets[programNumber]->programData[VOICES], VOICES);
@@ -1075,7 +1070,14 @@ void TalCore::setXmlPrograms(XmlElement* e, int programNumber, float version)
             talPresets[programNumber]->programData[ENVELOPEEDITORDEST1] = audioUtils.calcComboBoxValueNormalized(talPresets[programNumber]->programData[ENVELOPEEDITORDEST1], ENVELOPEEDITORDEST1);
             talPresets[programNumber]->programData[ENVELOPEEDITORSPEED] = audioUtils.calcComboBoxValueNormalized(talPresets[programNumber]->programData[ENVELOPEEDITORSPEED], ENVELOPEEDITORSPEED);
         }
-    
+
+        if (version < 1.7f)
+        {
+            // 2 new filter types
+            int filtertypeOld = (int)floorf(talPresets[programNumber]->programData[FILTERTYPE] * (10 - 1.0f) + 1.0f + 0.5f);
+            talPresets[programNumber]->programData[FILTERTYPE] = audioUtils.calcComboBoxValueNormalized(filtertypeOld, FILTERTYPE);
+        }
+
         EnvelopePresetUtility utility;
         Array<SplinePoint*> splinePoints = utility.getEnvelopeFromXml(e);
         talPresets[programNumber]->setPoints(splinePoints);

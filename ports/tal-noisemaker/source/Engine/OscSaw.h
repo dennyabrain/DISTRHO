@@ -99,6 +99,7 @@ public:
 			mixInBlep(resetFrac/tmp, x - fracMaster);
 			x = fracMaster;
 		}
+
 		if (x >= 1.0f) 
 		{
 			x -= 1.0f;

@@ -35,6 +35,8 @@
 #include "FilterN24db.h"
 #include "FilterStateVariable12db.h"
 
+#include "FilterMoog24.h"
+
 class FilterHandler
 {
 private:
@@ -55,6 +57,8 @@ private:
     FilterStateVariable12db *filterStateVariableLp12db;
     FilterStateVariable12db *filterStateVariableHp12db;
     FilterStateVariable12db *filterStateVariableBp12db;
+
+    FilterMoog24 *filterMoog24;
 
 	int filtertype;
     float filterDrive;
@@ -82,6 +86,8 @@ public:
         filterStateVariableLp12db = new FilterStateVariable12db(sampleRate * 4.0f, 0);
         filterStateVariableHp12db = new FilterStateVariable12db(sampleRate * 4.0f, 1);
         filterStateVariableBp12db = new FilterStateVariable12db(sampleRate * 4.0f, 2);
+
+        this->filterMoog24 = new FilterMoog24(sampleRate);
 
         this->filtertype = 0;
         this->filterDrive = 0.0f;
@@ -136,77 +142,96 @@ public:
 	{
         *input *= filterDrive + 1.0f;
         
-		interpolatorLinear->process4x(*input, upsampledValues);
+        if (filtertype > 10)
+        {
+            *input /= 4.0f;
 
-		// Do oversampled stuff here
-		switch (filtertype)
-		{
-		case 1: 
-			filterLp24db->process(&upsampledValues[0], cutoff, resonance, true);
-			filterLp24db->process(&upsampledValues[1], cutoff, resonance, false);
-			filterLp24db->process(&upsampledValues[2], cutoff, resonance, false);
-			filterLp24db->process(&upsampledValues[3], cutoff, resonance, false);
-			break;
-		case 2: 
-			filterLp18db->process(&upsampledValues[0], cutoff, resonance, true);
-			filterLp18db->process(&upsampledValues[1], cutoff, resonance, false);
-			filterLp18db->process(&upsampledValues[2], cutoff, resonance, false);
-			filterLp18db->process(&upsampledValues[3], cutoff, resonance, false);
-			break;
-		case 3: 
-			filterLp12db->process(&upsampledValues[0], cutoff, resonance, true);
-			filterLp12db->process(&upsampledValues[1], cutoff, resonance, false);
-			filterLp12db->process(&upsampledValues[2], cutoff, resonance, false);
-			filterLp12db->process(&upsampledValues[3], cutoff, resonance, false);
-			break;
-		case 4: 
-			filterLp06db->process(&upsampledValues[0], cutoff, resonance, true);
-			filterLp06db->process(&upsampledValues[1], cutoff, resonance, false);
-			filterLp06db->process(&upsampledValues[2], cutoff, resonance, false);
-			filterLp06db->process(&upsampledValues[3], cutoff, resonance, false);
-			break;
-		case 5: 
-			filterHp24db->process(&upsampledValues[0], cutoff, resonance, true);
-			filterHp24db->process(&upsampledValues[1], cutoff, resonance, false);
-			filterHp24db->process(&upsampledValues[2], cutoff, resonance, false);
-			filterHp24db->process(&upsampledValues[3], cutoff, resonance, false);
-			break;
-		case 6: 
-            filterBp24db->process(&upsampledValues[0], cutoff, resonance, true);
-			filterBp24db->process(&upsampledValues[1], cutoff, resonance, false);
-			filterBp24db->process(&upsampledValues[2], cutoff, resonance, false);
-			filterBp24db->process(&upsampledValues[3], cutoff, resonance, false);
-			break;
-		case 7: 
-            filterN24db->process(&upsampledValues[0], cutoff, resonance, true);
-			filterN24db->process(&upsampledValues[1], cutoff, resonance, false);
-			filterN24db->process(&upsampledValues[2], cutoff, resonance, false);
-			filterN24db->process(&upsampledValues[3], cutoff, resonance, false);
-			break;
-		case 8: 
-            filterStateVariableLp12db->process(&upsampledValues[0], cutoff, resonance, true);
-			filterStateVariableLp12db->process(&upsampledValues[1], cutoff, resonance, false);
-			filterStateVariableLp12db->process(&upsampledValues[2], cutoff, resonance, false);
-			filterStateVariableLp12db->process(&upsampledValues[3], cutoff, resonance, false);
-			break;
-		case 9: 
-            filterStateVariableHp12db->process(&upsampledValues[0], cutoff, resonance, true);
-			filterStateVariableHp12db->process(&upsampledValues[1], cutoff, resonance, false);
-			filterStateVariableHp12db->process(&upsampledValues[2], cutoff, resonance, false);
-			filterStateVariableHp12db->process(&upsampledValues[3], cutoff, resonance, false);
-			break;
-		case 10: 
-            filterStateVariableBp12db->process(&upsampledValues[0], cutoff, resonance, true);
-			filterStateVariableBp12db->process(&upsampledValues[1], cutoff, resonance, false);
-			filterStateVariableBp12db->process(&upsampledValues[2], cutoff, resonance, false);
-			filterStateVariableBp12db->process(&upsampledValues[3], cutoff, resonance, false);
-			break;
-		}
+		    switch (filtertype)
+		    {
+		    case 11: 
+                this->filterMoog24->Process(input, cutoff, resonance, false, true);
+                break;
+		    case 12: 
+                // this->filterMoog24->Process(input, cutoff, resonance, true, true);
+                break;
+            }
+            *input *= 4.0f;
+            *input *= 3.0f;
+        }
+        else
+        {
+		    interpolatorLinear->process4x(*input, upsampledValues);
 
-		float decimated1 = decimator->Calc(upsampledValues[0], upsampledValues[1]);
-		float decimated2 = decimator->Calc(upsampledValues[2], upsampledValues[3]);
-		*input = decimator2->Calc(decimated1, decimated2);
+		    // Do oversampled stuff here
+		    switch (filtertype)
+		    {
+		    case 1: 
+			    filterLp24db->process(&upsampledValues[0], cutoff, resonance, true);
+			    filterLp24db->process(&upsampledValues[1], cutoff, resonance, false);
+			    filterLp24db->process(&upsampledValues[2], cutoff, resonance, false);
+			    filterLp24db->process(&upsampledValues[3], cutoff, resonance, false);
+			    break;
+		    case 2: 
+			    filterLp18db->process(&upsampledValues[0], cutoff, resonance, true);
+			    filterLp18db->process(&upsampledValues[1], cutoff, resonance, false);
+			    filterLp18db->process(&upsampledValues[2], cutoff, resonance, false);
+			    filterLp18db->process(&upsampledValues[3], cutoff, resonance, false);
+			    break;
+		    case 3: 
+			    filterLp12db->process(&upsampledValues[0], cutoff, resonance, true);
+			    filterLp12db->process(&upsampledValues[1], cutoff, resonance, false);
+			    filterLp12db->process(&upsampledValues[2], cutoff, resonance, false);
+			    filterLp12db->process(&upsampledValues[3], cutoff, resonance, false);
+			    break;
+		    case 4: 
+			    filterLp06db->process(&upsampledValues[0], cutoff, resonance, true);
+			    filterLp06db->process(&upsampledValues[1], cutoff, resonance, false);
+			    filterLp06db->process(&upsampledValues[2], cutoff, resonance, false);
+			    filterLp06db->process(&upsampledValues[3], cutoff, resonance, false);
+			    break;
+		    case 5: 
+			    filterHp24db->process(&upsampledValues[0], cutoff, resonance, true);
+			    filterHp24db->process(&upsampledValues[1], cutoff, resonance, false);
+			    filterHp24db->process(&upsampledValues[2], cutoff, resonance, false);
+			    filterHp24db->process(&upsampledValues[3], cutoff, resonance, false);
+			    break;
+		    case 6: 
+                filterBp24db->process(&upsampledValues[0], cutoff, resonance, true);
+			    filterBp24db->process(&upsampledValues[1], cutoff, resonance, false);
+			    filterBp24db->process(&upsampledValues[2], cutoff, resonance, false);
+			    filterBp24db->process(&upsampledValues[3], cutoff, resonance, false);
+			    break;
+		    case 7: 
+                filterN24db->process(&upsampledValues[0], cutoff, resonance, true);
+			    filterN24db->process(&upsampledValues[1], cutoff, resonance, false);
+			    filterN24db->process(&upsampledValues[2], cutoff, resonance, false);
+			    filterN24db->process(&upsampledValues[3], cutoff, resonance, false);
+			    break;
+		    case 8: 
+                filterStateVariableLp12db->process(&upsampledValues[0], cutoff, resonance, true);
+			    filterStateVariableLp12db->process(&upsampledValues[1], cutoff, resonance, false);
+			    filterStateVariableLp12db->process(&upsampledValues[2], cutoff, resonance, false);
+			    filterStateVariableLp12db->process(&upsampledValues[3], cutoff, resonance, false);
+			    break;
+		    case 9: 
+                filterStateVariableHp12db->process(&upsampledValues[0], cutoff, resonance, true);
+			    filterStateVariableHp12db->process(&upsampledValues[1], cutoff, resonance, false);
+			    filterStateVariableHp12db->process(&upsampledValues[2], cutoff, resonance, false);
+			    filterStateVariableHp12db->process(&upsampledValues[3], cutoff, resonance, false);
+			    break;
+		    case 10: 
+                filterStateVariableBp12db->process(&upsampledValues[0], cutoff, resonance, true);
+			    filterStateVariableBp12db->process(&upsampledValues[1], cutoff, resonance, false);
+			    filterStateVariableBp12db->process(&upsampledValues[2], cutoff, resonance, false);
+			    filterStateVariableBp12db->process(&upsampledValues[3], cutoff, resonance, false);
+			    break;
+		    }
 
+		    float decimated1 = decimator->Calc(upsampledValues[0], upsampledValues[1]);
+		    float decimated2 = decimator->Calc(upsampledValues[2], upsampledValues[3]);
+		    *input = decimator2->Calc(decimated1, decimated2);
+        
+        }
         *input /= filterDrive * 0.5f + 1.0f;
 	}
 };
