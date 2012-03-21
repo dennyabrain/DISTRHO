@@ -42,15 +42,15 @@ int main(int argc, char *argv[])
     }
 
 #ifdef TTL_GENERATOR_WINDOWS
-    TTL_Generator_Function ttl_fcn = (TTL_Generator_Function)GetProcAddress((HMODULE)handle, "juce_lv2_ttl_generator");
+    TTL_Generator_Function ttl_fcn = (TTL_Generator_Function)GetProcAddress((HMODULE)handle, "lv2_generate_ttl");
 #else
-    TTL_Generator_Function ttl_fcn = (TTL_Generator_Function)dlsym(handle, "juce_lv2_ttl_generator");
+    TTL_Generator_Function ttl_fcn = (TTL_Generator_Function)dlsym(handle, "lv2_generate_ttl");
 #endif
 
     if (ttl_fcn)
         ttl_fcn();
     else
-        printf("Failed to find 'juce_lv2_ttl_generator' function\n");
+        printf("Failed to find 'lv2_generate_ttl' function\n");
 
 #ifdef TTL_GENERATOR_WINDOWS
     FreeLibrary((HMODULE)handle);

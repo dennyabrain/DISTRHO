@@ -134,7 +134,9 @@ String nameToSymbol(const String& name, const uint32 portIndex)
         for (int i=0; i < trimmedName.length(); i++)
         {
             const juce_wchar c = trimmedName[i];
-            if (std::isalpha(c) || std::isdigit(c))
+            if (i == 0 && std::isdigit(c))
+                symbol += "_";
+            else if (std::isalpha(c) || std::isdigit(c))
                 symbol += c;
             else
                 symbol += "_";
@@ -1777,7 +1779,7 @@ static const LV2UI_Descriptor JuceLv2UI_X11 = {
 // Mac startup code..
 #if JUCE_MAC
 
-    extern "C" __attribute__ ((visibility("default"))) void juce_lv2_ttl_generator()
+    extern "C" __attribute__ ((visibility("default"))) void lv2_generate_ttl()
     {
         createTtlFiles();
     }
@@ -1806,7 +1808,7 @@ static const LV2UI_Descriptor JuceLv2UI_X11 = {
 // Linux startup code..
 #elif JUCE_LINUX
 
-    extern "C" __attribute__ ((visibility("default"))) void juce_lv2_ttl_generator()
+    extern "C" __attribute__ ((visibility("default"))) void lv2_generate_ttl()
     {
         createTtlFiles();
     }
@@ -1843,7 +1845,7 @@ static const LV2UI_Descriptor JuceLv2UI_X11 = {
 // Windows startup code..
 #else
 
-    extern "C" __declspec (dllexport) void juce_lv2_ttl_generator()
+    extern "C" __declspec (dllexport) void lv2_generate_ttl()
     {
         createTtlFiles();
     }
