@@ -24,30 +24,20 @@ distclean: clean
 # 	$(MAKE) distclean -C plugins
 	$(MAKE) distclean -C ports
 
+
 # Custom build types
-# standalone:
-# 	$(MAKE) -C libs/juce-153/standalone
+standalone:
+	$(MAKE) -C libs/juce-2.0
 # 	$(MAKE) standalone -C plugins
-# 	$(MAKE) standalone -C ports
-# 
-# standalone_vst:
-# 	$(MAKE) -C libs/juce-153/standalone-vst
-# 	$(MAKE) standalone_vst -C plugins
-# 	$(MAKE) standalone_vst -C ports
-# 
-# lv2:
-# 	$(MAKE) -C libs/juce-153/plugin
-# 	$(MAKE) -C libs/juce-lv2
+	$(MAKE) standalone -C ports
+
+lv2:
+	$(MAKE) -C libs/juce-2.0
+	$(MAKE) -C libs/juce-lv2
 # 	$(MAKE) lv2 -C plugins
-# 	$(MAKE) lv2 -C ports
-# 
-# lv2_vst:
-# 	$(MAKE) -C libs/juce-153/plugin-vst
-# 	$(MAKE) -C libs/juce-lv2
-# 	$(MAKE) lv2_vst -C plugins
-# 	$(MAKE) lv2_vst -C ports
-# 
-# vst:
-# 	$(MAKE) -C libs/juce-153/plugin
+	$(MAKE) lv2 -C ports
+
+vst:
+	$(MAKE) -C libs/juce-2.0
 # 	$(MAKE) vst -C plugins
-# 	$(MAKE) vst -C ports
+	$(MAKE) vst -C ports
