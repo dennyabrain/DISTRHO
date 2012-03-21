@@ -69,7 +69,6 @@ vst:
 # 	$(MAKE) -C tal-vocoder-2-juce/VST
 # 	$(MAKE) -C wolpertinger/VST
 
-
 clean:
 	# Standalone
 	$(MAKE) clean -C arctican-function/Standalone

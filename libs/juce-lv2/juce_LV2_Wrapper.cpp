@@ -1767,7 +1767,7 @@ static const LV2UI_Descriptor JuceLv2UI_ExternalOld = {
 
 static const LV2UI_Descriptor JuceLv2UI_X11 = {
     JucePlugin_LV2URI "#X11UI",
-    juceLV2UI_InstantiateExternal,
+    juceLV2UI_InstantiateX11,
     juceLV2UI_Cleanup,
     juceLV2UI_PortEvent,
     juceLV2UI_ExtensionData
