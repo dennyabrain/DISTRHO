@@ -1,0 +1,22 @@
+# Compile the VST Plugin
+
+BUILD_FLAGS = -O2 -mtune=generic -msse -ffast-math -fomit-frame-pointer -fvisibility=hidden -fPIC -shared -Wall -I../../../sdks/vstsdk2.4 `pkg-config --cflags jack` $(CXX_FLAGS)
+LINK_FLAGS  = `pkg-config --libs jack` $(LDD_FLAGS)
+
+WINECXX       ?= wineg++
+WINECXX_FLAGS ?= -m32 -L/usr/lib32/wine -L/usr/lib/i386-linux-gnu/wine
+
+all: build
+
+build: ../../../bin/JackAss.so
+wine: ../../../bin/JackAss.dll
+
+../../../bin/JackAss.so: ../source/jackass.cpp
+	$(CXX) $(BUILD_FLAGS) $< -o $@ $(LINK_FLAGS)
+
+../../../bin/JackAss.dll: ../source/jackass.cpp
+	$(WINECXX) $(BUILD_FLAGS) $(WINECXX_FLAGS) $< wine.def -o $@ $(LINK_FLAGS)
+	mv $@.so $@
+
+clean:
+	rm -f ../../../bin/JackAss.*

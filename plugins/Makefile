@@ -1,0 +1,45 @@
+# Compile all the Plugins
+
+all: build
+
+
+build: libs standalone lv2 vst
+
+plugins: standalone lv2 vst
+
+
+libs:
+	$(MAKE) -C ../libs/juce-2.0
+	$(MAKE) -C ../libs/juce-lv2
+
+standalone:
+	$(MAKE) -C 3BandEQ/Standalone
+
+lv2:
+	$(MAKE) -C 3BandEQ/LV2
+
+vst:
+	$(MAKE) -C 3BandEQ/VST
+	$(MAKE) -C JackAss/VST -f Makefile.real
+
+clean:
+	# Standalone
+	$(MAKE) clean -C 3BandEQ/Standalone
+
+	# LV2
+	$(MAKE) clean -C 3BandEQ/LV2
+
+	# VST
+	$(MAKE) clean -C 3BandEQ/VST
+	$(MAKE) clean -C JackAss/VST -f Makefile.real
+
+	rm -rf */Standalone/intermediate
+	rm -rf */LV2/intermediate
+	rm -rf */VST/intermediate
+
+distclean: clean
+	rm -rf */LV2/*.lv2
+	rm -f */*/Makefile
+	rm -f */*/*.make
+	rm -f */*/*.sln
+	rm -f */*/*.vcproj
