@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="juce-gui-extra"
-	ProjectGUID="{9D40164D-B100-C6A6-E399-8C18D745A3E5}"
+	ProjectGUID="{9CAA3A4E-E501-171C-EA39-39E9569A83BC}"
 	RootNamespace="juce-gui-extra"
 	Keyword="Win32Proj"
 	>

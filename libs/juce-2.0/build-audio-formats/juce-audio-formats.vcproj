@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="juce-audio-formats"
-	ProjectGUID="{0011E30A-5D23-0FFE-372B-F2A784C823E2}"
+	ProjectGUID="{57E7C66E-0D9F-45AF-AFC4-3B322E037125}"
 	RootNamespace="juce-audio-formats"
 	Keyword="Win32Proj"
 	>

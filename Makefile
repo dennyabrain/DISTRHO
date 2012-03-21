@@ -19,6 +19,10 @@ clean:
 	$(MAKE) clean -C ports
 	rm -rf bin/*.lv2
 
+distclean: clean
+	$(MAKE) distclean -C libs/juce-2.0
+# 	$(MAKE) distclean -C plugins
+	$(MAKE) distclean -C ports
 
 # Custom build types
 # standalone:

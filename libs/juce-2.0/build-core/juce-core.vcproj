@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="juce-core"
-	ProjectGUID="{B42551EE-B479-9201-E282-002B417A3857}"
+	ProjectGUID="{5BBF78F6-AB60-9F4D-394D-98CF504351BC}"
 	RootNamespace="juce-core"
 	Keyword="Win32Proj"
 	>

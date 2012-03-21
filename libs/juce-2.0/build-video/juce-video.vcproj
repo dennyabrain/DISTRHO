@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="juce-video"
-	ProjectGUID="{D7234762-089A-B565-C4A6-0633D198754F}"
+	ProjectGUID="{63F736DD-5C04-8FE2-4DD0-9D4E35F6043C}"
 	RootNamespace="juce-video"
 	Keyword="Win32Proj"
 	>

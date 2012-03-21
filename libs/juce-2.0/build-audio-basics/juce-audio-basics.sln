@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "juce-audio-basics", "./juce-audio-basics.vcproj", "{DABA1ADA-1E1C-18AA-B229-8636CA902007}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "juce-audio-basics", "./juce-audio-basics.vcproj", "{7D693101-DBAB-EA21-47B0-49C46FC6B352}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
@@ -10,10 +10,10 @@ Global
 		Debug|Win32 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{DABA1ADA-1E1C-18AA-B229-8636CA902007}.Release|Win32.ActiveCfg = Release|Win32
-		{DABA1ADA-1E1C-18AA-B229-8636CA902007}.Release|Win32.Build.0 = Release|Win32
-		{DABA1ADA-1E1C-18AA-B229-8636CA902007}.Debug|Win32.ActiveCfg = Debug|Win32
-		{DABA1ADA-1E1C-18AA-B229-8636CA902007}.Debug|Win32.Build.0 = Debug|Win32
+		{7D693101-DBAB-EA21-47B0-49C46FC6B352}.Release|Win32.ActiveCfg = Release|Win32
+		{7D693101-DBAB-EA21-47B0-49C46FC6B352}.Release|Win32.Build.0 = Release|Win32
+		{7D693101-DBAB-EA21-47B0-49C46FC6B352}.Debug|Win32.ActiveCfg = Debug|Win32
+		{7D693101-DBAB-EA21-47B0-49C46FC6B352}.Debug|Win32.Build.0 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "juce-opengl", "./juce-opengl.vcproj", "{F46185A0-18E7-A424-8B2A-4EBABB26427F}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "juce-opengl", "./juce-opengl.vcproj", "{104FF855-2BBA-69E0-CFEE-AE48AB6EAA65}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
@@ -10,10 +10,10 @@ Global
 		Debug|Win32 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{F46185A0-18E7-A424-8B2A-4EBABB26427F}.Release|Win32.ActiveCfg = Release|Win32
-		{F46185A0-18E7-A424-8B2A-4EBABB26427F}.Release|Win32.Build.0 = Release|Win32
-		{F46185A0-18E7-A424-8B2A-4EBABB26427F}.Debug|Win32.ActiveCfg = Debug|Win32
-		{F46185A0-18E7-A424-8B2A-4EBABB26427F}.Debug|Win32.Build.0 = Debug|Win32
+		{104FF855-2BBA-69E0-CFEE-AE48AB6EAA65}.Release|Win32.ActiveCfg = Release|Win32
+		{104FF855-2BBA-69E0-CFEE-AE48AB6EAA65}.Release|Win32.Build.0 = Release|Win32
+		{104FF855-2BBA-69E0-CFEE-AE48AB6EAA65}.Debug|Win32.ActiveCfg = Debug|Win32
+		{104FF855-2BBA-69E0-CFEE-AE48AB6EAA65}.Debug|Win32.Build.0 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

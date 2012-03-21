@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="TheFunction.lv2/The_Function"
-	ProjectGUID="{9C521BDF-B5AB-CBD6-F766-4630F9C7E729}"
+	ProjectGUID="{AF5E1FA5-44C5-FDE0-457D-3A2B9936ED68}"
 	RootNamespace="TheFunction.lv2/The_Function"
 	Keyword="Win32Proj"
 	>

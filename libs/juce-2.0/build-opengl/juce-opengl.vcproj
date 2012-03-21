@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="juce-opengl"
-	ProjectGUID="{F46185A0-18E7-A424-8B2A-4EBABB26427F}"
+	ProjectGUID="{104FF855-2BBA-69E0-CFEE-AE48AB6EAA65}"
 	RootNamespace="juce-opengl"
 	Keyword="Win32Proj"
 	>

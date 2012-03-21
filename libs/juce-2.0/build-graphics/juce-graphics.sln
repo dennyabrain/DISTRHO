@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "juce-graphics", "./juce-graphics.vcproj", "{FEB42B69-521A-B3DF-CA89-D25C83652ADA}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "juce-graphics", "./juce-graphics.vcproj", "{0BCC7E5D-9F5A-C98D-7D0D-F60E3892940D}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
@@ -10,10 +10,10 @@ Global
 		Debug|Win32 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{FEB42B69-521A-B3DF-CA89-D25C83652ADA}.Release|Win32.ActiveCfg = Release|Win32
-		{FEB42B69-521A-B3DF-CA89-D25C83652ADA}.Release|Win32.Build.0 = Release|Win32
-		{FEB42B69-521A-B3DF-CA89-D25C83652ADA}.Debug|Win32.ActiveCfg = Debug|Win32
-		{FEB42B69-521A-B3DF-CA89-D25C83652ADA}.Debug|Win32.Build.0 = Debug|Win32
+		{0BCC7E5D-9F5A-C98D-7D0D-F60E3892940D}.Release|Win32.ActiveCfg = Release|Win32
+		{0BCC7E5D-9F5A-C98D-7D0D-F60E3892940D}.Release|Win32.Build.0 = Release|Win32
+		{0BCC7E5D-9F5A-C98D-7D0D-F60E3892940D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{0BCC7E5D-9F5A-C98D-7D0D-F60E3892940D}.Debug|Win32.Build.0 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
