@@ -3,8 +3,8 @@
 all: build
 
 
-build: audio-basics audio-devices audio-devices_full audio-formats audio-processors audio-processors_full audio-utils \
-	core cryptography data-structures events graphics gui-basics gui-extra opengl video
+build: audio-basics audio-devices audio-devices_full audio-formats audio-processors audio-utils \ # audio-processors_full
+	core data-structures events graphics gui-basics
 
 
 audio-basics:
@@ -23,8 +23,7 @@ audio-processors:
 	$(MAKE) -C build-audio-processors
 
 audio-processors_full:
-	# FIXME - doesn't build
-# 	$(MAKE) -C build-audio-processors-full
+	$(MAKE) -C build-audio-processors-full
 
 audio-utils:
 	$(MAKE) -C build-audio-utils

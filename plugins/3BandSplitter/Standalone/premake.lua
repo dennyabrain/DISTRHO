@@ -30,7 +30,9 @@ else
   package.config["Release"].buildoptions = { "-O2 -mtune=generic -msse -ffast-math -fomit-frame-pointer -fvisibility=hidden -fPIC" }
   package.config["Debug"].buildoptions   = { "-O0 -ggdb -fPIC" }
   if (macosx) then
-    package.defines = { package.defines, "MAC=1" }
+    package.defines      = { package.defines, "MAC=1" }
+    package.buildoptions = { "-ObjC++" }
+    package.linkoptions  = { "-framework AudioToolbox -framework Cocoa -framework CoreAudio -framework CoreMidi -framework QuartzCore" }
   else
     package.defines = { package.defines, "LINUX=1" }
     package.links   = { "freetype", "pthread", "asound", "dl", "rt", "X11", "Xext" }

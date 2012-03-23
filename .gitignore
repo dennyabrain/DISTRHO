@@ -9,6 +9,7 @@
 .fuse*
 .svn
 .*.kate-swp
+.DS_Store
 
 bin/*
 debian

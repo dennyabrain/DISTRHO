@@ -26,6 +26,7 @@ else
   package.config["Debug"].buildoptions   = { "-O0 -ggdb -fPIC" }
   if (macosx) then
     package.defines = { "MAC=1" }
+    package.buildoptions =  { "-ObjC++" }
   else
     package.defines = { "LINUX=1" }
     package.buildoptions = { "`pkg-config --cflags freetype2`" }

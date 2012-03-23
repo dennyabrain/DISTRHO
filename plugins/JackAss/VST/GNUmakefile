@@ -1,6 +1,6 @@
 # Compile the VST Plugin
 
-BUILD_FLAGS = -O2 -mtune=generic -msse -ffast-math -fomit-frame-pointer -fvisibility=hidden -fPIC -shared -Wall -I../../../sdks/vstsdk2.4 `pkg-config --cflags jack` $(CXX_FLAGS)
+BUILD_FLAGS = -shared -O2 -mtune=generic -msse -ffast-math -fomit-frame-pointer -fvisibility=hidden -fPIC -Wall -I../../../sdks/vstsdk2.4 `pkg-config --cflags jack` $(CXX_FLAGS)
 LINK_FLAGS  = `pkg-config --libs jack` $(LDD_FLAGS)
 
 WINECXX       ?= wineg++

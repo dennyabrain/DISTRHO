@@ -31,6 +31,9 @@ else
   package.config["Debug"].buildoptions   = { "-O0 -ggdb -fPIC" }
   if (macosx) then
     package.defines = { package.defines, "MAC=1", "BINTYPE=\"Mac-LV2\"" }
+    package.targetextension = "dylib"
+    package.buildoptions    = { "-ObjC++" }
+    package.linkoptions     = { "-bundle -framework Carbon -framework QuartzCore" }
   else
     package.defines = { package.defines, "LINUX=1", "BINTYPE=\"Linux-LV2\"" }
     package.links   = { "freetype", "pthread", "rt", "m", "X11", "Xext" }

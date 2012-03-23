@@ -28,6 +28,7 @@ else
   package.config["Debug"].buildoptions   = { "-Wall -O0 -ggdb -fPIC" }
   if (macosx) then
     package.defines = { package.defines, "MAC=1" }
+    package.targetextension = "dylib"
   else
     package.defines = { package.defines, "LINUX=1" }
   end

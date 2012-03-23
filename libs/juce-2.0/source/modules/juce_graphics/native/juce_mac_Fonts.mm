@@ -31,6 +31,15 @@
 
 #if JUCE_CORETEXT_AVAILABLE
 
+#if MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_5
+// The following symbols are SPI in 10.5.
+extern "C" {
+void CTRunGetAdvances(CTRunRef run, CFRange range, CGSize buffer[]);
+const CGSize* CTRunGetAdvancesPtr(CTRunRef run);
+extern const CFStringRef kCTTypesetterOptionForcedEmbeddingLevel;
+}
+#endif
+
 namespace CoreTextTypeLayout
 {
     CTFontRef createCTFont (const Font& font, const float fontSize,

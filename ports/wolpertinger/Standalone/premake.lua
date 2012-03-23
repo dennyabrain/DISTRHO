@@ -29,7 +29,9 @@ else
   package.config["Release"].buildoptions = { "-O2 -mtune=generic -msse -ffast-math -fomit-frame-pointer -fvisibility=hidden -fPIC" }
   package.config["Debug"].buildoptions   = { "-O0 -ggdb -fPIC" }
   if (macosx) then
-    package.defines = { package.defines, "MAC=1", "BINTYPE=\"Mac-Standalone\"" }
+    package.defines      = { package.defines, "MAC=1", "BINTYPE=\"Mac-Standalone\"" }
+    package.buildoptions = { "-ObjC++" }
+    package.linkoptions  = { "-framework AudioToolbox -framework Cocoa -framework CoreAudio -framework CoreMidi -framework QuartzCore" }
   else
     package.defines = { package.defines, "LINUX=1", "BINTYPE=\"Linux-Standalone\"" }
     package.links   = { "freetype", "pthread", "asound", "dl", "rt", "m", "X11", "Xext" }

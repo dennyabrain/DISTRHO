@@ -20,7 +20,7 @@ lv2:
 
 vst:
 	$(MAKE) -C 3BandEQ/VST
-	$(MAKE) -C JackAss/VST -f Makefile.real
+	$(MAKE) -C JackAss/VST
 
 clean:
 	# Standalone
@@ -31,7 +31,7 @@ clean:
 
 	# VST
 	$(MAKE) clean -C 3BandEQ/VST
-	$(MAKE) clean -C JackAss/VST -f Makefile.real
+	$(MAKE) clean -C JackAss/VST
 
 	rm -rf */Standalone/intermediate
 	rm -rf */LV2/intermediate
