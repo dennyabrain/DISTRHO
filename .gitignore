@@ -5,6 +5,10 @@
 *.o
 *.so
 
+*.lv2
+*.make
+Makefile
+
 .directory
 .fuse*
 .svn

@@ -1,0 +1,66 @@
+-------------------------
+-  README for DISTRHO  -
+-----------------------
+
+DISTRHO is an open source project that has the goal of making cross-platform plugins and Linux LV2 ports.
+The DISTRHO Team currently has 2 members - falkTX (the coder) and nieee (graphics designer).
+
+The source repository is layered out this way:
+ bin/                 - directory where all the compiled binaries will be placed
+ libs/                - libraries
+ libs/distrho-ports/  - disthro own code to take care of standard-to-standard conversion, currently only has a small vst-to-lv2 helper
+ libs/juce-2.0/       - juce 2.0 source code and build scripts
+ libs/juce-lv2/       - juce lv2 wrapper code
+ libs/juce-plugin/    - disthro own juce code, created to make building separate plugin types easy (Standalone, VST and LV2)
+ plugins/             - plugins developed and/or designed by the DISTRHO Team
+ ports/               - all plugin ports (plugins not made by us) will be placed here
+ scripts/             - build scripts
+ sdks/                - SDKs must be placed here (ASIO SDK and VST SDK)
+
+
+
+-------------------------------------------------------------------------------------------------------------------
+---- BUILD and INSTALL
+
+In order to build the plugins, first run:
+
+$ ./scripts/premake-update.sh _OS_
+
+where _OS_ can be 'linux', 'mac' or 'windows'. This operation requires 'premake' (version 3) to be installed on your system.
+On Linux and MacOS this will create a set of Makefiles, on Windows it will generate VC-2005 projects.
+
+
+You are now ready to start building. If you run Linux or MacOS, run this on the source root folder:
+
+$ make
+
+If you just want to build specific plugin versions, you can use 'make standalone', 'make lv2' or 'make vst' to build their respective versions.
+On Windows, you need to go through all build folders and open the VC-2005 projects one at a time and compile them.
+
+
+When you're done, and if you built LV2 versions (yes by default), run this:
+
+$ make gen
+
+to generate to static LV2 turtle data.
+
+
+
+-------------------------------------------------------------------------------------------------------------------
+---- BUILD DEPENDENCIES
+
+To build plugins, you first need to install the following dependencies:
+
+ All OSes:
+
+- premake
+- Qt4
+
+
+ Linux: (development versions of these)
+
+- ALSA
+- JACK
+- freetype2
+- X11 core
+- X11 extensions (Xinerama, X Shared memory/Xshm, XRender and XCursor)
