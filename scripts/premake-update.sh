@@ -2,6 +2,26 @@
 
 set -e
 
+LINUX=0
+MAC=0
+WINDOWS=0
+
+if [ "$1" = "" ]; then
+  echo "usage: $0 linux|mac|windows"
+  exit
+fi
+
+if [ "$1" = "linux" ]; then
+  LINUX=1
+elif [ "$1" = "mac" ]; then
+  MAC=1
+elif [ "$1" = "windows" ]; then
+  WINDOWS=1
+else
+  echo "parameter must be linux, mac or windows"
+  exit
+fi
+
 if [ -d ../libs ]; then
   echo cd ..
   cd ..
@@ -15,20 +35,31 @@ for i in $FILES; do
   echo cd $FOLDER
   cd $FOLDER
 
-  echo premake --os windows --target vs2005
-  premake --os windows --target vs2005
+  if [ $LINUX = 1 ]; then
 
-  echo sed "s/SubSystem=\\\"1\\\"/SubSystem=\\\"2\\\"/" -i `find . -name \*.vcproj`
-  sed "s/SubSystem=\"1\"/SubSystem=\"2\"/" -i `find . -name \*.vcproj`
+    echo premake --os linux --target gnu --cc gcc
+    premake --os linux --target gnu --cc gcc
 
-  echo sed "s/\t\t\t\tEntryPointSymbol=\\\"mainCRTStartup\\\"//" -i `find . -name \*.vcproj`
-  sed "s/\t\t\t\tEntryPointSymbol=\"mainCRTStartup\"//" -i `find . -name \*.vcproj`
+    echo sed "s/\\\$(LDFLAGS)/\\\$(LDFLAGS) \\\$(LDFLAGS)/" -i `find . -name \*.make`
+    sed "s/\$(LDFLAGS)/\$(LDFLAGS) \$(LDFLAGS)/" -i `find . -name \*.make`
 
-  echo premake --os linux --target gnu --cc gcc
-  premake --os linux --target gnu --cc gcc
+  elif [ $MAC = 1 ]; then
 
-  echo sed "s/\\\$(LDFLAGS)/\\\$(LDFLAGS) \\\$(LDFLAGS)/" -i `find . -name \*.make`
-  sed "s/\$(LDFLAGS)/\$(LDFLAGS) \$(LDFLAGS)/" -i `find . -name \*.make`
+    echo premake --os macosx --target gnu --cc gcc
+    premake --os macosx --target gnu --cc gcc
+
+  elif [ $WINDOWS = 1 ]; then
+
+    echo premake --os windows --target vs2005
+    premake --os windows --target vs2005
+
+    echo sed "s/SubSystem=\\\"1\\\"/SubSystem=\\\"2\\\"/" -i `find . -name \*.vcproj`
+    sed "s/SubSystem=\"1\"/SubSystem=\"2\"/" -i `find . -name \*.vcproj`
+
+    echo sed "s/\t\t\t\tEntryPointSymbol=\\\"mainCRTStartup\\\"//" -i `find . -name \*.vcproj`
+    sed "s/\t\t\t\tEntryPointSymbol=\"mainCRTStartup\"//" -i `find . -name \*.vcproj`
+
+  fi
 
   if [ -d ../libs ]; then
     echo cd ..
