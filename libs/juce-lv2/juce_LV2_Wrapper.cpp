@@ -21,7 +21,7 @@
 * - atom based MIDI and Time-Pos
 * - X11 UI
 */
-#define JUCE_LV2_ENABLE_DEV_FEATURES 1
+#define JUCE_LV2_ENABLE_DEV_FEATURES 0
 
 /*
  * Available macros:
@@ -64,7 +64,7 @@
  #include "includes/time.h"
  #include "includes/ui-resize.h"
 #else
- #define LV2_ATOM__String LV2_ATOM_PREFIX "String"
+ #define LV2_ATOM__String "http://lv2plug.in/ns/ext/atom#String"
  #include "includes/event.h"
  #include "includes/event-helpers.h"
 #endif
@@ -93,10 +93,12 @@ extern AudioProcessor* JUCE_CALLTYPE createPluginFilter();
 //==============================================================================
 // Various helper functions for creating the ttl files
 
-#ifdef JUCE_WINDOWS
- #define PLUGIN_EXT ".dll"
-#else
+#if JUCE_MAC
+ #define PLUGIN_EXT ".dylib"
+#elif JUCE_LINUX
  #define PLUGIN_EXT ".so"
+#elif JUCE_WINDOWS
+ #define PLUGIN_EXT ".dll"
 #endif
 
 /** Returns the name of the plugin binary file */
@@ -540,7 +542,6 @@ public:
     /** Close button handler */
     void closeButtonPressed()
     {
-        std::cout << "close button pressed" << std::endl;
         saveLastPos();
         removeFromDesktop();
         closed = true;
@@ -558,7 +559,6 @@ public:
 
     Point<int> getLastPos()
     {
-        std::cout << "getLastPos - " << lastPos.getX() << " : " << lastPos.getY() << std::endl;
         return lastPos;
     }
 
@@ -626,7 +626,6 @@ public:
 
     Point<int> getScreenPosition()
     {
-        std::cerr << "getScreenPos" << std::endl;
         if (window)
         {
             if (window->isClosed())
@@ -635,16 +634,13 @@ public:
                 return window->getScreenPosition();
         }
 
-        std::cerr << "getScreenPos NO" << std::endl;
         return Point<int> (100, 100);
     }
 
     void setScreenPos(int x, int y)
     {
-        std::cerr << "setScreenPos " << x << " :" << y << std::endl;
         if (window && ! window->isClosed())
         {
-            std::cerr << "setScreenPos YES" << std::endl;
             window->setTopLeftPosition(x, y);
         }
     }
@@ -1020,7 +1016,6 @@ private:
 
     void resetExternalUI(const LV2_Feature* const* features)
     {
-        std::cout << " resetExternalUI" << externalUI << std::endl;
         externalUIHost = nullptr;
 
         for (uint16 i = 0; features[i]; i++)
@@ -1463,6 +1458,9 @@ public:
         if (sampleRate <= 0)
             return false;
 
+ #if JUCE_LV2_ENABLE_DEV_FEATURES
+        // TODO
+ #else
         if (portTimeBPM)
             info.bpm = *portTimeBPM;
         else
@@ -1475,8 +1473,9 @@ public:
         info.timeInSeconds  = 0;
         info.editOriginTime = 0;
         info.frameRate   = AudioPlayHead::fpsUnknown;
-        info.isPlaying   = true;
+        info.isPlaying   = false;
         info.isRecording = false;
+ #endif
 
         return true;
 #endif

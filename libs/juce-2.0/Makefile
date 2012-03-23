@@ -3,8 +3,9 @@
 all: build
 
 
-build: audio-basics audio-devices audio-devices_full audio-formats audio-processors audio-utils \ # audio-processors_full
+build: audio-basics audio-devices audio-devices_full audio-formats audio-processors audio-utils \
 	core data-structures events graphics gui-basics
+ # audio-processors_full
 
 
 audio-basics:

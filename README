@@ -45,6 +45,12 @@ $ make gen
 to generate to static LV2 turtle data.
 
 
+Note that some plugins may require extra files to be installed on your system in order to work.
+We created a README for each one them. Currently they are:
+
+ - ports/hybridreverb2/
+
+
 
 -------------------------------------------------------------------------------------------------------------------
 ---- BUILD DEPENDENCIES
