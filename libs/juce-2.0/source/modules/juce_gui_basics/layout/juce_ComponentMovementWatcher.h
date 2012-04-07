@@ -40,7 +40,7 @@
 
     It also includes a callback that lets you know when the top-level peer is changed.
 
-    This class is used by specialised components like OpenGLComponent or QuickTimeComponent
+    This class is used by specialised components like WebBrowserComponent or QuickTimeComponent
     because they need to keep their custom windows in the right place and respond to
     changes in the peer.
 */
@@ -66,6 +66,9 @@ public:
         one of its parents being made visible or invisible.
     */
     virtual void componentVisibilityChanged() = 0;
+
+    /** Returns the component that's being watched. */
+    Component* getComponent() const noexcept         { return component; }
 
     //==============================================================================
     /** @internal */

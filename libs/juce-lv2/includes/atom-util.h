@@ -29,7 +29,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "lv2/lv2plug.in/ns/ext/atom/atom.h"
+#include "atom.h"
 
 #ifdef __cplusplus
 extern "C" {

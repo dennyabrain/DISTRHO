@@ -48,6 +48,7 @@ namespace
     Value getPluginEditorNeedsKeyFocus (Project& project)         { return project.getProjectValue ("pluginEditorRequiresKeys"); }
     Value getPluginAUExportPrefix (Project& project)              { return project.getProjectValue ("pluginAUExportPrefix"); }
     Value getPluginAUCocoaViewClassName (Project& project)        { return project.getProjectValue ("pluginAUViewClass"); }
+    Value getPluginAUMainType (Project& project)                  { return project.getProjectValue ("pluginAUMainType"); }
     Value getPluginRTASCategory (Project& project)                { return project.getProjectValue ("pluginRTASCategory"); }
 
     String getPluginRTASCategoryCode (Project& project)
@@ -59,6 +60,16 @@ namespace
         if (s.isEmpty())
             s = "ePlugInCategory_None";
 
+        return s;
+    }
+
+    String getAUMainTypeString (Project& project)
+    {
+        String s (getPluginAUMainType (project).toString());
+
+        if (s.isEmpty())
+            s = static_cast <bool> (getPluginIsSynth (project).getValue()) ? "kAudioUnitType_MusicDevice"
+                                                                           : "kAudioUnitType_Effect";
         return s;
     }
 
@@ -108,7 +119,7 @@ namespace
         flags.set ("JucePlugin_VersionString",               project.getVersionString().quoted());
         flags.set ("JucePlugin_VSTUniqueID",                 "JucePlugin_PluginCode");
         flags.set ("JucePlugin_VSTCategory",                 static_cast <bool> (getPluginIsSynth (project).getValue()) ? "kPlugCategSynth" : "kPlugCategEffect");
-        flags.set ("JucePlugin_AUMainType",                  static_cast <bool> (getPluginIsSynth (project).getValue()) ? "kAudioUnitType_MusicDevice" : "kAudioUnitType_Effect");
+        flags.set ("JucePlugin_AUMainType",                  getAUMainTypeString (project));
         flags.set ("JucePlugin_AUSubType",                   "JucePlugin_PluginCode");
         flags.set ("JucePlugin_AUExportPrefix",              getPluginAUExportPrefix (project).toString());
         flags.set ("JucePlugin_AUExportPrefixQuoted",        getPluginAUExportPrefix (project).toString().quoted());
@@ -302,23 +313,25 @@ namespace RTASHelpers
     {
         fixMissingRTASValues (exporter);
 
-        exporter.xcodeCanUseDwarf = false;
-
-        exporter.msvcTargetSuffix = ".dpm";
-        exporter.msvcNeedsDLLRuntimeLib = true;
-
-        RelativePath rtasFolder (getRTASFolderRelativePath (exporter));
-        exporter.msvcExtraPreprocessorDefs.set ("JucePlugin_WinBag_path", CodeHelpers::addEscapeChars (rtasFolder.getChildFile ("WinBag")
-                                                                                                                 .toWindowsStyle()).quoted());
-
-        String msvcPathToRTASFolder (exporter.getJucePathFromTargetFolder()
-                                             .getChildFile ("juce_audio_plugin_client/RTAS")
-                                             .toWindowsStyle() + "\\");
-
-        exporter.msvcDelayLoadedDLLs = "DAE.dll; DigiExt.dll; DSI.dll; PluginLib.dll; DSPManager.dll";
-
         if (exporter.isVisualStudio())
         {
+            exporter.msvcTargetSuffix = ".dpm";
+            exporter.msvcNeedsDLLRuntimeLib = true;
+
+            String winbag (getRTASFolderRelativePath (exporter).getChildFile ("WinBag").toWindowsStyle());
+
+            // (VS10 automatically adds escape characters to the quotes for this definition)
+            winbag = (exporter.getVisualStudioVersion() < 10) ? CodeHelpers::addEscapeChars (winbag.quoted())
+                                                              : CodeHelpers::addEscapeChars (winbag).quoted();
+
+            exporter.msvcExtraPreprocessorDefs.set ("JucePlugin_WinBag_path", winbag);
+
+            String msvcPathToRTASFolder (exporter.getJucePathFromTargetFolder()
+                                                 .getChildFile ("juce_audio_plugin_client/RTAS")
+                                                 .toWindowsStyle() + "\\");
+
+            exporter.msvcDelayLoadedDLLs = "DAE.dll; DigiExt.dll; DSI.dll; PluginLib.dll; DSPManager.dll";
+
             if (! exporter.getExtraLinkerFlags().toString().contains ("/FORCE:multiple"))
                 exporter.getExtraLinkerFlags() = exporter.getExtraLinkerFlags().toString() + " /FORCE:multiple";
 
@@ -331,9 +344,14 @@ namespace RTASHelpers
                                                                     + "\" \"$(TargetPath)\".rsr";
             }
         }
+        else
+        {
+            exporter.xcodeCanUseDwarf = false;
 
-        exporter.xcodeExtraLibrariesDebug.add   (rtasFolder.getChildFile ("MacBag/Libs/Debug/libPluginLibrary.a"));
-        exporter.xcodeExtraLibrariesRelease.add (rtasFolder.getChildFile ("MacBag/Libs/Release/libPluginLibrary.a"));
+            RelativePath rtasFolder (getRTASFolder (exporter).toString(), RelativePath::projectFolder);
+            exporter.xcodeExtraLibrariesDebug.add   (rtasFolder.getChildFile ("MacBag/Libs/Debug/libPluginLibrary.a"));
+            exporter.xcodeExtraLibrariesRelease.add (rtasFolder.getChildFile ("MacBag/Libs/Release/libPluginLibrary.a"));
+        }
 
         writePluginCharacteristicsFile (projectSaver);
 

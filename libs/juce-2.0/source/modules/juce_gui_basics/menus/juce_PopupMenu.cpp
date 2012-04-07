@@ -23,7 +23,6 @@
   ==============================================================================
 */
 
-
 class PopupMenu::Item
 {
 public:
@@ -993,7 +992,7 @@ private:
                 PopupMenu::ItemComponent* itemUnderMouse = dynamic_cast <PopupMenu::ItemComponent*> (c);
 
                 if (itemUnderMouse == nullptr && c != nullptr)
-                    itemUnderMouse = c->findParentComponentOfClass ((PopupMenu::ItemComponent*) nullptr);
+                    itemUnderMouse = c->findParentComponentOfClass<PopupMenu::ItemComponent>();
 
                 if (itemUnderMouse != currentChild
                       && (isOver || (activeSubMenu == nullptr) || ! activeSubMenu->isVisible()))

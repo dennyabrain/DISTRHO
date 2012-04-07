@@ -52,7 +52,11 @@ struct Target
 
     void makeActive() const noexcept
     {
-        context.extensions.glBindFramebuffer (GL_FRAMEBUFFER, frameBufferID);
+       #if JUCE_WINDOWS
+        if (context.extensions.glBindFramebuffer != nullptr)
+       #endif
+            context.extensions.glBindFramebuffer (GL_FRAMEBUFFER, frameBufferID);
+
         glViewport (0, 0, bounds.getWidth(), bounds.getHeight());
         glDisable (GL_DEPTH_TEST);
     }
@@ -599,9 +603,6 @@ public:
 //==============================================================================
 struct StateHelpers
 {
-    struct ActiveTextures;
-
-    //==============================================================================
     struct BlendingMode
     {
         BlendingMode() noexcept
@@ -742,8 +743,7 @@ struct StateHelpers
 
         void clear() noexcept
         {
-            for (int i = 0; i < numElementsInArray (currentTextureID); ++i)
-                currentTextureID[i] = 0;
+            zeromem (currentTextureID, sizeof (currentTextureID));
         }
 
         void clearCurrent() noexcept
@@ -774,7 +774,7 @@ struct StateHelpers
                             currentTextureID[i] = 0;
                         }
 
-                        JUCE_CHECK_OPENGL_ERROR
+                        clearGLError();
                        #endif
                     }
                 }
@@ -1025,7 +1025,7 @@ struct StateHelpers
             GLuint colour;
         };
 
-       #if ! JUCE_MAC
+       #if ! (JUCE_MAC || JUCE_ANDROID || JUCE_IOS)
         enum { numQuads = 64 }; // (had problems with my drivers segfaulting when these buffers are any larger)
        #else
         enum { numQuads = 8192 };
@@ -1054,13 +1054,13 @@ struct StateHelpers
             : context (context_),
               activeShader (nullptr)
         {
-            const Identifier programValueID ("GraphicsContextPrograms");
-            programs = dynamic_cast <ShaderPrograms*> (context.properties [programValueID].getObject());
+            const char programValueID[] = "GraphicsContextPrograms";
+            programs = static_cast <ShaderPrograms*> (context.getAssociatedObject (programValueID));
 
             if (programs == nullptr)
             {
                 programs = new ShaderPrograms (context);
-                context.properties.set (programValueID, var (programs));
+                context.setAssociatedObject (programValueID, programs);
             }
         }
 
@@ -1158,6 +1158,9 @@ public:
        #if defined (GL_INDEX_ARRAY)
         glDisableClientState (GL_INDEX_ARRAY);
        #endif
+
+        target.context.extensions.glBindBuffer (GL_ARRAY_BUFFER, 0);
+        target.context.extensions.glBindBuffer (GL_ELEMENT_ARRAY_BUFFER, 0);
     }
 
     void flush()
@@ -2188,6 +2191,7 @@ public:
        #if ! JUCE_ANDROID
         target.context.extensions.glActiveTexture (GL_TEXTURE0);
         glEnable (GL_TEXTURE_2D);
+        clearGLError();
        #endif
 
         OpenGLTexture texture;
@@ -2199,7 +2203,12 @@ public:
                                                                    texture.getHeight()),
                                     target.bounds.getWidth(), target.bounds.getHeight());
         glBindTexture (GL_TEXTURE_2D, 0);
-        target.context.extensions.glBindFramebuffer (GL_FRAMEBUFFER, previousFrameBufferTarget);
+
+       #if JUCE_WINDOWS
+        if (target.context.extensions.glBindFramebuffer != nullptr)
+       #endif
+            target.context.extensions.glBindFramebuffer (GL_FRAMEBUFFER, previousFrameBufferTarget);
+
         JUCE_CHECK_OPENGL_ERROR
     }
 
@@ -2217,20 +2226,17 @@ LowLevelGraphicsContext* createOpenGLContext (const Target& target)
         return new ShaderContext (target);
    #endif
 
-    Image tempImage (Image::ARGB, target.bounds.getWidth(), target.bounds.getHeight(), true);
+    Image tempImage (Image::ARGB, target.bounds.getWidth(), target.bounds.getHeight(), true, SoftwareImageType());
     return new NonShaderContext (target, tempImage);
 }
 
 }
 
 //==============================================================================
-LowLevelGraphicsContext* createOpenGLGraphicsContext (OpenGLComponent& target)
+LowLevelGraphicsContext* createOpenGLGraphicsContext (OpenGLContext& context)
 {
-    OpenGLContext* const context = target.getCurrentContext();
-    jassert (context != nullptr); // must have a valid context when this is called!
-
-    return createOpenGLGraphicsContext (*context, context->getFrameBufferID(),
-                                        context->getWidth(), context->getHeight());
+    return createOpenGLGraphicsContext (context, context.getFrameBufferID(),
+                                        context.getWidth(), context.getHeight());
 }
 
 LowLevelGraphicsContext* createOpenGLGraphicsContext (OpenGLContext& context, OpenGLFrameBuffer& target)

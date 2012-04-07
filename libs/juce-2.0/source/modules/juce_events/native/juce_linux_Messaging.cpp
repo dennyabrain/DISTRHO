@@ -59,7 +59,7 @@ public:
     }
 
     //==============================================================================
-    void postMessage (Message* msg)
+    void postMessage (MessageManager::MessageBase* const msg)
     {
         const int maxBytesInSocketQueue = 128;
 
@@ -133,7 +133,7 @@ public:
 
 private:
     CriticalSection lock;
-    ReferenceCountedArray <Message> queue;
+    ReferenceCountedArray <MessageManager::MessageBase> queue;
     int fd[2];
     int bytesInSocket;
     int totalEventCount;
@@ -173,7 +173,7 @@ private:
         return true;
     }
 
-    Message::Ptr popNextMessage()
+    MessageManager::MessageBase::Ptr popNextMessage()
     {
         const ScopedLock sl (lock);
 
@@ -192,12 +192,17 @@ private:
 
     bool dispatchNextInternalMessage()
     {
-        const Message::Ptr msg (popNextMessage());
+        const MessageManager::MessageBase::Ptr msg (popNextMessage());
 
         if (msg == nullptr)
             return false;
 
-        MessageManager::getInstance()->deliverMessage (msg);
+        JUCE_TRY
+        {
+            msg->messageCallback();
+        }
+        JUCE_CATCH_EXCEPTION
+
         return true;
     }
 };
@@ -234,7 +239,7 @@ namespace LinuxErrorHandling
 
         XGetErrorText (display, event->error_code, errorStr, 64);
         XGetErrorDatabaseText (display, "XRequest", String (event->request_code).toUTF8(), "Unknown", requestStr, 64);
-        DBG ("ERROR: X returned " + String (errorStr) + " for operation " + String (requestStr));
+        DBG ("ERROR: X returned " << errorStr << " for operation " << requestStr);
        #endif
 
         return 0;
@@ -346,7 +351,7 @@ void MessageManager::doPlatformSpecificShutdown()
     }
 }
 
-bool MessageManager::postMessageToSystemQueue (Message* message)
+bool MessageManager::postMessageToSystemQueue (MessageManager::MessageBase* const message)
 {
     if (LinuxErrorHandling::errorOccurred)
         return false;
@@ -358,49 +363,6 @@ bool MessageManager::postMessageToSystemQueue (Message* message)
 void MessageManager::broadcastMessage (const String& value)
 {
     /* TODO */
-}
-
-
-//==============================================================================
-class AsyncFunctionCaller   : public AsyncUpdater
-{
-public:
-    static void* call (MessageCallbackFunction* func_, void* parameter_)
-    {
-        if (MessageManager::getInstance()->isThisTheMessageThread())
-            return func_ (parameter_);
-
-        AsyncFunctionCaller caller (func_, parameter_);
-        caller.triggerAsyncUpdate();
-        caller.finished.wait();
-        return caller.result;
-    }
-
-    void handleAsyncUpdate()
-    {
-        result = (*func) (parameter);
-        finished.signal();
-    }
-
-private:
-    WaitableEvent finished;
-    MessageCallbackFunction* func;
-    void* parameter;
-    void* volatile result;
-
-    AsyncFunctionCaller (MessageCallbackFunction* func_, void* parameter_)
-        : result (nullptr), func (func_), parameter (parameter_)
-    {}
-
-    JUCE_DECLARE_NON_COPYABLE (AsyncFunctionCaller);
-};
-
-void* MessageManager::callFunctionOnMessageThread (MessageCallbackFunction* func, void* parameter)
-{
-    if (LinuxErrorHandling::errorOccurred)
-        return nullptr;
-
-    return AsyncFunctionCaller::call (func, parameter);
 }
 
 // this function expects that it will NEVER be called simultaneously for two concurrent threads

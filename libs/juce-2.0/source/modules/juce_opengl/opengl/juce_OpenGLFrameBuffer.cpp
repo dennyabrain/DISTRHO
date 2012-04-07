@@ -35,11 +35,10 @@ public:
           frameBufferID (0),
           depthOrStencilBuffer (0),
           hasDepthBuffer (false),
-          hasStencilBuffer (false),
-          ok (true)
+          hasStencilBuffer (false)
     {
         // Framebuffer objects can only be created when the current thread has an active OpenGL
-        // context. You'll need to make an OpenGLComponent active before calling this.
+        // context. You'll need to create this object in one of the OpenGLContext's callbacks.
         jassert (OpenGLHelpers::isContextActive());
 
        #if JUCE_WINDOWS || JUCE_LINUX
@@ -96,16 +95,24 @@ public:
 
     ~Pimpl()
     {
-        if (textureID != 0)
-            glDeleteTextures (1, &textureID);
+        if (OpenGLHelpers::isContextActive())
+        {
+            if (textureID != 0)
+                glDeleteTextures (1, &textureID);
 
-        if (depthOrStencilBuffer != 0)
-            context.extensions.glDeleteRenderbuffers (1, &depthOrStencilBuffer);
+            if (depthOrStencilBuffer != 0)
+                context.extensions.glDeleteRenderbuffers (1, &depthOrStencilBuffer);
 
-        if (frameBufferID != 0)
-            context.extensions.glDeleteFramebuffers (1, &frameBufferID);
+            if (frameBufferID != 0)
+                context.extensions.glDeleteFramebuffers (1, &frameBufferID);
 
-        JUCE_CHECK_OPENGL_ERROR
+            JUCE_CHECK_OPENGL_ERROR
+        }
+    }
+
+    bool createdOk() const
+    {
+        return frameBufferID != 0 && textureID != 0;
     }
 
     void bind()
@@ -123,7 +130,7 @@ public:
     OpenGLContext& context;
     const int width, height;
     GLuint textureID, frameBufferID, depthOrStencilBuffer;
-    bool hasDepthBuffer, hasStencilBuffer, ok;
+    bool hasDepthBuffer, hasStencilBuffer;
 
 private:
     bool checkStatus() noexcept
@@ -177,7 +184,7 @@ bool OpenGLFrameBuffer::initialise (OpenGLContext& context, int width, int heigh
     pimpl = nullptr;
     pimpl = new Pimpl (context, width, height, false, false);
 
-    if (! pimpl->ok)
+    if (! pimpl->createdOk())
         pimpl = nullptr;
 
     return pimpl != nullptr;
@@ -212,6 +219,7 @@ bool OpenGLFrameBuffer::initialise (OpenGLFrameBuffer& other)
 
        #if ! JUCE_ANDROID
         glEnable (GL_TEXTURE_2D);
+        clearGLError();
        #endif
         glBindTexture (GL_TEXTURE_2D, p->textureID);
         pimpl->context.copyTexture (area, area, area.getWidth(), area.getHeight());
@@ -340,6 +348,7 @@ bool OpenGLFrameBuffer::writePixels (const PixelARGB* data, const Rectangle<int>
     const GLint cropRect[4] = { 0, texH - area.getHeight(), area.getWidth(), area.getHeight() };
     glTexParameteriv (GL_TEXTURE_2D, GL_TEXTURE_CROP_RECT_OES, cropRect);
     glEnable (GL_TEXTURE_2D);
+    clearGLError();
     glColor4f (1.0f, 1.0f, 1.0f, 1.0f);
     glDrawTexiOES (area.getX(), area.getY(), 1, area.getWidth(), area.getHeight());
     glBindTexture (GL_TEXTURE_2D, 0);
@@ -348,6 +357,7 @@ bool OpenGLFrameBuffer::writePixels (const PixelARGB* data, const Rectangle<int>
    #endif
 
     pimpl->context.extensions.glBindFramebuffer (GL_FRAMEBUFFER, 0);
+    JUCE_CHECK_OPENGL_ERROR
     return true;
 }
 
@@ -386,6 +396,7 @@ void OpenGLFrameBuffer::drawAt (float x1, float y1) const
     {
        #if ! JUCE_ANDROID
         glEnable (GL_TEXTURE_2D);
+        clearGLError();
        #endif
         glBindTexture (GL_TEXTURE_2D, pimpl->textureID);
 

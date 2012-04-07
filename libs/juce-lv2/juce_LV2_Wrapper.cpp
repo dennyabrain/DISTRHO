@@ -62,7 +62,6 @@
  #include "includes/atom.h"
  #include "includes/atom-util.h"
  #include "includes/time.h"
- #include "includes/ui-resize.h"
 #else
  #define LV2_ATOM__String "http://lv2plug.in/ns/ext/atom#String"
  #include "includes/event.h"
@@ -83,6 +82,7 @@ namespace juce
 }
 
 #define JUCE_LV2_STATE_STRING_URI "urn:juce:stateString"
+#define JUCE_LV2_STATE_BINARY_URI "urn:juce:blob"
 
 //==============================================================================
 /** Somewhere in the codebase of your plugin, you need to implement this function
@@ -244,7 +244,7 @@ String makePluginTtl(AudioProcessor* const filter, const String& binary)
     plugin += "    lv2:optionalFeature <" LV2_URID__map "> ;\n";
 #endif
 #if JucePlugin_WantsLV2State
-    plugin += "    lv2:extensionData <" LV2_STATE__Interface "> ;\n";
+    plugin += "    lv2:extensionData <" LV2_STATE__interface "> ;\n";
 #endif
     plugin += "\n";
 
@@ -698,7 +698,7 @@ private:
 class JuceLV2X11Container : public Component
 {
 public:
-    JuceLV2X11Container (AudioProcessorEditor* const editor, LV2_UI_Resize_Feature* uiResizeFeature_)
+    JuceLV2X11Container (AudioProcessorEditor* const editor, LV2UI_Resize* uiResizeFeature_)
         : uiResizeFeature(uiResizeFeature_)
     {
         setOpaque (true);
@@ -721,20 +721,20 @@ public:
         XResizeWindow (display, (Window) getWindowHandle(), cw, ch);
 
         if (uiResizeFeature)
-            uiResizeFeature->ui_resize (uiResizeFeature->data, cw, ch);
+            uiResizeFeature->ui_resize (uiResizeFeature->handle, cw, ch);
     }
 
-    void reset (LV2_UI_Resize_Feature* uiResizeFeature_)
+    void reset (LV2UI_Resize* uiResizeFeature_)
     {
         uiResizeFeature = uiResizeFeature_;
 
         if (uiResizeFeature)
-            uiResizeFeature->ui_resize (uiResizeFeature->data, getWidth(), getHeight());
+            uiResizeFeature->ui_resize (uiResizeFeature->handle, getWidth(), getHeight());
     }
 
 private:
     //==============================================================================
-    LV2_UI_Resize_Feature* uiResizeFeature;
+    LV2UI_Resize* uiResizeFeature;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (JuceLV2X11Container);
 };
@@ -969,7 +969,7 @@ private:
 
 #if JucePlugin_WantsLV2X11UI
     JuceLV2X11Container* x11Container;
-    LV2_UI_Resize_Feature* uiResizeFeature;
+    LV2UI_Resize* uiResizeFeature;
 #endif
     JuceLV2ExternalUIWrapper* externalUI;
     lv2_external_ui_host* externalUIHost;
@@ -986,11 +986,11 @@ private:
 
         for (uint16 i = 0; features[i]; i++)
         {
-            if (strcmp(features[i]->URI, LV2_UI_URI "#parent") == 0)
+            if (strcmp(features[i]->URI, LV2_UI__parent) == 0)
                 parent = features[i]->data;
 
-            else if (strcmp(features[i]->URI, LV2_UI_RESIZE_URI "#UIResize") == 0)
-                uiResizeFeature = (LV2_UI_Resize_Feature*)features[i]->data;
+            else if (strcmp(features[i]->URI, LV2_UI__resize) == 0)
+                uiResizeFeature = (LV2UI_Resize*)features[i]->data;
         }
 
         if (parent != nullptr)
@@ -1619,7 +1619,7 @@ void juceLV2_Cleanup(LV2_Handle instance)
 
 //==============================================================================
 #ifdef JucePlugin_WantsLV2State
-void juceLV2_Save(LV2_Handle instance, LV2_State_Store_Function store, LV2_State_Handle handle, uint32_t flags, const LV2_Feature* const* features)
+LV2_State_Status juceLV2_Save(LV2_Handle instance, LV2_State_Store_Function store, LV2_State_Handle handle, uint32_t flags, const LV2_Feature* const* features)
 {
     JuceLV2Wrapper* wrapper = (JuceLV2Wrapper*)instance;
     jassert(wrapper);
@@ -1633,9 +1633,11 @@ void juceLV2_Save(LV2_Handle instance, LV2_State_Store_Function store, LV2_State
            stateData.toUTF8().sizeInBytes(),
            uridMap->map(uridMap->handle, LV2_ATOM__String),
            LV2_STATE_IS_POD|LV2_STATE_IS_PORTABLE);
+
+    return LV2_STATE_SUCCESS;
 }
 
-void juceLV2_Restore(LV2_Handle instance, LV2_State_Retrieve_Function retrieve, LV2_State_Handle handle, uint32_t flags, const LV2_Feature* const* features)
+LV2_State_Status juceLV2_Restore(LV2_Handle instance, LV2_State_Retrieve_Function retrieve, LV2_State_Handle handle, uint32_t flags, const LV2_Feature* const* features)
 {
     JuceLV2Wrapper* wrapper = (JuceLV2Wrapper*)instance;
     jassert(wrapper);
@@ -1652,7 +1654,10 @@ void juceLV2_Restore(LV2_Handle instance, LV2_State_Retrieve_Function retrieve, 
     {
         String stateData = String(CharPointer_UTF8(static_cast<const char*>(data)));
         wrapper->setState(stateData);
+        return LV2_STATE_SUCCESS;
     }
+    else
+      return LV2_STATE_ERR_BAD_TYPE;
 }
 #endif
 
@@ -1660,7 +1665,7 @@ const void* juceLV2_ExtensionData(const char* uri)
 {
 #ifdef JucePlugin_WantsLV2State
     static const LV2_State_Interface state = { juceLV2_Save, juceLV2_Restore };
-    if (strcmp(uri, LV2_STATE__Interface) == 0)
+    if (strcmp(uri, LV2_STATE__interface) == 0)
         return &state;
 #endif
     return nullptr;
