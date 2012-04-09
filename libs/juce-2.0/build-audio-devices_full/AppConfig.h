@@ -50,6 +50,8 @@
 */
 #if LINUX
  #define JUCE_ALSA 1
+ //#define JUCE_ALSA_MIDI_INPUT_NAME  JucePlugin_Name
+ //#define JUCE_ALSA_MIDI_OUTPUT_NAME JucePlugin_Name
 #else
  #define JUCE_ALSA 0
 #endif
@@ -59,6 +61,7 @@
 */
 #if LINUX
  #define JUCE_JACK 1
+ //#define JUCE_JACK_CLIENT_NAME JucePlugin_Name
 #else
  #define JUCE_JACK 0
 #endif

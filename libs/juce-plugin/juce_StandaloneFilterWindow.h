@@ -392,8 +392,7 @@ public:
         selectorComp.setSize (500, 450);
 
         DialogWindow::showModalDialog (TRANS("Audio Settings"), &selectorComp, this,
-                                       //Colours::lightgrey, true, false, false, isUsingNativeTitleBar());
-                                       Colours::lightgrey, true, false, false);
+                                       Colours::lightgrey, true, false, false, isUsingNativeTitleBar());
     }
 
     //==============================================================================
