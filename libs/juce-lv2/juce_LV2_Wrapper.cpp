@@ -21,7 +21,7 @@
 * - atom based MIDI and Time-Pos
 * - X11 UI
 */
-#define JUCE_LV2_ENABLE_DEV_FEATURES 0
+#define JUCE_LV2_ENABLE_DEV_FEATURES 1
 
 /*
  * Available macros:
@@ -32,7 +32,7 @@
  */
 
 #if (JUCE_LINUX && JUCE_LV2_ENABLE_DEV_FEATURES)
- #define JucePlugin_WantsLV2X11UI 1
+ #define JucePlugin_WantsLV2X11UI 0
 #endif
 
 #ifdef _WIN32
