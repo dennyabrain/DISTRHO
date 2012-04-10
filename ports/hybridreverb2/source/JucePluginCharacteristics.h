@@ -258,6 +258,7 @@
 #define JucePlugin_LV2URI                    "http://www2.ika.rub.de/HybridReverb2"
 #define JucePlugin_LV2Category               "ReverbPlugin"
 #define JucePlugin_WantsLV2State             1
+#define JucePlugin_WantsLV2StateString       1
 #define JucePlugin_WantsLV2InstanceAccess    1
 
 //==============================================================================

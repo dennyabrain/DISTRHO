@@ -10,6 +10,11 @@
 // and your header search path must make it accessible to the module's files.
 #include "AppConfig.h"
 
+#if 1 // TODO - remove me
+#include "JucePluginMain.h"
+//#include "JucePluginCharacteristics.h"
+#endif
+
 #include "utility/juce_CheckSettingMacros.h"
 
 #if JucePlugin_Build_LV2
@@ -21,29 +26,26 @@
 * - atom based MIDI and Time-Pos
 * - X11 UI
 */
-#define JUCE_LV2_ENABLE_DEV_FEATURES 1
+#define JUCE_LV2_ENABLE_DEV_FEATURES 0
 
 /*
  * Available macros:
  * - JucePlugin_WantsLV2Presets
  * - JucePlugin_WantsLV2State
+ * - JucePlugin_WantsLV2StateString
  * - JucePlugin_WantsLV2TimePos
  * - JucePlugin_WantsLV2InstanceAccess (UI)
  */
 
 #if (JUCE_LINUX && JUCE_LV2_ENABLE_DEV_FEATURES)
- #define JucePlugin_WantsLV2X11UI 0
+ #define JucePlugin_WantsLV2X11UI 1
 #endif
 
-#ifdef _WIN32
- #include <windows.h>
-#elif defined (LINUX)
+#ifdef LINUX
  #include <X11/Xlib.h>
  #include <X11/Xutil.h>
  #include <X11/Xatom.h>
  #undef KeyPress
-#else
- #include <Carbon/Carbon.h>
 #endif
 
 #include <fstream>
@@ -56,6 +58,7 @@
 #include "includes/state.h"
 #include "includes/urid.h"
 #include "includes/ui.h"
+
 #include "includes/lv2_external_ui.h"
 
 #if JUCE_LV2_ENABLE_DEV_FEATURES
@@ -82,7 +85,7 @@ namespace juce
 }
 
 #define JUCE_LV2_STATE_STRING_URI "urn:juce:stateString"
-#define JUCE_LV2_STATE_BINARY_URI "urn:juce:blob"
+#define JUCE_LV2_STATE_BINARY_URI "urn:juce:stateBinary"
 
 //==============================================================================
 /** Somewhere in the codebase of your plugin, you need to implement this function
@@ -217,7 +220,7 @@ String makeManifestTtl(AudioProcessor* const filter, const String& binary)
 }
 
 /** Create the plugin.ttl contents */
-String makePluginTtl(AudioProcessor* const filter, const String& binary)
+String makePluginTtl(AudioProcessor* const filter)
 {
     String plugin;
 #if (JUCE_LV2_ENABLE_DEV_FEATURES && (JucePlugin_WantsMidiInput || JucePlugin_ProducesMidiOutput || JucePlugin_WantsLV2TimePos))
@@ -263,6 +266,7 @@ String makePluginTtl(AudioProcessor* const filter, const String& binary)
 
     uint32 portIndex = 0;
 
+    // Event input (old MIDI or MIDI+TimePos)
 #if (JucePlugin_WantsMidiInput || (JUCE_LV2_ENABLE_DEV_FEATURES && JucePlugin_WantsLV2TimePos))
     plugin += "    lv2:port [\n";
  #if JUCE_LV2_ENABLE_DEV_FEATURES
@@ -287,6 +291,7 @@ String makePluginTtl(AudioProcessor* const filter, const String& binary)
     plugin += "    ] ;\n\n";
 #endif
 
+    // Event output (MIDI only)
 #if JucePlugin_ProducesMidiOutput
     plugin += "    lv2:port [\n";
  #if JUCE_LV2_ENABLE_DEV_FEATURES
@@ -319,7 +324,7 @@ String makePluginTtl(AudioProcessor* const filter, const String& binary)
         if (i+1 == JucePlugin_MaxNumInputChannels)
             plugin += "    ] ;\n\n";
         else
-            plugin += "    ],\n";
+            plugin += "    ] ,\n";
     }
 
     for (int i=0; i<JucePlugin_MaxNumOutputChannels; i++)
@@ -337,7 +342,7 @@ String makePluginTtl(AudioProcessor* const filter, const String& binary)
         if (i+1 == JucePlugin_MaxNumOutputChannels)
             plugin += "    ] ;\n\n";
         else
-            plugin += "    ],\n";
+            plugin += "    ] ,\n";
     }
 
 #if JucePlugin_WantsLV2TimePos
@@ -375,7 +380,7 @@ String makePluginTtl(AudioProcessor* const filter, const String& binary)
         if (i+1 == filter->getNumParameters())
             plugin += "    ] ;\n\n";
         else
-            plugin += "    ],\n";
+            plugin += "    ] ,\n";
     }
 
     plugin += "    lv2:port [\n";
@@ -399,12 +404,14 @@ String makePresetsTtl(AudioProcessor* const filter)
     presets += "@prefix lv2:   <http://lv2plug.in/ns/lv2core#> .\n";
     presets += "@prefix pset:  <http://lv2plug.in/ns/ext/presets#> .\n";
     presets += "@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .\n";
-#if JucePlugin_WantsLV2State
+#if JucePlugin_WantsLV2StateString
     presets += "@prefix state: <http://lv2plug.in/ns/ext/state#> .\n";
+#elif JucePlugin_WantsLV2State
+    presets += "@prefix state: <http://lv2plug.in/ns/ext/state#> .\n";
+    presets += "@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .\n";
 #endif
     presets += "\n";
 
-    uint32 portIndex = 0;
     const int numPrograms = filter->getNumPrograms();
 
     for (int i = 0; i < numPrograms; i++)
@@ -418,10 +425,21 @@ String makePresetsTtl(AudioProcessor* const filter)
 
 #if JucePlugin_WantsLV2State
         presets += "    state:state [\n";
+#ifdef JucePlugin_WantsLV2StateString
         presets += "        <" JUCE_LV2_STATE_STRING_URI ">\n";
         presets += "\"\"\"\n";
         presets += filter->getStateInformationString().replace("\r\n","\n");
         presets += "\"\"\"\n";
+#else
+        MemoryBlock chunkMemory; // FIXME - mem leak here
+        chunkMemory.setSize (0);
+        presets += "        <" JUCE_LV2_STATE_BINARY_URI ">\n";
+        presets += "\"";
+        filter->getCurrentProgramStateInformation(chunkMemory);
+        presets += chunkMemory.toBase64Encoding();
+        chunkMemory.setSize (0);
+        presets += "\"^^xsd:base64Binary\n";
+#endif
         if (filter->getNumParameters() > 0)
           presets += "    ] ;\n\n";
         else
@@ -430,7 +448,10 @@ String makePresetsTtl(AudioProcessor* const filter)
 
         for (int j=0; j < filter->getNumParameters(); j++)
         {
-            presets += "    lv2:port [\n";
+              if (j == 0)
+                presets += "    lv2:port [\n";
+            else
+                presets += "    [\n";
 
             presets += "        lv2:symbol \"" + nameToSymbol(filter->getParameterName(j), j) + "\" ;\n";
             presets += "        pset:value " + String(filter->getParameter(j)) + " ;\n";
@@ -438,7 +459,7 @@ String makePresetsTtl(AudioProcessor* const filter)
             if (j+1 == filter->getNumParameters())
                 presets += "    ] ";
             else
-                presets += "    ] ;\n";
+                presets += "    ] ,\n";
         }
         presets += ".\n\n";
     }
@@ -455,15 +476,15 @@ void createTtlFiles()
     String binary = getBinaryName();
     String binaryTTL = binary + ".ttl";
 
-     std::cout << "Writing manifest.ttl..."; std::cout.flush();
-     std::fstream manifest("manifest.ttl", std::ios::out);
-     manifest << makeManifestTtl(filter, binary) << std::endl;
-     manifest.close();
-     std::cout << " done!" << std::endl;
+    std::cout << "Writing manifest.ttl..."; std::cout.flush();
+    std::fstream manifest("manifest.ttl", std::ios::out);
+    manifest << makeManifestTtl(filter, binary) << std::endl;
+    manifest.close();
+    std::cout << " done!" << std::endl;
 
     std::cout << "Writing " << binaryTTL << "..."; std::cout.flush();
     std::fstream plugin(binaryTTL.toUTF8(), std::ios::out);
-    plugin << makePluginTtl(filter, binary) << std::endl;
+    plugin << makePluginTtl(filter) << std::endl;
     plugin.close();
     std::cout << " done!" << std::endl;
 
@@ -475,6 +496,10 @@ void createTtlFiles()
     std::cout << " done!" << std::endl;
 #endif
 }
+
+static bool needsGUIShutdown = false;
+static Array<void*> activePlugins;
+static Array<void*> activeUIs;
 
 //==============================================================================
 #if JUCE_LINUX
@@ -504,6 +529,7 @@ public:
     {
         initialiseJuce_GUI();
         initialised = true;
+        needsGUIShutdown = true;
 
         MessageManager::getInstance()->setCurrentThreadAsMessageThread();
 
@@ -521,9 +547,6 @@ juce_ImplementSingleton (SharedMessageThread)
 
 #endif
 
-static Array<void*> activePlugins;
-static Array<void*> activeUIs;
-
 //==============================================================================
 /**
     Lightweight DocumentWindow subclass for external ui
@@ -537,6 +560,12 @@ public:
             closed (false),
             lastPos (100, 100)
     {
+        setSize(50, 50);
+        setOpaque (true);
+        setUsingNativeTitleBar (true);
+
+        // FIXME - does not work properly on Linux
+        //window->setAlwaysOnTop(true);
     }
 
     /** Close button handler */
@@ -586,105 +615,92 @@ private:
 class JuceLV2ExternalUIWrapper : public lv2_external_ui
 {
 public:
-    JuceLV2ExternalUIWrapper (AudioProcessorEditor* const editor_, const String& title) :
-            editor (editor_),
-            window (nullptr)
+    JuceLV2ExternalUIWrapper (AudioProcessorEditor* const editor, const String& title)
     {
-        const MessageManagerLock mmLock;
         window = new JuceLV2ExternalUIWindow (title);
-        window->setOpaque (true);
-        //window->setAlwaysOnTop(true); // FIXME - does not work properly on Linux
-        window->setUsingNativeTitleBar (true);
         window->setContentNonOwned (editor, true);
+
+        // native titlebar currently broken
+        window->setSize(editor->getWidth(), editor->getHeight());
 
         // external UI calls
         run  = doRun;
         show = doShow;
         hide = doHide;
-
     }
 
     ~JuceLV2ExternalUIWrapper()
     {
-        if (window)
-            delete window;
+        if (window->isOnDesktop())
+            window->removeFromDesktop();
+        delete window;
+        window = nullptr;
     }
 
     bool isClosed()
     {
-        if (window)
-            return window->isClosed();
-        else
-            return true;
+        return window->isClosed();
     }
 
     void resetWindow()
     {
-        if (window)
-            window->reset();
+        window->reset();
     }
 
     Point<int> getScreenPosition()
     {
-        if (window)
-        {
-            if (window->isClosed())
-                return window->getLastPos();
-            else
-                return window->getScreenPosition();
-        }
-
-        return Point<int> (100, 100);
+        if (window->isClosed())
+            return window->getLastPos();
+        else
+            return window->getScreenPosition();
     }
 
     void setScreenPos(int x, int y)
     {
-        if (window && ! window->isClosed())
+        if (! window->isClosed())
         {
             window->setTopLeftPosition(x, y);
         }
     }
 
     //==============================================================================
-    static void doRun(lv2_external_ui* _this_)
+    static void doRun (lv2_external_ui* _that_)
     {
         const MessageManagerLock mmLock;
-        JuceLV2ExternalUIWrapper* externalUI = (JuceLV2ExternalUIWrapper*) _this_;
+        JuceLV2ExternalUIWrapper* _this_ = (JuceLV2ExternalUIWrapper*) _that_;
 
-        if (externalUI->window && ! externalUI->window->isClosed())
-            externalUI->window->repaint();
+        if (! _this_->isClosed())
+            _this_->window->repaint();
     }
 
-    static void doShow(lv2_external_ui* _this_)
+    static void doShow (lv2_external_ui* _that_)
     {
         const MessageManagerLock mmLock;
-        JuceLV2ExternalUIWrapper* externalUI = (JuceLV2ExternalUIWrapper*) _this_;
+        JuceLV2ExternalUIWrapper* _this_ = (JuceLV2ExternalUIWrapper*) _that_;
 
-        if (externalUI->window && ! externalUI->window->isClosed ())
+        if (! _this_->isClosed())
         {
-            if (externalUI->window->isOnDesktop ())
-                externalUI->window->restoreLastPos ();
-            else
-                externalUI->window->addToDesktop ();
+            if (! _this_->window->isOnDesktop())
+                _this_->window->addToDesktop();
 
-            externalUI->window->setVisible (true);
+            _this_->window->restoreLastPos();
+            _this_->window->setVisible(true);
         }
     }
 
-    static void doHide(lv2_external_ui* _this_)
+    static void doHide (lv2_external_ui* _that_)
     {
         const MessageManagerLock mmLock;
-        JuceLV2ExternalUIWrapper* externalUI = (JuceLV2ExternalUIWrapper*) _this_;
+        JuceLV2ExternalUIWrapper* _this_ = (JuceLV2ExternalUIWrapper*) _that_;
 
-        if (externalUI->window && ! externalUI->window->isClosed())
+        if (! _this_->isClosed())
         {
-            externalUI->window->saveLastPos ();
-            externalUI->window->setVisible (false); //closeButtonPressed ();
+            _this_->window->saveLastPos();
+            _this_->window->setVisible(false);
         }
     }
 
 private:
-    AudioProcessorEditor* editor;
     JuceLV2ExternalUIWindow* window;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (JuceLV2ExternalUIWrapper);
@@ -767,20 +783,14 @@ public:
             externalUIHost (nullptr),
             externalUIPos (100, 100)
     {
-#if JUCE_LINUX
-        MessageManagerLock mmLock;
-#endif
-
         filter->addListener(this);
 
         if (filter->hasEditor())
-        {
             editor = filter->createEditorIfNeeded();
-        }
 
         if (editor)
         {
-            switch(uiType)
+            switch (uiType)
             {
 #if JucePlugin_WantsLV2X11UI
             case UI_X11:
@@ -823,7 +833,7 @@ public:
         }
 
         controlPortOffset = 0;
-#if JucePlugin_WantsMidiInput
+#if (JucePlugin_WantsMidiInput || (JUCE_LV2_ENABLE_DEV_FEATURES && JucePlugin_WantsLV2TimePos))
         controlPortOffset += 1;
 #endif
 #if JucePlugin_ProducesMidiOutput
@@ -840,62 +850,52 @@ public:
 
     ~JuceLV2UIWrapper()
     {
-        JUCE_AUTORELEASEPOOL
+        PopupMenu::dismissAllActiveMenus();
 
-        {
-#if JUCE_LINUX
-            MessageManagerLock mmLock;
-#endif
-            PopupMenu::dismissAllActiveMenus();
-
-            stopTimer();
-
-            filter->removeListener(this);
+        filter->removeListener(this);
 
 #if JucePlugin_WantsLV2X11UI
-            if (x11Container)
-              delete x11Container;
+        if (x11Container)
+            delete x11Container;
 #endif
+        if (externalUI)
+            delete externalUI;
 
-            if (externalUI)
-                delete externalUI;
+        externalUI = nullptr;
+        externalUIHost = nullptr;
 
-            if (editor)
-            {
-                filter->editorBeingDeleted(editor);
-                delete editor;
-            }
+        if (editor)
+        {
+            filter->editorBeingDeleted(editor);
+            delete editor;
+            editor = nullptr;
+        }
 
 #ifndef JucePlugin_WantsLV2InstanceAccess
-            // fake filter created for UI
-            delete filter;
-            filter = nullptr;
+        // fake filter created for UI
+        delete filter;
+        //filter = nullptr;
 #endif
 
-            jassert (activeUIs.contains (this));
-            activeUIs.removeValue (this);
-        }
-
-        if (activePlugins.size() == 0 && activeUIs.size() == 0)
-        {
-#if JUCE_LINUX
-            SharedMessageThread::deleteInstance();
-#endif
-            shutdownJuce_GUI();
-        }
+        jassert (activeUIs.contains (this));
+        activeUIs.removeValue (this);
     }
 
     void doPortEvent(const uint32 portIndex, const float value)
     {
 #ifndef JucePlugin_WantsLV2InstanceAccess
         // With instance access, plugin has already been updated
-        if (filter && portIndex-controlPortOffset >= 0) // FIXME?
+        if (filter && (int32)portIndex - (int32)controlPortOffset >= 0) // FIXME?
             filter->setParameter(portIndex-controlPortOffset, value);
+#else
+        (void)portIndex;
+        (void)value;
 #endif
     }
 
     void doCleanup()
     {
+#ifdef JucePlugin_WantsLV2InstanceAccess
         if (uiType == UI_X11)
         {
 #if JucePlugin_WantsLV2X11UI
@@ -905,20 +905,23 @@ public:
         }
         else if (uiType == UI_EXTERNAL)
         {
-            externalUIPos = externalUI->getScreenPosition();
+            if (externalUI)
+                externalUIPos = externalUI->getScreenPosition();
         }
+#endif
+
+        if (isTimerRunning())
+            stopTimer();
     }
 
     //==============================================================================
     void audioProcessorParameterChanged (AudioProcessor*, int index, float newValue)
     {
         if (controller && writeFunction)
-           writeFunction(controller, index+controlPortOffset, sizeof (float), 0, &newValue);
+            writeFunction(controller, index+controlPortOffset, sizeof (float), 0, &newValue);
     }
 
-    void audioProcessorChanged (AudioProcessor*)
-    {
-    }
+    void audioProcessorChanged (AudioProcessor*) {}
 
     void timerCallback()
     {
@@ -927,7 +930,8 @@ public:
             if (externalUIHost)
                 externalUIHost->ui_closed (controller);
 
-            stopTimer();
+            if (isTimerRunning()) // prevents assertion failure
+                stopTimer();
         }
     }
 
@@ -935,7 +939,7 @@ public:
     void resetIfNeeded(LV2UI_Write_Function writeFunction_, LV2UI_Controller controller_, LV2UI_Widget* widget, const LV2_Feature* const* features)
     {
         writeFunction = writeFunction_;
-        controller = controller_;
+        controller    = controller_;
 
         if (uiType == UI_X11)
         {
@@ -960,12 +964,12 @@ public:
     }
 
 private:
-    AudioProcessor* filter;
+    AudioProcessor* const filter;
     AudioProcessorEditor* editor;
 
     LV2UI_Write_Function writeFunction;
     LV2UI_Controller controller;
-    UIType uiType;
+    const UIType uiType;
 
 #if JucePlugin_WantsLV2X11UI
     JuceLV2X11Container* x11Container;
@@ -984,7 +988,7 @@ private:
         void* parent = nullptr;
         uiResizeFeature = nullptr;
 
-        for (uint16 i = 0; features[i]; i++)
+        for (uint32 i = 0; features[i]; i++)
         {
             if (strcmp(features[i]->URI, LV2_UI__parent) == 0)
                 parent = features[i]->data;
@@ -1018,7 +1022,7 @@ private:
     {
         externalUIHost = nullptr;
 
-        for (uint16 i = 0; features[i]; i++)
+        for (uint32 i = 0; features[i]; i++)
         {
             if (strcmp(features[i]->URI, LV2_EXTERNAL_UI_URI) == 0 || strcmp(features[i]->URI, LV2_EXTERNAL_UI_DEPRECATED_URI) == 0)
             {
@@ -1027,8 +1031,10 @@ private:
             }
         }
 
+#ifdef JucePlugin_WantsLV2InstanceAccess
         if (externalUI)
             externalUI->setScreenPos(externalUIPos.getX(), externalUIPos.getY());
+#endif
     }
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (JuceLV2UIWrapper);
@@ -1061,7 +1067,7 @@ public:
         filter->setPlayHead (this);
 
         // Set Port data
-#if JucePlugin_WantsMidiInput
+#if (JucePlugin_WantsMidiInput || (JUCE_LV2_ENABLE_DEV_FEATURES && JucePlugin_WantsLV2TimePos))
         portEventIn = nullptr;
 #endif
 #if JucePlugin_ProducesMidiOutput
@@ -1071,11 +1077,12 @@ public:
             portAudioIns[i] = nullptr;
         for (int i=0; i < numOutChans; i++)
             portAudioOuts[i] = nullptr;
+
         portControls.insertMultiple(0, nullptr, filter->getNumParameters());
         portLatency = nullptr;
 
 #if (JucePlugin_WantsMidiInput || JucePlugin_ProducesMidiOutput || JucePlugin_WantsLV2State || (JUCE_LV2_ENABLE_DEV_FEATURES && JucePlugin_WantsLV2TimePos))
-        for (uint16 i = 0; features[i]; i++)
+        for (uint32 i = 0; features[i]; i++)
         {
             if (strcmp(features[i]->URI, LV2_URID_MAP_URI) == 0)
             {
@@ -1086,6 +1093,8 @@ public:
                 break;
             }
         }
+#else
+        (void)features;
 #endif
 
         lastControlValues.insertMultiple(0, 0.0f, filter->getNumParameters());
@@ -1098,35 +1107,17 @@ public:
 
     ~JuceLV2Wrapper()
     {
-        JUCE_AUTORELEASEPOOL
+        delete filter;
+        filter = nullptr;
 
-        {
-#if JUCE_LINUX
-            MessageManagerLock mmLock;
-#endif
-            if (ui)
-                delete ui;
+        channels.free();
+        deleteTempChannels();
 
-            delete filter;
-            filter = nullptr;
+        portControls.clear();
+        lastControlValues.clear();
 
-            channels.free();
-            deleteTempChannels();
-
-            portControls.clear();
-            lastControlValues.clear();
-
-            jassert (activePlugins.contains (this));
-            activePlugins.removeValue (this);
-        }
-
-        if (activePlugins.size() == 0 && activeUIs.size() == 0)
-        {
-#if JUCE_LINUX
-            SharedMessageThread::deleteInstance();
-#endif
-            shutdownJuce_GUI();
-        }
+        jassert (activePlugins.contains (this));
+        activePlugins.removeValue (this);
     }
 
     //==============================================================================
@@ -1135,7 +1126,7 @@ public:
     {
         uint32 index = 0;
 
-#if JucePlugin_WantsMidiInput
+#if (JucePlugin_WantsMidiInput || (JUCE_LV2_ENABLE_DEV_FEATURES && JucePlugin_WantsLV2TimePos))
         if (portId == index)
         {
  #if JUCE_LV2_ENABLE_DEV_FEATURES
@@ -1253,7 +1244,7 @@ public:
         {
             firstProcessCallback = false;
 
-            // if this fails, the host hasn't called resume() before processing
+            // if this fails, the host hasn't called activate() before processing
             jassert (isProcessing);
 
             // (tragically, some hosts actually need this, although it's stupid to have
@@ -1271,7 +1262,7 @@ public:
         }
 
         // Check if buffer size changed
-        if (bufferSize >= 16 && bufferSize != numSamples)
+        if (bufferSize >= 2 && bufferSize != numSamples)
         {
             bufferSize = numSamples;
             filter->setPlayConfigDetails (numInChans, numOutChans, sampleRate, bufferSize);
@@ -1313,7 +1304,7 @@ public:
                 {
                     float* chan = tempChannels.getUnchecked(i);
 
-                    if (chan == 0)
+                    if (chan == nullptr)
                     {
                         chan = portAudioOuts[i];
 
@@ -1336,6 +1327,9 @@ public:
 
                     channels[i] = chan;
                 }
+
+                for (; i < numIn; ++i)
+                    channels[i] = portAudioIns[i];
 
 #if JucePlugin_WantsMidiInput
                 // LV2 MIDI Input
@@ -1379,9 +1373,6 @@ public:
                 }
 #endif
 
-                for (; i < numIn; ++i)
-                    channels[i] = portAudioIns[i];
-
                 {
                     AudioSampleBuffer chans (channels, jmax (numIn, numOut), numSamples);
                     filter->processBlock (chans, midiEvents);
@@ -1403,7 +1394,7 @@ public:
 #if JucePlugin_ProducesMidiOutput
             if (portEventOut != nullptr)
             {
-                const int numEvents = midiEvents.getNumEvents();
+                //const int numEvents = midiEvents.getNumEvents();
                 const uint8* midiEventData;
                 int midiEventSize, midiEventPosition;
                 MidiBuffer::Iterator i (midiEvents);
@@ -1418,12 +1409,12 @@ public:
 //                 LV2_SEQUENCE_FOREACH(portEventIn, j)
 //                 {
 //                     LV2_Atom_Event* const event = lv2_sequence_iter_get(j);
-// 
+//
 //                     if (event != nullptr && event->body.type == uridIdMidi)
 //                     {
 //                         if (event->time.frames >= numSamples)
 //                             break;
-// 
+//
 //                         uint8* const data = (uint8* const)(event + 1);
 //                         midiEvents.addEvent(data, event->body.size, event->time.frames);
 //                     }
@@ -1447,6 +1438,17 @@ public:
 
     void doCleanup()
     {
+#ifdef JucePlugin_WantsLV2InstanceAccess
+        if (ui)
+        {
+           #if JUCE_LINUX
+            MessageManagerLock mmLock;
+           #endif
+
+            delete ui;
+            ui = nullptr;
+        }
+#endif
     }
 
     //==============================================================================
@@ -1478,13 +1480,30 @@ public:
  #endif
 
         return true;
+#else
+        (void)info;
+        return false;
 #endif
     }
 
     AudioProcessor* getFilter() { return filter; }
 
     //==============================================================================
-    String getState ()
+    void getStateBinary (MemoryBlock& destData)
+    {
+        if (filter)
+            filter->getCurrentProgramStateInformation (destData);
+
+    }
+
+    void setStateBinary (const void* data, int sizeInBytes)
+    {
+        if (filter)
+            filter->setCurrentProgramStateInformation (data, sizeInBytes);
+    }
+
+#ifdef JucePlugin_WantsLV2StateString
+    String getStateString ()
     {
         if (filter == nullptr)
             return String::empty;
@@ -1492,34 +1511,27 @@ public:
         return filter->getStateInformationString().replace("\r\n","\n");
     }
 
-    void setState (const String& data)
+    void setStateString (const String& data)
     {
         if (filter == nullptr)
             return;
 
         filter->setStateInformationString(data);
     }
+#endif
 
-    LV2_URID_Map* const getURIDMap()
+    const LV2_URID_Map* getURIDMap()
     {
         return uridMap;
     }
 
-    bool hasUI()
-    {
-        return ui != nullptr;
-    }
-
-    JuceLV2UIWrapper* getUI(LV2UI_Write_Function writeFunction, LV2UI_Controller controller, LV2UI_Widget* widget, const LV2_Feature* const* features)
+    JuceLV2UIWrapper* getUI(LV2UI_Write_Function writeFunction, LV2UI_Controller controller, LV2UI_Widget* widget, const LV2_Feature* const* features, JuceLV2UIWrapper::UIType uiType)
     {
         if (ui)
-           ui->resetIfNeeded(writeFunction, controller, widget, features);
+            ui->resetIfNeeded(writeFunction, controller, widget, features);
+        else
+            ui = new JuceLV2UIWrapper(filter, writeFunction, controller, widget, features, uiType);
         return ui;
-    }
-
-    void createUI(LV2UI_Write_Function writeFunction, LV2UI_Controller controller, LV2UI_Widget* widget, const LV2_Feature* const* features, JuceLV2UIWrapper::UIType uiType)
-    {
-        ui = new JuceLV2UIWrapper(filter, writeFunction, controller, widget, features, uiType);
     }
 
     //==============================================================================
@@ -1538,10 +1550,10 @@ private:
     LV2_URID uridIdMidi;
 #endif
     LV2_URID_Map* uridMap;
-    Array<float> lastControlValues; 
+    Array<float> lastControlValues;
 
     // LV2 Port data
-#if JucePlugin_WantsMidiInput
+#if (JucePlugin_WantsMidiInput || (JUCE_LV2_ENABLE_DEV_FEATURES && JucePlugin_WantsLV2TimePos))
  #if JUCE_LV2_ENABLE_DEV_FEATURES
     LV2_Atom_Sequence* portEventIn;
  #else
@@ -1580,7 +1592,7 @@ private:
 
 //==============================================================================
 // LV2 descriptor functions
-LV2_Handle juceLV2_Instantiate(const LV2_Descriptor* descriptor, double sampleRate, const char* bundlePath, const LV2_Feature* const* features)
+LV2_Handle juceLV2_Instantiate(const LV2_Descriptor* /*descriptor*/, double sampleRate, const char* /*bundlePath*/, const LV2_Feature* const* features)
 {
     JuceLV2Wrapper* wrapper = new JuceLV2Wrapper(sampleRate, features);
     return wrapper;
@@ -1612,20 +1624,39 @@ void juceLV2_Deactivate(LV2_Handle instance)
 
 void juceLV2_Cleanup(LV2_Handle instance)
 {
-    JuceLV2Wrapper* wrapper = (JuceLV2Wrapper*)instance;
-    wrapper->doCleanup();
-    delete wrapper;
+    JUCE_AUTORELEASEPOOL
+    {
+        const MessageManagerLock mmLock;
+        JuceLV2Wrapper* wrapper = (JuceLV2Wrapper*)instance;
+        wrapper->doCleanup();
+        delete wrapper;
+    }
+
+    if (activePlugins.size() == 0 && activeUIs.size() == 0)
+    {
+       #if JUCE_LINUX
+        SharedMessageThread::deleteInstance();
+       #endif
+
+        if (needsGUIShutdown)
+        {
+            shutdownJuce_GUI();
+            needsGUIShutdown = false;
+        }
+    }
 }
 
 //==============================================================================
 #ifdef JucePlugin_WantsLV2State
-LV2_State_Status juceLV2_Save(LV2_Handle instance, LV2_State_Store_Function store, LV2_State_Handle handle, uint32_t flags, const LV2_Feature* const* features)
+LV2_State_Status juceLV2_Save(LV2_Handle instance, LV2_State_Store_Function store, LV2_State_Handle handle, uint32_t /*flags*/, const LV2_Feature* const* /*features*/)
 {
     JuceLV2Wrapper* wrapper = (JuceLV2Wrapper*)instance;
     jassert(wrapper);
 
-    String stateData = wrapper->getState();
-    LV2_URID_Map* uridMap = wrapper->getURIDMap();
+    const LV2_URID_Map* uridMap = wrapper->getURIDMap();
+
+#ifdef JucePlugin_WantsLV2StateString
+    String stateData = wrapper->getStateString();
 
     store (handle,
            uridMap->map(uridMap->handle, JUCE_LV2_STATE_STRING_URI),
@@ -1633,31 +1664,53 @@ LV2_State_Status juceLV2_Save(LV2_Handle instance, LV2_State_Store_Function stor
            stateData.toUTF8().sizeInBytes(),
            uridMap->map(uridMap->handle, LV2_ATOM__String),
            LV2_STATE_IS_POD|LV2_STATE_IS_PORTABLE);
+#else
+    MemoryBlock chunkMemory;
+    chunkMemory.setSize (0);
+    wrapper->getStateBinary(chunkMemory);
+
+    store (handle,
+           uridMap->map(uridMap->handle, JUCE_LV2_STATE_BINARY_URI),
+           chunkMemory.getData(),
+           chunkMemory.getSize(),
+           uridMap->map(uridMap->handle, JUCE_LV2_STATE_BINARY_URI),
+           LV2_STATE_IS_POD|LV2_STATE_IS_PORTABLE);
+#endif
 
     return LV2_STATE_SUCCESS;
 }
 
-LV2_State_Status juceLV2_Restore(LV2_Handle instance, LV2_State_Retrieve_Function retrieve, LV2_State_Handle handle, uint32_t flags, const LV2_Feature* const* features)
+LV2_State_Status juceLV2_Restore(LV2_Handle instance, LV2_State_Retrieve_Function retrieve, LV2_State_Handle handle, uint32_t flags, const LV2_Feature* const* /*features*/)
 {
     JuceLV2Wrapper* wrapper = (JuceLV2Wrapper*)instance;
     jassert(wrapper);
 
-    LV2_URID_Map* uridMap = wrapper->getURIDMap();
+    const LV2_URID_Map* uridMap = wrapper->getURIDMap();
 
     size_t size;
     uint32 type;
     const void* data = retrieve (handle,
+                             #ifdef JucePlugin_WantsLV2StateString
                                  uridMap->map(uridMap->handle, JUCE_LV2_STATE_STRING_URI),
+                             #else
+                                 uridMap->map(uridMap->handle, JUCE_LV2_STATE_BINARY_URI),
+                             #endif
                                  &size, &type, &flags);
 
+#ifdef JucePlugin_WantsLV2StateString
     if (type == uridMap->map(uridMap->handle, LV2_ATOM__String))
     {
         String stateData = String(CharPointer_UTF8(static_cast<const char*>(data)));
-        wrapper->setState(stateData);
+        wrapper->setStateString(stateData);
+#else
+    if (type == uridMap->map(uridMap->handle, JUCE_LV2_STATE_BINARY_URI))
+    {
+        wrapper->setStateBinary(data, size);
+#endif
         return LV2_STATE_SUCCESS;
     }
     else
-      return LV2_STATE_ERR_BAD_TYPE;
+        return LV2_STATE_ERR_BAD_TYPE;
 }
 #endif
 
@@ -1667,62 +1720,76 @@ const void* juceLV2_ExtensionData(const char* uri)
     static const LV2_State_Interface state = { juceLV2_Save, juceLV2_Restore };
     if (strcmp(uri, LV2_STATE__interface) == 0)
         return &state;
+#else
+    (void)uri;
 #endif
     return nullptr;
 }
 
 //==============================================================================
 // LV2 UI descriptor functions
-LV2UI_Handle juceLV2UI_Instantiate(const LV2UI_Descriptor* uiDescriptor, LV2UI_Write_Function writeFunction, LV2UI_Controller controller, LV2UI_Widget* widget, const LV2_Feature* const* features, JuceLV2UIWrapper::UIType uiType)
+LV2UI_Handle juceLV2UI_Instantiate(LV2UI_Write_Function writeFunction, LV2UI_Controller controller, LV2UI_Widget* widget, const LV2_Feature* const* features, JuceLV2UIWrapper::UIType uiType)
 {
-    const MessageManagerLock mmLock;
-
-    if (activePlugins.size() == 0 && activeUIs.size() == 0)
+    if (activeUIs.size() == 0)
         initialiseJuce_GUI();
 
+    const MessageManagerLock mmLock;
+    needsGUIShutdown = true;
+
 #ifdef JucePlugin_WantsLV2InstanceAccess
-    for (uint16 i = 0; features[i]; i++)
+    for (uint32 i = 0; features[i]; i++)
     {
         if (strcmp(features[i]->URI, LV2_INSTANCE_ACCESS_URI) == 0 && features[i]->data)
         {
             JuceLV2Wrapper* wrapper = (JuceLV2Wrapper*)features[i]->data;
-
-            if (! wrapper->hasUI())
-            {
-                wrapper->createUI (writeFunction, controller, widget, features, uiType);
-            }
-
-            return wrapper->getUI (writeFunction, controller, widget, features);
+            return wrapper->getUI(writeFunction, controller, widget, features, uiType);
         }
     }
     std::cerr << "Host does not support instance-access, cannot use UI" << std::endl;
     return nullptr;
 #else
     // this is a fake filter!
-    AudioProcessor* filter = createPluginFilter();
+    AudioProcessor* const filter = createPluginFilter();
     JuceLV2UIWrapper* uiWrapper = new JuceLV2UIWrapper(filter, writeFunction, controller, widget, features, uiType);
     return uiWrapper;
 #endif
 }
 
-LV2UI_Handle juceLV2UI_InstantiateExternal(const LV2UI_Descriptor* descriptor, const char* plugin_uri, const char* bundle_path, LV2UI_Write_Function writeFunction, LV2UI_Controller controller, LV2UI_Widget* widget, const LV2_Feature* const* features)
+LV2UI_Handle juceLV2UI_InstantiateExternal(const LV2UI_Descriptor* /*descriptor*/, const char* /*plugin_uri*/, const char* /*bundle_path*/, LV2UI_Write_Function writeFunction, LV2UI_Controller controller, LV2UI_Widget* widget, const LV2_Feature* const* features)
 {
-    return juceLV2UI_Instantiate(descriptor, writeFunction, controller, widget, features, JuceLV2UIWrapper::UI_EXTERNAL);
+    return juceLV2UI_Instantiate(writeFunction, controller, widget, features, JuceLV2UIWrapper::UI_EXTERNAL);
 }
 
-LV2UI_Handle juceLV2UI_InstantiateX11(const LV2UI_Descriptor* descriptor, const char* plugin_uri, const char* bundle_path, LV2UI_Write_Function writeFunction, LV2UI_Controller controller, LV2UI_Widget* widget, const LV2_Feature* const* features)
+LV2UI_Handle juceLV2UI_InstantiateX11(const LV2UI_Descriptor* /*descriptor*/, const char* /*plugin_uri*/, const char* /*bundle_path*/, LV2UI_Write_Function writeFunction, LV2UI_Controller controller, LV2UI_Widget* widget, const LV2_Feature* const* features)
 {
-    return juceLV2UI_Instantiate(descriptor, writeFunction, controller, widget, features, JuceLV2UIWrapper::UI_X11);
+    return juceLV2UI_Instantiate(writeFunction, controller, widget, features, JuceLV2UIWrapper::UI_X11);
 }
 
 void juceLV2UI_Cleanup(LV2UI_Handle instance)
 {
-    const MessageManagerLock mmLock;
-    JuceLV2UIWrapper* uiWrapper = (JuceLV2UIWrapper*)instance;
-    uiWrapper->doCleanup();
+    JUCE_AUTORELEASEPOOL
+    {
+        const MessageManagerLock mmLock;
+        JuceLV2UIWrapper* uiWrapper = (JuceLV2UIWrapper*)instance;
+        uiWrapper->doCleanup();
+
 #ifndef JucePlugin_WantsLV2InstanceAccess
-    delete (JuceLV2UIWrapper*)instance;
+        delete uiWrapper;
 #endif
+    }
+
+    if (activePlugins.size() == 0 && activeUIs.size() == 0)
+    {
+       #if JUCE_LINUX
+        SharedMessageThread::deleteInstance();
+       #endif
+
+        if (needsGUIShutdown)
+        {
+            shutdownJuce_GUI();
+            needsGUIShutdown = false;
+        }
+    }
 }
 
 void juceLV2UI_PortEvent(LV2UI_Handle instance, uint32 portIndex, uint32 bufferSize, uint32 format, const void* buffer)
@@ -1732,12 +1799,12 @@ void juceLV2UI_PortEvent(LV2UI_Handle instance, uint32 portIndex, uint32 bufferS
 
     if (uiWrapper && format == 0 && bufferSize == sizeof (float))
     {
-        float value = *(float*)buffer;
+        const float value = *(const float*)buffer;
         uiWrapper->doPortEvent(portIndex, value);
     }
 }
 
-const void* juceLV2UI_ExtensionData(const char* uri)
+const void* juceLV2UI_ExtensionData(const char* /*uri*/)
 {
     return nullptr;
 }

@@ -32,8 +32,9 @@
 
 #define JucePlugin_LV2URI               "http://argotlunar.info"
 #define JucePlugin_LV2Category          "ModulatorPlugin"
-#define JucePlugin_WantsLV2TimePos      1
-#define JucePlugin_WantsLV2State        1
+#define JucePlugin_WantsLV2TimePos        1
+#define JucePlugin_WantsLV2State          1
+#define JucePlugin_WantsLV2StateString    1
 #define JucePlugin_WantsLV2InstanceAccess 1
 
 #endif   // __PLUGINCHARACTERISTICS_D4EFFF1A__
