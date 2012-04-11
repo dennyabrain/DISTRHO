@@ -8,7 +8,7 @@
 
 #include <math.h>
 
-// Extra Plugin Hints
+// Extra Plugin Hints (VST only)
 const uint32_t PLUGIN_CAN_REPLACE = 1 << 3;
 
 // ---------------------------------------------------------------------------------------------
@@ -268,5 +268,12 @@ private:
     const char* m_license;
     long m_uniqueId;
 };
+
+// ---------------------------------------------------------------------------------------------
+
+DistrhoPluginBase* createDistrhoPlugin()
+{
+   return createEffectInstance(nullptr);
+}
 
 #endif // __DISTRHO_PORT_VST__

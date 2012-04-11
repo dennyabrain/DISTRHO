@@ -9,7 +9,7 @@
 #include <stdint.h>
 
 #ifndef nullptr
-#define nullptr 0
+#define nullptr (0)
 #endif
 
 // Plugin Hints
@@ -19,6 +19,7 @@ const uint32_t PLUGIN_IS_SYNTH = 1 << 2;
 // Parameter Hints
 const uint32_t PARAMETER_IS_ENABLED   = 1 << 1;
 const uint32_t PARAMETER_IS_AUTOMABLE = 1 << 2;
+const uint32_t PARAMETER_IS_OUTPUT    = 1 << 3;
 
 struct ParameterInfo {
     uint32_t hints;
@@ -27,12 +28,12 @@ struct ParameterInfo {
     const char* unit;
 
     struct {
-      float def;
-      float min;
-      float max;
-      float step;
-      float stepSmall;
-      float stepLarge;
+        float def;
+        float min;
+        float max;
+        float step;
+        float stepSmall;
+        float stepLarge;
     } range;
 };
 
@@ -47,6 +48,10 @@ public:
     {
         m_hints = 0;
         m_sampleRate = 44100;
+        m_bufferSize = 512;
+
+        m_audioInputs  = 0;
+        m_audioOutputs = 0;
 
         if (m_parameterCount > 0)
         {
@@ -80,7 +85,7 @@ public:
             p_programNames = nullptr;
     }
 
-    ~DistrhoPluginBase()
+    virtual ~DistrhoPluginBase()
     {
         if (m_parameterCount > 0)
         {
@@ -120,7 +125,7 @@ public:
         return m_parameterCount;
     }
 
-    ParameterInfo* d_parameterInfo(uint32_t index)
+    const ParameterInfo* d_parameterInfo(uint32_t index)
     {
         if (index < m_parameterCount)
             return &p_paramsInfo[index];
@@ -183,7 +188,7 @@ public:
     // Process stuff
     virtual void d_activate() = 0;
     virtual void d_deactivate() = 0;
-    virtual void d_run(float** inputs, float** outputs, uint32_t frames) = 0;
+    virtual void d_run(const float** const inputs, float** const outputs, uint32_t frames) = 0;
 
 protected:
     uint32_t m_hints;
@@ -219,6 +224,8 @@ inline void name_to_symbol(char* text)
             text[i] = '_';
     }
 }
+
+// ---------------------------------------------------------------------------------------------
 
 DistrhoPluginBase* createDistrhoPlugin();
 

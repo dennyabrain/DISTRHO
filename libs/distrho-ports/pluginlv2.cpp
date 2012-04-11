@@ -13,19 +13,10 @@
 #include <vector>
 
 #ifndef DISTRHO_PLUGIN_URI
-#define DISTRHO_PLUGIN_URI "urn:distrho:DemoPlugin"
+#define DISTRHO_PLUGIN_URI "urn:distrho:Plugin"
 #endif
 
-#if DISTRHO_BASE_VST
-
-#include "d-vst.h"
-
-DistrhoPluginBase* createDistrhoPlugin()
-{
-   return createEffectInstance(nullptr);
-}
-
-#endif
+// TODO - C linkage export macro
 
 // ---------------------------------------------------------------------------------------------
 
@@ -35,8 +26,12 @@ public:
     DistrhoPluginLv2(double sampleRate)
     {
         m_plugin = createDistrhoPlugin();
-        m_plugin->d_init();
+
+        lastBufferSize = 512;
         m_plugin->d_setSampleRate(sampleRate);
+        m_plugin->d_setBufferSize(lastBufferSize);
+
+        m_plugin->d_init();
 
         for (uint32_t i=0; i < m_plugin->d_audioInputs(); i++)
             portAudioIns.push_back(nullptr);
@@ -122,14 +117,27 @@ public:
 
     void lv2_run(uint32_t samples)
     {
+        // Check for updated bufferSize
+        if (samples >= 2 && samples != lastBufferSize)
+        {
+            lastBufferSize = samples;
+            m_plugin->d_setBufferSize(lastBufferSize);
+
+            m_plugin->d_deactivate();
+            m_plugin->d_activate();
+        }
+
         // Check for updated parameters
         float curValue;
+        const ParameterInfo* pinfo;
         for (uint32_t i=0; i < m_plugin->d_parameterCount(); i++)
         {
             if (portControls[i] != nullptr)
             {
                 curValue = *(float*)portControls[i];
-                if (lastControlValues[i] != curValue)
+                pinfo = m_plugin->d_parameterInfo(i);
+
+                if (lastControlValues[i] != curValue && ! (pinfo->hints & PARAMETER_IS_OUTPUT))
                 {
                     m_plugin->d_setParameterValue(i, curValue);
                     lastControlValues[i] = curValue;
@@ -137,7 +145,8 @@ public:
             }
         }
 
-        float* inputs[m_plugin->d_audioInputs()];
+        // Run plugin for this cycle
+        const float* inputs[m_plugin->d_audioInputs()];
         float* outputs[m_plugin->d_audioOutputs()];
 
         for (uint32_t i=0; i < m_plugin->d_audioInputs(); i++)
@@ -147,11 +156,24 @@ public:
             outputs[i] = portAudioOuts[i];
 
         m_plugin->d_run(inputs, outputs, samples);
+
+        // Update parameter outputs
+        for (uint32_t i=0; i < m_plugin->d_parameterCount(); i++)
+        {
+            pinfo = m_plugin->d_parameterInfo(i);
+            if (pinfo->hints & PARAMETER_IS_OUTPUT)
+            {
+                curValue = m_plugin->d_parameterValue(i);
+                *portControls[i] = curValue;
+                lastControlValues[i] = curValue;
+            }
+        }
     }
 
 private:
     DistrhoPluginBase* m_plugin;
     std::vector<float> lastControlValues;
+    uint32_t lastBufferSize;
 
     // LV2 ports
     LV2_Event_Buffer* portMidiIn;
@@ -197,7 +219,7 @@ static void run(LV2_Handle instance, uint32_t n_samples)
     plugin->lv2_run(n_samples);
 }
 
-static const void* extension_data(const char* uri)
+static const void* extension_data(const char* /*uri*/)
 {
     return nullptr;
 }
@@ -353,10 +375,13 @@ void lv2_generate_ttl()
         else
             plugin_string += "    [\n";
 
-        ParameterInfo* pinfo = plugin->d_parameterInfo(i);
+        const ParameterInfo* pinfo = plugin->d_parameterInfo(i);
 
         sprintf(portBuf, "%i", portIndex++);
-        plugin_string += "      a lv2:InputPort, lv2:ControlPort ;\n";
+        if (pinfo->hints & PARAMETER_IS_OUTPUT)
+            plugin_string += "      a lv2:OutputPort, lv2:ControlPort ;\n";
+        else
+            plugin_string += "      a lv2:InputPort, lv2:ControlPort ;\n";
         plugin_string += "      lv2:index ";
         plugin_string += portBuf;
         plugin_string += " ;\n";
@@ -389,16 +414,16 @@ void lv2_generate_ttl()
             plugin_string += "    ],\n";
     }
 
-//     sprintf(portBuf, "%i", portIndex++);
-//     plugin_string += "    lv2:port [\n";
-//     plugin_string += "      a lv2:OutputPort, lv2:ControlPort ;\n";
-//     plugin_string += "      lv2:index ";
-//     plugin_string += portBuf;
-//     plugin_string += " ;\n";
-//     plugin_string += "      lv2:symbol \"lv2_latency\" ;\n";
-//     plugin_string += "      lv2:name \"Latency\" ;\n";
-//     plugin_string += "      lv2:portProperty lv2:reportsLatency ;\n";
-//     plugin_string += "    ] ;\n\n";
+    //     sprintf(portBuf, "%i", portIndex++);
+    //     plugin_string += "    lv2:port [\n";
+    //     plugin_string += "      a lv2:OutputPort, lv2:ControlPort ;\n";
+    //     plugin_string += "      lv2:index ";
+    //     plugin_string += portBuf;
+    //     plugin_string += " ;\n";
+    //     plugin_string += "      lv2:symbol \"lv2_latency\" ;\n";
+    //     plugin_string += "      lv2:name \"Latency\" ;\n";
+    //     plugin_string += "      lv2:portProperty lv2:reportsLatency ;\n";
+    //     plugin_string += "    ] ;\n\n";
 
     plugin_string += "    doap:name \"";
     plugin_string += plugin_name;
