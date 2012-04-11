@@ -311,7 +311,7 @@ void lv2_generate_ttl()
     plugin_string += "\n";
 
 #if DISTRHO_PLUGIN_WANTS_UI
-    plugin_string += "    ui:ui <" DISTRHO_PLUGIN_URI "#Qt4UI> .\n\n";
+    plugin_string += "    ui:ui <" DISTRHO_PLUGIN_URI "#Qt4UI> ;\n\n";
 #endif
 
     uint32_t portIndex = 0;
