@@ -1,7 +1,6 @@
 // distrho lv2 plugin
 
-#include "pluginbase.h"
-#include "DistrhoPlugin.h"
+#include "PluginBase.h"
 
 #include "lv2/lv2.h"
 #include "lv2/event.h"
@@ -13,10 +12,9 @@
 #include <vector>
 
 #ifndef DISTRHO_PLUGIN_URI
+#warning DISTRHO_PLUGIN_URI not defined!
 #define DISTRHO_PLUGIN_URI "urn:distrho:Plugin"
 #endif
-
-// TODO - C linkage export macro
 
 // ---------------------------------------------------------------------------------------------
 
@@ -46,7 +44,7 @@ public:
         }
     }
 
-    ~DistrhoPluginLv2()
+    virtual ~DistrhoPluginLv2()
     {
         m_plugin->d_cleanup();
         delete m_plugin;
@@ -71,15 +69,14 @@ public:
     {
         uint32_t index = 0;
 
-        if (m_plugin->d_hints() & PLUGIN_IS_SYNTH)
+#if DISTRHO_PLUGIN_IS_SYNTH
+        if (portId == index)
         {
-            if (portId == index)
-            {
-                portMidiIn = (LV2_Event_Buffer*)data;
-                return;
-            }
-            index++;
+            portMidiIn = (LV2_Event_Buffer*)data;
+            return;
         }
+        index++;
+#endif
 
         for (uint32_t i=0; i < m_plugin->d_audioInputs(); i++, index++)
         {
@@ -263,6 +260,9 @@ void lv2_generate_ttl()
     std::string manifest_string;
     manifest_string += "@prefix lv2:  <http://lv2plug.in/ns/lv2core#> .\n";
     manifest_string += "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\n";
+#if DISTRHO_PLUGIN_WANTS_UI
+    manifest_string += "@prefix ui:   <http://lv2plug.in/ns/extensions/ui#> .\n";
+#endif
     manifest_string += "\n";
 
     manifest_string += "<" DISTRHO_PLUGIN_URI ">\n";
@@ -274,6 +274,15 @@ void lv2_generate_ttl()
     manifest_string += plugin_binary;
     manifest_string += ".ttl> .\n";
     manifest_string += "\n";
+
+#if DISTRHO_PLUGIN_WANTS_UI
+    manifest_string += "<" DISTRHO_PLUGIN_URI "#Qt4UI>\n";
+    manifest_string += "    a ui:Qt4UI ;\n";
+    manifest_string += "    ui:binary <";
+    manifest_string += plugin_binary;
+    manifest_string += ".so> .\n";
+    manifest_string += "\n";
+#endif
 
     manifest_file << manifest_string << std::endl;
     manifest_file.close();
@@ -287,32 +296,37 @@ void lv2_generate_ttl()
     plugin_string += "@prefix ev:   <http://lv2plug.in/ns/ext/event#> .\n";
     plugin_string += "@prefix foaf: <http://xmlns.com/foaf/0.1/> .\n";
     plugin_string += "@prefix lv2:  <http://lv2plug.in/ns/lv2core#> .\n";
+#if DISTRHO_PLUGIN_WANTS_UI
+    plugin_string += "@prefix ui:   <http://lv2plug.in/ns/extensions/ui#> ;\n";
+#endif
     plugin_string += "\n";
 
     plugin_string += "<" DISTRHO_PLUGIN_URI ">\n";
-    if (plugin->d_hints() & PLUGIN_IS_SYNTH)
-    {
-        plugin_string += "    a lv2:InstrumentPlugin, lv2:Plugin ;\n";
-        plugin_string += "    lv2:requiredFeature <" LV2_URID__map "> ;\n";
-    }
-    else
-        plugin_string += "    a lv2:Plugin ;\n";
+#if DISTRHO_PLUGIN_IS_SYNTH
+    plugin_string += "    a lv2:InstrumentPlugin, lv2:Plugin ;\n";
+    plugin_string += "    lv2:requiredFeature <" LV2_URID__map "> ;\n";
+#else
+    plugin_string += "    a lv2:Plugin ;\n";
+#endif
     plugin_string += "\n";
+
+#if DISTRHO_PLUGIN_WANTS_UI
+    plugin_string += "    ui:ui <" DISTRHO_PLUGIN_URI "#Qt4UI> .\n\n";
+#endif
 
     uint32_t portIndex = 0;
     char portBuf[64] = { 0 };
 
-    if (plugin->d_hints() & PLUGIN_IS_SYNTH)
-    {
-        plugin_string += "    lv2:port [\n";
-        plugin_string += "      a lv2:InputPort, ev:EventPort ;\n";
-        plugin_string += "      ev:supportsEvent <" LV2_MIDI__MidiEvent "> ;\n";
-        plugin_string += "      lv2:index 0 ;\n";
-        plugin_string += "      lv2:symbol \"lv2_midi_in\" ;\n";
-        plugin_string += "      lv2:name \"Midi Input\" ;\n";
-        plugin_string += "    ] ;\n\n";
-        portIndex++;
-    }
+#if DISTRHO_PLUGIN_IS_SYNTH
+    plugin_string += "    lv2:port [\n";
+    plugin_string += "      a lv2:InputPort, ev:EventPort ;\n";
+    plugin_string += "      ev:supportsEvent <" LV2_MIDI__MidiEvent "> ;\n";
+    plugin_string += "      lv2:index 0 ;\n";
+    plugin_string += "      lv2:symbol \"lv2_midi_in\" ;\n";
+    plugin_string += "      lv2:name \"Midi Input\" ;\n";
+    plugin_string += "    ] ;\n\n";
+    portIndex++;
+#endif
 
     for (uint32_t i=0; i < plugin->d_audioInputs(); i++)
     {
@@ -441,8 +455,10 @@ void lv2_generate_ttl()
     delete plugin;
 }
 
-extern "C" __attribute__ ((visibility("default")))
+DISTRHO_PLUGIN_EXPORT
 const LV2_Descriptor* lv2_descriptor(uint32_t index)
 {
     return (index == 0) ? &descriptor : nullptr;
 }
+
+int main() {}

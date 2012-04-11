@@ -16,9 +16,6 @@ StereoAudioGain::StereoAudioGain() :
 {
     x_left  = x_right  = 1.0f;
     vu_left = vu_right = 0.0f;
-
-    m_audioInputs  = 2;
-    m_audioOutputs = 2;
 }
 
 // Information

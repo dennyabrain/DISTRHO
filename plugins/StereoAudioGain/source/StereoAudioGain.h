@@ -7,11 +7,19 @@
 #ifndef STEREOAUDIOGAIN_H
 #define STEREOAUDIOGAIN_H
 
-#include "pluginbase.h"
+#include "PluginBase.h"
 
 class StereoAudioGain : public DistrhoPluginBase
 {
 public:
+    enum Params {
+        PARAMETER_LEFT     = 0,
+        PARAMETER_RIGHT    = 1,
+        PARAMETER_VU_LEFT  = 2,
+        PARAMETER_VU_RIGHT = 3,
+        PARAMETER_COUNT    = 4
+    };
+
     StereoAudioGain();
 
     // Information
@@ -36,14 +44,6 @@ public:
     virtual void d_run(const float** const inputs, float** const outputs, uint32_t frames);
 
 private:
-    enum Params {
-        PARAMETER_LEFT     = 0,
-        PARAMETER_RIGHT    = 1,
-        PARAMETER_VU_LEFT  = 2,
-        PARAMETER_VU_RIGHT = 3,
-        PARAMETER_COUNT    = 4
-    };
-
     float x_left, x_right, vu_left, vu_right;
 };
 

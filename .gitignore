@@ -5,8 +5,14 @@
 *.o
 *.so
 
+*.moc
+moc_*.cpp
+qrc_*.cpp
+ui_*.h
+
 *.lv2
 *.make
+*.pro.user
 Makefile
 
 .directory

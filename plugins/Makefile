@@ -17,6 +17,7 @@ standalone:
 
 lv2:
 	$(MAKE) -C 3BandEQ/LV2
+	$(MAKE) -C StereoAudioGain/LV2
 
 vst:
 	$(MAKE) -C 3BandEQ/VST
@@ -28,6 +29,7 @@ clean:
 
 	# LV2
 	$(MAKE) clean -C 3BandEQ/LV2
+	$(MAKE) clean -C StereoAudioGain/LV2
 
 	# VST
 	$(MAKE) clean -C 3BandEQ/VST

@@ -27,6 +27,8 @@ if [ -d ../libs ]; then
   cd ..
 fi
 
+# ------------------------------------------------------------------------------------------------------------
+
 FILES=`find . -name premake.lua`
 
 for i in $FILES; do
@@ -40,7 +42,7 @@ for i in $FILES; do
     echo premake --os linux --target gnu --cc gcc
     premake --os linux --target gnu --cc gcc
 
-    echo sed "s/\\\$(LDFLAGS)/\\\$(LDFLAGS) \\\$(LDFLAGS)/" -i `find . -name \*.make`
+    echo sed \""s/\\\$(LDFLAGS)/\\\$(LDFLAGS) \\\$(LDFLAGS)/\"" -i `find . -name \*.make`
     sed "s/\$(LDFLAGS)/\$(LDFLAGS) \$(LDFLAGS)/" -i `find . -name \*.make`
 
   elif [ $MAC = 1 ]; then
@@ -53,13 +55,44 @@ for i in $FILES; do
     echo premake --os windows --target vs2005
     premake --os windows --target vs2005
 
-    echo sed "s/SubSystem=\\\"1\\\"/SubSystem=\\\"2\\\"/" -i `find . -name \*.vcproj`
+    echo sed \""s/SubSystem=\\\"1\\\"/SubSystem=\\\"2\\\"/\"" -i `find . -name \*.vcproj`
     sed "s/SubSystem=\"1\"/SubSystem=\"2\"/" -i `find . -name \*.vcproj`
 
-    echo sed "s/\t\t\t\tEntryPointSymbol=\\\"mainCRTStartup\\\"//" -i `find . -name \*.vcproj`
+    echo sed \""s/\t\t\t\tEntryPointSymbol=\\\"mainCRTStartup\\\"//\"" -i `find . -name \*.vcproj`
     sed "s/\t\t\t\tEntryPointSymbol=\"mainCRTStartup\"//" -i `find . -name \*.vcproj`
 
   fi
+
+  if [ -d ../libs ]; then
+    echo cd ..
+    cd ..
+  elif [ -d ../../libs ]; then
+    echo cd ../..
+    cd ../..
+  elif [ -d ../../../libs ]; then
+    echo cd ../../..
+    cd ../../..
+  else
+    echo cd ../../../..
+    cd ../../../..
+  fi
+done
+
+# ------------------------------------------------------------------------------------------------------------
+
+FILES=`find . -name qmake.pro`
+
+for i in $FILES; do
+  FOLDER=`echo $i | awk sub'("/qmake.pro","")'`
+
+  echo cd $FOLDER
+  cd $FOLDER
+
+  echo qmake qmake.pro
+  qmake qmake.pro
+
+  echo sed \""s/ = lib/ = /\"" -i Makefile
+  sed "s/ = lib/ = /" -i Makefile
 
   if [ -d ../libs ]; then
     echo cd ..

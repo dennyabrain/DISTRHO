@@ -3,10 +3,10 @@
 #ifndef __DISTRHO_PORT_VST__
 #define __DISTRHO_PORT_VST__
 
-#include "pluginbase.h"
+#include "PluginBase.h"
 #include "DistrhoPlugin.h"
 
-#include <math.h>
+#include <cmath>
 
 // Extra Plugin Hints (VST only)
 const uint32_t PLUGIN_CAN_REPLACE = 1 << 3;

@@ -8,13 +8,17 @@
 #include <iostream>
 #include <stdint.h>
 
+#include "DistrhoPlugin.h"
+
 #ifndef nullptr
 #define nullptr (0)
 #endif
 
-// Plugin Hints
-const uint32_t PLUGIN_HAS_GUI  = 1 << 1;
-const uint32_t PLUGIN_IS_SYNTH = 1 << 2;
+#if defined(__WIN32__) || defined(__WIN64__)
+# define DISTRHO_PLUGIN_EXPORT extern "C" __declspec (dllexport)
+#else
+# define DISTRHO_PLUGIN_EXPORT extern "C" __attribute__ ((visibility("default")))
+#endif
 
 // Parameter Hints
 const uint32_t PARAMETER_IS_ENABLED   = 1 << 1;
@@ -46,7 +50,6 @@ public:
         m_parameterCount(parameterCount),
         m_programCount(programCount)
     {
-        m_hints = 0;
         m_sampleRate = 44100;
         m_bufferSize = 512;
 
@@ -112,11 +115,6 @@ public:
         }
     }
 
-    uint32_t d_hints()
-    {
-        return m_hints;
-    }
-
     // -------------------------------------------------
 
     // Parameters
@@ -147,12 +145,12 @@ public:
 
     uint32_t d_audioInputs() const
     {
-        return m_audioInputs;
+        return DISTRHO_PLUGIN_MAX_NUM_INPUTS;
     }
 
     uint32_t d_audioOutputs() const
     {
-        return m_audioOutputs;
+        return DISTRHO_PLUGIN_MAX_NUM_OUTPUTS;
     }
 
     // -------------------------------------------------
@@ -191,17 +189,17 @@ public:
     virtual void d_run(const float** const inputs, float** const outputs, uint32_t frames) = 0;
 
 protected:
-    uint32_t m_hints;
-    uint32_t m_parameterCount;
-    uint32_t m_programCount;
-    uint32_t m_audioInputs;
-    uint32_t m_audioOutputs;
-
     ParameterInfo* p_paramsInfo;
     const char**   p_programNames;
 
     double   m_sampleRate;
     uint32_t m_bufferSize;
+
+private:
+    uint32_t m_parameterCount;
+    uint32_t m_programCount;
+    uint32_t m_audioInputs;
+    uint32_t m_audioOutputs;
 };
 
 inline void name_to_symbol(char* text)

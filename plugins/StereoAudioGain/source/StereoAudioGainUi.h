@@ -7,7 +7,7 @@
 #ifndef STEREOAUDIOGAIN_UI_H
 #define STEREOAUDIOGAIN_UI_H
 
-#include "uibase.h"
+#include "UiBase.h"
 
 namespace Ui {
 class StereoAudioGainUi;
@@ -25,6 +25,11 @@ public:
 
 protected:
     Ui::StereoAudioGainUi* ui;
+
+private:
+    Q_SLOT void leftKnobValueChanged(int value);
+    Q_SLOT void rightKnobValueChanged(int value);
+
 };
 
 #endif // STEREOAUDIOGAIN_UI_H
