@@ -6,7 +6,7 @@
 #ifndef __BITCRUSHER_H
 #define __BITCRUSHER_H
 
-#include "d-vst.h"
+#include "d_vst.h"
 
 enum
 {

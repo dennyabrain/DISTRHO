@@ -186,7 +186,7 @@ public:
     // Process stuff
     virtual void d_activate() = 0;
     virtual void d_deactivate() = 0;
-    virtual void d_run(const float** const inputs, float** const outputs, uint32_t frames) = 0;
+    virtual void d_run(float** inputs, float** outputs, uint32_t frames) = 0;
 
 protected:
     ParameterInfo* p_paramsInfo;

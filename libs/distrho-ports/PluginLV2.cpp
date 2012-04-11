@@ -143,7 +143,7 @@ public:
         }
 
         // Run plugin for this cycle
-        const float* inputs[m_plugin->d_audioInputs()];
+        float* inputs[m_plugin->d_audioInputs()];
         float* outputs[m_plugin->d_audioOutputs()];
 
         for (uint32_t i=0; i < m_plugin->d_audioInputs(); i++)
@@ -297,7 +297,7 @@ void lv2_generate_ttl()
     plugin_string += "@prefix foaf: <http://xmlns.com/foaf/0.1/> .\n";
     plugin_string += "@prefix lv2:  <http://lv2plug.in/ns/lv2core#> .\n";
 #if DISTRHO_PLUGIN_WANTS_UI
-    plugin_string += "@prefix ui:   <http://lv2plug.in/ns/extensions/ui#> ;\n";
+    plugin_string += "@prefix ui:   <http://lv2plug.in/ns/extensions/ui#> .\n";
 #endif
     plugin_string += "\n";
 

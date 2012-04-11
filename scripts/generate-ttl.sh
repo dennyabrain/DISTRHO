@@ -17,8 +17,8 @@ FOLDERS=`find . -name \*.lv2`
 for i in $FOLDERS; do
   echo cd $i
   cd $i
-  echo ../../libs/juce_lv2_ttl_generator ./*.so
-  ../../libs/juce_lv2_ttl_generator ./*.so
+  echo ../../libs/lv2_ttl_generator ./*.so
+  ../../libs/lv2_ttl_generator ./*.so
   echo cd ..
   cd ..
 done

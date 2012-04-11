@@ -4,9 +4,9 @@
 
 #include "DistrhoPluginProcessor.h"
 
-#include "../../common/DistrhoIcon.h"
-#include "../../common/FilmStripKnob.h"
-#include "../../common/ImageSlider.h"
+#include "../../common/Juce-Widgets/DistrhoIcon.h"
+#include "../../common/Juce-Widgets/FilmStripKnob.h"
+#include "../../common/Juce-Widgets/ImageSlider.h"
 
 //==================================================================================
 class DistrhoPluginAudioProcessorEditor  : public AudioProcessorEditor,

@@ -8,8 +8,8 @@
 
 #include <cmath>
 
-// Extra Plugin Hints (VST only)
-const uint32_t PLUGIN_CAN_REPLACE = 1 << 3;
+// Plugin Hints (VST only)
+const uint32_t PLUGIN_CAN_REPLACE = 1 << 1;
 
 // ---------------------------------------------------------------------------------------------
 
@@ -43,8 +43,6 @@ public:
         m_maker   = nullptr;
         m_license = nullptr;
         m_uniqueId = 0;
-        m_audioInputs = 0;
-        m_audioOutputs = 0;
     }
 
     ~AudioEffectX()
@@ -80,14 +78,14 @@ public:
     // Internal data
     virtual float d_parameterValue(uint32_t index)
     {
-        if (index < m_parameterCount)
+        if (index < d_parameterCount())
             return getParameter(index);
         return 0.0f;
     }
 
     virtual void d_setParameterValue(uint32_t index, float value)
     {
-        if (index < m_parameterCount)
+        if (index < d_parameterCount())
             setParameter(index, value);
     }
 
@@ -108,7 +106,7 @@ public:
         getVendorString(buf_str);
         m_maker = strdup(buf_str);
 
-        for (uint32_t i = 0; i < m_parameterCount; i++)
+        for (uint32_t i = 0; i < d_parameterCount(); i++)
         {
             getParameterName(i, buf_str);
             p_paramsInfo[i].name = strdup(buf_str);
@@ -167,11 +165,11 @@ public:
 
     virtual void d_run(float** inputs, float** outputs, uint32_t frames)
     {
-        if (m_hints & PLUGIN_CAN_REPLACE)
+        if (vst_hints & PLUGIN_CAN_REPLACE)
             processReplacing(inputs, outputs, frames);
         else
         {
-            memset(outputs, 0, sizeof(float)*m_audioOutputs*frames);
+            memset(outputs, 0, sizeof(float) * d_audioOutputs() * frames);
             process(inputs, outputs, frames);
         }
     }
@@ -187,7 +185,7 @@ public:
 
     void canProcessReplacing()
     {
-        m_hints |= PLUGIN_CAN_REPLACE;
+        vst_hints |= PLUGIN_CAN_REPLACE;
     }
 
     void canDoubleReplacing()
@@ -196,17 +194,17 @@ public:
 
     void isSynth()
     {
-        m_hints |= PLUGIN_IS_SYNTH;
+        // already set with macro DISTRHO_PLUGIN_IS_SYNTH
     }
 
-    void setNumInputs(uint32_t numInputs)
+    void setNumInputs(uint32_t /*numInputs*/)
     {
-        m_audioInputs = numInputs;
+        // already set with macro DISTRHO_PLUGIN_MAX_NUM_INPUTS
     }
 
-    void setNumOutputs(uint32_t numOutputs)
+    void setNumOutputs(uint32_t /*numOutputs*/)
     {
-        m_audioOutputs = numOutputs;
+        // already set with macro DISTRHO_PLUGIN_MAX_NUM_OUTPUTS
     }
 
     void setUniqueID(long uniqueId)
@@ -267,6 +265,7 @@ private:
     const char* m_maker;
     const char* m_license;
     long m_uniqueId;
+    uint32_t vst_hints;
 };
 
 // ---------------------------------------------------------------------------------------------

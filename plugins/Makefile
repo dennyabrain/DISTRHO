@@ -10,7 +10,7 @@ plugins: standalone lv2 vst
 
 libs:
 	$(MAKE) -C ../libs/juce-2.0
-	$(MAKE) -C ../libs/juce-lv2
+	$(MAKE) -C ../libs/lv2-ttl-generator
 
 standalone:
 	$(MAKE) -C 3BandEQ/Standalone

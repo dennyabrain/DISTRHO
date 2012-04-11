@@ -139,7 +139,7 @@ bool StereoAudioGain::d_cleanup()
 void StereoAudioGain::d_activate() {}
 void StereoAudioGain::d_deactivate() {}
 
-void StereoAudioGain::d_run(const float** const inputs, float** const outputs, uint32_t frames)
+void StereoAudioGain::d_run(float** inputs, float** outputs, uint32_t frames)
 {
     const float* const p_inL = inputs[0];
     const float* const p_inR = inputs[1];

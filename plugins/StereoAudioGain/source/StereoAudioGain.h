@@ -41,7 +41,7 @@ public:
     // Process stuff
     virtual void d_activate();
     virtual void d_deactivate();
-    virtual void d_run(const float** const inputs, float** const outputs, uint32_t frames);
+    virtual void d_run(float** inputs, float** outputs, uint32_t frames);
 
 private:
     float x_left, x_right, vu_left, vu_right;
