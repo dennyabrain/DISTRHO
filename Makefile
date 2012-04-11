@@ -5,7 +5,7 @@ all: build
 
 build:
 	$(MAKE) -C libs/juce-2.0
-	$(MAKE) -C libs/juce-lv2
+	$(MAKE) -C libs/lv2-ttl-generator
 	$(MAKE) plugins -C plugins
 	$(MAKE) plugins -C ports
 
@@ -14,7 +14,7 @@ gen:
 
 clean:
 	$(MAKE) clean -C libs/juce-2.0
-	$(MAKE) clean -C libs/juce-lv2
+	$(MAKE) clean -C libs/lv2-ttl-generator
 	$(MAKE) clean -C plugins
 	$(MAKE) clean -C ports
 	rm -rf bin/*.lv2
@@ -33,7 +33,7 @@ standalone:
 
 lv2:
 	$(MAKE) -C libs/juce-2.0
-	$(MAKE) -C libs/juce-lv2
+	$(MAKE) -C libs/lv2-ttl-generator
 	$(MAKE) lv2 -C plugins
 	$(MAKE) lv2 -C ports
 
