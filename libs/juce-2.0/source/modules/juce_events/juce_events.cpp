@@ -52,6 +52,7 @@
  #import <IOKit/pwr_mgt/IOPMLib.h>
 
 #elif JUCE_LINUX
+ #include <unistd.h>
  #include <X11/Xlib.h>
  #include <X11/Xresource.h>
  #include <X11/Xutil.h>
