@@ -266,11 +266,11 @@ String makePluginTtl(AudioProcessor* const filter)
 
     uint32 portIndex = 0;
 
-    // Event input (old MIDI or MIDI+TimePos)
+    // Event input (old MIDI or MIDI + TimePos)
 #if (JucePlugin_WantsMidiInput || (JUCE_LV2_ENABLE_DEV_FEATURES && JucePlugin_WantsLV2TimePos))
     plugin += "    lv2:port [\n";
  #if JUCE_LV2_ENABLE_DEV_FEATURES
-    plugin += "      a lv2:InputPort, atom:MessagePort ;\n";
+    plugin += "      a lv2:InputPort, atom:AtomPort ;\n";
     plugin += "      atom:bufferType atom:Sequence ;\n";
   #if JucePlugin_WantsLV2TimePos
     plugin += "      atom:supports <" LV2_MIDI__MidiEvent "> ,\n";
@@ -295,7 +295,7 @@ String makePluginTtl(AudioProcessor* const filter)
 #if JucePlugin_ProducesMidiOutput
     plugin += "    lv2:port [\n";
  #if JUCE_LV2_ENABLE_DEV_FEATURES
-    plugin += "      a lv2:OutputPort, atom:MessagePort ;\n";
+    plugin += "      a lv2:OutputPort, atom:AtomPort ;\n";
     plugin += "      atom:bufferType atom:Sequence ;\n";
     plugin += "      atom:supports <" LV2_MIDI__MidiEvent "> ;\n";
  #else
@@ -354,7 +354,7 @@ String makePluginTtl(AudioProcessor* const filter)
     plugin += "      lv2:default 120.0 ;\n";
     plugin += "      lv2:minimum 10.0 ;\n";
     plugin += "      lv2:maximum 400.0 ;\n";
-    plugin += "      lv2:portProperty <http://lv2plug.in/ns/ext/port-props#reportsBpm> ;\n";
+    plugin += "      lv2:designation <http://lv2plug.in/ns/ext/time#beatsPerMinute> ;\n";
     plugin += "      ue:unit ue:bpm ;\n";
     plugin += "    ] ;\n\n";
 #endif
@@ -454,7 +454,7 @@ String makePresetsTtl(AudioProcessor* const filter)
                 presets += "    [\n";
 
             presets += "        lv2:symbol \"" + nameToSymbol(filter->getParameterName(j), j) + "\" ;\n";
-            presets += "        pset:value " + String(filter->getParameter(j)) + " ;\n";
+            presets += "        pset:value \"" + String(filter->getParameter(j)) + "\"^^xsd:float ;\n";
 
             if (j+1 == filter->getNumParameters())
                 presets += "    ] ";
@@ -1060,6 +1060,9 @@ public:
             bufferSize (512),
 #if (JucePlugin_WantsMidiInput || JucePlugin_ProducesMidiOutput)
             uridIdMidi (0),
+ #if JUCE_LV2_ENABLE_DEV_FEATURES
+            uridIdAtomSequence (0),
+ #endif
 #endif
             uridMap (nullptr)
     {
@@ -1092,6 +1095,9 @@ public:
                 uridMap = (LV2_URID_Map*)features[i]->data;
  #if (JucePlugin_WantsMidiInput || JucePlugin_ProducesMidiOutput)
                 uridIdMidi = uridMap->map(uridMap->handle, LV2_MIDI__MidiEvent);
+  #if JUCE_LV2_ENABLE_DEV_FEATURES
+                uridIdAtomSequence = uridMap->map(uridMap->handle, LV2_ATOM__Sequence);
+  #endif
  #endif
                 break;
             }
@@ -1364,7 +1370,7 @@ public:
                     {
                         LV2_Event* const event = lv2_event_get(&iter, &data);
 
-                        if (event != nullptr && event->type == uridIdMidi)
+                        if (event && event->type == uridIdMidi)
                         {
                             sampleFrame = event->frames;
                             midiEvents.addEvent(data, event->size, event->frames);
@@ -1397,31 +1403,33 @@ public:
 #if JucePlugin_ProducesMidiOutput
             if (portEventOut != nullptr)
             {
-                //const int numEvents = midiEvents.getNumEvents();
                 const uint8* midiEventData;
                 int midiEventSize, midiEventPosition;
                 MidiBuffer::Iterator i (midiEvents);
 
  #if JUCE_LV2_ENABLE_DEV_FEATURES
+                uint32_t size, offset = 0;
+                LV2_Atom_Event* aev;
+
+                portEventOut->atom.size = 0;
+                portEventOut->atom.type = uridIdAtomSequence;
+                portEventOut->body.unit = 0;
+                portEventOut->body.pad  = 0;
+
                 while (i.getNextEvent (midiEventData, midiEventSize, midiEventPosition))
                 {
                     jassert (midiEventPosition >= 0 && midiEventPosition < numSamples);
-                    //lv2_event_write(&iter, midiEventPosition, 0, uridIdMidi, midiEventSize, midiEventData);
-                }
 
-//                 LV2_SEQUENCE_FOREACH(portEventIn, j)
-//                 {
-//                     LV2_Atom_Event* const event = lv2_sequence_iter_get(j);
-//
-//                     if (event != nullptr && event->body.type == uridIdMidi)
-//                     {
-//                         if (event->time.frames >= numSamples)
-//                             break;
-//
-//                         uint8* const data = (uint8* const)(event + 1);
-//                         midiEvents.addEvent(data, event->body.size, event->time.frames);
-//                     }
-//                 }
+                    aev = (LV2_Atom_Event*)((char*)LV2_ATOM_CONTENTS(LV2_Atom_Sequence, portEventOut) + offset);
+                    aev->time.frames = midiEventPosition;
+                    aev->body.type   = uridIdMidi;
+                    aev->body.size   = midiEventSize;
+                    memcpy(LV2_ATOM_BODY(&aev->body), midiEventData, midiEventSize);
+
+                    size    = lv2_atom_pad_size(sizeof(LV2_Atom_Event) + midiEventSize);
+                    offset += size;
+                    portEventOut->atom.size += size;
+                }
  #else
                 LV2_Event_Iterator iter;
                 lv2_event_buffer_reset(portEventOut, LV2_EVENT_AUDIO_STAMP, (uint8*)(portEventOut + 1));
@@ -1430,6 +1438,7 @@ public:
                 while (i.getNextEvent (midiEventData, midiEventSize, midiEventPosition))
                 {
                     jassert (midiEventPosition >= 0 && midiEventPosition < numSamples);
+
                     lv2_event_write(&iter, midiEventPosition, 0, uridIdMidi, midiEventSize, midiEventData);
                 }
  #endif
@@ -1559,6 +1568,9 @@ private:
     uint32 bufferSize;
 #if (JucePlugin_WantsMidiInput || JucePlugin_ProducesMidiOutput)
     LV2_URID uridIdMidi;
+ #if JUCE_LV2_ENABLE_DEV_FEATURES
+    LV2_URID uridIdAtomSequence;
+ #endif
 #endif
     LV2_URID_Map* uridMap;
     Array<float> lastControlValues;
