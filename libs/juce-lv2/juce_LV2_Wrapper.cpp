@@ -73,6 +73,9 @@
 
 #include "modules/juce_audio_plugin_client/utility/juce_IncludeModuleHeaders.h"
 
+// FIXME - juce base64 algorithm is broken
+#include "base64/Base64.cpp"
+
 namespace juce
 {
  #if JUCE_MAC
@@ -431,19 +434,17 @@ String makePresetsTtl(AudioProcessor* const filter)
         presets += filter->getStateInformationString().replace("\r\n","\n");
         presets += "\"\"\"\n";
  #else
-        MemoryBlock chunkMemory; // FIXME - mem leak here
-        chunkMemory.setSize (0);
-        presets += "        <" JUCE_LV2_STATE_BINARY_URI ">\n";
-        presets += "\"";
+        MemoryBlock chunkMemory;
         filter->getCurrentProgramStateInformation(chunkMemory);
-        presets += chunkMemory.toBase64Encoding();
-        chunkMemory.setSize (0);
-        presets += "\"^^xsd:base64Binary\n";
+        const String chunkString = Base64Encode(chunkMemory);
+
+        presets += "        <" JUCE_LV2_STATE_BINARY_URI ">\n";
+        presets += "\"" + chunkString + "\"^^xsd:base64Binary\n";
  #endif
         if (filter->getNumParameters() > 0)
-          presets += "    ] ;\n\n";
+            presets += "    ] ;\n\n";
         else
-          presets += "    ] .\n\n";
+            presets += "    ] .\n\n";
 #endif
 
         for (int j=0; j < filter->getNumParameters(); j++)
