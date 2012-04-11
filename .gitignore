@@ -24,7 +24,10 @@ Makefile
 bin/*
 debian
 intermediate
-juce_lv2_ttl_generator
+lv2_ttl_generator
+
+scripts/*.h
+scripts/*.pro
 
 sdks/ASIOSDK2/*
 sdks/vstsdk2.4/*

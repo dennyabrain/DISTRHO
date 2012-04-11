@@ -42,8 +42,8 @@ extern const CFStringRef kCTTypesetterOptionForcedEmbeddingLevel;
 
 namespace CoreTextTypeLayout
 {
-    CTFontRef createCTFont (const Font& font, const float fontSize,
-                            const bool applyScaleFactor, bool& needsItalicTransform)
+    static CTFontRef createCTFont (const Font& font, const float fontSize,
+                                   const bool applyScaleFactor, bool& needsItalicTransform)
     {
         CFStringRef cfName = font.getTypefaceName().toCFString();
         CTFontRef ctFontRef = CTFontCreateWithName (cfName, fontSize, nullptr);
@@ -147,7 +147,7 @@ namespace CoreTextTypeLayout
     };
 
     //==============================================================================
-    CFAttributedStringRef createCFAttributedString (const AttributedString& text)
+    static CFAttributedStringRef createCFAttributedString (const AttributedString& text)
     {
        #if JUCE_IOS
         CGColorSpaceRef rgbColourSpace = CGColorSpaceCreateDeviceRGB();
@@ -247,8 +247,8 @@ namespace CoreTextTypeLayout
         return attribString;
     }
 
-    void drawToCGContext (const AttributedString& text, const Rectangle<float>& area,
-                          const CGContextRef& context, const float flipHeight)
+    static void drawToCGContext (const AttributedString& text, const Rectangle<float>& area,
+                                 const CGContextRef& context, const float flipHeight)
     {
         CFAttributedStringRef attribString = CoreTextTypeLayout::createCFAttributedString (text);
         CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString (attribString);
@@ -267,7 +267,7 @@ namespace CoreTextTypeLayout
         CFRelease (frame);
     }
 
-    void createLayout (TextLayout& glyphLayout, const AttributedString& text)
+    static void createLayout (TextLayout& glyphLayout, const AttributedString& text)
     {
         CFAttributedStringRef attribString = CoreTextTypeLayout::createCFAttributedString (text);
         CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString (attribString);
