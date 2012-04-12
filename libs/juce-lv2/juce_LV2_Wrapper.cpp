@@ -371,7 +371,7 @@ String makePluginTtl(AudioProcessor* const filter)
           plugin += "        lv2:name \"" + filter->getParameterName(i) + "\" ;\n";
         else
           plugin += "        lv2:name \"Port " + String(i+1) + "\" ;\n";
-        plugin += "        lv2:default " + String(filter->getParameter(i)) + " ;\n";
+        plugin += "        lv2:default " + String(filter->getParameter(i), 8) + " ;\n";
         plugin += "        lv2:minimum 0.0 ;\n";
         plugin += "        lv2:maximum 1.0 ;\n";
 
@@ -400,7 +400,7 @@ String makePresetsTtl(AudioProcessor* const filter)
 {
     String presets;
 #if JucePlugin_WantsLV2State
-    presets += "@prefix atom: <http://lv2plug.in/ns/ext/atom#> .\n";
+    presets += "@prefix atom:  <http://lv2plug.in/ns/ext/atom#> .\n";
 #endif
     presets += "@prefix lv2:   <http://lv2plug.in/ns/lv2core#> .\n";
     presets += "@prefix pset:  <http://lv2plug.in/ns/ext/presets#> .\n";
@@ -458,7 +458,7 @@ String makePresetsTtl(AudioProcessor* const filter)
                 presets += "    [\n";
 
             presets += "        lv2:symbol \"" + nameToSymbol(filter->getParameterName(j), j) + "\" ;\n";
-            presets += "        pset:value \"" + String(filter->getParameter(j)) + "\"^^xsd:float ;\n";
+            presets += "        pset:value " + String(filter->getParameter(j), 8) + " ;\n";
 
             if (j+1 == filter->getNumParameters())
                 presets += "    ] ";
