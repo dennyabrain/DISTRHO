@@ -2,5 +2,3 @@
 
 libs/juce-2.0/audio-devices         - check if JUCE_WASAPI is valid on Windows XP
 libs/juce-2.0/audio-processors_full - fails to build on linux
-
-3BandEQ/PingPongPan - JUCE Assertion failure in ../source/modules/juce_audio_processors/processors/juce_AudioProcessor.cpp, line 151

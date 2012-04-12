@@ -15,13 +15,10 @@ namespace DistrhoIconArtwork
     const int           aboutnormal_light_pngSize = 8487;
 
     extern const char*  abouthover_dark_png;
-    const int           abouthover_dark_pngSize = 5750;
+    const int           abouthover_dark_pngSize = 4613;
 
     extern const char*  aboutnormal_dark_png;
     const int           aboutnormal_dark_pngSize = 4591;
-
-    extern const char*  distrhoiconartwork_cpp;
-    const int           distrhoiconartwork_cppSize = 98297;
 
 };
 
