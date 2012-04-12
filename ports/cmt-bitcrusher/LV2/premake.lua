@@ -42,6 +42,6 @@ package.includepaths = {
 package.files = {
   matchfiles (
     "../source/BitcrusherEditMain.cpp",
-    "../../../libs/distrho-ports/PluginLv2.cpp"
+    "../../../libs/distrho-ports/PluginLV2.cpp"
   )
 }
