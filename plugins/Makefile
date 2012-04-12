@@ -14,25 +14,31 @@ libs:
 
 standalone:
 	$(MAKE) -C 3BandEQ/Standalone
+	$(MAKE) -C PingPongPan/Standalone
 
 lv2:
 	$(MAKE) -C 3BandEQ/LV2
+	$(MAKE) -C PingPongPan/LV2
 	$(MAKE) -C StereoAudioGain/LV2
 
 vst:
 	$(MAKE) -C 3BandEQ/VST
+	$(MAKE) -C PingPongPan/VST
 	$(MAKE) -C JackAss/VST
 
 clean:
 	# Standalone
 	$(MAKE) clean -C 3BandEQ/Standalone
+	$(MAKE) clean -C PingPongPan/Standalone
 
 	# LV2
 	$(MAKE) clean -C 3BandEQ/LV2
+	$(MAKE) clean -C PingPongPan/LV2
 	$(MAKE) clean -C StereoAudioGain/LV2
 
 	# VST
 	$(MAKE) clean -C 3BandEQ/VST
+	$(MAKE) clean -C PingPongPan/VST
 	$(MAKE) clean -C JackAss/VST
 
 	rm -rf */Standalone/intermediate

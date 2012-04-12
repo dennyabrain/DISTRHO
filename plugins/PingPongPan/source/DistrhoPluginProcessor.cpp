@@ -2,9 +2,7 @@
 #include "DistrhoPluginProcessor.h"
 #include "DistrhoPluginEditor.h"
 
-#define AMP_DB 8.656170245f
-#define DC_ADD 1e-30f
-#define PI 3.141592654f
+#define c_2PI 6.283185307f
 
 #ifndef WINDOWS
 inline float abs (float x)
@@ -12,6 +10,13 @@ inline float abs (float x)
     return ( x<0 ? -x:x);
 }
 #endif
+
+inline float absmax (float x, float y)
+{
+    float absx = abs(x);
+    float absy = abs(y);
+    return (absx>absy ? absx : absy);
+}
 
 inline float min (float x, float y)
 {
@@ -26,26 +31,10 @@ inline float max (float x, float y)
 //==============================================================================
 DistrhoPluginAudioProcessor::DistrhoPluginAudioProcessor()
 {
-    // Default values
-    fLow = 0.5;
-    fMid = 0.5;
-    fHigh = 0.5;
-    fMaster = 0.5;
-    fLowMidFreq = 0.208706402;
-    fMidHighFreq = 0.436790232;
+    freqFader = 0.5f;
+    waveSpeed = (c_2PI/2) / getSampleRate();
 
-    // Internal stuff
-    lowVol = midVol = highVol = outVol = 1.0;
-    freqLP = 200;
-    freqHP = 2000;
-
-    xLP = a0LP = b1LP = 0;
-    xHP = a0HP = b1HP = 0;
-
-    out1LP = out2LP = out1HP = out2HP = 0;
-    tmp1LP = tmp2LP = tmp1HP = tmp2HP = 0;
-
-    initialized = false;
+    width = 0.75f;
 }
 
 DistrhoPluginAudioProcessor::~DistrhoPluginAudioProcessor()
@@ -67,18 +56,10 @@ float DistrhoPluginAudioProcessor::getParameter (int index)
 {
     switch (index)
     {
-      case pLow:
-        return fLow;
-      case pMid:
-        return fMid;
-      case pHigh:
-        return fHigh;
-      case pMaster:
-        return fMaster;
-      case pLowMidFreq:
-        return fLowMidFreq;
-      case pMidHighFreq:
-        return fMidHighFreq;
+      case pFreq:
+        return freqFader;
+      case pWidth:
+        return width;
     }
     return 0.0f;
 }
@@ -92,35 +73,12 @@ void DistrhoPluginAudioProcessor::setParameter (int index, float newValue)
 
     switch (index)
     {
-      case pLow:
-        fLow = newValue;
-        lowVol = exp( (fLow - 0.5f) * 48 / AMP_DB);
+      case pFreq:
+        freqFader = newValue;
+        waveSpeed = (c_2PI * freqFader)/getSampleRate();
         break;
-      case pMid:
-        fMid = newValue;
-        midVol = exp( (fMid - 0.5f) * 48 / AMP_DB);
-        break;
-      case pHigh:
-        fHigh = newValue;
-        highVol = exp( (fHigh - 0.5f) * 48 / AMP_DB);
-        break;
-      case pMaster:
-        fMaster = newValue;
-        outVol = exp( (fMaster - 0.5f) * 48 / AMP_DB);
-        break;
-      case pLowMidFreq:
-        fLowMidFreq = min(newValue, fMidHighFreq);
-        freqLP = fLowMidFreq * fLowMidFreq * fLowMidFreq * 24000.0f;
-        xLP  = exp(-2.0 * PI * freqLP / sampleRate);
-        a0LP = 1.0 - xLP;
-        b1LP = -xLP;
-        break;
-      case pMidHighFreq:
-        fMidHighFreq = max(newValue, fLowMidFreq);
-        freqHP = fMidHighFreq * fMidHighFreq * fMidHighFreq * 24000.0f;
-        xHP  = exp(-2.0 * PI * freqHP / sampleRate);
-        a0HP = 1.0 - xHP;
-        b1HP = -xHP;
+      case pWidth:
+        width = newValue;
         break;
     }
 }
@@ -129,18 +87,10 @@ const String DistrhoPluginAudioProcessor::getParameterName (int index)
 {
     switch (index)
     {
-      case pLow:
-        return "Low";
-      case pMid:
-        return "Mid";
-      case pHigh:
-        return "High";
-      case pMaster:
-        return "Master";
-      case pLowMidFreq:
-        return "Low-Mid Freq";
-      case pMidHighFreq:
-        return "Mid-High Freq";
+      case pFreq:
+        return "Frequency";
+      case pWidth:
+        return "Width";
     }
     return String::empty;
 }
@@ -149,18 +99,10 @@ const String DistrhoPluginAudioProcessor::getParameterText (int index)
 {
     switch (index)
     {
-      case pLow:
-        return String (log(lowVol)*AMP_DB, 1);
-      case pMid:
-        return String (log(midVol)*AMP_DB, 1);
-      case pHigh:
-        return String (log(highVol)*AMP_DB, 1);
-      case pMaster:
-        return String (log(outVol)*AMP_DB, 1);
-      case pLowMidFreq:
-        return String (freqLP, 0);
-      case pMidHighFreq:
-        return String (freqHP, 0);
+      case pFreq:
+        return String (freqFader, 3);
+      case pWidth:
+        return String (width*100, 0);
     }
     return String::empty;
 }
@@ -221,24 +163,10 @@ void DistrhoPluginAudioProcessor::changeProgramName (int index, const String& ne
 //==============================================================================
 void DistrhoPluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    if (initialized == false)
-    {
-        xLP  = exp(-2.0 * PI * freqLP / sampleRate);
-        a0LP = 1.0f - xLP;
-        b1LP = -xLP;
-
-        xHP  = exp(-2.0 * PI * freqHP / sampleRate);
-        a0HP = 1.0 - xHP;
-        b1HP = -xHP;
-    }
-    initialized = true;
 }
 
 void DistrhoPluginAudioProcessor::releaseResources()
 {
-    out1LP = out2LP = out1HP = out2HP = 0.0f;
-    tmp1LP = tmp2LP = tmp1HP = tmp2HP = 0.0f;
-    initialized = false;
 }
 
 void DistrhoPluginAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
@@ -253,14 +181,13 @@ void DistrhoPluginAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiB
 
     while (--sampleFrames >= 0)
     {
-        out1LP = (tmp1LP = a0LP * (*buf1) - b1LP * tmp1LP + DC_ADD) - DC_ADD;
-        out2LP = (tmp2LP = a0LP * (*buf2) - b1LP * tmp2LP + DC_ADD) - DC_ADD;
+        pan = min( max( (sin(wavePos)) * width, -1 ) , 1 );
 
-        out1HP = (*buf1) - (tmp1HP = a0HP * (*buf1) - b1HP * tmp1HP + DC_ADD) - DC_ADD;
-        out2HP = (*buf2) - (tmp2HP = a0HP * (*buf2) - b1HP * tmp2HP + DC_ADD) - DC_ADD;
+        if ((wavePos+=waveSpeed) >= c_2PI)
+          wavePos -= c_2PI;
 
-        (*buf1++) = (out1LP*lowVol + ((*buf1) - out1LP - out1HP) * midVol + out1HP * highVol)*outVol;
-        (*buf2++) = (out2LP*lowVol + ((*buf2) - out2LP - out2HP) * midVol + out2HP * highVol)*outVol;
+        (*buf1++) += (*buf1) * (pan > 0 ? 1-pan:1);
+        (*buf2++) += (*buf2) * (pan < 0 ? 1+pan:1);
     }
 
     // In case we have more outputs than inputs, we'll clear any output
@@ -286,14 +213,10 @@ AudioProcessorEditor* DistrhoPluginAudioProcessor::createEditor()
 //==============================================================================
 void DistrhoPluginAudioProcessor::getStateInformation (MemoryBlock& destData)
 {
-    XmlElement xml ("3BandEQ-Settings");
+    XmlElement xml ("PingPongPan-Settings");
 
-    xml.setAttribute ("Low", fLow);
-    xml.setAttribute ("Mid", fMid);
-    xml.setAttribute ("High", fHigh);
-    xml.setAttribute ("Master", fMaster);
-    xml.setAttribute ("LowMidFreq", fLowMidFreq);
-    xml.setAttribute ("MidHighFreq", fMidHighFreq);
+    xml.setAttribute ("Freq", freqFader);
+    xml.setAttribute ("Width", width);
 
     copyXmlToBinary (xml, destData);
 }
@@ -302,14 +225,10 @@ void DistrhoPluginAudioProcessor::setStateInformation (const void* data, int siz
 {
     ScopedPointer<XmlElement> xmlState (getXmlFromBinary (data, sizeInBytes));
 
-    if (xmlState != nullptr && xmlState->hasTagName ("3BandEQ-Settings"))
+    if (xmlState != nullptr && xmlState->hasTagName ("PingPongPan-Settings"))
     {
-        fLow  = (float) xmlState->getDoubleAttribute ("Low", fLow);
-        fMid  = (float) xmlState->getDoubleAttribute ("Mid", fMid);
-        fHigh  = (float) xmlState->getDoubleAttribute ("High", fHigh);
-        fMaster  = (float) xmlState->getDoubleAttribute ("Master", fMaster);
-        fLowMidFreq  = (float) xmlState->getDoubleAttribute ("LowMidFreq", fLowMidFreq);
-        fMidHighFreq  = (float) xmlState->getDoubleAttribute ("MidHighFreq", fMidHighFreq);
+        freqFader = (float) xmlState->getDoubleAttribute ("Freq", freqFader);
+        width     = (float) xmlState->getDoubleAttribute ("Width", width);
     }
 }
 

@@ -29,7 +29,7 @@ public:
 
         g.setColour (Colours::white);
         g.setFont (18.0f);
-        g.drawSingleLineText ("DISTRHO " JucePlugin_Name, 90, 50);
+        g.drawSingleLineText ("DISTRHO " JucePlugin_Desc, 90, 50);
 
         g.setFont (15.0f);
 #if JucePlugin_Build_AU
@@ -100,11 +100,25 @@ private:
 class DistrhoIcon : public Button
 {
 public:
-    DistrhoIcon()
-      : Button("DistrhoIcon")
+    enum IconColour {
+        ICON_LIGHT,
+        ICON_DARK
+    };
+
+    DistrhoIcon(IconColour colour_)
+      : Button("DistrhoIcon"),
+        colour(colour_)
     {
-        bNormal = ImageCache::getFromMemory (DistrhoIconArtwork::bnormal_png, DistrhoIconArtwork::bnormal_pngSize);
-        bHover  = ImageCache::getFromMemory (DistrhoIconArtwork::bhover_png, DistrhoIconArtwork::bhover_pngSize);
+        if (colour == ICON_LIGHT)
+        {
+            bNormal = ImageCache::getFromMemory (DistrhoIconArtwork::aboutnormal_light_png, DistrhoIconArtwork::aboutnormal_light_pngSize);
+            bHover  = ImageCache::getFromMemory (DistrhoIconArtwork::abouthover_light_png,  DistrhoIconArtwork::abouthover_light_pngSize);
+        }
+        else
+        {
+            bNormal = ImageCache::getFromMemory (DistrhoIconArtwork::aboutnormal_dark_png, DistrhoIconArtwork::aboutnormal_dark_pngSize);
+            bHover  = ImageCache::getFromMemory (DistrhoIconArtwork::abouthover_dark_png,  DistrhoIconArtwork::abouthover_dark_pngSize);
+        }
 
         bWidth  = bNormal.getWidth();
         bHeight = bNormal.getHeight();
@@ -130,13 +144,18 @@ public:
     void clicked()
     {
         Point<int> pos = getPosition();
-        aboutDialog->setTopLeftPosition(getScreenX()-200, getScreenY()-250);
+
+        if (colour == ICON_LIGHT)
+            aboutDialog->setTopLeftPosition(getScreenX()-200, getScreenY()-250);
+        else
+            aboutDialog->setTopLeftPosition(getScreenX(), getScreenY()-100);
 
         aboutDialog->addToDesktop();
         aboutDialog->enterModalState(true);
     }
 
 private:
+    IconColour colour;
     Image bNormal;
     Image bHover;
     AboutWindow* aboutDialog;

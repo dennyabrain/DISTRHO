@@ -54,7 +54,7 @@ DistrhoPluginAudioProcessorEditor::DistrhoPluginAudioProcessorEditor (DistrhoPlu
     sMidHighFreq->addListener (this);
     addAndMakeVisible (sMidHighFreq);
 
-    aboutLogo = new DistrhoIcon();
+    aboutLogo = new DistrhoIcon(DistrhoIcon::ICON_LIGHT);
     aboutLogo->setTopLeftPosition(250, 300);
     addAndMakeVisible (aboutLogo);
 
