@@ -35,8 +35,7 @@ end
 
 package.includepaths = {
   ".",
-  "../../juce-2.0/source",
-  "../../juce-2.0/source/modules/juce_core" -- fake include to simulate juced as if in juce modules dir
+  "../../juce-2.0/source"
 }
 
 package.files = {

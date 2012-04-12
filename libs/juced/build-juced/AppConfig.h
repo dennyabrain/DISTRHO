@@ -72,13 +72,13 @@
  Enables direct inclusion of the angelscript library.
  Enabled by default.
 */
-#define JUCETICE_INCLUDE_ANGELSCRIPT_CODE  1
+#define JUCETICE_INCLUDE_ANGELSCRIPT_CODE  0
 
 /** Config: JUCETICE_INCLUDE_CURL_CODE
  Enables direct inclusion of curl.
  
  // Currently not available //
 */
-#define JUCETICE_INCLUDE_CURL_CODE 1
+#define JUCETICE_INCLUDE_CURL_CODE 0
 
 #endif // __DISTRHO_JUCED_APPCONFIG_H__
