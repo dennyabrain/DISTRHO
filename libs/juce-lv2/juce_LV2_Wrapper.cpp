@@ -273,23 +273,23 @@ String makePluginTtl(AudioProcessor* const filter)
 #if (JucePlugin_WantsMidiInput || (JUCE_LV2_ENABLE_DEV_FEATURES && JucePlugin_WantsLV2TimePos))
     plugin += "    lv2:port [\n";
  #if JUCE_LV2_ENABLE_DEV_FEATURES
-    plugin += "      a lv2:InputPort, atom:AtomPort ;\n";
-    plugin += "      atom:bufferType atom:Sequence ;\n";
+    plugin += "        a lv2:InputPort, atom:AtomPort ;\n";
+    plugin += "        atom:bufferType atom:Sequence ;\n";
   #if JucePlugin_WantsLV2TimePos
-    plugin += "      atom:supports <" LV2_MIDI__MidiEvent "> ,\n";
+    plugin += "        atom:supports <" LV2_MIDI__MidiEvent "> ,\n";
     plugin += "                    <" LV2_TIME__Position "> ;\n";
   #else
-    plugin += "      atom:supports <" LV2_MIDI__MidiEvent "> ;\n";
+    plugin += "        atom:supports <" LV2_MIDI__MidiEvent "> ;\n";
   #endif
  #else
-    plugin += "      a lv2:InputPort, ev:EventPort ;\n";
-    plugin += "      ev:supportsEvent <" LV2_MIDI__MidiEvent "> ;\n";
+    plugin += "        a lv2:InputPort, ev:EventPort ;\n";
+    plugin += "        ev:supportsEvent <" LV2_MIDI__MidiEvent "> ;\n";
  #endif
-    plugin += "      lv2:index " + String(portIndex++) + " ;\n";
-    plugin += "      lv2:symbol \"lv2_events_in\" ;\n";
-    plugin += "      lv2:name \"Events Input\" ;\n";
+    plugin += "        lv2:index " + String(portIndex++) + " ;\n";
+    plugin += "        lv2:symbol \"lv2_events_in\" ;\n";
+    plugin += "        lv2:name \"Events Input\" ;\n";
  #if ! JucePlugin_IsSynth
-    plugin += "      lv2:portProperty lv2:connectionOptional ;\n";
+    plugin += "        lv2:portProperty lv2:connectionOptional ;\n";
  #endif
     plugin += "    ] ;\n\n";
 #endif
@@ -298,17 +298,17 @@ String makePluginTtl(AudioProcessor* const filter)
 #if JucePlugin_ProducesMidiOutput
     plugin += "    lv2:port [\n";
  #if JUCE_LV2_ENABLE_DEV_FEATURES
-    plugin += "      a lv2:OutputPort, atom:AtomPort ;\n";
-    plugin += "      atom:bufferType atom:Sequence ;\n";
-    plugin += "      atom:supports <" LV2_MIDI__MidiEvent "> ;\n";
+    plugin += "        a lv2:OutputPort, atom:AtomPort ;\n";
+    plugin += "        atom:bufferType atom:Sequence ;\n";
+    plugin += "        atom:supports <" LV2_MIDI__MidiEvent "> ;\n";
  #else
-    plugin += "      a lv2:OutputPort, ev:EventPort ;\n";
-    plugin += "      ev:supportsEvent <" LV2_MIDI__MidiEvent "> ;\n";
+    plugin += "        a lv2:OutputPort, ev:EventPort ;\n";
+    plugin += "        ev:supportsEvent <" LV2_MIDI__MidiEvent "> ;\n";
  #endif
-    plugin += "      lv2:index " + String(portIndex++) + " ;\n";
-    plugin += "      lv2:symbol \"lv2_events_out\" ;\n";
-    plugin += "      lv2:name \"Events Output\" ;\n";
-    plugin += "      lv2:portProperty lv2:connectionOptional ;\n";
+    plugin += "        lv2:index " + String(portIndex++) + " ;\n";
+    plugin += "        lv2:symbol \"lv2_events_out\" ;\n";
+    plugin += "        lv2:name \"Events Output\" ;\n";
+    plugin += "        lv2:portProperty lv2:connectionOptional ;\n";
     plugin += "    ] ;\n\n";
 #endif
 
@@ -319,10 +319,10 @@ String makePluginTtl(AudioProcessor* const filter)
         else
             plugin += "    [\n";
 
-        plugin += "      a lv2:InputPort, lv2:AudioPort ;\n";
-        plugin += "      lv2:index " + String(portIndex++) + " ;\n";
-        plugin += "      lv2:symbol \"lv2_audio_in_" + String(i+1) + "\" ;\n";
-        plugin += "      lv2:name \"Audio Input " + String(i+1) + "\" ;\n";
+        plugin += "        a lv2:InputPort, lv2:AudioPort ;\n";
+        plugin += "        lv2:index " + String(portIndex++) + " ;\n";
+        plugin += "        lv2:symbol \"lv2_audio_in_" + String(i+1) + "\" ;\n";
+        plugin += "        lv2:name \"Audio Input " + String(i+1) + "\" ;\n";
 
         if (i+1 == JucePlugin_MaxNumInputChannels)
             plugin += "    ] ;\n\n";
@@ -337,10 +337,10 @@ String makePluginTtl(AudioProcessor* const filter)
         else
             plugin += "    [\n";
 
-        plugin += "      a lv2:OutputPort, lv2:AudioPort ;\n";
-        plugin += "      lv2:index " + String(portIndex++) + " ;\n";
-        plugin += "      lv2:symbol \"lv2_audio_out_" + String(i+1) + "\" ;\n";
-        plugin += "      lv2:name \"Audio Output " + String(i+1) + "\" ;\n";
+        plugin += "        a lv2:OutputPort, lv2:AudioPort ;\n";
+        plugin += "        lv2:index " + String(portIndex++) + " ;\n";
+        plugin += "        lv2:symbol \"lv2_audio_out_" + String(i+1) + "\" ;\n";
+        plugin += "        lv2:name \"Audio Output " + String(i+1) + "\" ;\n";
 
         if (i+1 == JucePlugin_MaxNumOutputChannels)
             plugin += "    ] ;\n\n";
@@ -350,15 +350,15 @@ String makePluginTtl(AudioProcessor* const filter)
 
 #if JucePlugin_WantsLV2TimePos
     plugin += "    lv2:port [\n";
-    plugin += "      a lv2:InputPort, lv2:ControlPort ;\n";
-    plugin += "      lv2:index " + String(portIndex++) + " ;\n";
-    plugin += "      lv2:symbol \"lv2_time_bpm\" ;\n";
-    plugin += "      lv2:name \"LV2 BPM\" ;\n";
-    plugin += "      lv2:default 120.0 ;\n";
-    plugin += "      lv2:minimum 10.0 ;\n";
-    plugin += "      lv2:maximum 400.0 ;\n";
-    plugin += "      lv2:designation <http://lv2plug.in/ns/ext/time#beatsPerMinute> ;\n";
-    plugin += "      ue:unit ue:bpm ;\n";
+    plugin += "        a lv2:InputPort, lv2:ControlPort ;\n";
+    plugin += "        lv2:index " + String(portIndex++) + " ;\n";
+    plugin += "        lv2:symbol \"lv2_time_bpm\" ;\n";
+    plugin += "        lv2:name \"LV2 BPM\" ;\n";
+    plugin += "        lv2:default 120.0 ;\n";
+    plugin += "        lv2:minimum 10.0 ;\n";
+    plugin += "        lv2:maximum 400.0 ;\n";
+    plugin += "        lv2:designation <http://lv2plug.in/ns/ext/time#beatsPerMinute> ;\n";
+    plugin += "        ue:unit ue:bpm ;\n";
     plugin += "    ] ;\n\n";
 #endif
 
@@ -369,16 +369,16 @@ String makePluginTtl(AudioProcessor* const filter)
         else
             plugin += "    [\n";
 
-        plugin += "      a lv2:InputPort, lv2:ControlPort ;\n";
-        plugin += "      lv2:index " + String(portIndex++) + " ;\n";
-        plugin += "      lv2:symbol \"" + nameToSymbol(filter->getParameterName(i), i) + "\" ;\n";
+        plugin += "        a lv2:InputPort, lv2:ControlPort ;\n";
+        plugin += "        lv2:index " + String(portIndex++) + " ;\n";
+        plugin += "        lv2:symbol \"" + nameToSymbol(filter->getParameterName(i), i) + "\" ;\n";
         if (filter->getParameterName(i).isNotEmpty())
-          plugin += "      lv2:name \"" + filter->getParameterName(i) + "\" ;\n";
+          plugin += "        lv2:name \"" + filter->getParameterName(i) + "\" ;\n";
         else
-          plugin += "      lv2:name \"Port " + String(i+1) + "\" ;\n";
-        plugin += "      lv2:default " + String(filter->getParameter(i)) + " ;\n";
-        plugin += "      lv2:minimum 0.0 ;\n";
-        plugin += "      lv2:maximum 1.0 ;\n";
+          plugin += "        lv2:name \"Port " + String(i+1) + "\" ;\n";
+        plugin += "        lv2:default " + String(filter->getParameter(i)) + " ;\n";
+        plugin += "        lv2:minimum 0.0 ;\n";
+        plugin += "        lv2:maximum 1.0 ;\n";
 
         if (i+1 == filter->getNumParameters())
             plugin += "    ] ;\n\n";
@@ -387,11 +387,11 @@ String makePluginTtl(AudioProcessor* const filter)
     }
 
     plugin += "    lv2:port [\n";
-    plugin += "      a lv2:OutputPort, lv2:ControlPort ;\n";
-    plugin += "      lv2:index " + String(portIndex++) + " ;\n";
-    plugin += "      lv2:symbol \"lv2_latency\" ;\n";
-    plugin += "      lv2:name \"Latency\" ;\n";
-    plugin += "      lv2:portProperty lv2:reportsLatency ;\n";
+    plugin += "        a lv2:OutputPort, lv2:ControlPort ;\n";
+    plugin += "        lv2:index " + String(portIndex++) + " ;\n";
+    plugin += "        lv2:symbol \"lv2_latency\" ;\n";
+    plugin += "        lv2:name \"Latency\" ;\n";
+    plugin += "        lv2:portProperty lv2:reportsLatency ;\n";
     plugin += "    ] ;\n\n";
 
     plugin += "    doap:name \"" JucePlugin_Name "\" ;\n";
@@ -404,8 +404,14 @@ String makePluginTtl(AudioProcessor* const filter)
 String makePresetsTtl(AudioProcessor* const filter)
 {
     String presets;
+#if JucePlugin_WantsLV2State
+    presets += "@prefix atom: <http://lv2plug.in/ns/ext/atom#> .\n";
+#endif
     presets += "@prefix lv2:   <http://lv2plug.in/ns/lv2core#> .\n";
     presets += "@prefix pset:  <http://lv2plug.in/ns/ext/presets#> .\n";
+#if JucePlugin_WantsLV2State
+    presets += "@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n";
+#endif
     presets += "@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .\n";
 #if JucePlugin_WantsLV2StateString
     presets += "@prefix state: <http://lv2plug.in/ns/ext/state#> .\n";
@@ -438,8 +444,10 @@ String makePresetsTtl(AudioProcessor* const filter)
         filter->getCurrentProgramStateInformation(chunkMemory);
         const String chunkString = Base64Encode(chunkMemory);
 
-        presets += "        <" JUCE_LV2_STATE_BINARY_URI ">\n";
-        presets += "\"" + chunkString + "\"^^xsd:base64Binary\n";
+        presets += "        <" JUCE_LV2_STATE_BINARY_URI "> [\n";
+        presets += "            a atom:Chunk ;\n";
+        presets += "            rdf:value\"\"\"" + chunkString + "\"\"\"^^xsd:base64Binary\n";
+        presets += "        ]\n";
  #endif
         if (filter->getNumParameters() > 0)
             presets += "    ] ;\n\n";
@@ -1697,14 +1705,14 @@ LV2_State_Status juceLV2_Save(LV2_Handle instance, LV2_State_Store_Function stor
            uridMap->map(uridMap->handle, JUCE_LV2_STATE_BINARY_URI),
            chunkMemory.getData(),
            chunkMemory.getSize(),
-           uridMap->map(uridMap->handle, JUCE_LV2_STATE_BINARY_URI),
+           uridMap->map(uridMap->handle, LV2_ATOM__Chunk),
            LV2_STATE_IS_POD|LV2_STATE_IS_PORTABLE);
  #endif
 
     return LV2_STATE_SUCCESS;
 }
 
-LV2_State_Status juceLV2_Restore(LV2_Handle instance, LV2_State_Retrieve_Function retrieve, LV2_State_Handle handle, uint32_t flags, const LV2_Feature* const* /*features*/)
+LV2_State_Status juceLV2_Restore(LV2_Handle instance, LV2_State_Retrieve_Function retrieve, LV2_State_Handle handle, uint32_t flags, const LV2_Feature* const* features)
 {
     JuceLV2Wrapper* wrapper = (JuceLV2Wrapper*)instance;
     jassert(wrapper);
@@ -1727,14 +1735,14 @@ LV2_State_Status juceLV2_Restore(LV2_Handle instance, LV2_State_Retrieve_Functio
         String stateData = String(CharPointer_UTF8(static_cast<const char*>(data)));
         wrapper->setStateString(stateData);
  #else
-    if (type == uridMap->map(uridMap->handle, JUCE_LV2_STATE_BINARY_URI))
+    if (type == uridMap->map(uridMap->handle, LV2_ATOM__Chunk))
     {
         wrapper->setStateBinary(data, size);
  #endif
         return LV2_STATE_SUCCESS;
     }
-    else
-        return LV2_STATE_ERR_BAD_TYPE;
+
+    return LV2_STATE_ERR_BAD_TYPE;
 }
 #endif
 
