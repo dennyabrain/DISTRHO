@@ -186,8 +186,8 @@ void DistrhoPluginAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiB
         if ((wavePos+=waveSpeed) >= c_2PI)
           wavePos -= c_2PI;
 
-        (*buf1++) += (*buf1) * (pan > 0 ? 1-pan:1);
-        (*buf2++) += (*buf2) * (pan < 0 ? 1+pan:1);
+        (*buf1++) = (*buf1) * (pan > 0 ? 1-pan:1);
+        (*buf2++) = (*buf2) * (pan < 0 ? 1+pan:1);
     }
 
     // In case we have more outputs than inputs, we'll clear any output
