@@ -36,6 +36,8 @@
 // and your header search path must make it accessible to the module's files.
 #include "AppConfig.h"
 
+#include <stdint.h>
+
 //#include "../juce_core/native/juce_BasicNativeHeaders.h"
 #include "juced.h"
 

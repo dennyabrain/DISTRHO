@@ -58,11 +58,11 @@ Gnuplot::Gnuplot() :
     return;
   }
 
-  printf ("Gnuplot executable found at '%s'.\n", (const char*) file.getFullPathName ());
+  printf ("Gnuplot executable found at '%s'.\n", (const char*) file.getFullPathName().toUTF8());
   printf ("Opening pipe to Gnuplot\n");
 
   String fileName = file.getFullPathName ();
-  mGnuPipe = ::popen ((const char*) (fileName + " -persist"), "w"); //Changed 'rw' to 'w'
+  mGnuPipe = ::popen ((const char*) (fileName + " -persist").toUTF8(), "w"); //Changed 'rw' to 'w'
   if (mGnuPipe==0)
   {
     printf ("Couldn't open connection to gnuplot\n");
@@ -337,7 +337,7 @@ void Gnuplot::setLineStyles()
 void Gnuplot::execute(const String& cmdstr) const
 {
   DBG ("Command sent to Gnuplot: " + cmdstr);
-  ::fputs ((const char*) (cmdstr+"\n"), (FILE*) mGnuPipe);
+  ::fputs ((const char*) (cmdstr+"\n").toUTF8(), (FILE*) mGnuPipe);
   ::fflush ((FILE*) mGnuPipe);
 
   Thread::sleep (1000);
