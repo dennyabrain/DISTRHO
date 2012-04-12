@@ -39,6 +39,8 @@ private:
     Image sliderImage;
     Image backgroundImage;
 
+    Array<int> slidersDraggedList;
+
     DistrhoPluginAudioProcessor* getProcessor() const
     {
         return static_cast <DistrhoPluginAudioProcessor*> (getAudioProcessor());

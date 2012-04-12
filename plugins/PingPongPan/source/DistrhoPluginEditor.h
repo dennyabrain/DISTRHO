@@ -34,6 +34,8 @@ private:
     Image knobImage;
     Image backgroundImage;
 
+    Array<int> slidersDraggedList;
+
     DistrhoPluginAudioProcessor* getProcessor() const
     {
         return static_cast <DistrhoPluginAudioProcessor*> (getAudioProcessor());

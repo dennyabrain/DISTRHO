@@ -64,6 +64,7 @@ DistrhoPluginAudioProcessorEditor::DistrhoPluginAudioProcessorEditor (DistrhoPlu
 DistrhoPluginAudioProcessorEditor::~DistrhoPluginAudioProcessorEditor()
 {
     stopTimer ();
+    slidersDraggedList.clear();
 
     delete sLow;
     delete sMid;
@@ -110,8 +111,9 @@ void DistrhoPluginAudioProcessorEditor::sliderValueChanged (Slider* caller)
 void DistrhoPluginAudioProcessorEditor::sliderDragStarted (Slider* caller)
 {
     NamedValueSet values = caller->getProperties();
-    if (values.contains(Identifier("index")))
+    if (values.contains(Identifier("index")) && ! slidersDraggedList.contains(values["index"]))
     {
+        slidersDraggedList.add(values["index"]);
         DistrhoPluginAudioProcessor* const ourProcessor = getProcessor();
         ourProcessor->beginParameterChangeGesture(values["index"]);
     }
@@ -120,8 +122,9 @@ void DistrhoPluginAudioProcessorEditor::sliderDragStarted (Slider* caller)
 void DistrhoPluginAudioProcessorEditor::sliderDragEnded (Slider* caller)
 {
     NamedValueSet values = caller->getProperties();
-    if (values.contains(Identifier("index")))
+    if (values.contains(Identifier("index")) && slidersDraggedList.contains(values["index"]))
     {
+        slidersDraggedList.removeValue(values["index"]);
         DistrhoPluginAudioProcessor* const ourProcessor = getProcessor();
         ourProcessor->endParameterChangeGesture(values["index"]);
     }
