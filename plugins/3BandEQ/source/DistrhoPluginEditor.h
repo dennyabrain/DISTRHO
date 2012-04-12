@@ -20,6 +20,8 @@ public:
     //==============================================================================
     void paint (Graphics& g);
     void sliderValueChanged (Slider* caller);
+    void sliderDragStarted (Slider* caller);
+    void sliderDragEnded (Slider* caller);
 
     //==============================================================================
     void timerCallback();

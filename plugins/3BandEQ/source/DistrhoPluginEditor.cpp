@@ -107,6 +107,26 @@ void DistrhoPluginAudioProcessorEditor::sliderValueChanged (Slider* caller)
     }
 }
 
+void DistrhoPluginAudioProcessorEditor::sliderDragStarted (Slider* caller)
+{
+    NamedValueSet values = caller->getProperties();
+    if (values.contains(Identifier("index")))
+    {
+        DistrhoPluginAudioProcessor* const ourProcessor = getProcessor();
+        ourProcessor->beginParameterChangeGesture(values["index"]);
+    }
+}
+
+void DistrhoPluginAudioProcessorEditor::sliderDragEnded (Slider* caller)
+{
+    NamedValueSet values = caller->getProperties();
+    if (values.contains(Identifier("index")))
+    {
+        DistrhoPluginAudioProcessor* const ourProcessor = getProcessor();
+        ourProcessor->endParameterChangeGesture(values["index"]);
+    }
+}
+
 //==============================================================================
 void DistrhoPluginAudioProcessorEditor::timerCallback()
 {
