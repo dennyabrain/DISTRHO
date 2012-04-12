@@ -24,7 +24,6 @@
 * This macro enables currently development/unstable features of LV2, use with care.
 * Features are:
 * - atom based MIDI and Time-Pos
-* - X11 UI
 */
 #define JUCE_LV2_ENABLE_DEV_FEATURES 1
 
@@ -36,10 +35,6 @@
  * - JucePlugin_WantsLV2TimePos
  * - JucePlugin_WantsLV2InstanceAccess (UI)
  */
-
-#if (JUCE_LINUX && JUCE_LV2_ENABLE_DEV_FEATURES)
- #define JucePlugin_WantsLV2X11UI 1
-#endif
 
 #if JUCE_LINUX
  #include <X11/Xlib.h>
@@ -196,7 +191,7 @@ String makeManifestTtl(AudioProcessor* const filter, const String& binary)
 #endif
         manifest += "\n";
 
-#if JucePlugin_WantsLV2X11UI
+#if JUCE_LINUX
         manifest += "<" JucePlugin_LV2URI "#X11UI>\n";
         manifest += "    a ui:X11UI ;\n";
         manifest += "    ui:binary <" + binary + PLUGIN_EXT "> ;\n";
@@ -258,7 +253,7 @@ String makePluginTtl(AudioProcessor* const filter)
     {
         plugin += "    ui:ui <" JucePlugin_LV2URI "#ExternalUI> ,\n";
         plugin += "          <" JucePlugin_LV2URI "#ExternalOldUI> ";
-#if JucePlugin_WantsLV2X11UI
+#if JUCE_LINUX
         plugin += ",\n";
         plugin += "          <" JucePlugin_LV2URI "#X11UI> ;\n";
 #else
@@ -719,7 +714,7 @@ private:
 /**
     Juce LV2 X11 UI container, listens for resize events and passes them to ui-resize
 */
-#if JucePlugin_WantsLV2X11UI
+#if JUCE_LINUX
 class JuceLV2X11Container : public Component
 {
 public:
@@ -787,7 +782,7 @@ public:
             writeFunction (writeFunction_),
             controller (controller_),
             uiType (uiType_),
-#if JucePlugin_WantsLV2X11UI
+#if JUCE_LINUX
             x11Container (nullptr),
             uiResizeFeature (nullptr),
 #endif
@@ -804,7 +799,7 @@ public:
         {
             switch (uiType)
             {
-#if JucePlugin_WantsLV2X11UI
+#if JUCE_LINUX
             case UI_X11:
                 resetX11UI (features);
 
@@ -866,7 +861,7 @@ public:
 
         filter->removeListener(this);
 
-#if JucePlugin_WantsLV2X11UI
+#if JUCE_LINUX
         if (x11Container)
             delete x11Container;
 #endif
@@ -910,7 +905,7 @@ public:
 #if JucePlugin_WantsLV2InstanceAccess
         if (uiType == UI_X11)
         {
- #if JucePlugin_WantsLV2X11UI
+ #if JUCE_LINUX
             if (x11Container && x11Container->isOnDesktop())
                 x11Container->removeFromDesktop();
  #endif
@@ -955,7 +950,7 @@ public:
 
         if (uiType == UI_X11)
         {
-#if JucePlugin_WantsLV2X11UI
+#if JUCE_LINUX
             resetX11UI (features);
             *widget = x11Container->getWindowHandle();
 #endif
@@ -983,7 +978,7 @@ private:
     LV2UI_Controller controller;
     const UIType uiType;
 
-#if JucePlugin_WantsLV2X11UI
+#if JUCE_LINUX
     JuceLV2X11Container* x11Container;
     LV2UI_Resize* uiResizeFeature;
 #endif
@@ -994,7 +989,7 @@ private:
     uint32 controlPortOffset;
 
     //==============================================================================
-#if JucePlugin_WantsLV2X11UI
+#if JUCE_LINUX
     void resetX11UI(const LV2_Feature* const* features)
     {
         void* parent = nullptr;
@@ -1931,7 +1926,7 @@ static const LV2UI_Descriptor JuceLv2UI_X11 = {
             return &JuceLv2UI_External;
           case 1:
             return &JuceLv2UI_ExternalOld;
-#if JucePlugin_WantsLV2X11UI
+#if JUCE_LINUX
           case 2:
             return &JuceLv2UI_X11;
 #endif
