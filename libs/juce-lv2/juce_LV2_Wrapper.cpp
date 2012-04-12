@@ -788,7 +788,8 @@ public:
 #endif
             externalUI (nullptr),
             externalUIHost (nullptr),
-            externalUIPos (100, 100)
+            externalUIPos (100, 100),
+            uiTouch (nullptr)
     {
         filter->addListener(this);
 
@@ -797,6 +798,16 @@ public:
 
         if (editor)
         {
+            // Get UI Touch feature
+            for (uint32 i = 0; features[i]; i++)
+            {
+                if (strcmp(features[i]->URI, LV2_UI__touch) == 0 && features[i]->data)
+                {
+                    uiTouch = (LV2UI_Touch*)features[i]->data;
+                    break;
+                }
+            }
+
             switch (uiType)
             {
 #if JUCE_LINUX
@@ -925,6 +936,18 @@ public:
 
     void audioProcessorChanged (AudioProcessor*) {}
 
+    void audioProcessorParameterChangeGestureBegin (AudioProcessor*, int parameterIndex)
+    {
+        if (uiTouch)
+            uiTouch->touch(uiTouch->handle, parameterIndex + controlPortOffset, true);
+    }
+
+    void audioProcessorParameterChangeGestureEnd (AudioProcessor*, int parameterIndex)
+    {
+        if (uiTouch)
+            uiTouch->touch(uiTouch->handle, parameterIndex + controlPortOffset, false);
+    }
+
     void timerCallback()
     {
         if (externalUI && externalUI->isClosed())
@@ -980,6 +1003,8 @@ private:
     ScopedPointer<JuceLV2ExternalUIWrapper> externalUI;
     lv2_external_ui_host* externalUIHost;
     Point<int> externalUIPos;
+
+    LV2UI_Touch* uiTouch;
 
     uint32 controlPortOffset;
 
@@ -1699,7 +1724,7 @@ LV2_State_Status juceLV2_Save(LV2_Handle instance, LV2_State_Store_Function stor
     return LV2_STATE_SUCCESS;
 }
 
-LV2_State_Status juceLV2_Restore(LV2_Handle instance, LV2_State_Retrieve_Function retrieve, LV2_State_Handle handle, uint32_t flags, const LV2_Feature* const* features)
+LV2_State_Status juceLV2_Restore(LV2_Handle instance, LV2_State_Retrieve_Function retrieve, LV2_State_Handle handle, uint32_t flags, const LV2_Feature* const* /*features*/)
 {
     JuceLV2Wrapper* wrapper = (JuceLV2Wrapper*)instance;
     jassert(wrapper);
