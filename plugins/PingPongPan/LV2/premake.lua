@@ -1,5 +1,5 @@
 
-project.name    = "PingPongPan.lv2/PingPongPan"
+project.name    = "PingPongPan.lv2/Ping_Pong_Pan"
 project.bindir  = "../../../bin"
 project.libdir  = project.bindir
 project.configs = { "Release", "Debug" }

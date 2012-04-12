@@ -11,7 +11,7 @@
 #ifndef __JUCEPLUGINCHARACTERISTICS_H__
 #define __JUCEPLUGINCHARACTERISTICS_H__
 
-#define JucePlugin_Name                 "PingPongPan"
+#define JucePlugin_Name                 "Ping Pong Pan"
 #define JucePlugin_Desc                 "Ping Pong Pan"
 #define JucePlugin_Manufacturer         "DISTRHO"
 #define JucePlugin_ManufacturerCode     'DIST'

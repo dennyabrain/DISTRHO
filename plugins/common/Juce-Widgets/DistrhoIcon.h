@@ -29,7 +29,7 @@ public:
 
         g.setColour (Colours::white);
         g.setFont (18.0f);
-        g.drawSingleLineText ("DISTRHO " JucePlugin_Desc, 90, 50);
+        g.drawSingleLineText ("DISTRHO " JucePlugin_Name, 90, 50);
 
         g.setFont (15.0f);
 #if JucePlugin_Build_AU
