@@ -637,7 +637,7 @@ public:
     {
         if (window->isOnDesktop())
             window->removeFromDesktop();
-        delete window;
+
         window = nullptr;
     }
 
@@ -705,7 +705,7 @@ public:
     }
 
 private:
-    JuceLV2ExternalUIWindow* window;
+    ScopedPointer<JuceLV2ExternalUIWindow> window;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (JuceLV2ExternalUIWrapper);
 };
@@ -862,19 +862,14 @@ public:
         filter->removeListener(this);
 
 #if JUCE_LINUX
-        if (x11Container)
-            delete x11Container;
+        x11Container = nullptr;
 #endif
-        if (externalUI)
-            delete externalUI;
-
         externalUI = nullptr;
         externalUIHost = nullptr;
 
         if (editor)
         {
             filter->editorBeingDeleted(editor);
-            delete editor;
             editor = nullptr;
         }
 
@@ -972,17 +967,17 @@ public:
 
 private:
     AudioProcessor* const filter;
-    AudioProcessorEditor* editor;
+    ScopedPointer<AudioProcessorEditor> editor;
 
     LV2UI_Write_Function writeFunction;
     LV2UI_Controller controller;
     const UIType uiType;
 
 #if JUCE_LINUX
-    JuceLV2X11Container* x11Container;
+    ScopedPointer<JuceLV2X11Container> x11Container;
     LV2UI_Resize* uiResizeFeature;
 #endif
-    JuceLV2ExternalUIWrapper* externalUI;
+    ScopedPointer<JuceLV2ExternalUIWrapper> externalUI;
     lv2_external_ui_host* externalUIHost;
     Point<int> externalUIPos;
 
@@ -1120,7 +1115,6 @@ public:
 
     ~JuceLV2Wrapper()
     {
-        delete filter;
         filter = nullptr;
 
         channels.free();
@@ -1455,11 +1449,7 @@ public:
     void doCleanup()
     {
 #if JucePlugin_WantsLV2InstanceAccess
-        if (ui)
-        {
-            delete ui;
-            ui = nullptr;
-        }
+        ui = nullptr;
 #endif
     }
 
@@ -1549,6 +1539,7 @@ public:
         return uridMap;
     }
 
+#if JucePlugin_WantsLV2InstanceAccess
     JuceLV2UIWrapper* getUI(LV2UI_Write_Function writeFunction, LV2UI_Controller controller, LV2UI_Widget* widget, const LV2_Feature* const* features, JuceLV2UIWrapper::UIType uiType)
     {
         if (ui)
@@ -1557,11 +1548,12 @@ public:
             ui = new JuceLV2UIWrapper(filter, writeFunction, controller, widget, features, uiType);
         return ui;
     }
+#endif
 
     //==============================================================================
 private:
-    AudioProcessor* filter;
-    JuceLV2UIWrapper* ui;
+    ScopedPointer<AudioProcessor> filter;
+    ScopedPointer<JuceLV2UIWrapper> ui;
     MidiBuffer midiEvents;
     int numInChans, numOutChans;
     bool isProcessing, firstProcessCallback;
