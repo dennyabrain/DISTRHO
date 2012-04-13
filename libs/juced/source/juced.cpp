@@ -38,7 +38,7 @@
 
 #include <stdint.h>
 
-//#include "../juce_core/native/juce_BasicNativeHeaders.h"
+#include "../../juce-2.0/source/modules/juce_core/native/juce_BasicNativeHeaders.h"
 #include "juced.h"
 
 // START_AUTOINCLUDE

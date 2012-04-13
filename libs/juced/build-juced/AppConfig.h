@@ -15,7 +15,6 @@
 #include "../build-audio-processors/AppConfig.h"
 #include "../build-audio-utils/AppConfig.h"
 #include "../build-core/AppConfig.h"
-#include "../build-cryptography/AppConfig.h"
 #include "../build-data-structures/AppConfig.h"
 #include "../build-events/AppConfig.h"
 #include "../build-graphics/AppConfig.h"
