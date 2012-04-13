@@ -10,11 +10,6 @@
 // and your header search path must make it accessible to the module's files.
 #include "AppConfig.h"
 
-#if 1 // TODO - remove me
-#include "JucePluginMain.h"
-//#include "JucePluginCharacteristics.h"
-#endif
-
 #include "utility/juce_CheckSettingMacros.h"
 
 #if JucePlugin_Build_LV2

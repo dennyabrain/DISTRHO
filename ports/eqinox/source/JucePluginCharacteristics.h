@@ -26,41 +26,39 @@
  ==============================================================================
 */
 
-#ifndef __JUCETICE_XSYNTH_PLUGIN_CHARACTERISTICS_H__
-#define __JUCETICE_XSYNTH_PLUGIN_CHARACTERISTICS_H__
+#ifndef __JUCETICE_EQINOX_PLUGIN_CHARACTERISTICS_H__
+#define __JUCETICE_EQINOX_PLUGIN_CHARACTERISTICS_H__
 
-#define JucePlugin_Name                     "Capsaicin"
-#define JucePlugin_Desc                     "Hot-Spicy synth"
+#define JucePlugin_Name                     "EQinox"
+#define JucePlugin_Desc                     "6band EQualizer"
 #define JucePlugin_Manufacturer             "kRAkEn/gORe"
 #define JucePlugin_ManufacturerCode         'kNGr'
-#define JucePlugin_PluginCode               'jcp0'
-#define JucePlugin_MaxNumInputChannels              0
+#define JucePlugin_PluginCode               'jeq0'
+#define JucePlugin_MaxNumInputChannels              2
 #define JucePlugin_MaxNumOutputChannels             2
-#define JucePlugin_PreferredChannelConfigurations   { 0, 1 }, { 0, 2 }
-#define JucePlugin_IsSynth                          1
+#define JucePlugin_PreferredChannelConfigurations   { 1, 1 }, { 2, 2 }
+#define JucePlugin_IsSynth                          0
 #define JucePlugin_WantsMidiInput                   1
 #define JucePlugin_ProducesMidiOutput               0
 #define JucePlugin_TailLengthSeconds                0
-#define JucePlugin_SilenceInProducesSilenceOut      0
+#define JucePlugin_SilenceInProducesSilenceOut      1
 #define JucePlugin_EditorRequiresKeyboardFocus      1
 
-#define JucePlugin_VersionCode              0x00000101
-#define JucePlugin_VersionString            "0.1.1"
+#define JucePlugin_VersionCode              0x00000205
+#define JucePlugin_VersionString            "0.2.5"
 #define JucePlugin_VSTUniqueID              JucePlugin_PluginCode
-#define JucePlugin_VSTCategory              kPlugCategSynth
-#define JucePlugin_AUMainType               kAudioUnitType_MusicDevice
+#define JucePlugin_VSTCategory              kPlugCategEffect
+#define JucePlugin_AUMainType               kAudioUnitType_Effect
 #define JucePlugin_AUSubType                JucePlugin_PluginCode
-#define JucePlugin_AUExportPrefix           capsaicinAU
-#define JucePlugin_AUExportPrefixQuoted     "capsaicinAU"
+#define JucePlugin_AUExportPrefix           JuceDemoAU
+#define JucePlugin_AUExportPrefixQuoted     "JuceDemoAU"
 #define JucePlugin_AUManufacturerCode       JucePlugin_ManufacturerCode
-#define JucePlugin_RTASCategory             ePlugInCategory_SWGenerators
+#define JucePlugin_RTASCategory             ePlugInCategory_None
 #define JucePlugin_RTASManufacturerCode     JucePlugin_ManufacturerCode
 #define JucePlugin_RTASProductId            JucePlugin_PluginCode
 
-#define JucePlugin_LV2URI                   "urn:juced:Capsaicin"
-#define JucePlugin_LV2Category              "InstrumentPlugin"
-#define JucePlugin_WantsLV2State            1
-#define JucePlugin_WantsLV2InstanceAccess   1
+#define JucePlugin_LV2URI                   "urn:juced:EQinox"
+#define JucePlugin_LV2Category              "EQPlugin"
 
 //==============================================================================
 
