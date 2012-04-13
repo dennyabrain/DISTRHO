@@ -117,6 +117,8 @@ const String getPluginType()
     return pluginType;
 }
 
+static Array<String> usedSymbols;
+
 /** Converts a parameter name to an LV2 compatible symbol. */
 String nameToSymbol(const String& name, const uint32 portIndex)
 {
@@ -140,7 +142,37 @@ String nameToSymbol(const String& name, const uint32 portIndex)
                 symbol += "_";
         }
     }
+
+    // Do not allow identical symbols
+    if (usedSymbols.contains(symbol))
+    {
+        int offset = 2;
+        String offsetStr = "_2";
+        symbol += offsetStr;
+
+        while (usedSymbols.contains(symbol))
+        {
+            offset += 1;
+            String newOffsetStr = "_" + String(offset);
+            symbol = symbol.replace(offsetStr, newOffsetStr);
+            offsetStr = newOffsetStr;
+        }
+    }
+    usedSymbols.add(symbol);
+
     return symbol;
+}
+
+/** Prevents NaN or out of 0.0<->1.0 bounds parameter values. */
+float safeParamValue(float value)
+{
+    if (isnan(value))
+      value = 0.0f;
+    else if (value < 0.0f)
+      value = 0.0f;
+    else if (value > 0.0f)
+      value = 1.0f;
+    return value;
 }
 
 /** Create the manifest.ttl contents */
@@ -366,7 +398,7 @@ String makePluginTtl(AudioProcessor* const filter)
           plugin += "        lv2:name \"" + filter->getParameterName(i) + "\" ;\n";
         else
           plugin += "        lv2:name \"Port " + String(i+1) + "\" ;\n";
-        plugin += "        lv2:default " + String(filter->getParameter(i), 8) + " ;\n";
+        plugin += "        lv2:default " + String(safeParamValue(filter->getParameter(i)), 8) + " ;\n";
         plugin += "        lv2:minimum 0.0 ;\n";
         plugin += "        lv2:maximum 1.0 ;\n";
 
