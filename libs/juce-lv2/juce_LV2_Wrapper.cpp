@@ -485,7 +485,7 @@ String makePresetsTtl(AudioProcessor* const filter)
                 presets += "    [\n";
 
             presets += "        lv2:symbol \"" + nameToSymbol(filter->getParameterName(j), j) + "\" ;\n";
-            presets += "        pset:value " + String(filter->getParameter(j), 8) + " ;\n";
+            presets += "        pset:value " + String(safeParamValue(filter->getParameter(j)), 8) + " ;\n";
 
             if (j+1 == filter->getNumParameters())
                 presets += "    ] ";
