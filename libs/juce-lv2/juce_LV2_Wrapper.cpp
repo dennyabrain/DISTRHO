@@ -45,16 +45,19 @@
 #include "includes/lv2.h"
 #include "includes/instance-access.h"
 #include "includes/midi.h"
+#include "includes/port-props.h"
+#include "includes/presets.h"
 #include "includes/state.h"
-#include "includes/urid.h"
+#include "includes/time.h"
 #include "includes/ui.h"
+#include "includes/units.h"
+#include "includes/urid.h"
 
 #include "includes/lv2_external_ui.h"
 
 #if JUCE_LV2_ENABLE_DEV_FEATURES
  #include "includes/atom.h"
  #include "includes/atom-util.h"
- #include "includes/time.h"
 #else
  #define LV2_ATOM__String "http://lv2plug.in/ns/ext/atom#String"
  #include "includes/event.h"
@@ -179,13 +182,13 @@ float safeParamValue(float value)
 String makeManifestTtl(AudioProcessor* const filter, const String& binary)
 {
     String manifest;
-    manifest += "@prefix lv2:  <http://lv2plug.in/ns/lv2core#> .\n";
+    manifest += "@prefix lv2:  <" LV2_CORE_PREFIX "> .\n";
 #if JucePlugin_WantsLV2Presets
-    manifest += "@prefix pset: <http://lv2plug.in/ns/ext/presets#> .\n";
+    manifest += "@prefix pset: <" LV2_PRESETS_PREFIX "> .\n";
 #endif
     manifest += "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\n";
     if (filter->hasEditor())
-        manifest += "@prefix ui:   <http://lv2plug.in/ns/extensions/ui#> .\n";
+        manifest += "@prefix ui:   <" LV2_UI_PREFIX "> .\n";
     manifest += "\n";
 
     manifest += "<" JucePlugin_LV2URI ">\n";
@@ -201,7 +204,7 @@ String makeManifestTtl(AudioProcessor* const filter, const String& binary)
         manifest += "    ui:binary <" + binary + PLUGIN_EXT "> ";
 #if JucePlugin_WantsLV2InstanceAccess
         manifest += ";\n";
-        manifest += "    ui:requiredFeature <" LV2_INSTANCE_ACCESS_URI "> .\n";
+        manifest += "    lv2:requiredFeature <" LV2_INSTANCE_ACCESS_URI "> .\n";
 #else
         manifest += ".\n";
 #endif
@@ -212,7 +215,7 @@ String makeManifestTtl(AudioProcessor* const filter, const String& binary)
         manifest += "    ui:binary <" + binary + PLUGIN_EXT "> ";
 #if JucePlugin_WantsLV2InstanceAccess
         manifest += ";\n";
-        manifest += "    ui:requiredFeature <" LV2_INSTANCE_ACCESS_URI "> .\n";
+        manifest += "    lv2:requiredFeature <" LV2_INSTANCE_ACCESS_URI "> .\n";
 #else
         manifest += ".\n";
 #endif
@@ -223,9 +226,9 @@ String makeManifestTtl(AudioProcessor* const filter, const String& binary)
         manifest += "    a ui:X11UI ;\n";
         manifest += "    ui:binary <" + binary + PLUGIN_EXT "> ;\n";
  #if JucePlugin_WantsLV2InstanceAccess
-        manifest += "    ui:requiredFeature <" LV2_INSTANCE_ACCESS_URI "> ;\n";
+        manifest += "    lv2:requiredFeature <" LV2_INSTANCE_ACCESS_URI "> ;\n";
  #endif
-        manifest += "    ui:optionalFeature ui:noUserResize .\n";
+        manifest += "    lv2:optionalFeature ui:noUserResize .\n";
         manifest += "\n";
 #endif
     }
@@ -249,19 +252,19 @@ String makePluginTtl(AudioProcessor* const filter)
 {
     String plugin;
 #if (JUCE_LV2_ENABLE_DEV_FEATURES && (JucePlugin_WantsMidiInput || JucePlugin_ProducesMidiOutput || JucePlugin_WantsLV2TimePos))
-    plugin += "@prefix atom: <http://lv2plug.in/ns/ext/atom#> .\n";
+    plugin += "@prefix atom: <" LV2_ATOM_PREFIX "> .\n";
 #endif
     plugin += "@prefix doap: <http://usefulinc.com/ns/doap#> .\n";
 #if ((! JUCE_LV2_ENABLE_DEV_FEATURES) && (JucePlugin_WantsMidiInput || JucePlugin_ProducesMidiOutput))
-    plugin += "@prefix ev:   <http://lv2plug.in/ns/ext/event#> .\n";
+    plugin += "@prefix ev:   <" LV2_EVENT_PREFIX "> .\n";
 #endif
     plugin += "@prefix foaf: <http://xmlns.com/foaf/0.1/> .\n";
-    plugin += "@prefix lv2:  <http://lv2plug.in/ns/lv2core#> .\n";
+    plugin += "@prefix lv2:  <" LV2_CORE_PREFIX "> .\n";
 #if JucePlugin_WantsLV2TimePos
-    plugin += "@prefix ue:   <http://lv2plug.in/ns/extensions/units#> .\n";
+    plugin += "@prefix ue:   <" LV2_UNITS_PREFIX "> .\n";
 #endif
     if (filter->hasEditor())
-        plugin += "@prefix ui:   <http://lv2plug.in/ns/extensions/ui#> .\n";
+        plugin += "@prefix ui:   <" LV2_UI_PREFIX "> .\n";
     plugin += "\n";
 
     plugin += "<" JucePlugin_LV2URI ">\n";
@@ -379,7 +382,7 @@ String makePluginTtl(AudioProcessor* const filter)
     plugin += "        lv2:default 120.0 ;\n";
     plugin += "        lv2:minimum 10.0 ;\n";
     plugin += "        lv2:maximum 400.0 ;\n";
-    plugin += "        lv2:designation <http://lv2plug.in/ns/ext/time#beatsPerMinute> ;\n";
+    plugin += "        lv2:designation <" LV2_TIME__beatsPerMinute "> ;\n";
     plugin += "        ue:unit ue:bpm ;\n";
     plugin += "    ] ;\n\n";
 #endif
@@ -401,6 +404,8 @@ String makePluginTtl(AudioProcessor* const filter)
         plugin += "        lv2:default " + String(safeParamValue(filter->getParameter(i)), 8) + " ;\n";
         plugin += "        lv2:minimum 0.0 ;\n";
         plugin += "        lv2:maximum 1.0 ;\n";
+        if (! filter->isParameterAutomatable(i))
+            plugin += "        lv2:portProperty <" LV2_PORT_PROPS__notAutomatic "> ;\n";
 
         if (i+1 == filter->getNumParameters())
             plugin += "    ] ;\n\n";
@@ -427,19 +432,19 @@ String makePresetsTtl(AudioProcessor* const filter)
 {
     String presets;
 #if JucePlugin_WantsLV2State
-    presets += "@prefix atom:  <http://lv2plug.in/ns/ext/atom#> .\n";
+    presets += "@prefix atom:  <" LV2_ATOM_PREFIX "> .\n";
 #endif
-    presets += "@prefix lv2:   <http://lv2plug.in/ns/lv2core#> .\n";
-    presets += "@prefix pset:  <http://lv2plug.in/ns/ext/presets#> .\n";
+    presets += "@prefix lv2:   <" LV2_CORE_PREFIX "> .\n";
+    presets += "@prefix pset:  <" LV2_PRESETS_PREFIX "> .\n";
 #if JucePlugin_WantsLV2State
     presets += "@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n";
 #endif
     presets += "@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .\n";
-#if JucePlugin_WantsLV2StateString
-    presets += "@prefix state: <http://lv2plug.in/ns/ext/state#> .\n";
-#elif JucePlugin_WantsLV2State
-    presets += "@prefix state: <http://lv2plug.in/ns/ext/state#> .\n";
+#if JucePlugin_WantsLV2State
+    presets += "@prefix state: <" LV2_STATE_PREFIX "> .\n";
+ #if JucePlugin_WantsLV2StateString
     presets += "@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .\n";
+ #endif
 #endif
     presets += "\n";
 
@@ -1397,9 +1402,9 @@ public:
                     midiEvents.clear();
 
  #if JUCE_LV2_ENABLE_DEV_FEATURES
-                    LV2_SEQUENCE_FOREACH(portEventIn, j)
+                    LV2_ATOM_SEQUENCE_FOREACH(portEventIn, iter)
                     {
-                        LV2_Atom_Event* const event = lv2_sequence_iter_get(j);
+                        LV2_Atom_Event* const event = (LV2_Atom_Event* const)iter;
 
                         if (event && event->body.type == uridIdMidi)
                         {

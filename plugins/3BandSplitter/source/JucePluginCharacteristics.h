@@ -40,7 +40,7 @@
 #define JucePlugin_RTASManufacturerCode JucePlugin_ManufacturerCode
 #define JucePlugin_RTASProductId        JucePlugin_PluginCode
 
-#define JucePlugin_LV2URI               "http://distrho.sourceforge.net/plugins/3BandSplitter.html"
+#define JucePlugin_LV2URI               "http://distrho.sourceforge.net/plugins/3BandSplitter"
 #define JucePlugin_LV2Category          "EQPlugin"
 
 #endif   // __JUCEPLUGINCHARACTERISTICS_H__

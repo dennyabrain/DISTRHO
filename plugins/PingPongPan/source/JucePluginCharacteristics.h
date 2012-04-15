@@ -40,7 +40,7 @@
 #define JucePlugin_RTASManufacturerCode JucePlugin_ManufacturerCode
 #define JucePlugin_RTASProductId        JucePlugin_PluginCode
 
-#define JucePlugin_LV2URI               "http://distrho.sourceforge.net/plugins/PingPongPan.html"
+#define JucePlugin_LV2URI               "http://distrho.sourceforge.net/plugins/PingPongPan"
 #define JucePlugin_LV2Category          "DelayPlugin"
 
 #endif   // __JUCEPLUGINCHARACTERISTICS_H__
