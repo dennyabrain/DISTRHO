@@ -256,6 +256,8 @@ void DistrhoPluginAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiB
     float* buf5 = buffer.getSampleData(4);
     float* buf6 = buffer.getSampleData(5);
 
+    float prev_buf1, prev_buf2;
+
     int sampleFrames = buffer.getNumSamples();
 
     while (--sampleFrames >= 0)
@@ -266,8 +268,8 @@ void DistrhoPluginAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiB
         out1HP = (*buf1) - (tmp1HP = a0HP * (*buf1) - b1HP * tmp1HP + DC_ADD) - DC_ADD;
         out2HP = (*buf2) - (tmp2HP = a0HP * (*buf2) - b1HP * tmp2HP + DC_ADD) - DC_ADD;
 
-        float prev_buf1 = *buf1;
-        float prev_buf2 = *buf2;
+        prev_buf1 = *buf1;
+        prev_buf2 = *buf2;
 
         (*buf1++) = out1LP*lowVol*outVol;
         (*buf2++) = out2LP*lowVol*outVol;

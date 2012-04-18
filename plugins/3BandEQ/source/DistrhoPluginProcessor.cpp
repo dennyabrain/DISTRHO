@@ -259,8 +259,8 @@ void DistrhoPluginAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiB
         out1HP = (*buf1) - (tmp1HP = a0HP * (*buf1) - b1HP * tmp1HP + DC_ADD) - DC_ADD;
         out2HP = (*buf2) - (tmp2HP = a0HP * (*buf2) - b1HP * tmp2HP + DC_ADD) - DC_ADD;
 
-        (*buf1++) = (out1LP*lowVol + ((*buf1) - out1LP - out1HP) * midVol + out1HP * highVol)*outVol;
-        (*buf2++) = (out2LP*lowVol + ((*buf2) - out2LP - out2HP) * midVol + out2HP * highVol)*outVol;
+        (*buf1) = (out1LP*lowVol + ((*buf1++) - out1LP - out1HP) * midVol + out1HP * highVol)*outVol;
+        (*buf2) = (out2LP*lowVol + ((*buf2++) - out2LP - out2HP) * midVol + out2HP * highVol)*outVol;
     }
 }
 

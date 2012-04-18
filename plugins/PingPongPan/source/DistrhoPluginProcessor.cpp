@@ -163,6 +163,7 @@ void DistrhoPluginAudioProcessor::changeProgramName (int index, const String& ne
 //==============================================================================
 void DistrhoPluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
+    waveSpeed = (c_2PI * freqFader)/sampleRate;
 }
 
 void DistrhoPluginAudioProcessor::releaseResources()
@@ -186,16 +187,8 @@ void DistrhoPluginAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiB
         if ((wavePos+=waveSpeed) >= c_2PI)
           wavePos -= c_2PI;
 
-        (*buf1++) = (*buf1) * (pan > 0 ? 1-pan:1);
-        (*buf2++) = (*buf2) * (pan < 0 ? 1+pan:1);
-    }
-
-    // In case we have more outputs than inputs, we'll clear any output
-    // channels that didn't contain input data, (because these aren't
-    // guaranteed to be empty - they may contain garbage).
-    for (int i = getNumInputChannels(); i < getNumOutputChannels(); ++i)
-    {
-        buffer.clear (i, 0, buffer.getNumSamples());
+        (*buf1) = (*buf1++) * (pan > 0 ? 1-pan:1);
+        (*buf2) = (*buf2++) * (pan < 0 ? 1+pan:1);
     }
 }
 
