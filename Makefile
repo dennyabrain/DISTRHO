@@ -13,6 +13,10 @@ build:
 
 gen:
 	@./scripts/generate-ttl.sh
+	
+	# Copy manually modified ttls with extra data
+	if [ -d bin/3BandEQ.lv2/ ]; then cp static-lv2-ttl/3BandEQ.ttl bin/3BandEQ.lv2/; fi
+	if [ -d bin/3BandSplitter.lv2/ ]; then cp static-lv2-ttl/3BandSplitter.ttl bin/3BandSplitter.lv2/; fi
 
 clean:
 	$(MAKE) clean -C libs/juce-2.0
