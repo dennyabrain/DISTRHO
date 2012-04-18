@@ -10,6 +10,22 @@
 
 #include "DistrhoPlugin.h"
 
+#ifndef DISTRHO_PLUGIN_IS_SYNTH
+#error DISTRHO_PLUGIN_IS_SYNTH undefined!
+#endif
+
+#ifndef DISTRHO_PLUGIN_WANTS_UI
+#error DISTRHO_PLUGIN_WANTS_UI undefined!
+#endif
+
+#ifndef DISTRHO_PLUGIN_MAX_NUM_INPUTS
+#error DISTRHO_PLUGIN_MAX_NUM_INPUTS undefined!
+#endif
+
+#ifndef DISTRHO_PLUGIN_MAX_NUM_OUTPUTS
+#error DISTRHO_PLUGIN_MAX_NUM_OUTPUTS undefined!
+#endif
+
 #ifndef nullptr
 #define nullptr (0)
 #endif

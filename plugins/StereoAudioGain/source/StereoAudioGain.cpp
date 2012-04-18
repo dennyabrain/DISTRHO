@@ -26,7 +26,7 @@ const char* StereoAudioGain::d_name()
 
 const char* StereoAudioGain::d_maker()
 {
-    return "falkTX";
+    return "DISTRHO";
 }
 
 const char* StereoAudioGain::d_license()
