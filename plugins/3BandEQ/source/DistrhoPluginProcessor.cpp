@@ -262,14 +262,6 @@ void DistrhoPluginAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiB
         (*buf1++) = (out1LP*lowVol + ((*buf1) - out1LP - out1HP) * midVol + out1HP * highVol)*outVol;
         (*buf2++) = (out2LP*lowVol + ((*buf2) - out2LP - out2HP) * midVol + out2HP * highVol)*outVol;
     }
-
-    // In case we have more outputs than inputs, we'll clear any output
-    // channels that didn't contain input data, (because these aren't
-    // guaranteed to be empty - they may contain garbage).
-    for (int i = getNumInputChannels(); i < getNumOutputChannels(); ++i)
-    {
-        buffer.clear (i, 0, buffer.getNumSamples());
-    }
 }
 
 //==============================================================================

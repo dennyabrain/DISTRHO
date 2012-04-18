@@ -172,7 +172,7 @@ const String DistrhoPluginAudioProcessor::getInputChannelName (int channelIndex)
 
 const String DistrhoPluginAudioProcessor::getOutputChannelName (int channelIndex) const
 {
-    return String (channelIndex + 11);
+    return String (channelIndex + 1);
 }
 
 bool DistrhoPluginAudioProcessor::isInputChannelStereoPair (int index) const
@@ -238,6 +238,7 @@ void DistrhoPluginAudioProcessor::releaseResources()
 {
     out1LP = out2LP = out1HP = out2HP = 0.0f;
     tmp1LP = tmp2LP = tmp1HP = tmp2HP = 0.0f;
+    initialized = false;
 }
 
 void DistrhoPluginAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
@@ -246,8 +247,8 @@ void DistrhoPluginAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiB
         return;
 
     // low
-    float* buf1 = buffer.getSampleData(0);
-    float* buf2 = buffer.getSampleData(1);
+    float* buf1 = buffer.getSampleData(0); // input1
+    float* buf2 = buffer.getSampleData(1); // input2
     // mid
     float* buf3 = buffer.getSampleData(2);
     float* buf4 = buffer.getSampleData(3);
@@ -277,14 +278,6 @@ void DistrhoPluginAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiB
         (*buf5++) = out1HP*highVol*outVol;
         (*buf6++) = out2HP*highVol*outVol;
     }
-
-    // In case we have more outputs than inputs, we'll clear any output
-    // channels that didn't contain input data, (because these aren't
-    // guaranteed to be empty - they may contain garbage).
-//     for (int i = getNumInputChannels(); i < getNumOutputChannels(); ++i)
-//     {
-//         buffer.clear (i, 0, buffer.getNumSamples());
-//     }
 }
 
 //==============================================================================

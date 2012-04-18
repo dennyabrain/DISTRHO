@@ -4,9 +4,9 @@
 
 #include "DistrhoPluginProcessor.h"
 
-#include "../../common/DistrhoIcon.h"
-#include "../../common/FilmStripKnob.h"
-#include "../../common/ImageSlider.h"
+#include "../../common/Juce-Widgets/DistrhoIcon.h"
+#include "../../common/Juce-Widgets/FilmStripKnob.h"
+#include "../../common/Juce-Widgets/ImageSlider.h"
 
 //==================================================================================
 class DistrhoPluginAudioProcessorEditor  : public AudioProcessorEditor,
@@ -20,6 +20,8 @@ public:
     //==============================================================================
     void paint (Graphics& g);
     void sliderValueChanged (Slider* caller);
+    void sliderDragStarted (Slider* caller);
+    void sliderDragEnded (Slider* caller);
 
     //==============================================================================
     void timerCallback();
@@ -36,6 +38,8 @@ private:
     Image knobImage;
     Image sliderImage;
     Image backgroundImage;
+
+    Array<int> slidersDraggedList;
 
     DistrhoPluginAudioProcessor* getProcessor() const
     {
