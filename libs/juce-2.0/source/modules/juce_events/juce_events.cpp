@@ -57,6 +57,7 @@
  #include <X11/Xresource.h>
  #include <X11/Xutil.h>
  #undef KeyPress
+ #include <unistd.h>
 #endif
 
 //==============================================================================
