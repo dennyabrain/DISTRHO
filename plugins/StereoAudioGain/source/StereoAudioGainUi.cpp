@@ -1,7 +1,5 @@
 /*
  * Qt4 Demo plugin by falkTX <falktx@gmail.com>
- *
- * Released under the Public Domain
  */
 
 #include "StereoAudioGain.h"

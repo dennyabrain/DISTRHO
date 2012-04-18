@@ -2,18 +2,18 @@
 
 #include "PluginBase.h"
 
-#include "lv2/lv2.h"
-#include "lv2/event.h"
-#include "lv2/midi.h"
-#include "lv2/urid.h"
+#include "lv2-sdk/lv2.h"
+#include "lv2-sdk/event.h"
+#include "lv2-sdk/event-helpers.h"
+#include "lv2-sdk/midi.h"
+#include "lv2-sdk/urid.h"
 
 #include <fstream>
 #include <iostream>
 #include <vector>
 
 #ifndef DISTRHO_PLUGIN_URI
-#warning DISTRHO_PLUGIN_URI not defined!
-#define DISTRHO_PLUGIN_URI "urn:distrho:Plugin"
+#error DISTRHO_PLUGIN_URI undefined!
 #endif
 
 // ---------------------------------------------------------------------------------------------
@@ -24,17 +24,16 @@ public:
     DistrhoPluginLv2(double sampleRate)
     {
         m_plugin = createDistrhoPlugin();
+        //m_plugin->d_init();
 
         lastBufferSize = 512;
         m_plugin->d_setSampleRate(sampleRate);
         m_plugin->d_setBufferSize(lastBufferSize);
 
-        m_plugin->d_init();
-
-        for (uint32_t i=0; i < m_plugin->d_audioInputs(); i++)
+        for (uint32_t i=0; i < DISTRHO_PLUGIN_NUM_INPUTS; i++)
             portAudioIns.push_back(nullptr);
 
-        for (uint32_t i=0; i < m_plugin->d_audioOutputs(); i++)
+        for (uint32_t i=0; i < DISTRHO_PLUGIN_NUM_OUTPUTS; i++)
             portAudioOuts.push_back(nullptr);
 
         for (uint32_t i=0; i < m_plugin->d_parameterCount(); i++)
@@ -46,7 +45,7 @@ public:
 
     virtual ~DistrhoPluginLv2()
     {
-        m_plugin->d_cleanup();
+        //m_plugin->d_cleanup();
         delete m_plugin;
 
         lastControlValues.clear();
@@ -78,7 +77,7 @@ public:
         index++;
 #endif
 
-        for (uint32_t i=0; i < m_plugin->d_audioInputs(); i++, index++)
+        for (uint32_t i=0; i < DISTRHO_PLUGIN_NUM_INPUTS; i++, index++)
         {
             if (portId == index)
             {
@@ -87,7 +86,7 @@ public:
             }
         }
 
-        for (uint32_t i=0; i < m_plugin->d_audioOutputs(); i++, index++)
+        for (uint32_t i=0; i < DISTRHO_PLUGIN_NUM_OUTPUTS; i++, index++)
         {
             if (portId == index)
             {
@@ -143,13 +142,13 @@ public:
         }
 
         // Run plugin for this cycle
-        float* inputs[m_plugin->d_audioInputs()];
-        float* outputs[m_plugin->d_audioOutputs()];
+        float* inputs[DISTRHO_PLUGIN_NUM_INPUTS];
+        float* outputs[DISTRHO_PLUGIN_NUM_OUTPUTS];
 
-        for (uint32_t i=0; i < m_plugin->d_audioInputs(); i++)
+        for (uint32_t i=0; i < DISTRHO_PLUGIN_NUM_INPUTS; i++)
             inputs[i] = portAudioIns[i];
 
-        for (uint32_t i=0; i < m_plugin->d_audioOutputs(); i++)
+        for (uint32_t i=0; i < DISTRHO_PLUGIN_NUM_OUTPUTS; i++)
             outputs[i] = portAudioOuts[i];
 
         m_plugin->d_run(inputs, outputs, samples);
@@ -238,7 +237,7 @@ extern "C" __attribute__ ((visibility("default")))
 void lv2_generate_ttl()
 {
     DistrhoPluginBase* plugin = createDistrhoPlugin();
-    plugin->d_init();
+    //plugin->d_init();
 
     const char* plugin_name = plugin->d_name();
     char* plugin_binary = strdup(plugin_name);
@@ -328,7 +327,7 @@ void lv2_generate_ttl()
     portIndex++;
 #endif
 
-    for (uint32_t i=0; i < plugin->d_audioInputs(); i++)
+    for (uint32_t i=0; i < DISTRHO_PLUGIN_NUM_INPUTS; i++)
     {
         if (i == 0)
             plugin_string += "    lv2:port [\n";
@@ -349,13 +348,13 @@ void lv2_generate_ttl()
         plugin_string += portBuf;
         plugin_string += "\" ;\n";
 
-        if (i+1 == plugin->d_audioInputs())
+        if (i+1 == DISTRHO_PLUGIN_NUM_INPUTS)
             plugin_string += "    ] ;\n\n";
         else
             plugin_string += "    ],\n";
     }
 
-    for (uint32_t i=0; i < plugin->d_audioOutputs(); i++)
+    for (uint32_t i=0; i < DISTRHO_PLUGIN_NUM_OUTPUTS; i++)
     {
         if (i == 0)
             plugin_string += "    lv2:port [\n";
@@ -376,7 +375,7 @@ void lv2_generate_ttl()
         plugin_string += portBuf;
         plugin_string += "\" ;\n";
 
-        if (i+1 == plugin->d_audioOutputs())
+        if (i+1 == DISTRHO_PLUGIN_NUM_OUTPUTS)
             plugin_string += "    ] ;\n\n";
         else
             plugin_string += "    ],\n";
@@ -451,7 +450,7 @@ void lv2_generate_ttl()
     std::cout << " done!" << std::endl;
 
     free(plugin_binary);
-    plugin->d_cleanup();
+    //plugin->d_cleanup();
     delete plugin;
 }
 
@@ -460,5 +459,3 @@ const LV2_Descriptor* lv2_descriptor(uint32_t index)
 {
     return (index == 0) ? &descriptor : nullptr;
 }
-
-int main() {}

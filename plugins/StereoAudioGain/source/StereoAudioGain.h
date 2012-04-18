@@ -1,7 +1,5 @@
 /*
  * Qt4 Demo plugin by falkTX <falktx@gmail.com>
- *
- * Released under the Public Domain
  */
 
 #ifndef STEREOAUDIOGAIN_H
@@ -23,25 +21,21 @@ public:
     StereoAudioGain();
 
     // Information
-    virtual const char* d_name();
-    virtual const char* d_maker();
-    virtual const char* d_license();
-    virtual int32_t d_version();
-    virtual long d_uniqueId();
+    const char* d_name();
+    const char* d_maker();
+    const char* d_license();
+    uint32_t    d_version();
+    long        d_uniqueId();
 
     // Internal data
-    virtual float d_parameterValue(uint32_t index);
-    virtual void d_setParameterValue(uint32_t index, float value);
-    virtual void d_setCurrentProgram(uint32_t index);
-
-    // init
-    virtual bool d_init();
-    virtual bool d_cleanup();
+    float d_parameterValue(uint32_t index);
+    void  d_setParameterValue(uint32_t index, float value);
+    void  d_setCurrentProgram(uint32_t index);
 
     // Process stuff
-    virtual void d_activate();
-    virtual void d_deactivate();
-    virtual void d_run(float** inputs, float** outputs, uint32_t frames);
+    void d_activate();
+    void d_deactivate();
+    void d_run(float** inputs, float** outputs, uint32_t frames);
 
 private:
     float x_left, x_right, vu_left, vu_right;

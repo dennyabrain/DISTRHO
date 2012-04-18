@@ -1,7 +1,5 @@
 /*
  * Qt4 Demo plugin by falkTX <falktx@gmail.com>
- *
- * Released under the Public Domain
  */
 
 #include "StereoAudioGain.h"
@@ -16,75 +14,7 @@ StereoAudioGain::StereoAudioGain() :
 {
     x_left  = x_right  = 1.0f;
     vu_left = vu_right = 0.0f;
-}
 
-// Information
-const char* StereoAudioGain::d_name()
-{
-    return "Stereo Audio Gain";
-}
-
-const char* StereoAudioGain::d_maker()
-{
-    return "DISTRHO";
-}
-
-const char* StereoAudioGain::d_license()
-{
-    return "";
-}
-
-int32_t StereoAudioGain::d_version()
-{
-    return 0x1000;
-}
-
-long StereoAudioGain::d_uniqueId()
-{
-    return 0;
-}
-
-// Internal data
-float StereoAudioGain::d_parameterValue(uint32_t index)
-{
-    switch (index)
-    {
-    case PARAMETER_LEFT:
-        return x_left;
-    case PARAMETER_RIGHT:
-        return x_right;
-    case PARAMETER_VU_LEFT:
-        return vu_left;
-    case PARAMETER_VU_RIGHT:
-        return vu_right;
-    default:
-        return 0.0f;
-    }
-}
-
-void StereoAudioGain::d_setParameterValue(uint32_t index, float value)
-{
-    if (value < 0.0)
-        value = 0.0;
-    else if (value > 2.0)
-        value = 2.0;
-
-    switch (index)
-    {
-    case PARAMETER_LEFT:
-        x_left = value;
-        break;
-    case PARAMETER_RIGHT:
-        x_right = value;
-        break;
-    }
-}
-
-void StereoAudioGain::d_setCurrentProgram(uint32_t) {}
-
-// init
-bool StereoAudioGain::d_init()
-{
     p_paramsInfo[PARAMETER_LEFT].hints      = PARAMETER_IS_ENABLED | PARAMETER_IS_AUTOMABLE;
     p_paramsInfo[PARAMETER_LEFT].name       = strdup("Left Gain");
     p_paramsInfo[PARAMETER_LEFT].symbol     = strdup("left_gain");
@@ -126,13 +56,72 @@ bool StereoAudioGain::d_init()
     p_paramsInfo[PARAMETER_VU_RIGHT].range.def = 0.0f;
     p_paramsInfo[PARAMETER_VU_RIGHT].range.min = 0.0f;
     p_paramsInfo[PARAMETER_VU_RIGHT].range.max = 1.0f;
-
-    return true;
 }
 
-bool StereoAudioGain::d_cleanup()
+// Information
+const char* StereoAudioGain::d_name()
 {
-    return true;
+    return "Stereo Audio Gain";
+}
+
+const char* StereoAudioGain::d_maker()
+{
+    return "DISTRHO";
+}
+
+const char* StereoAudioGain::d_license()
+{
+    return "";
+}
+
+uint32_t StereoAudioGain::d_version()
+{
+    return 0x1000;
+}
+
+long StereoAudioGain::d_uniqueId()
+{
+    return 0;
+}
+
+// Internal data
+float StereoAudioGain::d_parameterValue(uint32_t index)
+{
+    switch (index)
+    {
+    case PARAMETER_LEFT:
+        return x_left;
+    case PARAMETER_RIGHT:
+        return x_right;
+    case PARAMETER_VU_LEFT:
+        return vu_left;
+    case PARAMETER_VU_RIGHT:
+        return vu_right;
+    default:
+        return 0.0f;
+    }
+}
+
+void StereoAudioGain::d_setParameterValue(uint32_t index, float value)
+{
+    if (value < 0.0f)
+        value = 0.0f;
+    else if (value > 2.0f)
+        value = 2.0f;
+
+    switch (index)
+    {
+    case PARAMETER_LEFT:
+        x_left = value;
+        break;
+    case PARAMETER_RIGHT:
+        x_right = value;
+        break;
+    }
+}
+
+void StereoAudioGain::d_setCurrentProgram(uint32_t)
+{
 }
 
 // Process stuff

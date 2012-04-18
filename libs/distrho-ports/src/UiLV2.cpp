@@ -1,9 +1,12 @@
 // distrho lv2 ui
 
+#include "DistrhoPlugin.h"
+
+#if DISTRHO_PLUGIN_WANTS_UI
 #include "PluginBase.h"
 #include "UiBase.h"
 
-#include "lv2/ui.h"
+#include "lv2-sdk/ui.h"
 
 class DistrhoUiLv2 : public QObject
 {
@@ -22,8 +25,8 @@ public:
 #if DISTRHO_PLUGIN_IS_SYNTH
         controlPortOffset += 1;
 #endif
-        controlPortOffset += DISTRHO_PLUGIN_MAX_NUM_INPUTS;
-        controlPortOffset += DISTRHO_PLUGIN_MAX_NUM_OUTPUTS;
+        controlPortOffset += DISTRHO_PLUGIN_NUM_INPUTS;
+        controlPortOffset += DISTRHO_PLUGIN_NUM_OUTPUTS;
 
         connect(m_ui, SIGNAL(parameterChanged(uint32_t,float)), this, SLOT(pluginParameterChanged(uint32_t,float)));
     }
@@ -45,7 +48,7 @@ public:
         }
     }
 
-public slots:
+private slots:
     void pluginParameterChanged(uint32_t index, float value)
     {
         if (write_function && controller)
@@ -102,3 +105,5 @@ const LV2UI_Descriptor* lv2ui_descriptor(uint32_t index)
 {
     return (index == 0) ? &uidescriptor : nullptr;
 }
+
+#endif // DISTRHO_PLUGIN_WANTS_UI

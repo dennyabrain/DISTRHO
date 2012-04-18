@@ -1,7 +1,5 @@
 /*
  * Qt4 Demo plugin by falkTX <falktx@gmail.com>
- *
- * Released under the Public Domain
  */
 
 #ifndef STEREOAUDIOGAIN_UI_H
@@ -21,7 +19,7 @@ public:
     StereoAudioGainUi();
     ~StereoAudioGainUi();
 
-    virtual void setParameterValue(uint32_t index, float value);
+    void setParameterValue(uint32_t index, float value);
 
 protected:
     Ui::StereoAudioGainUi* ui;
@@ -29,7 +27,6 @@ protected:
 private:
     Q_SLOT void leftKnobValueChanged(int value);
     Q_SLOT void rightKnobValueChanged(int value);
-
 };
 
 #endif // STEREOAUDIOGAIN_UI_H

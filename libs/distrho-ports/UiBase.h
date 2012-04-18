@@ -15,8 +15,7 @@ class DistrhoUiBase : public QDialog
     Q_OBJECT
 
 public:
-    DistrhoUiBase(QWidget* parent = nullptr) :
-        QDialog (parent)
+    DistrhoUiBase(QWidget* parent = nullptr) : QDialog(parent)
     {
     }
 
@@ -32,6 +31,6 @@ signals:
 
 // ---------------------------------------------------------------------------------------------
 
-DistrhoUiBase* createDistrhoUI();
+extern DistrhoUiBase* createDistrhoUI();
 
 #endif // __DISTRHO_UI_BASE__
