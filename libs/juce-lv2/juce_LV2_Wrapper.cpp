@@ -15,12 +15,10 @@
 #if JucePlugin_Build_LV2
 
 //==============================================================================
-/** Enable LV2 development features
-* This macro enables currently development/unstable features of LV2, use with care.
-* Features are:
-* - atom based MIDI and Time-Pos
+/** Enable LV2 Atom Ports
+* Most hosts are not ready for this, this should be disabled for now.
 */
-#define JUCE_LV2_ENABLE_DEV_FEATURES 0
+#define JUCE_LV2_ENABLE_ATOM_PORTS 0
 
 /*
  * Available macros:
@@ -105,11 +103,9 @@ const String getPluginType()
 {
     String pluginType;
 #ifdef JucePlugin_LV2Category
-    pluginType = "lv2:" JucePlugin_LV2Category;
+    pluginType  = "lv2:" JucePlugin_LV2Category;
+    pluginType += ", ";
 #endif
-    if (pluginType.isNotEmpty())
-        pluginType += ", ";
-
     pluginType += "lv2:Plugin";
     return pluginType;
 }
@@ -245,11 +241,11 @@ String makeManifestTtl(AudioProcessor* const filter, const String& binary)
 String makePluginTtl(AudioProcessor* const filter)
 {
     String plugin;
-#if (JUCE_LV2_ENABLE_DEV_FEATURES && (JucePlugin_WantsMidiInput || JucePlugin_ProducesMidiOutput || JucePlugin_WantsLV2TimePos))
+#if (JUCE_LV2_ENABLE_ATOM_PORTS && (JucePlugin_WantsMidiInput || JucePlugin_ProducesMidiOutput || JucePlugin_WantsLV2TimePos))
     plugin += "@prefix atom: <" LV2_ATOM_PREFIX "> .\n";
 #endif
     plugin += "@prefix doap: <http://usefulinc.com/ns/doap#> .\n";
-#if ((! JUCE_LV2_ENABLE_DEV_FEATURES) && (JucePlugin_WantsMidiInput || JucePlugin_ProducesMidiOutput))
+#if ((! JUCE_LV2_ENABLE_ATOM_PORTS) && (JucePlugin_WantsMidiInput || JucePlugin_ProducesMidiOutput))
     plugin += "@prefix ev:   <" LV2_EVENT_PREFIX "> .\n";
 #endif
     plugin += "@prefix foaf: <http://xmlns.com/foaf/0.1/> .\n";
@@ -265,7 +261,7 @@ String makePluginTtl(AudioProcessor* const filter)
     plugin += "    a " + getPluginType() + " ;\n";
 #if JucePlugin_IsSynth
     plugin += "    lv2:requiredFeature <" LV2_URID__map "> ;\n";
-#elif (JucePlugin_WantsMidiInput || JucePlugin_ProducesMidiOutput || JucePlugin_WantsLV2State || (JUCE_LV2_ENABLE_DEV_FEATURES && JucePlugin_WantsLV2TimePos))
+#elif (JucePlugin_WantsMidiInput || JucePlugin_ProducesMidiOutput || JucePlugin_WantsLV2State || (JUCE_LV2_ENABLE_ATOM_PORTS && JucePlugin_WantsLV2TimePos))
     plugin += "    lv2:optionalFeature <" LV2_URID__map "> ;\n";
 #endif
 #if JucePlugin_WantsLV2State
@@ -289,14 +285,14 @@ String makePluginTtl(AudioProcessor* const filter)
     uint32 portIndex = 0;
 
     // Event input (old MIDI or MIDI + TimePos)
-#if (JucePlugin_WantsMidiInput || (JUCE_LV2_ENABLE_DEV_FEATURES && JucePlugin_WantsLV2TimePos))
+#if (JucePlugin_WantsMidiInput || (JUCE_LV2_ENABLE_ATOM_PORTS && JucePlugin_WantsLV2TimePos))
     plugin += "    lv2:port [\n";
- #if JUCE_LV2_ENABLE_DEV_FEATURES
+ #if JUCE_LV2_ENABLE_ATOM_PORTS
     plugin += "        a lv2:InputPort, atom:AtomPort ;\n";
     plugin += "        atom:bufferType atom:Sequence ;\n";
   #if JucePlugin_WantsLV2TimePos
     plugin += "        atom:supports <" LV2_MIDI__MidiEvent "> ,\n";
-    plugin += "                    <" LV2_TIME__Position "> ;\n";
+    plugin += "                      <" LV2_TIME__Position "> ;\n";
   #else
     plugin += "        atom:supports <" LV2_MIDI__MidiEvent "> ;\n";
   #endif
@@ -316,7 +312,7 @@ String makePluginTtl(AudioProcessor* const filter)
     // Event output (MIDI only)
 #if JucePlugin_ProducesMidiOutput
     plugin += "    lv2:port [\n";
- #if JUCE_LV2_ENABLE_DEV_FEATURES
+ #if JUCE_LV2_ENABLE_ATOM_PORTS
     plugin += "        a lv2:OutputPort, atom:AtomPort ;\n";
     plugin += "        atom:bufferType atom:Sequence ;\n";
     plugin += "        atom:supports <" LV2_MIDI__MidiEvent "> ;\n";
@@ -877,7 +873,7 @@ public:
         }
 
         controlPortOffset = 0;
-#if (JucePlugin_WantsMidiInput || (JUCE_LV2_ENABLE_DEV_FEATURES && JucePlugin_WantsLV2TimePos))
+#if (JucePlugin_WantsMidiInput || (JUCE_LV2_ENABLE_ATOM_PORTS && JucePlugin_WantsLV2TimePos))
         controlPortOffset += 1;
 #endif
 #if JucePlugin_ProducesMidiOutput
@@ -1110,7 +1106,7 @@ public:
             bufferSize (512),
 #if (JucePlugin_WantsMidiInput || JucePlugin_ProducesMidiOutput)
             uridIdMidi (0),
- #if JUCE_LV2_ENABLE_DEV_FEATURES
+ #if JUCE_LV2_ENABLE_ATOM_PORTS
             uridIdAtomSequence (0),
  #endif
 #endif
@@ -1123,7 +1119,7 @@ public:
         filter->setPlayHead (this);
 
         // Set Port data
-#if (JucePlugin_WantsMidiInput || (JUCE_LV2_ENABLE_DEV_FEATURES && JucePlugin_WantsLV2TimePos))
+#if (JucePlugin_WantsMidiInput || (JUCE_LV2_ENABLE_ATOM_PORTS && JucePlugin_WantsLV2TimePos))
         portEventIn = nullptr;
 #endif
 #if JucePlugin_ProducesMidiOutput
@@ -1137,7 +1133,7 @@ public:
         portControls.insertMultiple(0, nullptr, filter->getNumParameters());
         portLatency = nullptr;
 
-#if (JucePlugin_WantsMidiInput || JucePlugin_ProducesMidiOutput || JucePlugin_WantsLV2State || (JUCE_LV2_ENABLE_DEV_FEATURES && JucePlugin_WantsLV2TimePos))
+#if (JucePlugin_WantsMidiInput || JucePlugin_ProducesMidiOutput || JucePlugin_WantsLV2State || (JUCE_LV2_ENABLE_ATOM_PORTS && JucePlugin_WantsLV2TimePos))
         for (uint32 i = 0; features[i]; i++)
         {
             if (strcmp(features[i]->URI, LV2_URID_MAP_URI) == 0)
@@ -1145,7 +1141,7 @@ public:
                 uridMap = (LV2_URID_Map*)features[i]->data;
  #if (JucePlugin_WantsMidiInput || JucePlugin_ProducesMidiOutput)
                 uridIdMidi = uridMap->map(uridMap->handle, LV2_MIDI__MidiEvent);
-  #if JUCE_LV2_ENABLE_DEV_FEATURES
+  #if JUCE_LV2_ENABLE_ATOM_PORTS
                 uridIdAtomSequence = uridMap->map(uridMap->handle, LV2_ATOM__Sequence);
   #endif
  #endif
@@ -1184,10 +1180,10 @@ public:
     {
         uint32 index = 0;
 
-#if (JucePlugin_WantsMidiInput || (JUCE_LV2_ENABLE_DEV_FEATURES && JucePlugin_WantsLV2TimePos))
+#if (JucePlugin_WantsMidiInput || (JUCE_LV2_ENABLE_ATOM_PORTS && JucePlugin_WantsLV2TimePos))
         if (portId == index)
         {
- #if JUCE_LV2_ENABLE_DEV_FEATURES
+ #if JUCE_LV2_ENABLE_ATOM_PORTS
             portEventIn = (LV2_Atom_Sequence*)dataLocation;
  #else
             portEventIn = (LV2_Event_Buffer*)dataLocation;
@@ -1200,7 +1196,7 @@ public:
 #if JucePlugin_ProducesMidiOutput
         if (portId == index)
         {
- #if JUCE_LV2_ENABLE_DEV_FEATURES
+ #if JUCE_LV2_ENABLE_ATOM_PORTS
             portEventOut = (LV2_Atom_Sequence*)dataLocation;
  #else
             portEventOut = (LV2_Event_Buffer*)dataLocation;
@@ -1395,7 +1391,7 @@ public:
                 {
                     midiEvents.clear();
 
- #if JUCE_LV2_ENABLE_DEV_FEATURES
+ #if JUCE_LV2_ENABLE_ATOM_PORTS
                     LV2_ATOM_SEQUENCE_FOREACH(portEventIn, iter)
                     {
                         LV2_Atom_Event* const event = (LV2_Atom_Event* const)iter;
@@ -1456,7 +1452,7 @@ public:
                 int midiEventSize, midiEventPosition;
                 MidiBuffer::Iterator i (midiEvents);
 
- #if JUCE_LV2_ENABLE_DEV_FEATURES
+ #if JUCE_LV2_ENABLE_ATOM_PORTS
                 uint32_t size, offset = 0;
                 LV2_Atom_Event* aev;
 
@@ -1513,21 +1509,25 @@ public:
         if (sampleRate <= 0)
             return false;
 
- #if JUCE_LV2_ENABLE_DEV_FEATURES
+ #if JUCE_LV2_ENABLE_ATOM_PORTS
         if (portTimeBPM)
             info.bpm = *portTimeBPM;
         else
             info.bpm = 120.0;
 
+        // TODO
         info.timeSigNumerator   = 4;
         info.timeSigDenominator = 4;
         info.timeInSeconds  = 0;
         info.editOriginTime = 0;
         info.ppqPosition = 0;
         info.ppqPositionOfLastBarStart = 0;
+        info.ppqLoopStart = 0;
+        info.ppqLoopEnd   = 0;
         info.frameRate   = AudioPlayHead::fpsUnknown;
         info.isPlaying   = false;
         info.isRecording = false;
+        info.isLooping   = false;
  #else
         if (portTimeBPM)
             info.bpm = *portTimeBPM;
@@ -1540,9 +1540,12 @@ public:
         info.editOriginTime = 0;
         info.ppqPosition = 0;
         info.ppqPositionOfLastBarStart = 0;
+        info.ppqLoopStart = 0;
+        info.ppqLoopEnd   = 0;
         info.frameRate   = AudioPlayHead::fpsUnknown;
         info.isPlaying   = false;
         info.isRecording = false;
+        info.isLooping   = false;
  #endif
         return true;
 #else
@@ -1615,7 +1618,7 @@ private:
     uint32 bufferSize;
 #if (JucePlugin_WantsMidiInput || JucePlugin_ProducesMidiOutput)
     LV2_URID uridIdMidi;
- #if JUCE_LV2_ENABLE_DEV_FEATURES
+ #if JUCE_LV2_ENABLE_ATOM_PORTS
     LV2_URID uridIdAtomSequence;
  #endif
 #endif
@@ -1623,15 +1626,15 @@ private:
     Array<float> lastControlValues;
 
     // LV2 Port data
-#if (JucePlugin_WantsMidiInput || (JUCE_LV2_ENABLE_DEV_FEATURES && JucePlugin_WantsLV2TimePos))
- #if JUCE_LV2_ENABLE_DEV_FEATURES
+#if (JucePlugin_WantsMidiInput || (JUCE_LV2_ENABLE_ATOM_PORTS && JucePlugin_WantsLV2TimePos))
+ #if JUCE_LV2_ENABLE_ATOM_PORTS
     LV2_Atom_Sequence* portEventIn;
  #else
     LV2_Event_Buffer* portEventIn;
  #endif
 #endif
 #if JucePlugin_ProducesMidiOutput
- #if JUCE_LV2_ENABLE_DEV_FEATURES
+ #if JUCE_LV2_ENABLE_ATOM_PORTS
     LV2_Atom_Sequence* portEventOut;
  #else
     LV2_Event_Buffer* portEventOut;
