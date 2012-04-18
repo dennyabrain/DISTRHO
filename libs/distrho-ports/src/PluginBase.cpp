@@ -2,38 +2,12 @@
 
 #include "PluginBase.h"
 
-//#include <iostream>
-
-//inline void name_to_symbol(char* text)
-//{
-//    for (size_t i = 0, len = strlen(text); i < len; i++)
-//    {
-//        if (std::isalpha(text[i]))
-//        {
-//            // to lower case
-//            if (text[i] <= 'Z')
-//                text[i] += ('z' - 'Z');
-//        }
-//        else if (std::isdigit(text[i]))
-//        {
-//            // cannot start with a digit
-//            if (i == 0)
-//                text[i] = '_';
-//        }
-//        else
-//            text[i] = '_';
-//    }
-//}
-
 DistrhoPluginBase::DistrhoPluginBase(uint32_t parameterCount, uint32_t programCount) :
     m_parameterCount(parameterCount),
     m_programCount(programCount)
 {
     m_sampleRate = 44100;
     m_bufferSize = 512;
-
-    //m_audioInputs  = 0;
-    //m_audioOutputs = 0;
 
     if (m_parameterCount > 0)
     {
@@ -96,7 +70,7 @@ DistrhoPluginBase::~DistrhoPluginBase()
 
 // -------------------------------------------------
 
-// ...
+// Host state
 double DistrhoPluginBase::d_sampleRate()
 {
     return m_sampleRate;
@@ -106,6 +80,8 @@ uint32_t DistrhoPluginBase::d_bufferSize()
 {
     return m_bufferSize;
 }
+
+// TODO - time-pos
 
 // -------------------------------------------------
 
@@ -134,16 +110,6 @@ const char* DistrhoPluginBase::d_programName(uint32_t index)
         return p_programNames[index];
     return nullptr;
 }
-
-//uint32_t DistrhoPluginBase::d_audioInputs() const
-//{
-//    return DISTRHO_PLUGIN_NUM_INPUTS;
-//}
-
-//uint32_t DistrhoPluginBase::d_audioOutputs() const
-//{
-//    return DISTRHO_PLUGIN_NUM_OUTPUTS;
-//}
 
 // -------------------------------------------------
 

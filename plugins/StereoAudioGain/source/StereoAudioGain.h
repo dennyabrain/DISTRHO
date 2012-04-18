@@ -20,6 +20,8 @@ public:
 
     StereoAudioGain();
 
+    // -------------------------------------------------
+
     // Information
     const char* d_name();
     const char* d_maker();
@@ -27,15 +29,27 @@ public:
     uint32_t    d_version();
     long        d_uniqueId();
 
+    // -------------------------------------------------
+
     // Internal data
     float d_parameterValue(uint32_t index);
     void  d_setParameterValue(uint32_t index, float value);
     void  d_setCurrentProgram(uint32_t index);
 
+    // -------------------------------------------------
+
+    // Init
+    void d_init();
+    void d_cleanup();
+
+    // -------------------------------------------------
+
     // Process stuff
     void d_activate();
     void d_deactivate();
     void d_run(float** inputs, float** outputs, uint32_t frames);
+
+    // -------------------------------------------------
 
 private:
     float x_left, x_right, vu_left, vu_right;

@@ -3,6 +3,9 @@
 #ifndef __DISTRHO_UI_BASE__
 #define __DISTRHO_UI_BASE__
 
+#include "DistrhoPlugin.h"
+
+#if DISTRHO_PLUGIN_WANTS_UI
 #include <QtGui/QDialog>
 #include <stdint.h>
 
@@ -32,5 +35,6 @@ signals:
 // ---------------------------------------------------------------------------------------------
 
 extern DistrhoUiBase* createDistrhoUI();
+#endif
 
 #endif // __DISTRHO_UI_BASE__

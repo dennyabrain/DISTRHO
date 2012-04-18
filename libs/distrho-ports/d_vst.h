@@ -7,6 +7,7 @@
 #include "DistrhoPlugin.h"
 
 #include <cmath>
+#include <iostream>
 
 // Plugin Hints (VST only)
 const uint32_t PLUGIN_CAN_REPLACE = 1 << 1;
@@ -33,15 +34,38 @@ extern AudioEffect* createEffectInstance(audioMasterCallback audioMaster);
 
 // ---------------------------------------------------------------------------------------------
 
+void name_to_symbol(char* text)
+{
+    for (size_t i = 0, len = strlen(text); i < len; i++)
+    {
+        if (std::isalpha(text[i]))
+        {
+            // to lower case
+            if (text[i] <= 'Z')
+                text[i] += ('z' - 'Z');
+        }
+        else if (std::isdigit(text[i]))
+        {
+            // cannot start with a digit
+            if (i == 0)
+                text[i] = '_';
+        }
+        else
+            text[i] = '_';
+    }
+}
+
+// ---------------------------------------------------------------------------------------------
+
 class AudioEffectX : public DistrhoPluginBase
 {
 public:
-    AudioEffectX(audioMasterCallback audioMaster, uint32_t programCount, uint32_t parameterCount) :
+    AudioEffectX(audioMasterCallback, uint32_t programCount, uint32_t parameterCount) :
         DistrhoPluginBase(parameterCount, programCount)
     {
-        m_name    = nullptr;
-        m_maker   = nullptr;
-        m_license = nullptr;
+        m_name     = nullptr;
+        m_maker    = nullptr;
+        m_license  = nullptr;
         m_uniqueId = 0;
     }
 
@@ -49,54 +73,60 @@ public:
     {
     }
 
+    // -------------------------------------------------
     // Information
-    virtual const char* d_name()
+
+    const char* d_name()
     {
         return m_name;
     }
 
-    virtual const char* d_maker()
+    const char* d_maker()
     {
         return m_maker;
     }
 
-    virtual const char* d_license()
+    const char* d_license()
     {
         return m_license;
     }
 
-    virtual int32_t d_version()
+    uint32_t d_version()
     {
         return getVendorVersion();
     }
 
-    virtual long d_uniqueId()
+    long d_uniqueId()
     {
         return m_uniqueId;
     }
 
+    // -------------------------------------------------
     // Internal data
-    virtual float d_parameterValue(uint32_t index)
+
+    float d_parameterValue(uint32_t index)
     {
         if (index < d_parameterCount())
             return getParameter(index);
         return 0.0f;
     }
 
-    virtual void d_setParameterValue(uint32_t index, float value)
+    void d_setParameterValue(uint32_t index, float value)
     {
         if (index < d_parameterCount())
             setParameter(index, value);
     }
 
-    virtual void d_setCurrentProgram(uint32_t index)
+    void d_setCurrentProgram(uint32_t /*index*/)
     {
         //if (index < m_programCount)
         // TODO
     }
 
-    // init
-    virtual bool d_init()
+    // -------------------------------------------------
+    // Init
+
+    void d_init()
     {
         char buf_str[255] = { 0 };
 
@@ -130,11 +160,9 @@ public:
             //if (buf_str[0] != 0)
             //    p_programs[i] = strdup(buf_str);
         //}
-
-        return true;
     }
 
-    virtual bool d_cleanup()
+    void d_cleanup()
     {
         if (m_name)
             free((void*)m_name);
@@ -148,28 +176,28 @@ public:
         m_name    = nullptr;
         m_maker   = nullptr;
         m_license = nullptr;
-
-        return true;
     }
 
+    // -------------------------------------------------
     // Process stuff
-    virtual void d_activate()
+
+    void d_activate()
     {
         resume();
     }
 
-    virtual void d_deactivate()
+    void d_deactivate()
     {
         suspend();
     }
 
-    virtual void d_run(float** inputs, float** outputs, uint32_t frames)
+    void d_run(float** inputs, float** outputs, uint32_t frames)
     {
         if (vst_hints & PLUGIN_CAN_REPLACE)
             processReplacing(inputs, outputs, frames);
         else
         {
-            memset(outputs, 0, sizeof(float) * d_audioOutputs() * frames);
+            memset(outputs, 0, sizeof(float) * DISTRHO_PLUGIN_NUM_OUTPUTS * frames);
             process(inputs, outputs, frames);
         }
     }
@@ -177,7 +205,7 @@ public:
     // -------------------------------------------------
     // VST side compatibility calls
 
-#ifdef DISTRHO_BASE_VST_COMPAT
+#ifdef DISTRHO_PLUGIN_BASE_VST_COMPAT
     void canMono()
     {
     }
@@ -199,12 +227,12 @@ public:
 
     void setNumInputs(uint32_t /*numInputs*/)
     {
-        // already set with macro DISTRHO_PLUGIN_MAX_NUM_INPUTS
+        // already set with macro DISTRHO_PLUGIN_NUM_INPUTS
     }
 
     void setNumOutputs(uint32_t /*numOutputs*/)
     {
-        // already set with macro DISTRHO_PLUGIN_MAX_NUM_OUTPUTS
+        // already set with macro DISTRHO_PLUGIN_NUM_OUTPUTS
     }
 
     void setUniqueID(long uniqueId)
@@ -214,11 +242,16 @@ public:
 
     double getSampleRate()
     {
-        return m_sampleRate;
+        return d_sampleRate();
+    }
+
+    uint32_t getBufferSize()
+    {
+        return d_bufferSize();
     }
 
     // unused conversion methods
-#ifdef DISTRHO_BASE_VST_COMPAT
+#ifdef DISTRHO_PLUGIN_BASE_VST_COMPAT
     virtual void dB2string(float, char*) {}
     virtual void Hz2string(float, char*) {}
     virtual void ms2string(float, char*) {}
@@ -242,7 +275,7 @@ public:
     virtual bool getVendorString(char* text) = 0;
     virtual void getProgramName (char* name) = 0;
 
-#ifdef DISTRHO_BASE_VST_COMPAT
+#ifdef DISTRHO_PLUGIN_BASE_VST_COMPAT
     virtual long  getVendorVersion() = 0;
     virtual void  setParameter(long index, float value) = 0;
     virtual float getParameter(long index) = 0;
@@ -256,7 +289,7 @@ public:
     virtual float getParameter(int32_t index) = 0;
     virtual void getParameterName(int32_t index, char* text) = 0;
     virtual void getParameterLabel(int32_t index, char* label) = 0;
-    virtual void process(float** inputs, float** outputs, int32_t sampleFrames) {} // optional
+    virtual void process(float** /*inputs*/, float** /*outputs*/, int32_t /*sampleFrames*/) {} // optional
     virtual void processReplacing(float** inputs, float** outputs, int32_t sampleFrames) = 0;
 #endif
 

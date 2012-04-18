@@ -7,6 +7,7 @@
 #include "lv2-sdk/event-helpers.h"
 #include "lv2-sdk/midi.h"
 #include "lv2-sdk/urid.h"
+#include "lv2-sdk/ui.h"
 
 #include <fstream>
 #include <iostream>
@@ -24,7 +25,7 @@ public:
     DistrhoPluginLv2(double sampleRate)
     {
         m_plugin = createDistrhoPlugin();
-        //m_plugin->d_init();
+        m_plugin->d_init();
 
         lastBufferSize = 512;
         m_plugin->d_setSampleRate(sampleRate);
@@ -45,7 +46,7 @@ public:
 
     virtual ~DistrhoPluginLv2()
     {
-        //m_plugin->d_cleanup();
+        m_plugin->d_cleanup();
         delete m_plugin;
 
         lastControlValues.clear();
@@ -113,6 +114,9 @@ public:
 
     void lv2_run(uint32_t samples)
     {
+        if (samples == 0)
+            return;
+
         // Check for updated bufferSize
         if (samples >= 2 && samples != lastBufferSize)
         {
@@ -133,7 +137,7 @@ public:
                 curValue = *(float*)portControls[i];
                 pinfo = m_plugin->d_parameterInfo(i);
 
-                if (lastControlValues[i] != curValue && ! (pinfo->hints & PARAMETER_IS_OUTPUT))
+                if (lastControlValues[i] != curValue && (pinfo->hints & PARAMETER_IS_OUTPUT) == 0)
                 {
                     m_plugin->d_setParameterValue(i, curValue);
                     lastControlValues[i] = curValue;
@@ -237,7 +241,7 @@ extern "C" __attribute__ ((visibility("default")))
 void lv2_generate_ttl()
 {
     DistrhoPluginBase* plugin = createDistrhoPlugin();
-    //plugin->d_init();
+    plugin->d_init();
 
     const char* plugin_name = plugin->d_name();
     char* plugin_binary = strdup(plugin_name);
@@ -257,10 +261,10 @@ void lv2_generate_ttl()
     std::fstream manifest_file("manifest.ttl", std::ios::out);
 
     std::string manifest_string;
-    manifest_string += "@prefix lv2:  <http://lv2plug.in/ns/lv2core#> .\n";
+    manifest_string += "@prefix lv2:  <" LV2_CORE_PREFIX "> .\n";
     manifest_string += "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\n";
 #if DISTRHO_PLUGIN_WANTS_UI
-    manifest_string += "@prefix ui:   <http://lv2plug.in/ns/extensions/ui#> .\n";
+    manifest_string += "@prefix ui:   <" LV2_UI_PREFIX "> .\n";
 #endif
     manifest_string += "\n";
 
@@ -292,11 +296,13 @@ void lv2_generate_ttl()
 
     std::string plugin_string;
     plugin_string += "@prefix doap: <http://usefulinc.com/ns/doap#> .\n";
-    plugin_string += "@prefix ev:   <http://lv2plug.in/ns/ext/event#> .\n";
+#if DISTRHO_PLUGIN_IS_SYNTH
+    plugin_string += "@prefix ev:   <" LV2_EVENT_PREFIX "> .\n";
+#endif
     plugin_string += "@prefix foaf: <http://xmlns.com/foaf/0.1/> .\n";
-    plugin_string += "@prefix lv2:  <http://lv2plug.in/ns/lv2core#> .\n";
+    plugin_string += "@prefix lv2:  <" LV2_CORE_PREFIX "> .\n";
 #if DISTRHO_PLUGIN_WANTS_UI
-    plugin_string += "@prefix ui:   <http://lv2plug.in/ns/extensions/ui#> .\n";
+    plugin_string += "@prefix ui:   <" LV2_UI_PREFIX "> .\n";
 #endif
     plugin_string += "\n";
 
@@ -450,7 +456,7 @@ void lv2_generate_ttl()
     std::cout << " done!" << std::endl;
 
     free(plugin_binary);
-    //plugin->d_cleanup();
+    plugin->d_cleanup();
     delete plugin;
 }
 

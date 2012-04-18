@@ -4,8 +4,6 @@
 
 -----------------------------------------------------------------------------*/
 
-#include <iostream>
-
 #include "Bitcrusher.cpp"
 //#include "BitcrusherEdit.cpp"
 //#include "BCEditor.cpp"

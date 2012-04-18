@@ -78,6 +78,10 @@ public:
     virtual void  d_setParameterValue(uint32_t index, float value) = 0;
     virtual void  d_setCurrentProgram(uint32_t index) = 0;
 
+    // Init
+    virtual void d_init() = 0;
+    virtual void d_cleanup() = 0;
+
     // Process stuff
     virtual void d_activate() = 0;
     virtual void d_deactivate() = 0;
@@ -85,9 +89,11 @@ public:
 
     // -------------------------------------------------
 
-    // ...
+    // Host state
     double d_sampleRate();
     uint32_t d_bufferSize();
+
+    // TODO - time-pos
 
     // -------------------------------------------------
 
@@ -112,9 +118,6 @@ protected:
 private:
     uint32_t m_parameterCount;
     uint32_t m_programCount;
-    //uint32_t m_audioInputs;
-    //uint32_t m_audioOutputs;
-
     double   m_sampleRate;
     uint32_t m_bufferSize;
 };

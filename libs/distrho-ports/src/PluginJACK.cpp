@@ -21,11 +21,12 @@ public:
     DistrhoPluginJACK()
     {
         m_plugin = createDistrhoPlugin();
+        m_plugin->d_init();
+
         j_client = jack_client_open(m_plugin->d_name(), JackNullOption, 0);
 
         if (j_client)
         {
-            // init plugin
             m_plugin->d_setSampleRate(jack_get_sample_rate(j_client));
             m_plugin->d_setBufferSize(jack_get_buffer_size(j_client));
 
@@ -66,6 +67,8 @@ public:
 
         j_ains.clear();
         j_aouts.clear();
+
+        m_plugin->d_cleanup();
 
         delete m_ui;
         delete m_plugin;
