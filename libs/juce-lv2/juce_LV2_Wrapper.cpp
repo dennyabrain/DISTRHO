@@ -20,7 +20,7 @@
 * Features are:
 * - atom based MIDI and Time-Pos
 */
-#define JUCE_LV2_ENABLE_DEV_FEATURES 1
+#define JUCE_LV2_ENABLE_DEV_FEATURES 0
 
 /*
  * Available macros:

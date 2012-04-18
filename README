@@ -59,6 +59,7 @@ To build plugins, you first need to install the following dependencies:
 
  All OSes:
 
+- fftw3
 - premake
 - Qt4
 
