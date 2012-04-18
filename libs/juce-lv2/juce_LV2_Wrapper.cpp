@@ -43,6 +43,10 @@
 
 // LV2 includes
 #include "includes/lv2.h"
+#include "includes/atom.h"
+#include "includes/atom-util.h"
+#include "includes/event.h"
+#include "includes/event-helpers.h"
 #include "includes/instance-access.h"
 #include "includes/midi.h"
 #include "includes/port-props.h"
@@ -52,17 +56,7 @@
 #include "includes/ui.h"
 #include "includes/units.h"
 #include "includes/urid.h"
-
 #include "includes/lv2_external_ui.h"
-
-#if JUCE_LV2_ENABLE_DEV_FEATURES
- #include "includes/atom.h"
- #include "includes/atom-util.h"
-#else
- #define LV2_ATOM__String "http://lv2plug.in/ns/ext/atom#String"
- #include "includes/event.h"
- #include "includes/event-helpers.h"
-#endif
 
 #include "modules/juce_audio_plugin_client/utility/juce_IncludeModuleHeaders.h"
 

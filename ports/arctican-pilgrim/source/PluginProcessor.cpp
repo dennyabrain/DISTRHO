@@ -15,11 +15,11 @@
 //==============================================================================
 ThePilgrimAudioProcessor::ThePilgrimAudioProcessor()
 {
-	filterFreq=0.5;
-	samplesInBlock=0;
-	globalSampleRate=0.0;
-	mixAmount=1.0;
-	currentPreset=0;
+	learnIsActive=0;
+	currentLearnParam=0;
+	contnumber=0;
+	contvalue=0;
+	lastMovedParam=0;
 }
 
 ThePilgrimAudioProcessor::~ThePilgrimAudioProcessor()
@@ -39,47 +39,60 @@ int ThePilgrimAudioProcessor::getNumParameters()
 
 float ThePilgrimAudioProcessor::getParameter (int index)
 {
-    switch (index)
-    {
-        case filterFreqParam:		return filterFreq;
-		case mixParam:				return mixAmount;
-
-        default:            return 0.0f;
-    }
+	if (index == 0)
+		return filterParameter.getValue();
+	else if (index == 1)
+		return mixParameter.getValue();
+	return 0.0f;
 }
 
 void ThePilgrimAudioProcessor::setParameter (int index, float newValue)
 {
-	switch (index)
-    {
-        case filterFreqParam:		
-			{
-				filterFreq = newValue; 
-				filterChanged();
-				break;
-			}
-        case mixParam:				mixAmount = newValue;  break;
-
-        default:            break;
-    }
+	if (index == filterFreqParam)
+		filterParameter.setValue(newValue);
+	else if (index == mixParam)
+		mixParameter.setValue(newValue);	
 }
 
 const String ThePilgrimAudioProcessor::getParameterName (int index)
 {
-
-	switch (index)
-    {
-        case filterFreqParam:		return "Frequency";
-        case mixParam:				return "Mix";
-
-        default:            break;
-    }
+	if (index == filterFreqParam)
+		return "Filter Freq";
+	else if (index == mixParam)
+		return "Mix";
     return String::empty;
 }
 
 const String ThePilgrimAudioProcessor::getParameterText (int index)
 {
-    return String (getParameter (index), 2);
+	String output;
+	double newFilterFreq;	
+	
+	if (index == 0) {
+
+		if (filterParameter.getSmoothedValue() <= 0.5)
+		{
+			newFilterFreq = filterParameter.getValue() * 2.0;						// Scale 0.0-0.5 to 0-1
+			newFilterFreq = newFilterFreq * newFilterFreq * newFilterFreq;	// Cube values for smoother control
+			newFilterFreq  = (newFilterFreq * 19940.0) + 60;				// Scale to 60Hz to 20000Hz LOWPASS
+		}
+		else if (filterParameter.getSmoothedValue() > 0.5)
+		{
+			newFilterFreq = (filterParameter.getValue() - 0.5) * 2.0;				// Scale 0.5-1.0 to 0-1
+			newFilterFreq = newFilterFreq * newFilterFreq * newFilterFreq;	// Cube values for smoother control
+			newFilterFreq = (newFilterFreq * 18980.0) + 20;					// 20Hz to 19000Hz HIGHPASS
+		}
+	
+		output = String(newFilterFreq)+"Hz";
+		return output;
+	}
+	else if (index == 1)
+	{
+		int percent = (int(mixParameter.getValue()) * 100);
+		output = String(percent)+"%";
+		return output;
+	}
+    return String::empty;
 }
 
 const String ThePilgrimAudioProcessor::getInputChannelName (int channelIndex) const
@@ -122,73 +135,21 @@ bool ThePilgrimAudioProcessor::producesMidi() const
 
 int ThePilgrimAudioProcessor::getNumPrograms()
 {
-    return 5;
+    return 0;
 }
 
 int ThePilgrimAudioProcessor::getCurrentProgram()
 {
-    return currentPreset;
+    return 0;
 }
 
 void ThePilgrimAudioProcessor::setCurrentProgram (int index)
 {
-	if((Time::getMillisecondCounter()-timeSinceChunkCalled)<200) // Thanks to "valhallasound" from the JUCE forum for this tip! :)
-      return;
-
-	switch(index)
-	{
-	case 0:
-	  filterFreq = 0.5f;
-	  mixAmount = 1.0f;
-	  currentPreset = 0;
-	break;
-	case 1:
-	  filterFreq = 0.6f;
-	  mixAmount = 1.0f;
-	  currentPreset = 1;
-	break;
-	case 2:
-	  filterFreq = 0.4f;
-	  mixAmount = 1.0f;
-	  currentPreset = 2;
-	break;
-	case 3:
-	  filterFreq = 0.6f;
-	  mixAmount = 0.5f;
-	  currentPreset = 3;
-	break;
-	case 4:
-	  filterFreq = 0.4f;
-	  mixAmount = 0.5f;
-	  currentPreset = 4;
-	break;
-	}
-	filterChanged();
 }
 
 const String ThePilgrimAudioProcessor::getProgramName (int index)
 {
-	switch(index)
-	{
-		case 0:
-			return "All Pass";
-			break;
-		case 1:
-			return "Bass Cut";
-			break;
-		case 2:
-			return "Treble Cut";
-			break;
-		case 3:
-			return "Bass Attenuator";
-			break;
-		case 4:
-			return "Treble Attenuator";
-			break;
-		default:
-			return "This isn't a preset";
-			break;
-	}
+    return String("Default");
 }
 
 void ThePilgrimAudioProcessor::changeProgramName (int index, const String& newName)
@@ -200,14 +161,13 @@ void ThePilgrimAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
-
-	samplesInBlock = samplesPerBlock;
-	globalSampleRate = sampleRate;
-	filterChanged();
+	globalSampleRate=sampleRate;
+	updateFilter();
 	lowFilterL.reset();
 	lowFilterR.reset();
 	highFilterL.reset();
 	highFilterR.reset();
+	
 }
 
 void ThePilgrimAudioProcessor::releaseResources()
@@ -218,34 +178,110 @@ void ThePilgrimAudioProcessor::releaseResources()
 
 void ThePilgrimAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
 {
+	
+	MidiMessage message;
+	MidiBuffer::Iterator i (midiMessages);
+	int messageFrameRelativeTothisProcess;
+	while (i.getNextEvent (message, messageFrameRelativeTothisProcess))
+	{
+		if (message.isController() == true) 
+		{
+				
+				
+				
+			// Get values
+			contnumber = message.getControllerNumber();
+			contvalue = message.getControllerValue();
+			
+			
+			// Live Mode
+			if (learnIsActive == false)
+			{	
+				// Update Parameter
+				if (contnumber == filterParameter.getControllerNumber()) 
+					setParameter(filterFreqParam, (float(contvalue) / 127.0) );
+				else if (contnumber == mixParameter.getControllerNumber()) 
+					setParameter(mixParam, (float(contvalue) / 127.0) );
+			}	
+			
+			// Learn Mode
+			if (learnIsActive == true) 
+			{
+				if (currentLearnParam == 0) 
+				{
+					filterParameter.setControllerNumber(contnumber);
+				}
+				else if (currentLearnParam == 1)
+				{
+					mixParameter.setControllerNumber(contnumber);
+				}
+			}			
+				
+		}
+		
+		
+		
+		
+   }
+		
+		
+		//bool isController() const noexcept;
+
+   // int getControllerNumber() const noexcept;
+// get Controller name
+
+   // int getControllerValue() const noexcept;
+	
+	
+	
+	// TIDY UP THIS SO ANY VALUE WORKS
+	int samplesUntilSmooth = 8;
+	int currentSmoothSample = 0;
+	int smoothSampleWas = 0;
+	
     // This is the place where you'd normally do the guts of your plugin's
     // audio processing...
-
-	// Dry Buffer
-	AudioSampleBuffer dryBuffer = buffer;
-
-    for (int channel = 0; channel < getNumInputChannels(); ++channel)
+	
+	// The 'for' loop cycles through each channel at a time.
+    for (int channel = 0; channel < getNumInputChannels(); ++channel) 
     {
         float* channelData = buffer.getSampleData (channel);
+		AudioSampleBuffer dryBuffer = buffer;
         float* dryData = dryBuffer.getSampleData (channel);
-		
-		if (channel == 0)
-		{
-				lowFilterL.processSamples(channelData, buffer.getNumSamples());
-				highFilterL.processSamples(channelData, buffer.getNumSamples());
-		}
-		else if (channel == 1)
-		{
-				lowFilterR.processSamples(channelData, buffer.getNumSamples());
-				highFilterR.processSamples(channelData, buffer.getNumSamples());
-		}
-		
-		for (int i = 0; i < buffer.getNumSamples(); ++i)
-		{
-			channelData[i] = (channelData[i] * mixAmount) + (dryData[i] * ((mixAmount - 1) * -1.0));
-		}
-    }
+			
+			for (int i = 0; i < buffer.getNumSamples(); ++i)
+			{
+				
+			// Smoother //
+				currentSmoothSample++;
+				if (currentSmoothSample>samplesUntilSmooth) {
+					filterParameter.smooth();
+					mixParameter.smooth();
+					currentSmoothSample=currentSmoothSample-samplesUntilSmooth;
+					updateFilter();
+				}
+			//////////////
+				
+				
+				// Filter Channels
+				if (channel == 0){
+					channelData[i] = lowFilterL.processSingleSampleRaw(channelData[i]);
+					channelData[i] = highFilterL.processSingleSampleRaw(channelData[i]);}
+				else if (channel == 1){
+					channelData[i] = lowFilterR.processSingleSampleRaw(channelData[i]);
+					channelData[i] = highFilterR.processSingleSampleRaw(channelData[i]);}			
+				//////////////////
 
+				// Mix (Wet/Dry)
+				channelData[i] = (channelData[i] * mixParameter.getSmoothedValue()) + (dryData[i] * ((mixParameter.getSmoothedValue() - 1) * -1.0));
+				/////
+				
+					//channelData[i] = channelData[i] * filterParameter.getSmoothedValue();			
+			}	
+		
+		currentSmoothSample=smoothSampleWas;
+		
+    }
 
     // In case we have more outputs than inputs, we'll clear any output
     // channels that didn't contain input data, (because these aren't
@@ -254,6 +290,33 @@ void ThePilgrimAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuff
     {
         buffer.clear (i, 0, buffer.getNumSamples());
     }
+}
+
+void ThePilgrimAudioProcessor::updateFilter()
+{
+	double filterFreq = double(filterParameter.getSmoothedValue());
+	
+	if (filterParameter.getSmoothedValue() <= 0.5)
+	{
+		double newFilterFreq = filterFreq * 2.0;						// Scale 0.0-0.5 to 0-1
+		newFilterFreq = newFilterFreq * newFilterFreq * newFilterFreq;	// Cube values for smoother control
+		newFilterFreq  = (newFilterFreq * 19940.0) + 60;				// Scale to 60Hz to 20000Hz LOWPASS
+		lowFilterL.makeLowPass(globalSampleRate, newFilterFreq);
+		lowFilterR.makeLowPass(globalSampleRate, newFilterFreq);
+		highFilterL.makeHighPass(globalSampleRate, 20.0);
+		highFilterR.makeHighPass(globalSampleRate, 20.0);
+	}
+	else if (filterParameter.getSmoothedValue() > 0.5)
+	{
+		double newFilterFreq = (filterFreq - 0.5) * 2.0;				// Scale 0.5-1.0 to 0-1
+		newFilterFreq = newFilterFreq * newFilterFreq * newFilterFreq;	// Cube values for smoother control
+		newFilterFreq = (newFilterFreq * 18980.0) + 20;					// 20Hz to 19000Hz HIGHPASS
+		highFilterL.makeHighPass(globalSampleRate, newFilterFreq);
+		highFilterR.makeHighPass(globalSampleRate, newFilterFreq);
+		lowFilterL.makeLowPass(globalSampleRate, 20000.0);
+		lowFilterR.makeLowPass(globalSampleRate, 20000.0);
+	}
+	
 }
 
 //==============================================================================
@@ -275,45 +338,75 @@ void ThePilgrimAudioProcessor::getStateInformation (MemoryBlock& destData)
     // as intermediaries to make it easy to save and load complex data.
 	// Create an outer XML element..
     XmlElement xml ("MYPLUGINSETTINGS");
-
+	
     // add some attributes to it..
-   // xml.setAttribute ("uiWidth", lastUIWidth);
-   // xml.setAttribute ("uiHeight", lastUIHeight);
+	// xml.setAttribute ("uiWidth", lastUIWidth);
+	// xml.setAttribute ("uiHeight", lastUIHeight);
     //xml.setAttribute ("gain", gain);
-   // xml.setAttribute ("delay", delay);
-	xml.setAttribute ("freq", filterFreq);
-	xml.setAttribute ("mix", mixAmount);
-
-
+	// xml.setAttribute ("delay", delay);
+	xml.setAttribute ("freq", filterParameter.getValue());
+	xml.setAttribute ("mix", mixParameter.getValue());
+	xml.setAttribute ("freqCC", filterParameter.getControllerNumber());
+	xml.setAttribute ("mixCC", mixParameter.getControllerNumber());	
+	
     // then use this helper function to stuff it into the binary blob and return it..
     copyXmlToBinary (xml, destData);
-
-
 }
 
 void ThePilgrimAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
-
-	timeSinceChunkCalled = Time::getMillisecondCounter();
-
+	
+	//timeSinceChunkCalled = Time::getMillisecondCounter();
+	
 	ScopedPointer<XmlElement> xmlState (getXmlFromBinary (data, sizeInBytes));
-
+	
     if (xmlState != 0)
     {
         // make sure that it's actually our type of XML object..
         if (xmlState->hasTagName ("MYPLUGINSETTINGS"))
         {
             // ok, now pull out our parameters..
-           // gain  = xmlState->getIntAttribute ("gain", gain);
+			// gain  = xmlState->getIntAttribute ("gain", gain);
             //lastUIHeight = xmlState->getIntAttribute ("uiHeight", lastUIHeight);
-
-            filterFreq  = (float) xmlState->getDoubleAttribute ("freq", filterFreq);
-            mixAmount  = (float) xmlState->getDoubleAttribute ("mix", mixAmount);
-
+			
+            filterParameter.setValue((float) xmlState->getDoubleAttribute ("freq", 0));
+            mixParameter.setValue((float) xmlState->getDoubleAttribute ("mix", 0));
+            filterParameter.setControllerNumber((float) xmlState->getDoubleAttribute ("freqCC", 0));
+            mixParameter.setControllerNumber((float) xmlState->getDoubleAttribute ("mixCC", 0));
+			
         }
 	}
+}
+
+String ThePilgrimAudioProcessor::getStateInformationString ()
+{
+    XmlElement xml ("MYPLUGINSETTINGS");
+
+    //xml.setAttribute ("freq", filterParameter.getValue());
+    //xml.setAttribute ("mix", mixParameter.getValue());
+    xml.setAttribute ("freqCC", filterParameter.getControllerNumber());
+    xml.setAttribute ("mixCC", mixParameter.getControllerNumber()); 
+
+    return xml.createDocument (String::empty);
+}
+
+void ThePilgrimAudioProcessor::setStateInformationString (const String& data)
+{
+    XmlElement* const xmlState = XmlDocument::parse(data);
+    
+    if (xmlState != 0)
+    {
+        // make sure that it's actually our type of XML object..
+        if (xmlState->hasTagName ("MYPLUGINSETTINGS"))
+        {  
+            //filterParameter.setValue((float) xmlState->getDoubleAttribute ("freq", 0));
+            //mixParameter.setValue((float) xmlState->getDoubleAttribute ("mix", 0));
+            filterParameter.setControllerNumber((float) xmlState->getDoubleAttribute ("freqCC", 0));
+            mixParameter.setControllerNumber((float) xmlState->getDoubleAttribute ("mixCC", 0));
+        }
+    }
 }
 
 //==============================================================================
@@ -321,29 +414,4 @@ void ThePilgrimAudioProcessor::setStateInformation (const void* data, int sizeIn
 AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new ThePilgrimAudioProcessor();
-}
-
-
-void ThePilgrimAudioProcessor::filterChanged(void)
-{
-	if (filterFreq <= 0.5)
-	{
-		double newFilterFreq = filterFreq * 2.0;						// Scale 0.0-0.5 to 0-1
-		newFilterFreq = newFilterFreq * newFilterFreq * newFilterFreq;	// Cube values for smoother control
-		newFilterFreq  = (newFilterFreq * 19940.0) + 60;				// Scale to 60Hz to 20000Hz LOWPASS
-		lowFilterL.makeLowPass(globalSampleRate, newFilterFreq);
-		lowFilterR.makeLowPass(globalSampleRate, newFilterFreq);
-		highFilterL.makeHighPass(globalSampleRate, 20.0);
-		highFilterR.makeHighPass(globalSampleRate, 20.0);
-	}
-	else if (filterFreq > 0.5)
-	{
-		double newFilterFreq = (filterFreq - 0.5) * 2.0;				// Scale 0.5-1.0 to 0-1
-		newFilterFreq = newFilterFreq * newFilterFreq * newFilterFreq;	// Cube values for smoother control
-		newFilterFreq = (newFilterFreq * 18980.0) + 20;					// 20Hz to 19000Hz HIGHPASS
-		highFilterL.makeHighPass(globalSampleRate, newFilterFreq);
-		highFilterR.makeHighPass(globalSampleRate, newFilterFreq);
-		lowFilterL.makeLowPass(globalSampleRate, 20000.0);
-		lowFilterR.makeLowPass(globalSampleRate, 20000.0);
-	}
 }

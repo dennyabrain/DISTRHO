@@ -20,28 +20,31 @@
 #define JucePlugin_MaxNumOutputChannels 2
 #define JucePlugin_PreferredChannelConfigurations   {1, 1}, {2, 2}
 #define JucePlugin_IsSynth              0
-#define JucePlugin_WantsMidiInput       0
+#define JucePlugin_WantsMidiInput       1
 #define JucePlugin_ProducesMidiOutput   0
 #define JucePlugin_SilenceInProducesSilenceOut  0
 #define JucePlugin_TailLengthSeconds    0
 #define JucePlugin_EditorRequiresKeyboardFocus  1
-#define JucePlugin_VersionCode          0x10000
-#define JucePlugin_VersionString        "1.0.0"
+#define JucePlugin_VersionCode          0x20000
+#define JucePlugin_VersionString        "2.0.0"
 #define JucePlugin_VSTUniqueID          JucePlugin_PluginCode
 #define JucePlugin_VSTCategory          kPlugCategEffect
 #define JucePlugin_AUMainType           kAudioUnitType_Effect
 #define JucePlugin_AUSubType            JucePlugin_PluginCode
-#define JucePlugin_AUExportPrefix       ThePilgrimProjectAU
-#define JucePlugin_AUExportPrefixQuoted "ThePilgrimProjectAU"
+#define JucePlugin_AUExportPrefix       ThePilgrim2ProjectAU
+#define JucePlugin_AUExportPrefixQuoted "ThePilgrim2ProjectAU"
 #define JucePlugin_AUManufacturerCode   JucePlugin_ManufacturerCode
-#define JucePlugin_CFBundleIdentifier   com.arcticanaudio.ThePilgrim
-#define JucePlugin_AUCocoaViewClassName ThePilgrimProjectAU_V1
+#define JucePlugin_CFBundleIdentifier   com.arcticanaudio.ThePilgrim2
+#define JucePlugin_AUCocoaViewClassName ThePilgrim2ProjectAU_V1
 #define JucePlugin_RTASCategory         ePlugInCategory_None
 #define JucePlugin_RTASManufacturerCode JucePlugin_ManufacturerCode
 #define JucePlugin_RTASProductId        JucePlugin_PluginCode
 
-#define JucePlugin_LV2URI               "http://arcticanaudio.com/plugins/thepilgrim"
-#define JucePlugin_LV2Category          "PhaserPlugin"
-#define JucePlugin_WantsLV2Presets      1
+#define JucePlugin_LV2URI                 "http://arcticanaudio.com/plugins/thepilgrim"
+#define JucePlugin_LV2Category            "PhaserPlugin"
+#define JucePlugin_WantsLV2Presets        1
+#define JucePlugin_WantsLV2State          1
+#define JucePlugin_WantsLV2StateString    1
+#define JucePlugin_WantsLV2InstanceAccess 1
 
 #endif   // __PLUGINCHARACTERISTICS_D4EFFF1A__

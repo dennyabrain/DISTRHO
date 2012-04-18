@@ -1,5 +1,5 @@
 
-project.name    = "ThePilgrim"
+project.name    = "ThePilgrim2"
 project.bindir  = "../../../bin"
 project.libdir  = project.bindir
 project.configs = { "Release", "Debug" }
@@ -53,9 +53,6 @@ package.libpaths = {
 package.files = {
   matchfiles (
     "../source/*.cpp",
-    "../source/Headers/UI/Knob.cpp",
-    "../source/Headers/Binary Data/Backgrounds/thepilgrimbackground.cpp",
-    "../source/Headers/Binary Data/UI/knobs.cpp",
     "../../../libs/juce-plugin/JucePluginMain.cpp"
   )
 }

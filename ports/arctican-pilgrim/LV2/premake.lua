@@ -56,9 +56,6 @@ package.libpaths = {
 package.files = {
   matchfiles (
     "../source/*.cpp",
-    "../source/Headers/UI/Knob.cpp",
-    "../source/Headers/Binary Data/Backgrounds/thepilgrimbackground.cpp",
-    "../source/Headers/Binary Data/UI/knobs.cpp",
     "../../../libs/juce-plugin/JucePluginMain.cpp"
   )
 }

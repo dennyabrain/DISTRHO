@@ -8,39 +8,34 @@
   ==============================================================================
 */
 
-#ifndef __VOLUMEDIAL_H_CFF4EBB1__
-#define __VOLUMEDIAL_H_CFF4EBB1__
+#ifndef __MIDIBUTTON__
+#define __MIDIBUTTON__
 
 #include "JuceHeader.h"
 #include "JucePluginCharacteristics.h"
-#include "../Binary Data/UI/knobs.h"
+#include "KnobsBI.h"
 
 
 //==============================================================================
-/**
-*/
-class Knob  : public Slider
+/**	Button that toggles MIDI learn on and off. Very hacky, need to redo.**/
 
+class MIDIButton  :	public TextButton
 {
 public:
     //==============================================================================
-    Knob();
-    ~Knob();
-
-	String getTextFromValue (double value);
-	void setReadoutType(String type);
-	//void Slider::PopupDisplayComponent::BubbleComponent::paint(Graphics& g);
+    MIDIButton();
+    ~MIDIButton();
 
     void paint (Graphics& g);
+	void setIsLearning(bool isItLearning);
+
 
 private:
     //==============================================================================
 
-	Image knobImage,smallKnobImage;
-	int frameWidth;
-	String readoutType;
-	String testReadout;
-
+	Image buttonImage;
+	bool isLearning;
+	
 };
 
-#endif  // __VOLUMEDIAL_H_CFF4EBB1__
+#endif  // __MIDIBUTTON__

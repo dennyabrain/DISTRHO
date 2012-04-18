@@ -8,26 +8,25 @@
   ==============================================================================
 */
 
-#ifndef __PLUGINEDITOR_H_CC807F53__
-#define __PLUGINEDITOR_H_CC807F53__
+#ifndef __PLUGINEDITOR_H_A5624E04__
+#define __PLUGINEDITOR_H_A5624E04__
 
 #include "JuceHeader.h"
 #include "JucePluginCharacteristics.h"
 #include "PluginProcessor.h"
+#include "Knob.h"
+#include "BackgroundImage.h"
+#include "MIDIButton.h"
 
-// UI Elements
-#include "Headers/UI/Knob.h"
-//#include "Headers/UI/FancyButton.h"
-
-// Background Binary Data
-#include "Headers/Binary Data/Backgrounds/thepilgrimbackground.h"
 
 //==============================================================================
 /**
 */
 class ThePilgrimAudioProcessorEditor  : public AudioProcessorEditor,
-										public SliderListener,
+										public Slider::Listener,
+										public Button::Listener,
 										public Timer
+
 {
 public:
     ThePilgrimAudioProcessorEditor (ThePilgrimAudioProcessor* ownerFilter);
@@ -36,19 +35,27 @@ public:
     //==============================================================================
     // This is just a standard Juce paint method...
     void paint (Graphics& g);
-	void sliderValueChanged (Slider* slider);
-	void resized();
+	void resized ();
+	void sliderValueChanged (Slider *slider);
 	void timerCallback();
-
-	Image backgroundGUI;
-	Knob filterKnob;
-	Knob wetdryKnob;
-
+	void buttonClicked(Button *buttonThatWasClicked);
+	void actionListenerCallback (const String &message);
+	
 	ThePilgrimAudioProcessor* getProcessor() const
     {
         return static_cast <ThePilgrimAudioProcessor*> (getAudioProcessor());
     }
+	
+private:
+	Knob filterSlider;
+	Knob mixSlider;
+	Image bgImage;
+	//Label contNo;
+	//Label contVal;
+	MIDIButton learnButton;
+	
+
 };
 
 
-#endif  // __PLUGINEDITOR_H_CC807F53__
+#endif  // __PLUGINEDITOR_H_A5624E04__

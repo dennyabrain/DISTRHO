@@ -8,11 +8,13 @@
   ==============================================================================
 */
 
-#ifndef __PLUGINPROCESSOR_H_67671760__
-#define __PLUGINPROCESSOR_H_67671760__
+#ifndef __PLUGINPROCESSOR_H_34DAFF0F__
+#define __PLUGINPROCESSOR_H_34DAFF0F__
 
 #include "JuceHeader.h"
 #include "JucePluginCharacteristics.h"
+
+#include "PluginParameter.h"
 
 
 //==============================================================================
@@ -64,33 +66,45 @@ public:
     //==============================================================================
     void getStateInformation (MemoryBlock& destData);
     void setStateInformation (const void* data, int sizeInBytes);
-	void filterChanged(void);
 
-	enum Parameters
-    {
-        filterFreqParam = 0,
-		mixParam,
+    String getStateInformationString ();
+    void setStateInformationString (const String& data);
 
-        totalNumParams
-    };
+    //==============================================================================
+    //	USER FUNCTIONS =============================================================
+    //==============================================================================
+	
+	void updateFilter();
 
-
+	PluginParameter filterParameter;
+	PluginParameter mixParameter;
+	
 	IIRFilter highFilterL;
 	IIRFilter highFilterR;
 	IIRFilter lowFilterL;
 	IIRFilter lowFilterR;
-
-	int samplesInBlock;
+	
 	double globalSampleRate;
-	double filterFreq;
-	double mixAmount;
-	int currentPreset;
-	int timeSinceChunkCalled;
-
-
+	
+	enum Parameters
+    {
+        filterFreqParam = 0,
+		mixParam,
+		
+        totalNumParams
+    };
+	
+	int contnumber;
+	int contvalue;
+	bool learnIsActive;
+	int currentLearnParam;
+	int lastMovedParam;
+	
+	
 private:
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ThePilgrimAudioProcessor);
+	
 };
 
-#endif  // __PLUGINPROCESSOR_H_67671760__
+#endif  // __PLUGINPROCESSOR_H_34DAFF0F__
