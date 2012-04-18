@@ -15,6 +15,7 @@ libs:
 standalone:
 	$(MAKE) -C 3BandEQ/Standalone
 	$(MAKE) -C PingPongPan/Standalone
+	$(MAKE) -C StereoAudioGain/Standalone
 
 lv2:
 	$(MAKE) -C 3BandEQ/LV2
@@ -32,6 +33,7 @@ clean:
 	# Standalone
 	$(MAKE) clean -C 3BandEQ/Standalone
 	$(MAKE) clean -C PingPongPan/Standalone
+	$(MAKE) clean -C StereoAudioGain/Standalone
 
 	# LV2
 	$(MAKE) clean -C 3BandEQ/LV2
