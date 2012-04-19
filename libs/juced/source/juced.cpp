@@ -38,7 +38,7 @@
 
 #include <stdint.h>
 
-#ifdef JUCE_LINUX
+#if LINUX
 #include <unistd.h>
 #endif
 
