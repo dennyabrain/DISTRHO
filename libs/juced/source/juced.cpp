@@ -38,6 +38,10 @@
 
 #include <stdint.h>
 
+#ifdef JUCE_LINUX
+#include <unistd.h>
+#endif
+
 #include "../../juce-2.0/source/modules/juce_core/native/juce_BasicNativeHeaders.h"
 #include "juced.h"
 

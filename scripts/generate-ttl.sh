@@ -17,8 +17,8 @@ FOLDERS=`find . -name \*.lv2`
 for i in $FOLDERS; do
   echo cd $i
   cd $i
-  echo ../../libs/lv2_ttl_generator ./*.so
-  ../../libs/lv2_ttl_generator ./*.so
+  echo "if [ ! -f ./manifest.ttl ]; then ../../libs/lv2_ttl_generator ./*.so; fi"
+  if [ ! -f ./manifest.ttl ]; then ../../libs/lv2_ttl_generator ./*.so; fi
   echo cd ..
   cd ..
 done
