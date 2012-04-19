@@ -30,11 +30,9 @@ typedef int32_t VstInt32;
 typedef void* audioMasterCallback;
 typedef DistrhoPluginBase AudioEffect;
 
-extern AudioEffect* createEffectInstance(audioMasterCallback audioMaster);
-
 // ---------------------------------------------------------------------------------------------
 
-void name_to_symbol(char* text)
+static inline void name_to_symbol(char* text)
 {
     for (size_t i = 0, len = strlen(text); i < len; i++)
     {
@@ -300,12 +298,5 @@ private:
     long m_uniqueId;
     uint32_t vst_hints;
 };
-
-// ---------------------------------------------------------------------------------------------
-
-DistrhoPluginBase* createDistrhoPlugin()
-{
-   return createEffectInstance(nullptr);
-}
 
 #endif // __DISTRHO_PORT_VST__

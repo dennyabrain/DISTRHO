@@ -22,5 +22,6 @@ INCLUDEPATH = \
 
 # -----------------------------------------------------------
 
+CONFIG += DISTRHO_PLUGIN_BASE_VST
 CONFIG += DISTRHO_PLUGIN_TARGET_LV2
 include(../../../libs/distrho-ports/d_src.pri)

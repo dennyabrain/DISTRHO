@@ -7,6 +7,10 @@ HEADERS     += $$PWD/UiBase.h
 
 SOURCES     += $$PWD/src/PluginBase.cpp
 
+DISTRHO_PLUGIN_BASE_VST {
+SOURCES     += $$PWD/src/d_vst.cpp
+}
+
 DISTRHO_PLUGIN_TARGET_JACK {
 SOURCES     += $$PWD/src/PluginJACK.cpp
 CONFIG      += link_pkgconfig
