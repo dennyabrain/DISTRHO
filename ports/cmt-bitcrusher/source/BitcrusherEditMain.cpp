@@ -4,7 +4,7 @@
 
 -----------------------------------------------------------------------------*/
 
-#include "Bitcrusher.cpp"
+#include "Bitcrusher.hpp"
 //#include "BitcrusherEdit.cpp"
 //#include "BCEditor.cpp"
 //#include "c_radio_group.cpp"
