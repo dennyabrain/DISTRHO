@@ -2,7 +2,7 @@
 
 QT -= core gui
 
-CONFIG += qt resources warn_on shared dll plugin
+CONFIG  = warn_on shared dll plugin
 CONFIG += release
 #CONFIG += debug
 
