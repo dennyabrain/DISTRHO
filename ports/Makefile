@@ -40,8 +40,8 @@ standalone:
 	$(MAKE) -C tal-reverb-2/Standalone
 	$(MAKE) -C tal-reverb-3/Standalone
 	$(MAKE) -C tal-vocoder-2/Standalone
-	$(MAKE) -C wolpertinger/Standalone
 	$(MAKE) -C vex/Standalone
+	$(MAKE) -C wolpertinger/Standalone
 
 lv2:
 	$(MAKE) -C arctican-function/LV2
@@ -71,8 +71,8 @@ lv2:
 	$(MAKE) -C tal-reverb-2/LV2
 	$(MAKE) -C tal-reverb-3/LV2
 	$(MAKE) -C tal-vocoder-2/LV2
-	$(MAKE) -C wolpertinger/LV2
 	$(MAKE) -C vex/LV2
+	$(MAKE) -C wolpertinger/LV2
 
 vst:
 	$(MAKE) -C arctican-function/VST
@@ -100,8 +100,8 @@ vst:
 	$(MAKE) -C tal-reverb-2/VST
 	$(MAKE) -C tal-reverb-3/VST
 	$(MAKE) -C tal-vocoder-2/VST
-	$(MAKE) -C wolpertinger/VST
 	$(MAKE) -C vex/VST
+	$(MAKE) -C wolpertinger/VST
 
 clean:
 	# Standalone
@@ -130,8 +130,8 @@ clean:
 	$(MAKE) clean -C tal-reverb-2/Standalone
 	$(MAKE) clean -C tal-reverb-3/Standalone
 	$(MAKE) clean -C tal-vocoder-2/Standalone
-	$(MAKE) clean -C wolpertinger/Standalone
 	$(MAKE) clean -C vex/Standalone
+	$(MAKE) clean -C wolpertinger/Standalone
 
 	# LV2
 	$(MAKE) clean -C arctican-function/LV2
@@ -161,8 +161,8 @@ clean:
 	$(MAKE) clean -C tal-reverb-2/LV2
 	$(MAKE) clean -C tal-reverb-3/LV2
 	$(MAKE) clean -C tal-vocoder-2/LV2
-	$(MAKE) clean -C wolpertinger/LV2
 	$(MAKE) clean -C vex/LV2
+	$(MAKE) clean -C wolpertinger/LV2
 
 	# VST
 	$(MAKE) clean -C arctican-function/VST
@@ -190,8 +190,8 @@ clean:
 	$(MAKE) clean -C tal-reverb-2/VST
 	$(MAKE) clean -C tal-reverb-3/VST
 	$(MAKE) clean -C tal-vocoder-2/VST
-	$(MAKE) clean -C wolpertinger/VST
 	$(MAKE) clean -C vex/VST
+	$(MAKE) clean -C wolpertinger/VST
 
 	rm -rf */Standalone/intermediate
 	rm -rf */LV2/intermediate
