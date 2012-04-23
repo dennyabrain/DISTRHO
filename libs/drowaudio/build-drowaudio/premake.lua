@@ -22,8 +22,8 @@ package.config["Debug"].defines      = { "DEBUG=1", "_DEBUG=1" }
 if (windows) then
   package.defines = { "WINDOWS=1" }
 else
-  package.config["Release"].buildoptions = { "-O2 -mtune=generic -ffast-math -fomit-frame-pointer -fvisibility=hidden -fPIC" }
-  package.config["Debug"].buildoptions   = { "-O0 -ggdb -fPIC" }
+  package.config["Release"].buildoptions = { "-O2 -mtune=generic -msse -ffast-math -fomit-frame-pointer -fvisibility=hidden -fPIC" }
+  package.config["Debug"].buildoptions   = { "-O0 -ggdb -msse -fPIC" }
   if (macosx) then
     package.defines = { "MAC=1" }
     package.buildoptions =  { "-ObjC++" }
