@@ -52,14 +52,17 @@ for i in $FILES; do
 
   elif [ $WINDOWS = 1 ]; then
 
-    echo premake --os windows --target vs2005
-    premake --os windows --target vs2005
+    echo premake --os windows --target gnu --cc gcc
+    premake --os windows --target gnu --cc gcc
 
-    echo sed \""s/SubSystem=\\\"1\\\"/SubSystem=\\\"2\\\"/\"" -i `find . -name \*.vcproj`
-    sed "s/SubSystem=\"1\"/SubSystem=\"2\"/" -i `find . -name \*.vcproj`
-
-    echo sed \""s/\t\t\t\tEntryPointSymbol=\\\"mainCRTStartup\\\"//\"" -i `find . -name \*.vcproj`
-    sed "s/\t\t\t\tEntryPointSymbol=\"mainCRTStartup\"//" -i `find . -name \*.vcproj`
+#     echo premake --os windows --target vs2005
+#     premake --os windows --target vs2005
+# 
+#     echo sed \""s/SubSystem=\\\"1\\\"/SubSystem=\\\"2\\\"/\"" -i `find . -name \*.vcproj`
+#     sed "s/SubSystem=\"1\"/SubSystem=\"2\"/" -i `find . -name \*.vcproj`
+# 
+#     echo sed \""s/\t\t\t\tEntryPointSymbol=\\\"mainCRTStartup\\\"//\"" -i `find . -name \*.vcproj`
+#     sed "s/\t\t\t\tEntryPointSymbol=\"mainCRTStartup\"//" -i `find . -name \*.vcproj`
 
   fi
 

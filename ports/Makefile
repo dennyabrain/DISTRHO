@@ -49,6 +49,7 @@ lv2:
 	$(MAKE) -C argotlunar/LV2
 	$(MAKE) -C bitmangler/LV2
 	$(MAKE) -C capsaicin/LV2
+	$(MAKE) -C cmt-bitcrusher/LV2
 	$(MAKE) -C drowaudio-distortion/LV2
 	$(MAKE) -C drowaudio-distortionshaper/LV2
 	$(MAKE) -C drowaudio-flanger/LV2
@@ -57,7 +58,6 @@ lv2:
 	$(MAKE) -C drumsynth/LV2
 	$(MAKE) -C eqinox/LV2
 	$(MAKE) -C highlife/LV2
-	$(MAKE) -C cmt-bitcrusher/LV2
 	$(MAKE) -C hybridreverb2/LV2
 	$(MAKE) -C juce-demo-plugin/LV2
 	$(MAKE) -C juce_pitcher/LV2
