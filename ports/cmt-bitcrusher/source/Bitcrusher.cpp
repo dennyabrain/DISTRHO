@@ -21,7 +21,7 @@ Bitcrusher::Bitcrusher(audioMasterCallback audioMaster)
 {
     // Default positions for the faders and knobs
     fDistortionType = 0.0f;	// Default distortion function (clipper)
-    fGain = 1.0f;			// No extra gain by default
+    fGain = 0.5f;			// No extra gain by default
     fBitDepth = 0.0f;		// Start with full 24 bits
     fSampleRate = 1.0f;		// Start with full samplerate
 
@@ -110,7 +110,8 @@ void Bitcrusher::getParameterDisplay (long index, char *text)
             sprintf(text, "%i", 3);
         break;
 
-    case kGain:       sprintf(text, "%f", 20.*log10((-16.f * fGain + 17.f)));	break;
+    //case kGain:       sprintf(text, "%f", 20.*log10((-16.f * fGain + 17.f)));	break;
+    case kGain:       sprintf(text, "%f", fGain*2);   break;
     case kBitDepth:	  sprintf(text,"%i",(int)(-23.f * fBitDepth + 24.f));				break;
     case kSampleRate: sprintf(text,"%i",(int)(-39.f * fSampleRate + 40.f));			break;
     }
@@ -122,7 +123,7 @@ void Bitcrusher::getParameterLabel (long index, char *label)
     switch (index)
     {
     case kDistortionType:	strcpy (label, "");		break;
-    case kGain:				strcpy (label, "dB");	break;
+    case kGain:				strcpy (label, "");	break;
     case kBitDepth:			strcpy (label, "Bits");	break;
     case kSampleRate:		strcpy (label, "x");	break;
     }
@@ -155,7 +156,8 @@ void Bitcrusher::processReplacing(float **inputs, float **outputs, long sampleFr
     float inv_bit_depth = 1.f / bit_depth;
 
     // 0-24dBs of extra gain by default
-    float preamp = -16.f*fGain + 17.f;
+    //float preamp = -16.f*fGain + 17.f;
+    float preamp = fGain * 2;
 
     // Distortion switch #1 (clipper)
     if(fDistortionType < 0.33)
