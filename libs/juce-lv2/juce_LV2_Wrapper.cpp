@@ -368,7 +368,7 @@ String makePluginTtl(AudioProcessor* const filter)
     plugin += "        a lv2:InputPort, lv2:ControlPort ;\n";
     plugin += "        lv2:index " + String(portIndex++) + " ;\n";
     plugin += "        lv2:symbol \"lv2_time_bpm\" ;\n";
-    plugin += "        lv2:name \"LV2 BPM\" ;\n";
+    plugin += "        lv2:name \"Host BPM\" ;\n";
     plugin += "        lv2:default 120.0 ;\n";
     plugin += "        lv2:minimum 10.0 ;\n";
     plugin += "        lv2:maximum 400.0 ;\n";
@@ -471,6 +471,8 @@ String makePresetsTtl(AudioProcessor* const filter)
         else
             presets += "    ] .\n\n";
 #endif
+
+        usedSymbols.clear();
 
         for (int j=0; j < filter->getNumParameters(); j++)
         {
