@@ -675,6 +675,11 @@ public:
         window->reset();
     }
 
+    void repaint()
+    {
+        window->repaint();
+    }
+
     Point<int> getScreenPosition()
     {
         if (window->isClosed())
@@ -1010,6 +1015,20 @@ public:
         }
         else
             *widget = nullptr;
+    }
+
+    void repaint()
+    {
+        if (editor)
+            editor->repaint();
+
+#if JUCE_LINUX
+        if (x11Container)
+            x11Container->repaint();
+#endif
+
+        if (externalUI)
+            externalUI->repaint();
     }
 
 private:
@@ -1570,6 +1589,9 @@ public:
     {
         if (filter)
             filter->setCurrentProgramStateInformation (data, sizeInBytes);
+
+        if (ui)
+            ui->repaint();
     }
 
 #if JucePlugin_WantsLV2StateString
@@ -1587,6 +1609,9 @@ public:
             return;
 
         filter->setStateInformationString(data);
+
+        if (ui)
+            ui->repaint();
     }
 #endif
 
