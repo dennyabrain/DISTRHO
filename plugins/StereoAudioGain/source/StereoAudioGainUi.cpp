@@ -38,6 +38,11 @@ StereoAudioGainUi::~StereoAudioGainUi()
 {
 }
 
+bool StereoAudioGainUi::isUiResizable()
+{
+    return false;
+}
+
 void StereoAudioGainUi::setParameterValue(uint32_t index, float value)
 {
     blockSignals(true);

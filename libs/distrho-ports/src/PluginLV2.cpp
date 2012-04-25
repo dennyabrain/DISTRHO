@@ -279,11 +279,19 @@ void lv2_generate_ttl()
     manifest_string += "\n";
 
 #if DISTRHO_PLUGIN_WANTS_UI
-    manifest_string += "<" DISTRHO_PLUGIN_URI "#Qt4UI>\n";
-    manifest_string += "    a ui:Qt4UI ;\n";
+//    manifest_string += "<" DISTRHO_PLUGIN_URI "#Qt4UI>\n";
+//    manifest_string += "    a ui:Qt4UI ;\n";
+//    manifest_string += "    ui:binary <";
+//    manifest_string += plugin_binary;
+//    manifest_string += ".so> .\n";
+//    manifest_string += "\n";
+
+    manifest_string += "<" DISTRHO_PLUGIN_URI "#X11UI>\n";
+    manifest_string += "    a ui:X11UI ;\n";
     manifest_string += "    ui:binary <";
     manifest_string += plugin_binary;
-    manifest_string += ".so> .\n";
+    manifest_string += ".so> ;\n";
+    manifest_string += "    lv2:optionalFeature ui:noUserResize .\n";
     manifest_string += "\n";
 #endif
 
@@ -316,7 +324,9 @@ void lv2_generate_ttl()
     plugin_string += "\n";
 
 #if DISTRHO_PLUGIN_WANTS_UI
-    plugin_string += "    ui:ui <" DISTRHO_PLUGIN_URI "#Qt4UI> ;\n\n";
+    plugin_string += "    ui:ui <" DISTRHO_PLUGIN_URI "#Qt4UI> ,\n";
+    plugin_string += "          <" DISTRHO_PLUGIN_URI "#X11UI> ;\n";
+    plugin_string += "\n";
 #endif
 
     uint32_t portIndex = 0;

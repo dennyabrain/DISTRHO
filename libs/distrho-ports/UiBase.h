@@ -26,6 +26,7 @@ public:
     {
     }
 
+    virtual bool isUiResizable() = 0;
     virtual void setParameterValue(uint32_t index, float value) = 0;
 
 signals:
