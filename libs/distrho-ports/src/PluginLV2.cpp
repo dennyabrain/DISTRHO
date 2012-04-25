@@ -279,12 +279,12 @@ void lv2_generate_ttl()
     manifest_string += "\n";
 
 #if DISTRHO_PLUGIN_WANTS_UI
-//    manifest_string += "<" DISTRHO_PLUGIN_URI "#Qt4UI>\n";
-//    manifest_string += "    a ui:Qt4UI ;\n";
-//    manifest_string += "    ui:binary <";
-//    manifest_string += plugin_binary;
-//    manifest_string += ".so> .\n";
-//    manifest_string += "\n";
+    manifest_string += "<" DISTRHO_PLUGIN_URI "#Qt4UI>\n";
+    manifest_string += "    a ui:Qt4UI ;\n";
+    manifest_string += "    ui:binary <";
+    manifest_string += plugin_binary;
+    manifest_string += ".so> .\n";
+    manifest_string += "\n";
 
     manifest_string += "<" DISTRHO_PLUGIN_URI "#X11UI>\n";
     manifest_string += "    a ui:X11UI ;\n";
