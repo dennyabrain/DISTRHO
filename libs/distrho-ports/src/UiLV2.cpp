@@ -91,7 +91,7 @@ public:
             m_x11Container->adjustSize();
 
             // Create resize grip
-            if (m_ui->isUiResizable() == false)
+            if (m_ui->isUiResizable())
             {
                 m_grip = new QSizeGrip(m_x11Container);
                 m_grip->resize(m_grip->sizeHint());

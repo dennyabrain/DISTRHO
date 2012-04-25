@@ -40,7 +40,7 @@ StereoAudioGainUi::~StereoAudioGainUi()
 
 bool StereoAudioGainUi::isUiResizable()
 {
-    return false;
+    return true;
 }
 
 void StereoAudioGainUi::setParameterValue(uint32_t index, float value)
