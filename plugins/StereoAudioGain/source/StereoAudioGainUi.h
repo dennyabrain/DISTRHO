@@ -20,7 +20,7 @@ public:
     ~StereoAudioGainUi();
 
     bool isUiResizable();
-    void setParameterValue(uint32_t index, float value);
+    void setParameterValue(quint32 index, float value);
 
 protected:
     Ui::StereoAudioGainUi* ui;

@@ -7,7 +7,6 @@
 
 #if DISTRHO_PLUGIN_WANTS_UI
 #include <QtGui/QDialog>
-#include <stdint.h>
 
 #ifndef nullptr
 #define nullptr (0)
@@ -27,10 +26,10 @@ public:
     }
 
     virtual bool isUiResizable() = 0;
-    virtual void setParameterValue(uint32_t index, float value) = 0;
+    virtual void setParameterValue(quint32 index, float value) = 0;
 
 signals:
-    void parameterChanged(uint32_t index, float value);
+    void parameterChanged(quint32 index, float value);
 };
 
 // ---------------------------------------------------------------------------------------------

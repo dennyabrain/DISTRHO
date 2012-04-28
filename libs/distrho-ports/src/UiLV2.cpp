@@ -123,7 +123,7 @@ public:
         controlPortOffset += DISTRHO_PLUGIN_NUM_INPUTS;
         controlPortOffset += DISTRHO_PLUGIN_NUM_OUTPUTS;
 
-        connect(m_ui, SIGNAL(parameterChanged(uint32_t,float)), this, SLOT(pluginParameterChanged(uint32_t,float)));
+        connect(m_ui, SIGNAL(parameterChanged(quint32,float)), this, SLOT(pluginParameterChanged(quint32,float)));
     }
 
     virtual ~DistrhoUiLv2()
@@ -190,7 +190,7 @@ protected:
 #endif
 
 private slots:
-    void pluginParameterChanged(uint32_t index, float value)
+    void pluginParameterChanged(quint32 index, float value)
     {
         if (ui_controller && ui_writeFunction)
             ui_writeFunction(ui_controller, index+controlPortOffset, sizeof(float), 0, &value);

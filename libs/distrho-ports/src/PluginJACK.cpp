@@ -53,7 +53,7 @@ public:
         m_ui = createDistrhoUI();
         m_ui->show();
 
-        connect(m_ui, SIGNAL(parameterChanged(uint32_t,float)), this, SLOT(pluginParameterChanged(uint32_t,float)));
+        connect(m_ui, SIGNAL(parameterChanged(quint32,float)), this, SLOT(pluginParameterChanged(quint32,float)));
         QTimer::singleShot(0, this, SLOT(recheckParameters()));
     }
 
@@ -100,7 +100,7 @@ public:
     }
 
 protected slots:
-    void pluginParameterChanged(uint32_t index, float value)
+    void pluginParameterChanged(quint32 index, float value)
     {
         m_plugin->d_setParameterValue(index, value);
     }
