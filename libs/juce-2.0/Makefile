@@ -1,11 +1,11 @@
 # Compile the juce modules
 
-all: build
-
 
 build: audio-basics audio-devices audio-devices_full audio-formats audio-processors audio-utils \
 	core data-structures events graphics gui-basics
- # audio-processors_full
+
+all: audio-basics audio-devices audio-devices_full audio-formats audio-processors audio-processors_full audio-utils \
+	core data-structures events graphics gui-basics gui-extra video
 
 
 audio-basics:
@@ -24,7 +24,7 @@ audio-processors:
 	$(MAKE) -C build-audio-processors
 
 audio-processors_full:
-	$(MAKE) -C build-audio-processors-full
+	$(MAKE) -C build-audio-processors_full
 
 audio-utils:
 	$(MAKE) -C build-audio-utils
