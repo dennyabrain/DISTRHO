@@ -1,5 +1,3 @@
 # TODO for DISTRHO
 
 libs/juce-2.0/audio-devices         - check if JUCE_WASAPI is valid on Windows XP
-
-s/ThePilgrim2/ThePilgrim
