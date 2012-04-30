@@ -49,6 +49,7 @@
 #include "includes/midi.h"
 #include "includes/port-props.h"
 #include "includes/presets.h"
+#include "includes/programs.h"
 #include "includes/state.h"
 #include "includes/time.h"
 #include "includes/ui.h"
@@ -1578,6 +1579,26 @@ public:
     AudioProcessor* getFilter() { return filter; }
 
     //==============================================================================
+    int getNumPrograms()
+    {
+        if (filter)
+            return filter->getNumPrograms();
+        return 0;
+    }
+
+    String getProgramName(int index)
+    {
+        if (filter)
+            return filter->getProgramName(index);
+        return String::empty;
+    }
+
+    void setCurrentProgram(int index)
+    {
+        if (filter)
+            filter->setCurrentProgram(index);
+    }
+
     void getStateBinary (MemoryBlock& destData)
     {
         if (filter)
@@ -1691,62 +1712,43 @@ private:
 };
 
 //==============================================================================
-// LV2 descriptor functions
-LV2_Handle juceLV2_Instantiate(const LV2_Descriptor* /*descriptor*/, double sampleRate, const char* /*bundlePath*/, const LV2_Feature* const* features)
+// LV2 extension_data() functions
+const LV2_Program_Descriptor* juceLV2_getProgram(LV2_Programs_Handle handle, uint32_t index)
 {
-    JuceLV2Wrapper* wrapper = new JuceLV2Wrapper(sampleRate, features);
-    return wrapper;
-}
+    static LV2_Program_Descriptor desc = { 0, 0, nullptr };
 
-void juceLV2_ConnectPort(LV2_Handle instance, uint32 port, void* dataLocation)
-{
-    JuceLV2Wrapper* wrapper = (JuceLV2Wrapper*)instance;
-    wrapper->doConnectPort(port, dataLocation);
-}
-
-void juceLV2_Activate(LV2_Handle instance)
-{
-    JuceLV2Wrapper* wrapper = (JuceLV2Wrapper*)instance;
-    wrapper->doActivate();
-}
-
-void juceLV2_Run(LV2_Handle instance, uint32 sampleCount)
-{
-    JuceLV2Wrapper* wrapper = (JuceLV2Wrapper*)instance;
-    wrapper->doRun(sampleCount);
-}
-
-void juceLV2_Deactivate(LV2_Handle instance)
-{
-    JuceLV2Wrapper* wrapper = (JuceLV2Wrapper*)instance;
-    wrapper->doDeactivate();
-}
-
-void juceLV2_Cleanup(LV2_Handle instance)
-{
-    JUCE_AUTORELEASEPOOL
+    if (desc.name)
     {
-        const MessageManagerLock mmLock;
-        JuceLV2Wrapper* wrapper = (JuceLV2Wrapper*)instance;
-        wrapper->doCleanup();
-        delete wrapper;
+        free((void*)desc.name);
+        desc.name = nullptr;
     }
 
-    if (activePlugins.size() == 0 && activeUIs.size() == 0)
-    {
-       #if JUCE_LINUX
-        SharedMessageThread::deleteInstance();
-       #endif
+    if (handle == nullptr)
+        return nullptr;
 
-        if (needsGUIShutdown)
-        {
-            shutdownJuce_GUI();
-            needsGUIShutdown = false;
-        }
+    JuceLV2Wrapper* wrapper = (JuceLV2Wrapper*)handle;
+
+    if ((int)index < wrapper->getNumPrograms())
+    {
+        desc.bank    = index / 127;
+        desc.program = index % 127;
+        desc.name    = strdup(wrapper->getProgramName(index).toUTF8());
+        return &desc;
     }
+
+    return nullptr;
 }
 
-//==============================================================================
+void juceLV2_selectProgram(LV2_Programs_Handle handle, uint32_t bank, uint32_t program)
+{
+    JuceLV2Wrapper* wrapper = (JuceLV2Wrapper*)handle;
+    jassert(wrapper);
+
+    int juceProgram = bank * 127 + program;
+    if (juceProgram < wrapper->getNumPrograms())
+        wrapper->setCurrentProgram(juceProgram);
+}
+
 #if JucePlugin_WantsLV2State
 LV2_State_Status juceLV2_Save(LV2_Handle instance, LV2_State_Store_Function store, LV2_State_Handle handle, uint32_t /*flags*/, const LV2_Feature* const* /*features*/)
 {
@@ -1814,15 +1816,75 @@ LV2_State_Status juceLV2_Restore(LV2_Handle instance, LV2_State_Retrieve_Functio
 }
 #endif
 
+//==============================================================================
+// LV2 descriptor functions
+LV2_Handle juceLV2_Instantiate(const LV2_Descriptor* /*descriptor*/, double sampleRate, const char* /*bundlePath*/, const LV2_Feature* const* features)
+{
+    JuceLV2Wrapper* wrapper = new JuceLV2Wrapper(sampleRate, features);
+    return wrapper;
+}
+
+void juceLV2_ConnectPort(LV2_Handle instance, uint32 port, void* dataLocation)
+{
+    JuceLV2Wrapper* wrapper = (JuceLV2Wrapper*)instance;
+    wrapper->doConnectPort(port, dataLocation);
+}
+
+void juceLV2_Activate(LV2_Handle instance)
+{
+    JuceLV2Wrapper* wrapper = (JuceLV2Wrapper*)instance;
+    wrapper->doActivate();
+}
+
+void juceLV2_Run(LV2_Handle instance, uint32 sampleCount)
+{
+    JuceLV2Wrapper* wrapper = (JuceLV2Wrapper*)instance;
+    wrapper->doRun(sampleCount);
+}
+
+void juceLV2_Deactivate(LV2_Handle instance)
+{
+    JuceLV2Wrapper* wrapper = (JuceLV2Wrapper*)instance;
+    wrapper->doDeactivate();
+}
+
+void juceLV2_Cleanup(LV2_Handle instance)
+{
+    JUCE_AUTORELEASEPOOL
+    {
+        const MessageManagerLock mmLock;
+        JuceLV2Wrapper* wrapper = (JuceLV2Wrapper*)instance;
+        wrapper->doCleanup();
+        delete wrapper;
+    }
+
+    if (activePlugins.size() == 0 && activeUIs.size() == 0)
+    {
+       #if JUCE_LINUX
+        SharedMessageThread::deleteInstance();
+       #endif
+
+        if (needsGUIShutdown)
+        {
+            shutdownJuce_GUI();
+            needsGUIShutdown = false;
+        }
+
+        // cleanup static data
+        juceLV2_getProgram(nullptr, 0);
+    }
+}
+
 const void* juceLV2_ExtensionData(const char* uri)
 {
+    static const LV2_Programs_Extension programs = { juceLV2_getProgram, juceLV2_selectProgram };
 #if JucePlugin_WantsLV2State
     static const LV2_State_Interface state = { juceLV2_Save, juceLV2_Restore };
     if (strcmp(uri, LV2_STATE__interface) == 0)
         return &state;
-#else
-    (void)uri;
 #endif
+    if (strcmp(uri, LV2_PROGRAMS_URI) == 0)
+        return &programs;
     return nullptr;
 }
 
@@ -1889,6 +1951,9 @@ void juceLV2UI_Cleanup(LV2UI_Handle instance)
             shutdownJuce_GUI();
             needsGUIShutdown = false;
         }
+
+        // cleanup static data
+        juceLV2_getProgram(nullptr, 0);
     }
 }
 
