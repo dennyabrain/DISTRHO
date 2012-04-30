@@ -237,7 +237,7 @@ static const LV2_Descriptor descriptor = {
 
 // ---------------------------------------------------------------------------------------------
 
-extern "C" __attribute__ ((visibility("default")))
+DISTRHO_PLUGIN_EXPORT
 void lv2_generate_ttl()
 {
     DistrhoPluginBase* plugin = createDistrhoPlugin();
@@ -286,6 +286,7 @@ void lv2_generate_ttl()
     manifest_string += ".so> .\n";
     manifest_string += "\n";
 
+#if defined(Q_OS_LINUX) || defined(__linux__)
     manifest_string += "<" DISTRHO_PLUGIN_URI "#X11UI>\n";
     manifest_string += "    a ui:X11UI ;\n";
     manifest_string += "    ui:binary <";
@@ -293,6 +294,7 @@ void lv2_generate_ttl()
     manifest_string += ".so> ;\n";
     manifest_string += "    lv2:optionalFeature ui:noUserResize .\n";
     manifest_string += "\n";
+#endif
 #endif
 
     manifest_file << manifest_string << std::endl;
@@ -324,8 +326,12 @@ void lv2_generate_ttl()
     plugin_string += "\n";
 
 #if DISTRHO_PLUGIN_WANTS_UI
+#if defined(Q_OS_LINUX) || defined(__linux__)
     plugin_string += "    ui:ui <" DISTRHO_PLUGIN_URI "#Qt4UI> ,\n";
     plugin_string += "          <" DISTRHO_PLUGIN_URI "#X11UI> ;\n";
+#else
+    plugin_string += "    ui:ui <" DISTRHO_PLUGIN_URI "#Qt4UI> ;\n";
+#endif
     plugin_string += "\n";
 #endif
 

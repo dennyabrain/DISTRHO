@@ -6,11 +6,8 @@
 #include "DistrhoPlugin.h"
 
 #if DISTRHO_PLUGIN_WANTS_UI
-#include <QtGui/QDialog>
 
-#ifndef nullptr
-#define nullptr (0)
-#endif
+#include <QtGui/QDialog>
 
 class DistrhoUiBase : public QDialog
 {
@@ -35,6 +32,6 @@ signals:
 // ---------------------------------------------------------------------------------------------
 
 extern DistrhoUiBase* createDistrhoUI();
-#endif
 
+#endif // DISTRHO_PLUGIN_WANTS_UI
 #endif // __DISTRHO_UI_BASE__

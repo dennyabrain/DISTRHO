@@ -31,7 +31,7 @@ const char* StereoAudioGain::d_maker()
 
 const char* StereoAudioGain::d_license()
 {
-    return "";
+    return nullptr;
 }
 
 uint32_t StereoAudioGain::d_version()

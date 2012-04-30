@@ -22,10 +22,6 @@ HEADERS  = \
     ../../common/Qt4-Widgets/digitalpeakmeter.h \
     ../../common/Qt4-Widgets/pixmapdial.h
 
-HEADERS += \
-    ../../../libs/distrho-ports/PluginBase.h \
-    ../../../libs/distrho-ports/UiBase.h
-
 FORMS    = \
     ../source/StereoAudioGain.ui
 

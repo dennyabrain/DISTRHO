@@ -3,6 +3,7 @@
 #include "DistrhoPlugin.h"
 
 #if DISTRHO_PLUGIN_WANTS_UI
+
 #include "PluginBase.h"
 #include "UiBase.h"
 
@@ -50,7 +51,7 @@ public:
         // Get UI Touch feature
         for (quint32 i = 0; features[i]; i++)
         {
-            if (strcmp(features[i]->URI, LV2_UI__touch) == 0 && features[i]->data)
+            if (strcmp(features[i]->URI, LV2_UI__touch) == 0)
             {
                 ui_touch = (LV2UI_Touch*)features[i]->data;
                 break;
@@ -63,7 +64,7 @@ public:
             // Get UI Resize feature
             for (quint32 i = 0; features[i]; i++)
             {
-                if (strcmp(features[i]->URI, LV2_UI__resize) == 0 && features[i]->data)
+                if (strcmp(features[i]->URI, LV2_UI__resize) == 0)
                 {
                     ui_resize = (LV2UI_Resize*)features[i]->data;
                     break;
@@ -75,7 +76,7 @@ public:
 
             for (quint32 i=0; features[i]; i++)
             {
-                if (strcmp(features[i]->URI, LV2_UI__parent) == 0 && features[i]->data)
+                if (strcmp(features[i]->URI, LV2_UI__parent) == 0)
                 {
                     parent = (WId)features[i]->data;
                     break;

@@ -3,9 +3,9 @@
 #ifndef __DISTRHO_PLUGIN_BASE__
 #define __DISTRHO_PLUGIN_BASE__
 
+#include <cstdint>
 #include <cstdlib>
 #include <cstring>
-#include <stdint.h>
 
 #include "DistrhoPlugin.h"
 
@@ -23,10 +23,6 @@
 
 #ifndef DISTRHO_PLUGIN_NUM_OUTPUTS
 #error DISTRHO_PLUGIN_NUM_OUTPUTS undefined!
-#endif
-
-#ifndef nullptr
-#define nullptr (0)
 #endif
 
 #if defined(__WIN32__) || defined(__WIN64__)

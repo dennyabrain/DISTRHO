@@ -45,15 +45,17 @@ bool StereoAudioGainUi::isUiResizable()
 
 void StereoAudioGainUi::setParameterValue(quint32 index, float value)
 {
-    blockSignals(true);
-
     switch (index)
     {
     case StereoAudioGain::PARAMETER_LEFT:
+        blockSignals(true);
         ui->dial_left->setValue((value*50)-50);
+        blockSignals(false);
         break;
     case StereoAudioGain::PARAMETER_RIGHT:
+        blockSignals(true);
         ui->dial_right->setValue((value*50)-50);
+        blockSignals(false);
         break;
     case StereoAudioGain::PARAMETER_VU_LEFT:
         ui->lpeak->displayMeter(1, value);
@@ -62,8 +64,6 @@ void StereoAudioGainUi::setParameterValue(quint32 index, float value)
         ui->rpeak->displayMeter(1, value);
         break;
     }
-
-    blockSignals(false);
 }
 
 void StereoAudioGainUi::leftKnobValueChanged(int value)

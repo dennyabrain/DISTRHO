@@ -21,3 +21,5 @@ DISTRHO_PLUGIN_TARGET_LV2 {
 SOURCES     += $$PWD/src/PluginLV2.cpp
 SOURCES     += $$PWD/src/UiLV2.cpp
 }
+
+QMAKE_CXXFLAGS *= --std=c++0x
