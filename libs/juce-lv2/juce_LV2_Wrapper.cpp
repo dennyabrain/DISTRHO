@@ -1610,7 +1610,12 @@ public:
     void setCurrentProgram(int index)
     {
         if (filter)
+        {
             filter->setCurrentProgram(index);
+
+            for (int i = 0; i < portControls.size(); i++)
+                *portControls[i] = lastControlValues[i] = filter->getParameter(i);
+        }
     }
 
     void getStateBinary (MemoryBlock& destData)
@@ -1744,8 +1749,8 @@ const LV2_Program_Descriptor* juceLV2_getProgram(LV2_Handle handle, uint32_t ind
 
     if ((int)index < wrapper->getNumPrograms())
     {
-        desc.bank    = index / 127;
-        desc.program = index % 127;
+        desc.bank    = index / 128;
+        desc.program = index % 128;
         desc.name    = strdup(wrapper->getProgramName(index).toUTF8());
         return &desc;
     }
@@ -1758,7 +1763,7 @@ void juceLV2_selectPluginProgram(LV2_Handle handle, uint32_t bank, uint32_t prog
     JuceLV2Wrapper* wrapper = (JuceLV2Wrapper*)handle;
     jassert(wrapper);
 
-    int juceProgram = bank * 127 + program;
+    int juceProgram = bank * 128 + program;
     if (juceProgram < wrapper->getNumPrograms())
         wrapper->setCurrentProgram(juceProgram);
 }
@@ -1769,7 +1774,7 @@ void juceLV2_selectUIProgram(LV2UI_Handle handle, uint32_t bank, uint32_t progra
     JuceLV2UIWrapper* wrapper = (JuceLV2UIWrapper*)handle;
     jassert(wrapper);
 
-    int juceProgram = bank * 127 + program;
+    int juceProgram = bank * 128 + program;
     wrapper->setCurrentProgram(juceProgram);
 }
 #endif
