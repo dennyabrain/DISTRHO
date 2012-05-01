@@ -1613,8 +1613,13 @@ public:
         {
             filter->setCurrentProgram(index);
 
+            float curValue;
             for (int i = 0; i < portControls.size(); i++)
-                *portControls[i] = lastControlValues[i] = filter->getParameter(i);
+            {
+                curValue = filter->getParameter(i);
+                *(portControls.getReference(i)) = curValue;
+                lastControlValues.set(i, curValue);
+            }
         }
     }
 
