@@ -192,35 +192,39 @@ String makeManifestTtl(AudioProcessor* const filter, const String& binary)
     {
         manifest += "<" JucePlugin_LV2URI "#ExternalUI>\n";
         manifest += "    a <" LV2_EXTERNAL_UI_URI "> ;\n";
-        manifest += "    ui:binary <" + binary + PLUGIN_EXT "> ";
-#if JucePlugin_WantsLV2InstanceAccess
-        manifest += ";\n";
-        manifest += "    lv2:requiredFeature <" LV2_INSTANCE_ACCESS_URI "> .\n";
+        manifest += "    ui:binary <" + binary + PLUGIN_EXT "> ;\n";
+#if ! JucePlugin_WantsLV2InstanceAccess
+        if (filter->getNumPrograms() > 0)
+            manifest += "    lv2:extensionData <" LV2_PROGRAMS__UIInterface "> ;\n";
 #else
-        manifest += ".\n";
+        manifest += "    lv2:requiredFeature <" LV2_INSTANCE_ACCESS_URI "> ;\n";
 #endif
-        manifest += "\n";
+        manifest += "    .\n\n";
 
         manifest += "<" JucePlugin_LV2URI "#ExternalOldUI>\n";
         manifest += "    a ui:external ;\n";
-        manifest += "    ui:binary <" + binary + PLUGIN_EXT "> ";
-#if JucePlugin_WantsLV2InstanceAccess
-        manifest += ";\n";
-        manifest += "    lv2:requiredFeature <" LV2_INSTANCE_ACCESS_URI "> .\n";
+        manifest += "    ui:binary <" + binary + PLUGIN_EXT "> ;\n";
+#if ! JucePlugin_WantsLV2InstanceAccess
+        if (filter->getNumPrograms() > 0)
+            manifest += "    lv2:extensionData <" LV2_PROGRAMS__UIInterface "> ;\n";
 #else
-        manifest += ".\n";
+        manifest += "    lv2:requiredFeature <" LV2_INSTANCE_ACCESS_URI "> ;\n";
 #endif
-        manifest += "\n";
+        manifest += "    .\n\n";
 
 #if JUCE_LINUX
         manifest += "<" JucePlugin_LV2URI "#X11UI>\n";
         manifest += "    a ui:X11UI ;\n";
         manifest += "    ui:binary <" + binary + PLUGIN_EXT "> ;\n";
- #if JucePlugin_WantsLV2InstanceAccess
+ #if ! JucePlugin_WantsLV2InstanceAccess
+        if (filter->getNumPrograms() > 0)
+            manifest += "    lv2:extensionData <" LV2_PROGRAMS__UIInterface "> ;\n";
+ #else
         manifest += "    lv2:requiredFeature <" LV2_INSTANCE_ACCESS_URI "> ;\n";
  #endif
         manifest += "    lv2:optionalFeature ui:noUserResize .\n";
-        manifest += "\n";
+
+        manifest += "    .\n\n";
 #endif
     }
 
@@ -268,6 +272,8 @@ String makePluginTtl(AudioProcessor* const filter)
 #if JucePlugin_WantsLV2State
     plugin += "    lv2:extensionData <" LV2_STATE__interface "> ;\n";
 #endif
+    if (filter->getNumPrograms() > 0)
+        plugin += "    lv2:extensionData <" LV2_PROGRAMS__Interface "> ;\n";
     plugin += "\n";
 
     if (filter->hasEditor())
@@ -1721,7 +1727,7 @@ private:
 
 //==============================================================================
 // LV2 extension_data() functions
-const LV2_Program_Descriptor* juceLV2_getProgram(LV2_Programs_Handle handle, uint32_t index)
+const LV2_Program_Descriptor* juceLV2_getProgram(LV2_Handle handle, uint32_t index)
 {
     static LV2_Program_Descriptor desc = { 0, 0, nullptr };
 
@@ -1747,7 +1753,7 @@ const LV2_Program_Descriptor* juceLV2_getProgram(LV2_Programs_Handle handle, uin
     return nullptr;
 }
 
-void juceLV2_selectPluginProgram(LV2_Programs_Handle handle, uint32_t bank, uint32_t program)
+void juceLV2_selectPluginProgram(LV2_Handle handle, uint32_t bank, uint32_t program)
 {
     JuceLV2Wrapper* wrapper = (JuceLV2Wrapper*)handle;
     jassert(wrapper);
@@ -1758,7 +1764,7 @@ void juceLV2_selectPluginProgram(LV2_Programs_Handle handle, uint32_t bank, uint
 }
 
 #if ! JucePlugin_WantsLV2InstanceAccess
-void juceLV2_selectUIProgram(LV2_Programs_Handle handle, uint32_t bank, uint32_t program)
+void juceLV2_selectUIProgram(LV2UI_Handle handle, uint32_t bank, uint32_t program)
 {
     JuceLV2UIWrapper* wrapper = (JuceLV2UIWrapper*)handle;
     jassert(wrapper);
@@ -1896,13 +1902,13 @@ void juceLV2_Cleanup(LV2_Handle instance)
 
 const void* juceLV2_ExtensionData(const char* uri)
 {
-    static const LV2_Programs_Plugin_Extension programs = { juceLV2_getProgram, juceLV2_selectPluginProgram };
+    static const LV2_Programs_Interface programs = { juceLV2_getProgram, juceLV2_selectPluginProgram };
 #if JucePlugin_WantsLV2State
     static const LV2_State_Interface state = { juceLV2_Save, juceLV2_Restore };
     if (strcmp(uri, LV2_STATE__interface) == 0)
         return &state;
 #endif
-    if (strcmp(uri, LV2_PROGRAMS_URI) == 0)
+    if (strcmp(uri, LV2_PROGRAMS__Interface) == 0)
         return &programs;
     return nullptr;
 }
@@ -1991,9 +1997,9 @@ void juceLV2UI_PortEvent(LV2UI_Handle instance, uint32 portIndex, uint32 bufferS
 const void* juceLV2UI_ExtensionData(const char* uri)
 {
 #if ! JucePlugin_WantsLV2InstanceAccess
-    static const LV2_Programs_UI_Extension programs = { juceLV2_selectUIProgram };
-    if (strcmp(uri, LV2_PROGRAMS_URI) == 0)
-        return &programs;
+    static const LV2_Programs_UI_Interface uiPrograms = { juceLV2_selectUIProgram };
+    if (strcmp(uri, LV2_PROGRAMS__UIInterface) == 0)
+        return &uiPrograms;
 #else
     (void)uri;
 #endif
