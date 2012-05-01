@@ -222,7 +222,7 @@ String makeManifestTtl(AudioProcessor* const filter, const String& binary)
  #else
         manifest += "    lv2:requiredFeature <" LV2_INSTANCE_ACCESS_URI "> ;\n";
  #endif
-        manifest += "    lv2:optionalFeature ui:noUserResize .\n";
+        manifest += "    lv2:optionalFeature ui:noUserResize ;\n";
 
         manifest += "    .\n\n";
 #endif
