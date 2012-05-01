@@ -54,11 +54,11 @@ typedef struct _LV2_Program_Descriptor {
 } LV2_Program_Descriptor;
 
 /**
-   Programs extension.
+   Programs extension, plugin data.
 
-   When the plugin's extension_data is called with argument
-   LV2_PROGRAMS_URI, the plugin MUST return an LV2_Programs_Extension
-   structure, which remains valid for the lifetime of the plugin.
+   When the plugin's extension_data is called with argument LV2_PROGRAMS_URI,
+   the plugin MUST return an LV2_Programs_Plugin_Extension structure, which
+   remains valid for the lifetime of the plugin.
 */
 typedef struct {
     /**
@@ -112,7 +112,27 @@ typedef struct {
                            uint32_t bank,
                            uint32_t program);
 
-} LV2_Programs_Extension;
+} LV2_Programs_Plugin_Extension;
+
+/**
+   Programs extension, UI data.
+
+   When the UI's extension_data is called with argument LV2_PROGRAMS_URI,
+   the UI MUST return an LV2_Programs_UI_Extension structure, which
+   remains valid for the lifetime of the UI.
+*/
+typedef struct {
+    /**
+     * select_program()
+     *
+     * This is exactly the same as select_program in LV2_Programs_Plugin_Extension,
+     * but this struct relates to the UI instead of the plugin.
+     */
+    void (*select_program)(LV2_Programs_Handle handle,
+                           uint32_t bank,
+                           uint32_t program);
+
+} LV2_Programs_UI_Extension;
 
 #ifdef __cplusplus
 }

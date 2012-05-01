@@ -990,6 +990,14 @@ public:
         }
     }
 
+#if ! JucePlugin_WantsLV2InstanceAccess
+    void setCurrentProgram(int index)
+    {
+        if (filter && index < filter->getNumPrograms())
+            filter->setCurrentProgram(index);
+    }
+#endif
+
     //==============================================================================
     void resetIfNeeded(LV2UI_Write_Function writeFunction_, LV2UI_Controller controller_, LV2UI_Widget* widget, const LV2_Feature* const* features)
     {
@@ -1739,7 +1747,7 @@ const LV2_Program_Descriptor* juceLV2_getProgram(LV2_Programs_Handle handle, uin
     return nullptr;
 }
 
-void juceLV2_selectProgram(LV2_Programs_Handle handle, uint32_t bank, uint32_t program)
+void juceLV2_selectPluginProgram(LV2_Programs_Handle handle, uint32_t bank, uint32_t program)
 {
     JuceLV2Wrapper* wrapper = (JuceLV2Wrapper*)handle;
     jassert(wrapper);
@@ -1748,6 +1756,17 @@ void juceLV2_selectProgram(LV2_Programs_Handle handle, uint32_t bank, uint32_t p
     if (juceProgram < wrapper->getNumPrograms())
         wrapper->setCurrentProgram(juceProgram);
 }
+
+#if ! JucePlugin_WantsLV2InstanceAccess
+void juceLV2_selectUIProgram(LV2_Programs_Handle handle, uint32_t bank, uint32_t program)
+{
+    JuceLV2UIWrapper* wrapper = (JuceLV2UIWrapper*)handle;
+    jassert(wrapper);
+
+    int juceProgram = bank * 127 + program;
+    wrapper->setCurrentProgram(juceProgram);
+}
+#endif
 
 #if JucePlugin_WantsLV2State
 LV2_State_Status juceLV2_Save(LV2_Handle instance, LV2_State_Store_Function store, LV2_State_Handle handle, uint32_t /*flags*/, const LV2_Feature* const* /*features*/)
@@ -1877,7 +1896,7 @@ void juceLV2_Cleanup(LV2_Handle instance)
 
 const void* juceLV2_ExtensionData(const char* uri)
 {
-    static const LV2_Programs_Extension programs = { juceLV2_getProgram, juceLV2_selectProgram };
+    static const LV2_Programs_Plugin_Extension programs = { juceLV2_getProgram, juceLV2_selectPluginProgram };
 #if JucePlugin_WantsLV2State
     static const LV2_State_Interface state = { juceLV2_Save, juceLV2_Restore };
     if (strcmp(uri, LV2_STATE__interface) == 0)
@@ -1969,8 +1988,15 @@ void juceLV2UI_PortEvent(LV2UI_Handle instance, uint32 portIndex, uint32 bufferS
     }
 }
 
-const void* juceLV2UI_ExtensionData(const char* /*uri*/)
+const void* juceLV2UI_ExtensionData(const char* uri)
 {
+#if ! JucePlugin_WantsLV2InstanceAccess
+    static const LV2_Programs_UI_Extension programs = { juceLV2_selectUIProgram };
+    if (strcmp(uri, LV2_PROGRAMS_URI) == 0)
+        return &programs;
+#else
+    (void)uri;
+#endif
     return nullptr;
 }
 
