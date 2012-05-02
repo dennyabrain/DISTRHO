@@ -5,6 +5,7 @@
 *.o
 *.so
 
+*.cdbs-orig
 *.moc
 moc_*.cpp
 qrc_*.cpp
