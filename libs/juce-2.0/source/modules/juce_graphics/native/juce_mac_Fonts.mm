@@ -42,11 +42,22 @@ extern const CFStringRef kCTTypesetterOptionForcedEmbeddingLevel;
 
 namespace CoreTextTypeLayout
 {
+    static String findBestAvailableStyle (const String& typefaceName, const String& style)
+    {
+        const StringArray availableStyles (Font::findAllTypefaceStyles (typefaceName));
+
+        if (! availableStyles.contains (style))
+            return availableStyles[0];
+
+        return style;
+    }
+
     static CTFontRef createCTFont (const Font& font, const float fontSize,
                                    const bool applyScaleFactor)
     {
         CFStringRef cfFontFamily = font.getTypefaceName().toCFString();
-        CFStringRef cfFontStyle = font.getTypefaceStyle().toCFString();
+        CFStringRef cfFontStyle = findBestAvailableStyle (font.getTypefaceName(),
+                                                          font.getTypefaceStyle()).toCFString();
         CFStringRef keys[] = { kCTFontFamilyNameAttribute, kCTFontStyleNameAttribute };
         CFTypeRef values[] = { cfFontFamily, cfFontStyle };
 
@@ -1079,7 +1090,6 @@ StringArray Font::findAllTypefaceStyles (const String& family)
         NSArray* style = [styles objectAtIndex: i];
         results.add (nsStringToJuce ((NSString*) [style objectAtIndex: 1]));
        #endif
-
     }
 
     return results;
