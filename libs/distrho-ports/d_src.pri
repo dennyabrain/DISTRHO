@@ -17,6 +17,10 @@ CONFIG      += link_pkgconfig
 PKGCONFIG   += jack
 }
 
+DISTRHO_PLUGIN_TARGET_LADSPA {
+SOURCES     += $$PWD/src/PluginLADSPA.cpp
+}
+
 DISTRHO_PLUGIN_TARGET_LV2 {
 SOURCES     += $$PWD/src/PluginLV2.cpp
 SOURCES     += $$PWD/src/UiLV2.cpp

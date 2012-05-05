@@ -28,8 +28,8 @@ public:
         m_plugin->d_init();
 
         lastBufferSize = 512;
-        m_plugin->d_setSampleRate(sampleRate);
-        m_plugin->d_setBufferSize(lastBufferSize);
+        m_plugin->__setSampleRate(sampleRate);
+        m_plugin->__setBufferSize(lastBufferSize);
 
         for (uint32_t i=0; i < DISTRHO_PLUGIN_NUM_INPUTS; i++)
             portAudioIns.push_back(nullptr);
@@ -121,7 +121,7 @@ public:
         if (samples >= 2 && samples != lastBufferSize)
         {
             lastBufferSize = samples;
-            m_plugin->d_setBufferSize(lastBufferSize);
+            m_plugin->__setBufferSize(lastBufferSize);
 
             m_plugin->d_deactivate();
             m_plugin->d_activate();

@@ -24,6 +24,7 @@ public:
 
     // Information
     const char* d_name();
+    const char* d_label();
     const char* d_maker();
     const char* d_license();
     uint32_t    d_version();

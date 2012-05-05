@@ -62,6 +62,7 @@ public:
         DistrhoPluginBase(parameterCount, programCount)
     {
         m_name     = nullptr;
+        m_label    = nullptr;
         m_maker    = nullptr;
         m_license  = nullptr;
         m_uniqueId = 0;
@@ -77,6 +78,11 @@ public:
     const char* d_name()
     {
         return m_name;
+    }
+
+    const char* d_label()
+    {
+        return m_label;
     }
 
     const char* d_maker()
@@ -130,6 +136,9 @@ public:
 
         getEffectName(buf_str);
         m_name = strdup(buf_str);
+
+        name_to_symbol(buf_str);
+        m_label = strdup(buf_str);
 
         getVendorString(buf_str);
         m_maker = strdup(buf_str);
@@ -293,6 +302,7 @@ public:
 
 private:
     const char* m_name;
+    const char* m_label;
     const char* m_maker;
     const char* m_license;
     long m_uniqueId;

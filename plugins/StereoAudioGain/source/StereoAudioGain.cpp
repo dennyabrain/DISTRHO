@@ -24,6 +24,11 @@ const char* StereoAudioGain::d_name()
     return "Stereo Audio Gain";
 }
 
+const char* StereoAudioGain::d_label()
+{
+    return "StereoAudioGain";
+}
+
 const char* StereoAudioGain::d_maker()
 {
     return "DISTRHO";
@@ -31,7 +36,7 @@ const char* StereoAudioGain::d_maker()
 
 const char* StereoAudioGain::d_license()
 {
-    return nullptr;
+    return "";
 }
 
 uint32_t StereoAudioGain::d_version()

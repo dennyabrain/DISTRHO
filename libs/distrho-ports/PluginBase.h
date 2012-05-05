@@ -63,7 +63,8 @@ public:
     // -------------------------------------------------
 
     // Information
-    virtual const char* d_name() = 0;
+    virtual const char* d_name()  = 0;
+    virtual const char* d_label() = 0;
     virtual const char* d_maker() = 0;
     virtual const char* d_license() = 0;
     virtual uint32_t    d_version() = 0;
@@ -88,6 +89,7 @@ public:
     // Host state
     double d_sampleRate();
     uint32_t d_bufferSize();
+    void d_setLatency(uint32_t samples);
 
     // TODO - time-pos
 
@@ -104,8 +106,9 @@ public:
     // -------------------------------------------------
 
     // internal use only
-    void d_setSampleRate(double sampleRate);
-    void d_setBufferSize(uint32_t bufferSize);
+    void __setSampleRate(double sampleRate);
+    void __setBufferSize(uint32_t bufferSize);
+    uint32_t __latency();
 
 protected:
     ParameterInfo* p_paramsInfo;
@@ -116,6 +119,7 @@ private:
     uint32_t m_programCount;
     double   m_sampleRate;
     uint32_t m_bufferSize;
+    uint32_t m_latency;
 };
 
 // ---------------------------------------------------------------------------------------------

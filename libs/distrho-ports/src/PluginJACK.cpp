@@ -27,8 +27,8 @@ public:
 
         if (j_client)
         {
-            m_plugin->d_setSampleRate(jack_get_sample_rate(j_client));
-            m_plugin->d_setBufferSize(jack_get_buffer_size(j_client));
+            m_plugin->__setSampleRate(jack_get_sample_rate(j_client));
+            m_plugin->__setBufferSize(jack_get_buffer_size(j_client));
 
             char port_name[11] = { 0 };
 
@@ -114,7 +114,7 @@ protected slots:
             {
                 info = m_plugin->d_parameterInfo(i);
 
-                if (info && info->hints & PARAMETER_IS_OUTPUT)
+                if (info && (info->hints & PARAMETER_IS_OUTPUT) > 0)
                     m_ui->setParameterValue(i, m_plugin->d_parameterValue(i));
             }
         }

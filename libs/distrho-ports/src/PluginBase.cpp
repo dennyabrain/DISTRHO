@@ -8,6 +8,7 @@ DistrhoPluginBase::DistrhoPluginBase(uint32_t parameterCount, uint32_t programCo
 {
     m_sampleRate = 44100;
     m_bufferSize = 512;
+    m_latency    = 0;
 
     if (m_parameterCount > 0)
     {
@@ -81,6 +82,11 @@ uint32_t DistrhoPluginBase::d_bufferSize()
     return m_bufferSize;
 }
 
+void DistrhoPluginBase::d_setLatency(uint32_t samples)
+{
+    m_latency = samples;
+}
+
 // TODO - time-pos
 
 // -------------------------------------------------
@@ -114,12 +120,17 @@ const char* DistrhoPluginBase::d_programName(uint32_t index)
 // -------------------------------------------------
 
 // internal use only
-void DistrhoPluginBase::d_setSampleRate(double sampleRate)
+void DistrhoPluginBase::__setSampleRate(double sampleRate)
 {
     m_sampleRate = sampleRate;
 }
 
-void DistrhoPluginBase::d_setBufferSize(uint32_t bufferSize)
+void DistrhoPluginBase::__setBufferSize(uint32_t bufferSize)
 {
     m_bufferSize = bufferSize;
+}
+
+uint32_t DistrhoPluginBase::__latency()
+{
+    return m_latency;
 }
