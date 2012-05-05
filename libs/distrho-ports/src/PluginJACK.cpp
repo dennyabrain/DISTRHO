@@ -85,7 +85,7 @@ public:
         for (uint32_t i=0; i < DISTRHO_PLUGIN_NUM_OUTPUTS; i++)
             p_aouts[i] = (float*)jack_port_get_buffer(j_aouts[i], nframes);
 
-        m_plugin->d_run(p_ains, p_aouts, nframes);
+        m_plugin->d_run(p_ains, p_aouts, nframes, 0, nullptr);
     }
 
     static int j_process_callback(jack_nframes_t nframes, void* arg)

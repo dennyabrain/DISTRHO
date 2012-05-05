@@ -13,7 +13,7 @@ SOURCES  = \
     ../source/StereoAudioGain.cpp \
     ../source/StereoAudioGainUi.cpp \
     ../../common/Qt4-Widgets/digitalpeakmeter.cpp \
-    ../../common/Qt4-Widgets/pixmapdial.cpp \
+    ../../common/Qt4-Widgets/pixmapdial.cpp
 
 HEADERS = \
     ../source/DistrhoPlugin.h \

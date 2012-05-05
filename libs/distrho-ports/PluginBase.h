@@ -52,6 +52,12 @@ struct ParameterInfo {
     } range;
 };
 
+struct MidiEvent
+{
+    uint32_t frame;
+    char buffer[4];
+};
+
 // ---------------------------------------------------------------------------------------------
 
 class DistrhoPluginBase
@@ -82,7 +88,7 @@ public:
     // Process stuff
     virtual void d_activate() = 0;
     virtual void d_deactivate() = 0;
-    virtual void d_run(float** inputs, float** outputs, uint32_t frames) = 0;
+    virtual void d_run(float** inputs, float** outputs, uint32_t frames, uint32_t midiEventCount, MidiEvent* midiEvents) = 0;
 
     // -------------------------------------------------
 

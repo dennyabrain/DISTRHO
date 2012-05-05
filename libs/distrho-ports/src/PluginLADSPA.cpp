@@ -147,7 +147,7 @@ public:
         for (uint32_t i=0; i < DISTRHO_PLUGIN_NUM_OUTPUTS; i++)
             outputs[i] = portAudioOuts[i];
 
-        m_plugin->d_run(inputs, outputs, bufferSize);
+        m_plugin->d_run(inputs, outputs, bufferSize, 0, nullptr);
 
         // Update parameter outputs
         for (uint32_t i=0; i < m_plugin->d_parameterCount(); i++)

@@ -48,7 +48,7 @@ public:
     // Process stuff
     void d_activate();
     void d_deactivate();
-    void d_run(float** inputs, float** outputs, uint32_t frames);
+    void d_run(float** inputs, float** outputs, uint32_t frames, uint32_t midiEventCount, MidiEvent* midiEvents);
 
     // -------------------------------------------------
 
