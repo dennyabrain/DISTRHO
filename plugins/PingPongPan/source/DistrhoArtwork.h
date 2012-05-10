@@ -9,7 +9,7 @@ namespace DistrhoArtwork
     const int           knob_pngSize = 705874;
 
     extern const char*  background_png;
-    const int           background_pngSize = 39539;
+    const int           background_pngSize = 39730;
 
 };
 
