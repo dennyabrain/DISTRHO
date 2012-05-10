@@ -7,38 +7,157 @@
 #define __cdecl
 #endif
 
-#ifndef nullptr
-#define nullptr 0
-#endif
-
-#include "public.sdk/source/vst2.x/audioeffect.h"
 #include "public.sdk/source/vst2.x/audioeffect.cpp"
-#include "public.sdk/source/vst2.x/audioeffectx.h"
 #include "public.sdk/source/vst2.x/audioeffectx.cpp"
 #include "public.sdk/source/vst2.x/vstplugmain.cpp"
+
+#include <cstdio>
+#include <cstring>
+#include <list>
+#include <pthread.h>
 
 #include <jack/jack.h>
 #include <jack/midiport.h>
 
-#include <pthread.h>
-#include <string.h>
+// -------------------------------------------------
+// Midi data
 
-#define MAX_MIDI_EVENTS 1024
+#define MAX_MIDI_EVENTS 512
 
-// Shared Stuff
 struct midi_data_t {
     unsigned char status;
-    unsigned char note;
-    unsigned char velo;
+    unsigned char data1;
+    unsigned char data2;
     VstInt32 time;
 };
 
-// VST Stuff
+// -------------------------------------------------
+// Global JACK client
+
+static jack_client_t* global_client = nullptr;
+
+// -------------------------------------------------
+// JackAss instance, containing 1 JACK MIDI port
+
+class JackAssInstance
+{
+public:
+    JackAssInstance(jack_port_t* port) :
+        jport(port)
+    {
+        pthread_mutex_init(&midi_mutex, nullptr);
+        clear_events();
+    }
+
+    ~JackAssInstance()
+    {
+        clear_events();
+        pthread_mutex_destroy(&midi_mutex);
+
+        jack_port_unregister(global_client, jport);
+    }
+
+    void clear_events()
+    {
+        pthread_mutex_lock(&midi_mutex);
+        memset(&midi_data, 0, sizeof(midi_data_t)*MAX_MIDI_EVENTS);
+        pthread_mutex_unlock(&midi_mutex);
+    }
+
+    void put_event(unsigned char status, unsigned char data1, unsigned char data2, VstInt32 time)
+    {
+        pthread_mutex_lock(&midi_mutex);
+
+        for (int i=0; i<MAX_MIDI_EVENTS; i++)
+        {
+            if (midi_data[i].status == 0)
+            {
+                midi_data[i].status = status;
+                midi_data[i].data1  = data1;
+                midi_data[i].data2  = data2;
+                midi_data[i].time   = time;
+                break;
+            }
+        }
+
+        pthread_mutex_unlock(&midi_mutex);
+    }
+
+    void process(jack_nframes_t nframes)
+    {
+        unsigned char* buffer;
+        void* port_buffer = jack_port_get_buffer(jport, nframes);
+        jack_midi_clear_buffer(port_buffer);
+
+        pthread_mutex_lock(&midi_mutex);
+
+        for (int i=0; i<MAX_MIDI_EVENTS; i++)
+        {
+            if (midi_data[i].status != 0)
+            {
+                buffer = jack_midi_event_reserve(port_buffer, midi_data[i].time, 3);
+                buffer[0] = midi_data[i].status;
+                buffer[1] = midi_data[i].data1;
+                buffer[2] = midi_data[i].data2;
+
+                midi_data[i].status = 0;
+            }
+            else
+                break;
+        }
+
+        pthread_mutex_unlock(&midi_mutex);
+    }
+
+private:
+    midi_data_t midi_data[MAX_MIDI_EVENTS];
+    pthread_mutex_t midi_mutex;
+    jack_port_t* const jport;
+};
+
+static std::list<JackAssInstance*> instances;
+typedef std::list<JackAssInstance*>::iterator ins;
+
+// -------------------------------------------------
+// JACK calls
+
+static int jprocess_callback(jack_nframes_t nframes, void *arg)
+{
+    for (ins it = instances.begin(); it != instances.end(); ++it)
+        (*it)->process(nframes);
+
+    return 0;
+}
+
+void init_jack(const char* client_name)
+{
+    if (! global_client)
+    {
+        global_client = jack_client_open(client_name, JackNullOption, nullptr);
+        jack_set_process_callback(global_client, jprocess_callback, nullptr);
+        jack_activate(global_client);
+    }
+}
+
+void close_jack()
+{
+    if (global_client && instances.size() == 0)
+    {
+        jack_deactivate(global_client);
+        jack_client_close(global_client);
+        global_client = nullptr;
+    }
+}
+
+// -------------------------------------------------
+// JackAss plugin
+
 class JackAss : public AudioEffectX
 {
 public:
     JackAss(audioMasterCallback audioMaster) :
-        AudioEffectX(audioMaster, 0, 0)
+        AudioEffectX(audioMaster, 0, 0),
+        instance(nullptr)
     {
         if (audioMaster)
         {
@@ -48,16 +167,38 @@ public:
             setNumOutputs(2); // For Hosts that don't support MIDI plugins
             setUniqueID(CCONST('J', 'A', 's', 's'));
 
-            pthread_mutex_init(&midi_mutex, nullptr);
-            clear_midi_buffer();
-            init_jack();
+            char buf_str[64] = { 0 };
+
+            // Register global JACK client if needed
+            if (getHostProductString(buf_str) == false)
+                strcpy(buf_str, "JackAss");
+
+            init_jack(buf_str);
+
+            // Create instance+port for this plugin
+#if __LP64__
+            sprintf(buf_str, "midi-out_%02lu", instances.size()+1);
+#else
+            sprintf(buf_str, "midi-out_%02lu", instances.size()+1);
+#endif
+
+            //jack_deactivate(global_client);
+            jack_port_t* jport = jack_port_register(global_client, buf_str, JACK_DEFAULT_MIDI_TYPE, JackPortIsOutput, 0);
+            //jack_activate(global_client);
+
+            instance = new JackAssInstance(jport);
+            instances.push_back(instance);
         }
     }
 
     ~JackAss()
     {
+        if (instance)
+        {
+            instances.remove(instance);
+            delete instance;
+        }
         close_jack();
-        pthread_mutex_destroy(&midi_mutex);
     }
 
     void processReplacing(float** /*inputs*/, float** outputs, VstInt32 sampleFrames)
@@ -65,48 +206,21 @@ public:
         // Silent output
         float* out1 = outputs[0];
         float* out2 = outputs[1];
-
-        while (--sampleFrames >= 0)
-            out1[sampleFrames] = out2[sampleFrames] = 0.0f;
+        memset(out1, 0, sizeof(float)*sampleFrames);
+        memset(out2, 0, sizeof(float)*sampleFrames);
     }
 
     VstInt32 processEvents(VstEvents* ev)
     {
-        pthread_mutex_lock(&midi_mutex);
-        VstInt32 i, j=0, k=0;
-
-        // Find initial pos where to put events
-        for (i=0; i<MAX_MIDI_EVENTS; i++)
+        for (VstInt32 i=0; i < ev->numEvents; i++)
         {
-            if (midi_data[i].status == 0)
+            if (ev->events[i]->type == kVstMidiType)
             {
-                k = i;
-                break;
+                const VstMidiEvent* event = (VstMidiEvent*)ev->events[i];
+                instance->put_event(event->midiData[0], event->midiData[1], event->midiData[2], event->deltaFrames);
             }
         }
-
-        for (i=0; i < ev->numEvents && k+i < MAX_MIDI_EVENTS; i++)
-        {
-            if ((ev->events[i])->type != kVstMidiType)
-            {
-                j++;
-                continue;
-            }
-
-            VstMidiEvent* event = (VstMidiEvent*)ev->events[i];
-            char* midiData = event->midiData;
-
-            midi_data[k+i-j].status = midiData[0];
-            midi_data[k+i-j].note   = midiData[1];
-            midi_data[k+i-j].velo   = midiData[2];
-            midi_data[k+i-j].time   = event->deltaFrames;
-        }
-
-        // Set last event
-        midi_data[k+i-j+1].status = 0;
-        pthread_mutex_unlock(&midi_mutex);
-
-        return 1;
+        return 0;
     }
 
     bool getEffectName(char* name)
@@ -152,85 +266,12 @@ public:
         return 0;
     }
 
-    static int jprocess_callback(jack_nframes_t nframes, void *arg)
-    {
-        if (arg == nullptr)
-          return 0;
-
-        JackAss* ass = (JackAss*)arg;
-
-        void* port_buffer = jack_port_get_buffer(ass->jport, nframes);
-        jack_midi_clear_buffer(port_buffer);
-        unsigned char* buffer;
-
-        // make a copy of the events, so we can unlock the mutex asap
-        midi_data_t midi_data_tmp[MAX_MIDI_EVENTS];
-
-        pthread_mutex_lock(&ass->midi_mutex);
-        memcpy(&midi_data_tmp, &ass->midi_data, sizeof(midi_data_t)*MAX_MIDI_EVENTS);
-        memset(&ass->midi_data, 0, sizeof(midi_data_t)*MAX_MIDI_EVENTS);
-        pthread_mutex_unlock(&ass->midi_mutex);
-
-        for (int i=0; i<MAX_MIDI_EVENTS; i++)
-        {
-            midi_data_t* mevent = &midi_data_tmp[i];
-
-            if (mevent->status != 0)
-            {
-                buffer = jack_midi_event_reserve(port_buffer, mevent->time, 3);
-                buffer[0] = mevent->status;
-                buffer[1] = mevent->note;
-                buffer[2] = mevent->velo;
-            }
-            else
-                break;
-        }
-        return 0;
-    }
-
-protected:
-    jack_client_t* jclient;
-    jack_port_t* jport;
-    midi_data_t midi_data[MAX_MIDI_EVENTS];
-    pthread_mutex_t midi_mutex;
-
 private:
-    void init_jack()
-    {
-        char host_name[64] = { 0 };
-
-        if (getHostProductString(host_name) == false)
-        {
-            host_name[0] = 'J';
-            host_name[1] = 'a';
-            host_name[2] = 'c';
-            host_name[3] = 'k';
-            host_name[4] = 'A';
-            host_name[5] = 's';
-            host_name[6] = 's';
-            host_name[7] = '\0';
-        }
-
-        jclient = jack_client_open(host_name, JackNullOption, 0);
-        jport   = jack_port_register(jclient, "midi_out", JACK_DEFAULT_MIDI_TYPE, JackPortIsOutput, 0);
-        jack_set_process_callback(jclient, jprocess_callback, this);
-        jack_activate(jclient);
-    }
-
-    void close_jack()
-    {
-        jack_deactivate(jclient);
-        jack_client_close(jclient);
-        jclient = nullptr;
-    }
-
-    void clear_midi_buffer()
-    {
-        pthread_mutex_lock(&midi_mutex);
-        memset(&midi_data, 0, sizeof(midi_data_t)*MAX_MIDI_EVENTS);
-        pthread_mutex_unlock(&midi_mutex);
-    }
+    JackAssInstance* instance;
 };
+
+// -------------------------------------------------
+// DLL entry point
 
 AudioEffect* createEffectInstance(audioMasterCallback audioMaster)
 {
