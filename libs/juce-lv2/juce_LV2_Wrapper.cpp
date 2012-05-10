@@ -49,13 +49,13 @@
 #include "includes/midi.h"
 #include "includes/port-props.h"
 #include "includes/presets.h"
-#include "includes/programs.h"
 #include "includes/state.h"
 #include "includes/time.h"
 #include "includes/ui.h"
 #include "includes/units.h"
 #include "includes/urid.h"
 #include "includes/lv2_external_ui.h"
+#include "includes/lv2_programs.h"
 
 #include "modules/juce_audio_plugin_client/utility/juce_IncludeModuleHeaders.h"
 
@@ -194,7 +194,7 @@ String makeManifestTtl(AudioProcessor* const filter, const String& binary)
         manifest += "    a <" LV2_EXTERNAL_UI_URI "> ;\n";
         manifest += "    ui:binary <" + binary + PLUGIN_EXT "> ;\n";
 #if ! JucePlugin_WantsLV2InstanceAccess
-        if (filter->getNumPrograms() > 0)
+        if (filter->getNumPrograms() > 1)
             manifest += "    lv2:extensionData <" LV2_PROGRAMS__UIInterface "> ;\n";
 #else
         manifest += "    lv2:requiredFeature <" LV2_INSTANCE_ACCESS_URI "> ;\n";
@@ -205,7 +205,7 @@ String makeManifestTtl(AudioProcessor* const filter, const String& binary)
         manifest += "    a ui:external ;\n";
         manifest += "    ui:binary <" + binary + PLUGIN_EXT "> ;\n";
 #if ! JucePlugin_WantsLV2InstanceAccess
-        if (filter->getNumPrograms() > 0)
+        if (filter->getNumPrograms() > 1)
             manifest += "    lv2:extensionData <" LV2_PROGRAMS__UIInterface "> ;\n";
 #else
         manifest += "    lv2:requiredFeature <" LV2_INSTANCE_ACCESS_URI "> ;\n";
@@ -217,7 +217,7 @@ String makeManifestTtl(AudioProcessor* const filter, const String& binary)
         manifest += "    a ui:X11UI ;\n";
         manifest += "    ui:binary <" + binary + PLUGIN_EXT "> ;\n";
  #if ! JucePlugin_WantsLV2InstanceAccess
-        if (filter->getNumPrograms() > 0)
+        if (filter->getNumPrograms() > 1)
             manifest += "    lv2:extensionData <" LV2_PROGRAMS__UIInterface "> ;\n";
  #else
         manifest += "    lv2:requiredFeature <" LV2_INSTANCE_ACCESS_URI "> ;\n";
@@ -272,7 +272,7 @@ String makePluginTtl(AudioProcessor* const filter)
 #if JucePlugin_WantsLV2State
     plugin += "    lv2:extensionData <" LV2_STATE__interface "> ;\n";
 #endif
-    if (filter->getNumPrograms() > 0)
+    if (filter->getNumPrograms() > 1)
         plugin += "    lv2:extensionData <" LV2_PROGRAMS__Interface "> ;\n";
     plugin += "\n";
 
@@ -827,6 +827,7 @@ public:
             externalUIPos (100, 100),
             uiTouch (nullptr)
     {
+        lastProgramCount = filter->getNumPrograms();
         filter->addListener(this);
 
         if (filter->hasEditor())
@@ -838,10 +839,9 @@ public:
             for (uint32 i = 0; features[i]; i++)
             {
                 if (strcmp(features[i]->URI, LV2_UI__touch) == 0 && features[i]->data)
-                {
                     uiTouch = (LV2UI_Touch*)features[i]->data;
-                    break;
-                }
+                else if (strcmp(features[i]->URI, LV2_PROGRAMS__Host) == 0 && features[i]->data)
+                    hostPrograms = (LV2_Programs_Host*)features[i]->data;
             }
 
             switch (uiType)
@@ -970,7 +970,15 @@ public:
             writeFunction(controller, index+controlPortOffset, sizeof (float), 0, &newValue);
     }
 
-    void audioProcessorChanged (AudioProcessor*) {}
+    void audioProcessorChanged (AudioProcessor*)
+    {
+        if (filter && hostPrograms)
+        {
+            if (filter->getNumPrograms() != lastProgramCount)
+                return hostPrograms->program_changed(hostPrograms->handle, -1);
+            return hostPrograms->program_changed(hostPrograms->handle, filter->getCurrentProgram());
+        }
+    }
 
     void audioProcessorParameterChangeGestureBegin (AudioProcessor*, int parameterIndex)
     {
@@ -1063,8 +1071,10 @@ private:
     Point<int> externalUIPos;
 
     LV2UI_Touch* uiTouch;
+    LV2_Programs_Host* hostPrograms;
 
     uint32 controlPortOffset;
+    uint32 lastProgramCount;
 
     //==============================================================================
 #if JUCE_LINUX
