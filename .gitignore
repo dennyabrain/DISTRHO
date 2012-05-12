@@ -4,6 +4,7 @@
 *.la
 *.o
 *.so
+*.so.*
 
 *.cdbs-orig
 *.moc
