@@ -77,10 +77,18 @@
 #endif
 
 //==============================================================================
+#ifdef _MSC_VER
+ #pragma pack (push, 8)
+#endif
+
 #include "../utility/juce_IncludeModuleHeaders.h"
 #include "../utility/juce_FakeMouseMoveGenerator.h"
 #include "../utility/juce_PluginHostType.h"
 #include "modules/juce_audio_processors/format_types/juce_VSTMidiEventList.h"
+
+#ifdef _MSC_VER
+ #pragma pack (pop)
+#endif
 
 #undef MemoryBlock
 

@@ -55,7 +55,7 @@ namespace CoreTextTypeLayout
     static CTFontRef createCTFont (const Font& font, const float fontSize,
                                    const bool applyScaleFactor)
     {
-        CFStringRef cfFontFamily = font.getTypefaceName().toCFString();
+        CFStringRef cfFontFamily = FontStyleHelpers::getConcreteFamilyName (font).toCFString();
         CFStringRef cfFontStyle = findBestAvailableStyle (font.getTypefaceName(),
                                                           font.getTypefaceStyle()).toCFString();
         CFStringRef keys[] = { kCTFontFamilyNameAttribute, kCTFontStyleNameAttribute };
@@ -321,10 +321,9 @@ namespace CoreTextTypeLayout
                 CTFontRef ctRunFont;
                 if (CFDictionaryGetValueIfPresent (runAttributes, kCTFontAttributeName, (const void **) &ctRunFont))
                 {
-                    CTFontDescriptorRef ctFontDescRef = CTFontCopyFontDescriptor (ctRunFont);
-                    CFDictionaryRef fontDescAttributes = CTFontDescriptorCopyAttributes (ctFontDescRef);
-                    CTFontRef ctFontRef = CTFontCreateWithFontDescriptor (ctFontDescRef, 1024, nullptr);
-                    CFRelease (ctFontDescRef);
+                    CFStringRef cfsFontName = CTFontCopyPostScriptName (ctRunFont);
+                    CTFontRef ctFontRef = CTFontCreateWithName (cfsFontName, 1024, nullptr);
+                    CFRelease (cfsFontName);
 
                     CGFontRef cgFontRef = CTFontCopyGraphicsFont (ctFontRef, nullptr);
                     CFRelease (ctFontRef);
@@ -332,13 +331,15 @@ namespace CoreTextTypeLayout
                     const float fontHeightToCGSizeFactor = CGFontGetUnitsPerEm (cgFontRef) / (float) totalHeight;
                     CGFontRelease (cgFontRef);
 
-                    CFStringRef cfsFontFamily = (CFStringRef) CFDictionaryGetValue (fontDescAttributes, kCTFontFamilyNameAttribute);
-                    CFStringRef cfsFontStyle  = (CFStringRef) CFDictionaryGetValue (fontDescAttributes, kCTFontStyleNameAttribute);
+                    CFStringRef cfsFontFamily = (CFStringRef) CTFontCopyAttribute (ctRunFont, kCTFontFamilyNameAttribute);
+                    CFStringRef cfsFontStyle  = (CFStringRef) CTFontCopyAttribute (ctRunFont, kCTFontStyleNameAttribute);
 
                     glyphRun->font = Font (String::fromCFString (cfsFontFamily),
                                            String::fromCFString (cfsFontStyle),
                                            CTFontGetSize (ctRunFont) / fontHeightToCGSizeFactor);
-                    CFRelease (fontDescAttributes);
+
+                    CFRelease (cfsFontStyle);
+                    CFRelease (cfsFontFamily);
                 }
 
                 CGColorRef cgRunColor;
