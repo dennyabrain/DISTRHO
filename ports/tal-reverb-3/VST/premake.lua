@@ -1,6 +1,6 @@
 
 project.name    = "TAL-Reverb-3"
-project.bindir  = "../../../bin"
+project.bindir  = "../../../bin/vst"
 project.libdir  = project.bindir
 project.configs = { "Release", "Debug" }
 

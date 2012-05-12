@@ -6,7 +6,7 @@ CONFIG += qt resources warn_on
 CONFIG += release
 #CONFIG += debug
 
-TARGET   = ../../../bin/StereoAudioGain
+TARGET   = ../../../bin/standalone/StereoAudioGain
 TEMPLATE = app
 
 SOURCES  = \

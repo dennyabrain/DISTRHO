@@ -1,6 +1,6 @@
 
 project.name    = "TAL-NoiseMaker.lv2/TAL_NoiseMaker_Plugin"
-project.bindir  = "../../../bin"
+project.bindir  = "../../../bin/lv2"
 project.libdir  = project.bindir
 project.configs = { "Release", "Debug" }
 

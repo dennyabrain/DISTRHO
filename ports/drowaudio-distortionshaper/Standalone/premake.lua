@@ -1,6 +1,6 @@
 
 project.name    = "drowaudio-distortionshaper"
-project.bindir  = "../../../bin"
+project.bindir  = "../../../bin/standalone"
 project.libdir  = project.bindir
 project.configs = { "Release", "Debug" }
 

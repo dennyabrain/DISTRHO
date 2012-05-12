@@ -6,7 +6,7 @@ CONFIG += qt resources warn_on shared dll plugin
 CONFIG += release
 #CONFIG += debug
 
-TARGET   = ../../../bin/StereoAudioGain.lv2/Stereo_Audio_Gain
+TARGET   = ../../../bin/lv2/StereoAudioGain.lv2/Stereo_Audio_Gain
 TEMPLATE = lib
 
 SOURCES  = \

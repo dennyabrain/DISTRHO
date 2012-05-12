@@ -1,6 +1,6 @@
 
 project.name    = "drowaudio-distortion.lv2/dRowAudio_Distortion"
-project.bindir  = "../../../bin"
+project.bindir  = "../../../bin/lv2"
 project.libdir  = project.bindir
 project.configs = { "Release", "Debug" }
 

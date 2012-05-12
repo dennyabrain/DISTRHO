@@ -1,6 +1,6 @@
 
 project.name    = "drowaudio-tremolo.lv2/dRowAudio_Tremolo"
-project.bindir  = "../../../bin"
+project.bindir  = "../../../bin/lv2"
 project.libdir  = project.bindir
 project.configs = { "Release", "Debug" }
 

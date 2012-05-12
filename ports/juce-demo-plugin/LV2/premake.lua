@@ -1,6 +1,6 @@
 
 project.name    = "JuceDemoPlugin.lv2/Juce_Demo_Plugin"
-project.bindir  = "../../../bin"
+project.bindir  = "../../../bin/lv2"
 project.libdir  = project.bindir
 project.configs = { "Release", "Debug" }
 

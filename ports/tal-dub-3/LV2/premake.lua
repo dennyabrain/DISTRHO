@@ -1,6 +1,6 @@
 
 project.name    = "TAL-Dub-III.lv2/TAL_Dub_III_Plugin"
-project.bindir  = "../../../bin"
+project.bindir  = "../../../bin/lv2"
 project.libdir  = project.bindir
 project.configs = { "Release", "Debug" }
 

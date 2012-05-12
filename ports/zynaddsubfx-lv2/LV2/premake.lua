@@ -1,6 +1,6 @@
 
 project.name    = "zynaddsubfx.lv2/zynaddsubfx"
-project.bindir  = "../../../bin"
+project.bindir  = "../../../bin/lv2"
 project.libdir  = project.bindir
 project.configs = { "Release", "Debug" }
 

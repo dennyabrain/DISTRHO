@@ -1,6 +1,6 @@
 
 project.name    = "PingPongPan.lv2/Ping_Pong_Pan"
-project.bindir  = "../../../bin"
+project.bindir  = "../../../bin/lv2"
 project.libdir  = project.bindir
 project.configs = { "Release", "Debug" }
 

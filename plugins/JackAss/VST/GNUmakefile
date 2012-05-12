@@ -8,15 +8,15 @@ WINECXX_FLAGS ?= -m32 -L/usr/lib32/wine -L/usr/lib/i386-linux-gnu/wine
 
 all: build
 
-build: ../../../bin/JackAss.so
-wine: ../../../bin/JackAss.dll
+build: ../../../bin/vst/JackAss.so
+wine: ../../../bin/vst/JackAss.dll
 
-../../../bin/JackAss.so: ../source/jackass.cpp
+../../../bin/vst/JackAss.so: ../source/jackass.cpp
 	$(CXX) $(BUILD_FLAGS) $< -o $@ $(LINK_FLAGS)
 
-../../../bin/JackAss.dll: ../source/jackass.cpp
+../../../bin/vst/JackAss.dll: ../source/jackass.cpp
 	$(WINECXX) $(BUILD_FLAGS) $(WINECXX_FLAGS) $< wine.def -o $@ $(LINK_FLAGS)
 	mv $@.so $@
 
 clean:
-	rm -f ../../../bin/JackAss.*
+	rm -f ../../../bin/vst/JackAss.*

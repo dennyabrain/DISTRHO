@@ -10,14 +10,27 @@ TARGET   = ../../../bin/dssi/StereoAudioGain.so
 TEMPLATE = lib
 
 SOURCES  = \
-    ../source/StereoAudioGain.cpp
+    ../source/StereoAudioGain.cpp \
+    ../source/StereoAudioGainUi.cpp \
+    ../../common/Qt4-Widgets/digitalpeakmeter.cpp \
+    ../../common/Qt4-Widgets/pixmapdial.cpp
 
 HEADERS = \
     ../source/DistrhoPlugin.h \
-    ../source/StereoAudioGain.h
+    ../source/StereoAudioGain.h \
+    ../source/StereoAudioGainUi.h \
+    ../../common/Qt4-Widgets/digitalpeakmeter.h \
+    ../../common/Qt4-Widgets/pixmapdial.h
+
+FORMS    = \
+    ../source/StereoAudioGain.ui
+
+RESOURCES = \
+    ../../common/Artwork/knobs/knobs.qrc
 
 INCLUDEPATH = \
-    ../source
+    ../source \
+    ../../common/Qt4-Widgets
 
 # -----------------------------------------------------------
 

@@ -1,6 +1,6 @@
 
 project.name    = "eqinox.lv2/EQinox"
-project.bindir  = "../../../bin"
+project.bindir  = "../../../bin/lv2"
 project.libdir  = project.bindir
 project.configs = { "Release", "Debug" }
 

@@ -1,6 +1,6 @@
 
 project.name    = "vex.lv2/Vex"
-project.bindir  = "../../../bin"
+project.bindir  = "../../../bin/lv2"
 project.libdir  = project.bindir
 project.configs = { "Release", "Debug" }
 

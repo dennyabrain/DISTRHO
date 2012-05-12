@@ -1,6 +1,6 @@
 
 project.name    = "drowaudio-reverb.lv2/dRowAudio_Reverb"
-project.bindir  = "../../../bin"
+project.bindir  = "../../../bin/lv2"
 project.libdir  = project.bindir
 project.configs = { "Release", "Debug" }
 

@@ -6,7 +6,7 @@ CONFIG  = warn_on shared dll plugin
 CONFIG += release
 #CONFIG += debug
 
-TARGET   = ../../../bin/Bitcrusher.lv2/Bitcrusher
+TARGET   = ../../../bin/lv2/Bitcrusher.lv2/Bitcrusher
 TEMPLATE = lib
 
 SOURCES  = \
