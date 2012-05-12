@@ -216,7 +216,9 @@ private:
             height = m_minHeight;
 
         m_x11Container->setFixedSize(width, height);
-        m_grip->move(width - m_grip->width(), height - m_grip->height());
+
+        if (m_grip)
+            m_grip->move(width - m_grip->width(), height - m_grip->height());
 
         if (ui_resize)
             ui_resize->ui_resize(ui_resize->handle, width, height);

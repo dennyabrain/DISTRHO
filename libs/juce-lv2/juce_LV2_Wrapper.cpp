@@ -161,11 +161,11 @@ String nameToSymbol(const String& name, const uint32 portIndex)
 float safeParamValue(float value)
 {
     if (isnan(value))
-      value = 0.0f;
+        value = 0.0f;
     else if (value < 0.0f)
-      value = 0.0f;
+        value = 0.0f;
     else if (value > 1.0f)
-      value = 1.0f;
+        value = 1.0f;
     return value;
 }
 
@@ -173,6 +173,8 @@ float safeParamValue(float value)
 String makeManifestTtl(AudioProcessor* const filter, const String& binary)
 {
     String manifest;
+
+    // Header
     manifest += "@prefix lv2:  <" LV2_CORE_PREFIX "> .\n";
 #if JucePlugin_WantsLV2Presets
     manifest += "@prefix pset: <" LV2_PRESETS_PREFIX "> .\n";
@@ -182,53 +184,59 @@ String makeManifestTtl(AudioProcessor* const filter, const String& binary)
         manifest += "@prefix ui:   <" LV2_UI_PREFIX "> .\n";
     manifest += "\n";
 
+    // Plugin
     manifest += "<" JucePlugin_LV2URI ">\n";
     manifest += "    a lv2:Plugin ;\n";
     manifest += "    lv2:binary <" + binary + PLUGIN_EXT "> ;\n";
     manifest += "    rdfs:seeAlso <" + binary + ".ttl> .\n";
     manifest += "\n";
 
+    // UIs
     if (filter->hasEditor())
     {
         manifest += "<" JucePlugin_LV2URI "#ExternalUI>\n";
         manifest += "    a <" LV2_EXTERNAL_UI_URI "> ;\n";
-        manifest += "    ui:binary <" + binary + PLUGIN_EXT "> ;\n";
-#if ! JucePlugin_WantsLV2InstanceAccess
-        if (filter->getNumPrograms() > 1)
-            manifest += "    lv2:extensionData <" LV2_PROGRAMS__UIInterface "> ;\n";
+        manifest += "    ui:binary <" + binary + PLUGIN_EXT "> ";
+#if JucePlugin_WantsLV2InstanceAccess
+        manifest += ";\n    lv2:requiredFeature <" LV2_INSTANCE_ACCESS_URI "> .\n";
 #else
-        manifest += "    lv2:requiredFeature <" LV2_INSTANCE_ACCESS_URI "> ;\n";
+        if (filter->getNumPrograms() > 1)
+            manifest += ";\n    lv2:extensionData <" LV2_PROGRAMS__UIInterface "> .\n";
+        else
+            manifest += ".\n";
 #endif
-        manifest += "    .\n\n";
+        manifest += "\n";
 
         manifest += "<" JucePlugin_LV2URI "#ExternalOldUI>\n";
         manifest += "    a ui:external ;\n";
-        manifest += "    ui:binary <" + binary + PLUGIN_EXT "> ;\n";
-#if ! JucePlugin_WantsLV2InstanceAccess
-        if (filter->getNumPrograms() > 1)
-            manifest += "    lv2:extensionData <" LV2_PROGRAMS__UIInterface "> ;\n";
+        manifest += "    ui:binary <" + binary + PLUGIN_EXT "> ";
+#if JucePlugin_WantsLV2InstanceAccess
+        manifest += ";\n    lv2:requiredFeature <" LV2_INSTANCE_ACCESS_URI "> .\n";
 #else
-        manifest += "    lv2:requiredFeature <" LV2_INSTANCE_ACCESS_URI "> ;\n";
+        if (filter->getNumPrograms() > 1)
+            manifest += ";\n    lv2:extensionData <" LV2_PROGRAMS__UIInterface "> .\n";
+        else
+            manifest += ".\n";
 #endif
-        manifest += "    .\n\n";
+        manifest += "\n";
 
 #if JUCE_LINUX
         manifest += "<" JucePlugin_LV2URI "#X11UI>\n";
         manifest += "    a ui:X11UI ;\n";
         manifest += "    ui:binary <" + binary + PLUGIN_EXT "> ;\n";
- #if ! JucePlugin_WantsLV2InstanceAccess
+ #if JucePlugin_WantsLV2InstanceAccess
+        manifest += "    lv2:requiredFeature <" LV2_INSTANCE_ACCESS_URI "> ;\n";
+ #else
         if (filter->getNumPrograms() > 1)
             manifest += "    lv2:extensionData <" LV2_PROGRAMS__UIInterface "> ;\n";
- #else
-        manifest += "    lv2:requiredFeature <" LV2_INSTANCE_ACCESS_URI "> ;\n";
  #endif
-        manifest += "    lv2:optionalFeature ui:noUserResize ;\n";
-
-        manifest += "    .\n\n";
+        manifest += "    lv2:optionalFeature ui:noUserResize .\n";
+        manifest += "\n";
 #endif
     }
 
 #if JucePlugin_WantsLV2Presets
+    // Presets
     for (int i = 0; i < filter->getNumPrograms(); i++)
     {
         manifest += "<" JucePlugin_LV2URI "#preset" + String(i+1) + ">\n";
@@ -246,27 +254,30 @@ String makeManifestTtl(AudioProcessor* const filter, const String& binary)
 String makePluginTtl(AudioProcessor* const filter)
 {
     String plugin;
-#if (JUCE_LV2_ENABLE_ATOM_PORTS && (JucePlugin_WantsMidiInput || JucePlugin_ProducesMidiOutput || JucePlugin_WantsLV2TimePos))
+
+    // Header
+#if ((JucePlugin_WantsMidiInput || JucePlugin_ProducesMidiOutput) && JUCE_LV2_ENABLE_ATOM_PORTS)
     plugin += "@prefix atom: <" LV2_ATOM_PREFIX "> .\n";
 #endif
     plugin += "@prefix doap: <http://usefulinc.com/ns/doap#> .\n";
-#if ((! JUCE_LV2_ENABLE_ATOM_PORTS) && (JucePlugin_WantsMidiInput || JucePlugin_ProducesMidiOutput))
+#if ((JucePlugin_WantsMidiInput || JucePlugin_ProducesMidiOutput) && ! JUCE_LV2_ENABLE_ATOM_PORTS)
     plugin += "@prefix ev:   <" LV2_EVENT_PREFIX "> .\n";
 #endif
     plugin += "@prefix foaf: <http://xmlns.com/foaf/0.1/> .\n";
     plugin += "@prefix lv2:  <" LV2_CORE_PREFIX "> .\n";
 #if JucePlugin_WantsLV2TimePos
-    plugin += "@prefix ue:   <" LV2_UNITS_PREFIX "> .\n";
+    plugin += "@prefix unit: <" LV2_UNITS_PREFIX "> .\n";
 #endif
     if (filter->hasEditor())
         plugin += "@prefix ui:   <" LV2_UI_PREFIX "> .\n";
     plugin += "\n";
 
+    // Plugin
     plugin += "<" JucePlugin_LV2URI ">\n";
     plugin += "    a " + getPluginType() + " ;\n";
 #if JucePlugin_IsSynth
     plugin += "    lv2:requiredFeature <" LV2_URID__map "> ;\n";
-#elif (JucePlugin_WantsMidiInput || JucePlugin_ProducesMidiOutput || JucePlugin_WantsLV2State || (JUCE_LV2_ENABLE_ATOM_PORTS && JucePlugin_WantsLV2TimePos))
+#elif (JucePlugin_WantsMidiInput || JucePlugin_ProducesMidiOutput || JucePlugin_WantsLV2State)
     plugin += "    lv2:optionalFeature <" LV2_URID__map "> ;\n";
 #endif
 #if JucePlugin_WantsLV2State
@@ -276,6 +287,7 @@ String makePluginTtl(AudioProcessor* const filter)
         plugin += "    lv2:extensionData <" LV2_PROGRAMS__Interface "> ;\n";
     plugin += "\n";
 
+    // UIs
     if (filter->hasEditor())
     {
         plugin += "    ui:ui <" JucePlugin_LV2URI "#ExternalUI> ,\n";
@@ -291,32 +303,27 @@ String makePluginTtl(AudioProcessor* const filter)
 
     uint32 portIndex = 0;
 
-    // Event input (old MIDI or MIDI + TimePos)
-#if (JucePlugin_WantsMidiInput || (JUCE_LV2_ENABLE_ATOM_PORTS && JucePlugin_WantsLV2TimePos))
+    // MIDI input
+#if JucePlugin_WantsMidiInput
     plugin += "    lv2:port [\n";
  #if JUCE_LV2_ENABLE_ATOM_PORTS
     plugin += "        a lv2:InputPort, atom:AtomPort ;\n";
     plugin += "        atom:bufferType atom:Sequence ;\n";
-  #if JucePlugin_WantsLV2TimePos
-    plugin += "        atom:supports <" LV2_MIDI__MidiEvent "> ,\n";
-    plugin += "                      <" LV2_TIME__Position "> ;\n";
-  #else
     plugin += "        atom:supports <" LV2_MIDI__MidiEvent "> ;\n";
-  #endif
  #else
     plugin += "        a lv2:InputPort, ev:EventPort ;\n";
     plugin += "        ev:supportsEvent <" LV2_MIDI__MidiEvent "> ;\n";
  #endif
     plugin += "        lv2:index " + String(portIndex++) + " ;\n";
-    plugin += "        lv2:symbol \"lv2_events_in\" ;\n";
-    plugin += "        lv2:name \"Events Input\" ;\n";
+    plugin += "        lv2:symbol \"lv2_midi_in\" ;\n";
+    plugin += "        lv2:name \"MIDI Input\" ;\n";
  #if ! JucePlugin_IsSynth
     plugin += "        lv2:portProperty lv2:connectionOptional ;\n";
  #endif
     plugin += "    ] ;\n\n";
 #endif
 
-    // Event output (MIDI only)
+    // MIDI output
 #if JucePlugin_ProducesMidiOutput
     plugin += "    lv2:port [\n";
  #if JUCE_LV2_ENABLE_ATOM_PORTS
@@ -328,12 +335,13 @@ String makePluginTtl(AudioProcessor* const filter)
     plugin += "        ev:supportsEvent <" LV2_MIDI__MidiEvent "> ;\n";
  #endif
     plugin += "        lv2:index " + String(portIndex++) + " ;\n";
-    plugin += "        lv2:symbol \"lv2_events_out\" ;\n";
-    plugin += "        lv2:name \"Events Output\" ;\n";
+    plugin += "        lv2:symbol \"lv2_midi_out\" ;\n";
+    plugin += "        lv2:name \"MIDI Output\" ;\n";
     plugin += "        lv2:portProperty lv2:connectionOptional ;\n";
     plugin += "    ] ;\n\n";
 #endif
 
+    // Audio inputs
     for (int i=0; i<JucePlugin_MaxNumInputChannels; i++)
     {
         if (i == 0)
@@ -352,6 +360,7 @@ String makePluginTtl(AudioProcessor* const filter)
             plugin += "    ] ,\n";
     }
 
+    // Audio outputs
     for (int i=0; i<JucePlugin_MaxNumOutputChannels; i++)
     {
         if (i == 0)
@@ -370,17 +379,68 @@ String makePluginTtl(AudioProcessor* const filter)
             plugin += "    ] ,\n";
     }
 
+    // Time-Pos
 #if JucePlugin_WantsLV2TimePos
     plugin += "    lv2:port [\n";
     plugin += "        a lv2:InputPort, lv2:ControlPort ;\n";
     plugin += "        lv2:index " + String(portIndex++) + " ;\n";
     plugin += "        lv2:symbol \"lv2_time_bpm\" ;\n";
-    plugin += "        lv2:name \"Host BPM\" ;\n";
+    plugin += "        lv2:name \"Time-Pos (BPM)\" ;\n";
     plugin += "        lv2:default 120.0 ;\n";
     plugin += "        lv2:minimum 10.0 ;\n";
-    plugin += "        lv2:maximum 400.0 ;\n";
+    plugin += "        lv2:maximum 600.0 ;\n";
     plugin += "        lv2:designation <" LV2_TIME__beatsPerMinute "> ;\n";
     plugin += "        ue:unit ue:bpm ;\n";
+    plugin += "    ] ,\n";
+
+    plugin += "    [\n";
+    plugin += "        a lv2:InputPort, lv2:ControlPort ;\n";
+    plugin += "        lv2:index " + String(portIndex++) + " ;\n";
+    plugin += "        lv2:symbol \"lv2_time_beats_per_bar\" ;\n";
+    plugin += "        lv2:name \"Time-Pos (BeatsPerBar)\" ;\n";
+    plugin += "        lv2:default 4.0 ;\n";
+    plugin += "        lv2:minimum 1.0 ;\n";
+    plugin += "        lv2:maximum 36.0 ;\n";
+    plugin += "        lv2:designation <" LV2_TIME__beatsPerBar "> ;\n";;
+    plugin += "        lv2:portProperty lv2:integer ;\n";
+    plugin += "    ] ,\n";
+
+    plugin += "    [\n";
+    plugin += "        a lv2:InputPort, lv2:ControlPort ;\n";
+    plugin += "        lv2:index " + String(portIndex++) + " ;\n";
+    plugin += "        lv2:symbol \"lv2_time_beat_unit\" ;\n";
+    plugin += "        lv2:name \"Time-Pos (BeatUnit)\" ;\n";
+    plugin += "        lv2:default 4.0 ;\n";
+    plugin += "        lv2:minimum 1.0 ;\n";
+    plugin += "        lv2:maximum 36.0 ;\n";
+    plugin += "        lv2:designation <" LV2_TIME__beatUnit "> ;\n";
+    plugin += "        lv2:portProperty lv2:integer ;\n";
+    plugin += "        ue:unit ue:bpm ;\n";
+    plugin += "    ] ,\n";
+
+    plugin += "    [\n";
+    plugin += "        a lv2:InputPort, lv2:ControlPort ;\n";
+    plugin += "        lv2:index " + String(portIndex++) + " ;\n";
+    plugin += "        lv2:symbol \"lv2_time_frame\" ;\n";
+    plugin += "        lv2:name \"Time-Pos (Frame)\" ;\n";
+    plugin += "        lv2:default 0.0 ;\n";
+    plugin += "        lv2:minimum 0.0 ;\n";
+    plugin += "        lv2:maximum 2147483647.0 ; # 0x7fffffff\n";
+    plugin += "        lv2:designation <" LV2_TIME__frame "> ;\n";
+    plugin += "        lv2:portProperty lv2:integer ;\n";
+    plugin += "        ue:unit ue:frame ;\n";
+    plugin += "    ] ,\n";
+
+    plugin += "    [\n";
+    plugin += "        a lv2:InputPort, lv2:ControlPort ;\n";
+    plugin += "        lv2:index " + String(portIndex++) + " ;\n";
+    plugin += "        lv2:symbol \"lv2_time_speed\" ;\n";
+    plugin += "        lv2:name \"Time-Pos (Speed)\" ;\n";
+    plugin += "        lv2:default 0.0 ;\n";
+    plugin += "        lv2:minimum 0.0 ;\n";
+    plugin += "        lv2:maximum 1.0 ;\n";
+    plugin += "        lv2:designation <" LV2_TIME__speed "> ;\n";
+    plugin += "        lv2:portProperty lv2:toggled ;\n";
     plugin += "    ] ;\n\n";
 #endif
 
@@ -893,7 +953,7 @@ public:
 #if JucePlugin_ProducesMidiOutput
         controlPortOffset += 1;
 #endif
-#if JucePlugin_WantsLV2TimePos
+#if JucePlugin_WantsLV2TimePos && ! JUCE_LV2_ENABLE_ATOM_PORTS
         controlPortOffset += 1;
 #endif
         controlPortOffset += JucePlugin_MaxNumInputChannels;
@@ -1270,7 +1330,7 @@ public:
             }
         }
 
-#if JucePlugin_WantsLV2TimePos
+#if JucePlugin_WantsLV2TimePos && ! JUCE_LV2_ENABLE_ATOM_PORTS
         if (portId == index)
         {
             portTimeBPM = (float*)dataLocation;
@@ -1556,10 +1616,7 @@ public:
             return false;
 
  #if JUCE_LV2_ENABLE_ATOM_PORTS
-        if (portTimeBPM)
-            info.bpm = *portTimeBPM;
-        else
-            info.bpm = 120.0;
+        info.bpm = 120.0;
 
         // TODO
         info.timeSigNumerator   = 4;
@@ -1575,10 +1632,7 @@ public:
         info.isRecording = false;
         info.isLooping   = false;
  #else
-        if (portTimeBPM)
-            info.bpm = *portTimeBPM;
-        else
-            info.bpm = 120.0;
+        info.bpm = *portTimeBPM;
 
         info.timeSigNumerator   = 4;
         info.timeSigDenominator = 4;
@@ -1724,7 +1778,7 @@ private:
 #endif
     float* portAudioIns[JucePlugin_MaxNumInputChannels];
     float* portAudioOuts[JucePlugin_MaxNumOutputChannels];
-#if JucePlugin_WantsLV2TimePos
+#if JucePlugin_WantsLV2TimePos && ! JUCE_LV2_ENABLE_ATOM_PORTS
     float* portTimeBPM;
 #endif
     Array<float*> portControls;

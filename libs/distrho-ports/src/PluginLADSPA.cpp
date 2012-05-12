@@ -1,4 +1,4 @@
-// distrho lv2 plugin
+// distrho ladspa plugin
 
 #include "PluginBase.h"
 

@@ -55,7 +55,7 @@ struct ParameterInfo {
 struct MidiEvent
 {
     uint32_t frame;
-    char buffer[4];
+    char buffer[3];
 };
 
 // ---------------------------------------------------------------------------------------------
