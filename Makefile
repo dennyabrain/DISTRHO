@@ -26,7 +26,7 @@ clean:
 	$(MAKE) clean -C libs/lv2-ttl-generator
 	$(MAKE) clean -C plugins
 	$(MAKE) clean -C ports
-	rm -rf bin/*.lv2
+	rm -rf bin/lv2/*.lv2
 
 distclean: clean
 	$(MAKE) distclean -C libs/juce-2.0
