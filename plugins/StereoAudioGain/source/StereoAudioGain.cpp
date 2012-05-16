@@ -4,10 +4,17 @@
 
 #include "StereoAudioGain.h"
 
-double abs_d(double value)
+float abs_f(float value)
 {
     return (value < 0.0) ? -value : value;
 }
+
+long CCONST(int a, int b, int c, int d)
+{
+    return (a << 24) | (b << 16) | (c << 8) | (d << 0);
+}
+
+// ---------------------------------------------------------------------------------------------
 
 StereoAudioGain::StereoAudioGain() :
     DistrhoPluginBase(PARAMETER_COUNT, 0)
@@ -46,7 +53,7 @@ uint32_t StereoAudioGain::d_version()
 
 long StereoAudioGain::d_uniqueId()
 {
-    return 0;
+    return CCONST('D', 'S', 'A', 'G');
 }
 
 // -------------------------------------------------
@@ -87,7 +94,7 @@ void StereoAudioGain::d_setParameterValue(uint32_t index, float value)
     }
 }
 
-void StereoAudioGain::d_setCurrentProgram(uint32_t)
+void StereoAudioGain::d_setProgram(uint32_t)
 {
 }
 
@@ -96,7 +103,7 @@ void StereoAudioGain::d_setCurrentProgram(uint32_t)
 // Init
 void StereoAudioGain::d_init()
 {
-    p_paramsInfo[PARAMETER_LEFT].hints      = PARAMETER_IS_ENABLED | PARAMETER_IS_AUTOMABLE;
+    p_paramsInfo[PARAMETER_LEFT].hints      = PARAMETER_IS_AUTOMABLE;
     p_paramsInfo[PARAMETER_LEFT].name       = strdup("Left Gain");
     p_paramsInfo[PARAMETER_LEFT].symbol     = strdup("left_gain");
     p_paramsInfo[PARAMETER_LEFT].unit       = nullptr;
@@ -108,7 +115,7 @@ void StereoAudioGain::d_init()
     p_paramsInfo[PARAMETER_LEFT].range.stepSmall = 0.0001f;
     p_paramsInfo[PARAMETER_LEFT].range.stepLarge = 0.1f;
 
-    p_paramsInfo[PARAMETER_RIGHT].hints      = PARAMETER_IS_ENABLED | PARAMETER_IS_AUTOMABLE;
+    p_paramsInfo[PARAMETER_RIGHT].hints      = PARAMETER_IS_AUTOMABLE;
     p_paramsInfo[PARAMETER_RIGHT].name       = strdup("Right Gain");
     p_paramsInfo[PARAMETER_RIGHT].symbol     = strdup("right_gain");
     p_paramsInfo[PARAMETER_RIGHT].unit       = nullptr;
@@ -120,7 +127,7 @@ void StereoAudioGain::d_init()
     p_paramsInfo[PARAMETER_RIGHT].range.stepSmall = 0.0001f;
     p_paramsInfo[PARAMETER_RIGHT].range.stepLarge = 0.1f;
 
-    p_paramsInfo[PARAMETER_VU_LEFT].hints      = PARAMETER_IS_ENABLED | PARAMETER_IS_AUTOMABLE | PARAMETER_IS_OUTPUT;
+    p_paramsInfo[PARAMETER_VU_LEFT].hints      = PARAMETER_IS_AUTOMABLE | PARAMETER_IS_OUTPUT;
     p_paramsInfo[PARAMETER_VU_LEFT].name       = strdup("Left Meter");
     p_paramsInfo[PARAMETER_VU_LEFT].symbol     = strdup("left_meter");
     p_paramsInfo[PARAMETER_VU_LEFT].unit       = nullptr;
@@ -129,7 +136,7 @@ void StereoAudioGain::d_init()
     p_paramsInfo[PARAMETER_VU_LEFT].range.min  = 0.0f;
     p_paramsInfo[PARAMETER_VU_LEFT].range.max  = 1.0f;
 
-    p_paramsInfo[PARAMETER_VU_RIGHT].hints     = PARAMETER_IS_ENABLED | PARAMETER_IS_AUTOMABLE | PARAMETER_IS_OUTPUT;
+    p_paramsInfo[PARAMETER_VU_RIGHT].hints     = PARAMETER_IS_AUTOMABLE | PARAMETER_IS_OUTPUT;
     p_paramsInfo[PARAMETER_VU_RIGHT].name      = strdup("Right Meter");
     p_paramsInfo[PARAMETER_VU_RIGHT].symbol    = strdup("right_meter");
     p_paramsInfo[PARAMETER_VU_RIGHT].unit      = nullptr;
@@ -145,7 +152,7 @@ void StereoAudioGain::d_cleanup()
 
 // -------------------------------------------------
 
-// Process stuff
+// Process
 void StereoAudioGain::d_activate() {}
 void StereoAudioGain::d_deactivate() {}
 
@@ -163,11 +170,11 @@ void StereoAudioGain::d_run(float** inputs, float** outputs, uint32_t frames, ui
         p_outL[i] = p_inL[i]*x_left;
         p_outR[i] = p_inR[i]*x_right;
 
-        if (abs_d(p_outL[i]) > vu_left)
-            vu_left = abs_d(p_outL[i]);
+        if (abs_f(p_outL[i]) > vu_left)
+            vu_left = abs_f(p_outL[i]);
 
-        if (p_outR[i] > vu_right)
-            vu_right = abs_d(p_outR[i]);
+        if (abs_f(p_outR[i]) > vu_right)
+            vu_right = abs_f(p_outR[i]);
     }
 
     if (vu_left > 1.0f)

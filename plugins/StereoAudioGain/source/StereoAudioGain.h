@@ -35,7 +35,7 @@ public:
     // Internal data
     float d_parameterValue(uint32_t index);
     void  d_setParameterValue(uint32_t index, float value);
-    void  d_setCurrentProgram(uint32_t index);
+    void  d_setProgram(uint32_t index);
 
     // -------------------------------------------------
 
@@ -45,7 +45,7 @@ public:
 
     // -------------------------------------------------
 
-    // Process stuff
+    // Process
     void d_activate();
     void d_deactivate();
     void d_run(float** inputs, float** outputs, uint32_t frames, uint32_t midiEventCount, MidiEvent* midiEvents);

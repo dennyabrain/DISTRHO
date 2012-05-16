@@ -32,9 +32,8 @@
 #endif
 
 // Parameter Hints
-const uint32_t PARAMETER_IS_ENABLED   = 1 << 1;
-const uint32_t PARAMETER_IS_AUTOMABLE = 1 << 2;
-const uint32_t PARAMETER_IS_OUTPUT    = 1 << 3;
+const uint32_t PARAMETER_IS_AUTOMABLE = 1 << 1;
+const uint32_t PARAMETER_IS_OUTPUT    = 1 << 2;
 
 struct ParameterInfo {
     uint32_t hints;
@@ -79,13 +78,13 @@ public:
     // Internal data
     virtual float d_parameterValue(uint32_t index) = 0;
     virtual void  d_setParameterValue(uint32_t index, float value) = 0;
-    virtual void  d_setCurrentProgram(uint32_t index) = 0;
+    virtual void  d_setProgram(uint32_t index) = 0;
 
     // Init
     virtual void d_init() = 0;
     virtual void d_cleanup() = 0;
 
-    // Process stuff
+    // Process
     virtual void d_activate() = 0;
     virtual void d_deactivate() = 0;
     virtual void d_run(float** inputs, float** outputs, uint32_t frames, uint32_t midiEventCount, MidiEvent* midiEvents) = 0;

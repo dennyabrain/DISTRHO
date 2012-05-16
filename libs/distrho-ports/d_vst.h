@@ -121,7 +121,7 @@ public:
             setParameter(index, value);
     }
 
-    void d_setCurrentProgram(uint32_t /*index*/)
+    void d_setProgram(uint32_t /*index*/)
     {
         //if (index < m_programCount)
         // TODO
@@ -155,8 +155,7 @@ public:
             getParameterLabel(i, buf_str);
             p_paramsInfo[i].unit = strdup(buf_str);
 
-            p_paramsInfo[i].hints |= PARAMETER_IS_ENABLED;
-            // TODO - set parameter automable
+            p_paramsInfo[i].hints = PARAMETER_IS_AUTOMABLE; // FIXME
             p_paramsInfo[i].range.def = getParameter(i);
         }
 

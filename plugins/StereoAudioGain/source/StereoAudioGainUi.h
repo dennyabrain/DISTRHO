@@ -19,8 +19,9 @@ public:
     StereoAudioGainUi();
     ~StereoAudioGainUi();
 
-    bool isUiResizable();
-    void setParameterValue(quint32 index, float value);
+    bool d_isUiResizable();
+    void d_setParameterValue(quint32 index, float value);
+    void d_setProgram(quint32 index);
 
 protected:
     Ui::StereoAudioGainUi* ui;

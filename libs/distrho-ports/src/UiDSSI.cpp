@@ -43,8 +43,6 @@ public:
         lo_server_thread_add_method(osc_server_thread, nullptr, nullptr, osc_message_handler, nullptr);
         lo_server_thread_start(osc_server_thread);
 
-        osc_send_update();
-
         controlPortOffset  = 0;
 #if DISTRHO_PLUGIN_IS_SYNTH
         controlPortOffset += 1;
@@ -53,6 +51,8 @@ public:
         controlPortOffset += DISTRHO_PLUGIN_NUM_OUTPUTS;
 
         connect(m_ui, SIGNAL(parameterChanged(quint32,float)), this, SLOT(pluginParameterChanged(quint32,float)));
+
+        osc_send_update();
     }
 
     ~DistrhoUiDssi()
@@ -69,6 +69,31 @@ public:
         m_ui->close();
         delete m_ui;
     }
+
+    // -----------------------------------------------------------------------------------------
+
+    void osc_handle_control(int param, float value)
+    {
+        if (param >= 0)
+            m_ui->d_setParameterValue(param, value);
+    }
+
+    void osc_handle_show()
+    {
+        m_ui->show();
+    }
+
+    void osc_handle_hide()
+    {
+        m_ui->hide();
+    }
+
+    void osc_handle_exit()
+    {
+        m_ui->close();
+    }
+
+    // -----------------------------------------------------------------------------------------
 
 private slots:
     void pluginParameterChanged(quint32 index, float value)
@@ -134,9 +159,9 @@ void dssiui_descriptor(const char* osc_url)
     char* argv[] = { nullptr };
     QApplication app(argc, argv, true);
     DistrhoUiDssi pGui(osc_url);
+    //app.setQuitOnLastWindowClosed(true);
     app.exec();
 
-    //Q_UNUSED(app);
     //Q_UNUSED(pGui);
 }
 

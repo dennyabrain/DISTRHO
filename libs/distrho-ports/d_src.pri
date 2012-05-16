@@ -19,12 +19,12 @@ PKGCONFIG   += jack
 
 DISTRHO_PLUGIN_TARGET_LADSPA {
 DEFINES     += DISTRHO_PLUGIN_TARGET_LADSPA
-SOURCES     += $$PWD/src/PluginLADSPA.cpp
+SOURCES     += $$PWD/src/PluginLADSPA-DSSI.cpp
 }
 
 DISTRHO_PLUGIN_TARGET_DSSI {
 DEFINES     += DISTRHO_PLUGIN_TARGET_DSSI
-SOURCES     += $$PWD/src/PluginDSSI.cpp
+SOURCES     += $$PWD/src/PluginLADSPA-DSSI.cpp
 SOURCES     += $$PWD/src/UiDSSI.cpp
 CONFIG      += link_pkgconfig
 PKGCONFIG   += liblo

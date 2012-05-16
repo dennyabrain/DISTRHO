@@ -38,12 +38,12 @@ StereoAudioGainUi::~StereoAudioGainUi()
 {
 }
 
-bool StereoAudioGainUi::isUiResizable()
+bool StereoAudioGainUi::d_isUiResizable()
 {
     return true;
 }
 
-void StereoAudioGainUi::setParameterValue(quint32 index, float value)
+void StereoAudioGainUi::d_setParameterValue(quint32 index, float value)
 {
     switch (index)
     {
@@ -66,14 +66,18 @@ void StereoAudioGainUi::setParameterValue(quint32 index, float value)
     }
 }
 
+void StereoAudioGainUi::d_setProgram(quint32)
+{
+}
+
 void StereoAudioGainUi::leftKnobValueChanged(int value)
 {
-    emit parameterChanged(StereoAudioGain::PARAMETER_LEFT, (float(value+50)/100)*2);
+    emit d_parameterChanged(StereoAudioGain::PARAMETER_LEFT, (float(value+50)/100)*2);
 }
 
 void StereoAudioGainUi::rightKnobValueChanged(int value)
 {
-    emit parameterChanged(StereoAudioGain::PARAMETER_RIGHT, (float(value+50)/100)*2);
+    emit d_parameterChanged(StereoAudioGain::PARAMETER_RIGHT, (float(value+50)/100)*2);
 }
 
 // ---------------------------------------------------------------------------------------------

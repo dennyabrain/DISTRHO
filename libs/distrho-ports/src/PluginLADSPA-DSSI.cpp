@@ -17,10 +17,10 @@ typedef void* snd_seq_event_t;
 
 // ---------------------------------------------------------------------------------------------
 
-class DistrhoPluginDssiLadspa
+class DistrhoPluginLadspaDssi
 {
 public:
-    DistrhoPluginDssiLadspa(double sampleRate)
+    DistrhoPluginLadspaDssi(double sampleRate)
     {
         m_plugin = createDistrhoPlugin();
         m_plugin->d_init();
@@ -42,7 +42,7 @@ public:
         }
     }
 
-    ~DistrhoPluginDssiLadspa()
+    ~DistrhoPluginLadspaDssi()
     {
         m_plugin->d_cleanup();
         delete m_plugin;
@@ -114,9 +114,9 @@ public:
 #ifdef DISTRHO_PLUGIN_TARGET_DSSI
     char* dssi_configure(const char* key, const char* value)
     {
+        return nullptr;
         (void)key;
         (void)value;
-        return nullptr;
     }
 
     const DSSI_Program_Descriptor* dssi_get_program(unsigned long index)
@@ -136,7 +136,7 @@ public:
     {
         uint32_t realProgram = bank * 128 + program;
         if (realProgram < m_plugin->d_programCount())
-            m_plugin->d_setCurrentProgram(realProgram);
+            m_plugin->d_setProgram(realProgram);
     }
 #endif
 
@@ -249,61 +249,61 @@ private:
 
 static LADSPA_Handle ladspa_instantiate(const LADSPA_Descriptor*, unsigned long sampleRate)
 {
-    return new DistrhoPluginDssiLadspa(sampleRate);
+    return new DistrhoPluginLadspaDssi(sampleRate);
 }
 
 static void ladspa_connect_port(LADSPA_Handle instance, unsigned long port, LADSPA_Data* dataLocation)
 {
-    DistrhoPluginDssiLadspa* plugin = (DistrhoPluginDssiLadspa*)instance;
+    DistrhoPluginLadspaDssi* plugin = (DistrhoPluginLadspaDssi*)instance;
     plugin->ladspa_connect_port(port, dataLocation);
 }
 
 static void ladspa_activate(LADSPA_Handle instance)
 {
-    DistrhoPluginDssiLadspa* plugin = (DistrhoPluginDssiLadspa*)instance;
+    DistrhoPluginLadspaDssi* plugin = (DistrhoPluginLadspaDssi*)instance;
     plugin->ladspa_activate();
 }
 
 static void ladspa_run(LADSPA_Handle instance, unsigned long sampleCount)
 {
-    DistrhoPluginDssiLadspa* plugin = (DistrhoPluginDssiLadspa*)instance;
+    DistrhoPluginLadspaDssi* plugin = (DistrhoPluginLadspaDssi*)instance;
     plugin->ladspa_run(sampleCount);
 }
 
 static void ladspa_deactivate(LADSPA_Handle instance)
 {
-    DistrhoPluginDssiLadspa* plugin = (DistrhoPluginDssiLadspa*)instance;
+    DistrhoPluginLadspaDssi* plugin = (DistrhoPluginLadspaDssi*)instance;
     plugin->ladspa_deactivate();
 }
 
 static void ladspa_cleanup(LADSPA_Handle instance)
 {
-    delete (DistrhoPluginDssiLadspa*)instance;
+    delete (DistrhoPluginLadspaDssi*)instance;
 }
 
 #ifdef DISTRHO_PLUGIN_TARGET_DSSI
 static char* dssi_configure(LADSPA_Handle instance, const char* key, const char* value)
 {
-    DistrhoPluginDssiLadspa* plugin = (DistrhoPluginDssiLadspa*)instance;
+    DistrhoPluginLadspaDssi* plugin = (DistrhoPluginLadspaDssi*)instance;
     return plugin->dssi_configure(key, value);
 }
 
 static const DSSI_Program_Descriptor* dssi_get_program(LADSPA_Handle instance, unsigned long index)
 {
-    DistrhoPluginDssiLadspa* plugin = (DistrhoPluginDssiLadspa*)instance;
+    DistrhoPluginLadspaDssi* plugin = (DistrhoPluginLadspaDssi*)instance;
     return plugin->dssi_get_program(index);
 }
 
 static void dssi_select_program(LADSPA_Handle instance, unsigned long bank, unsigned long program)
 {
-    DistrhoPluginDssiLadspa* plugin = (DistrhoPluginDssiLadspa*)instance;
+    DistrhoPluginLadspaDssi* plugin = (DistrhoPluginLadspaDssi*)instance;
     plugin->dssi_select_program(bank, program);
 }
 
 #if DISTRHO_PLUGIN_IS_SYNTH
 static void dssi_run_synth(LADSPA_Handle instance, unsigned long sampleCount, snd_seq_event_t* events, unsigned long eventCount)
 {
-    DistrhoPluginDssi* plugin = (DistrhoPluginDssi*)instance;
+    DistrhoPluginLadspaDssi* plugin = (DistrhoPluginLadspaDssi*)instance;
     plugin->dssi_run_synth(sampleCount, events, eventCount);
 }
 #endif
@@ -365,7 +365,7 @@ static void descriptor_init()
 
     // Get data
     unsigned long i, port = 0;
-    unsigned long PortCount = DummyInfoPlugin->d_parameterCount() + DISTRHO_PLUGIN_NUM_INPUTS + DISTRHO_PLUGIN_NUM_OUTPUTS + 1;
+    unsigned long PortCount = DISTRHO_PLUGIN_NUM_INPUTS + DISTRHO_PLUGIN_NUM_OUTPUTS + DummyInfoPlugin->d_parameterCount() + 1;
     unsigned long UniqueID  = DummyInfoPlugin->d_uniqueId();
     const char** PortNames  = new const char* [PortCount];
     LADSPA_PortDescriptor* PortDescriptors = new LADSPA_PortDescriptor [PortCount];

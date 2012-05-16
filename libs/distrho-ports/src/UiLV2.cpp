@@ -92,7 +92,7 @@ public:
             m_x11Container->adjustSize();
 
             // Create resize grip
-            if (m_ui->isUiResizable())
+            if (m_ui->d_isUiResizable())
             {
                 m_grip = new QSizeGrip(m_x11Container);
                 m_grip->resize(m_grip->sizeHint());
@@ -151,7 +151,7 @@ public:
             if (format == 0 && buffer_size == sizeof(float))
             {
                 const float value = *(float*)buffer;
-                m_ui->setParameterValue(port_index-controlPortOffset, value);
+                m_ui->d_setParameterValue(port_index-controlPortOffset, value);
             }
         }
     }

@@ -7,14 +7,14 @@
 
 #if DISTRHO_PLUGIN_WANTS_UI
 
-#include <QtGui/QDialog>
+#include <QtGui/QWidget>
 
-class DistrhoUiBase : public QDialog
+class DistrhoUiBase : public QWidget
 {
     Q_OBJECT
 
 public:
-    DistrhoUiBase(QWidget* parent = nullptr) : QDialog(parent)
+    DistrhoUiBase(QWidget* parent = nullptr) : QWidget(parent)
     {
     }
 
@@ -22,11 +22,12 @@ public:
     {
     }
 
-    virtual bool isUiResizable() = 0;
-    virtual void setParameterValue(quint32 index, float value) = 0;
+    virtual bool d_isUiResizable() = 0;
+    virtual void d_setParameterValue(quint32 index, float value) = 0;
+    virtual void d_setProgram(quint32 index) = 0;
 
 signals:
-    void parameterChanged(quint32 index, float value);
+    void d_parameterChanged(quint32 index, float value);
 };
 
 // ---------------------------------------------------------------------------------------------
