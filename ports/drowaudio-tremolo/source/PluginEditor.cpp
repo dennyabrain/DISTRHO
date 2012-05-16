@@ -75,8 +75,6 @@ TremoloAudioProcessorEditor::TremoloAudioProcessorEditor (TremoloAudioProcessor*
 	bufferViewRLabel->setFont (Font (30, Font::plain));
     //	bufferView2Label->setColour(Label::textColourId, Colours::white);
 
-        std::cout << "TEST -> " << ownerFilter->getNumInputChannels() << std::endl;
-
 #if 0
 	if (ownerFilter->getNumInputChannels() == 1)
 		setSize (360, 170);

@@ -135,14 +135,28 @@ void PluginParameter::setStep (double newStep)
 	step = newStep;
 }
 
+String getXmlName(const String& name)
+{
+    String xmlName = name.replace("&", ":-amp-:")
+                         .replace("<",":-lt-:")
+                         .replace(">",":-gt-:")
+                         .replace("'",":-apos-:")
+                         .replace("\"",":-quot-:")
+                         .replace(".",":-46-:")
+                         .replace("/", ":-47-:")
+                         .replace("\\", ":-92-:")
+                         .replace(" ", ":-nbsp-:");
+    return xmlName;
+}
+
 void PluginParameter::writeXml (XmlElement& xmlState)
 {
-	xmlState.setAttribute (name,	getValue());
+	xmlState.setAttribute (getXmlName(name), getValue());
 }
 
 void PluginParameter::readXml (const XmlElement* xmlState)
 {
-	setValue (xmlState->getDoubleAttribute (name, getValue()));
+	setValue (xmlState->getDoubleAttribute (getXmlName(name), getValue()));
 }
 
 void PluginParameter::setupSlider (Slider &slider)

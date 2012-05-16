@@ -6,5 +6,5 @@ extern AudioEffect* createEffectInstance(audioMasterCallback audioMaster);
 
 DistrhoPluginBase* createDistrhoPlugin()
 {
-   return createEffectInstance(nullptr);
+    return createEffectInstance((void*)1); // make audioMaster ptr non-null
 }

@@ -67,27 +67,27 @@ public:
     {
         uint32_t index = 0;
 
-        for (uint32_t i=0; i < DISTRHO_PLUGIN_NUM_INPUTS; i++, index++)
+        for (uint32_t i=0; i < DISTRHO_PLUGIN_NUM_INPUTS; i++)
         {
-            if (port == index)
+            if (port == index++)
             {
                 portAudioIns[i] = dataLocation;
                 return;
             }
         }
 
-        for (uint32_t i=0; i < DISTRHO_PLUGIN_NUM_OUTPUTS; i++, index++)
+        for (uint32_t i=0; i < DISTRHO_PLUGIN_NUM_OUTPUTS; i++)
         {
-            if (port == index)
+            if (port == index++)
             {
                 portAudioOuts[i] = dataLocation;
                 return;
             }
         }
 
-        for (uint32_t i=0; i < m_plugin->d_parameterCount(); i++, index++)
+        for (uint32_t i=0; i < m_plugin->d_parameterCount(); i++)
         {
-            if (port == index)
+            if (port == index++)
             {
                 portControls[i] = dataLocation;
 
@@ -98,7 +98,7 @@ public:
             }
         }
 
-        if (port == index)
+        if (port == index++)
         {
             portLatency = dataLocation;
             *portLatency = m_plugin->__latency();

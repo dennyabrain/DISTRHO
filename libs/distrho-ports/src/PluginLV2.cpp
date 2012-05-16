@@ -31,10 +31,12 @@ public:
         m_plugin->__setSampleRate(sampleRate);
         m_plugin->__setBufferSize(lastBufferSize);
 
-        for (uint32_t i=0; i < DISTRHO_PLUGIN_NUM_INPUTS; i++)
+        portMidiIn = nullptr;
+
+        for (int32_t i=0; i < DISTRHO_PLUGIN_NUM_INPUTS; i++)
             portAudioIns.push_back(nullptr);
 
-        for (uint32_t i=0; i < DISTRHO_PLUGIN_NUM_OUTPUTS; i++)
+        for (int32_t i=0; i < DISTRHO_PLUGIN_NUM_OUTPUTS; i++)
             portAudioOuts.push_back(nullptr);
 
         for (uint32_t i=0; i < m_plugin->d_parameterCount(); i++)
@@ -70,46 +72,46 @@ public:
         uint32_t index = 0;
 
 #if DISTRHO_PLUGIN_IS_SYNTH
-        if (portId == index)
+        if (portId == index++)
         {
             portMidiIn = (LV2_Event_Buffer*)data;
             return;
         }
-        index++;
 #endif
 
-        for (uint32_t i=0; i < DISTRHO_PLUGIN_NUM_INPUTS; i++, index++)
+        for (int32_t i=0; i < DISTRHO_PLUGIN_NUM_INPUTS; i++)
         {
-            if (portId == index)
+            if (portId == index++)
             {
                 portAudioIns[i] = (float*)data;
                 return;
             }
         }
 
-        for (uint32_t i=0; i < DISTRHO_PLUGIN_NUM_OUTPUTS; i++, index++)
+        for (int32_t i=0; i < DISTRHO_PLUGIN_NUM_OUTPUTS; i++)
         {
-            if (portId == index)
+            if (portId == index++)
             {
                 portAudioOuts[i] = (float*)data;
                 return;
             }
         }
 
-        for (uint32_t i=0; i < m_plugin->d_parameterCount(); i++, index++)
+        for (uint32_t i=0; i < m_plugin->d_parameterCount(); i++)
         {
-            if (portId == index)
+            if (portId == index++)
             {
                 portControls[i] = (float*)data;
                 return;
             }
         }
 
-        //if (portId == index)
-        //{
-        //    portLatency = (float*)dataLocation;
-        //    return;
-        //}
+        if (portId == index++)
+        {
+            portLatency = (float*)data;
+            *portLatency = m_plugin->__latency();
+            return;
+        }
     }
 
     void lv2_run(uint32_t samples)
@@ -130,12 +132,13 @@ public:
         // Check for updated parameters
         float curValue;
         const ParameterInfo* pinfo;
+
         for (uint32_t i=0; i < m_plugin->d_parameterCount(); i++)
         {
             if (portControls[i] != nullptr)
             {
                 curValue = *(float*)portControls[i];
-                pinfo = m_plugin->d_parameterInfo(i);
+                pinfo    = m_plugin->d_parameterInfo(i);
 
                 if (lastControlValues[i] != curValue && (pinfo->hints & PARAMETER_IS_OUTPUT) == 0)
                 {
@@ -145,42 +148,71 @@ public:
             }
         }
 
+        // Get MIDI Events
+        uint32_t midiEventCount = 0;
+
+        if (portMidiIn)
+        {
+            LV2_Event* ev;
+            LV2_Event_Iterator iter;
+
+            uint8_t* data;
+            lv2_event_begin(&iter, portMidiIn);
+
+            for (uint32_t i=0; i < iter.buf->event_count; i++)
+            {
+                ev = lv2_event_get(&iter, &data);
+                if (ev && data)
+                {
+                    midiEvents[midiEventCount].frame = ev->frames;
+                    midiEvents[midiEventCount].buffer[0] = data[0];
+                    midiEvents[midiEventCount].buffer[1] = data[1];
+                    midiEvents[midiEventCount].buffer[2] = data[2];
+                    midiEventCount++;
+                }
+
+                lv2_event_increment(&iter);
+            }
+        }
+
         // Run plugin for this cycle
         float* inputs[DISTRHO_PLUGIN_NUM_INPUTS];
         float* outputs[DISTRHO_PLUGIN_NUM_OUTPUTS];
 
-        for (uint32_t i=0; i < DISTRHO_PLUGIN_NUM_INPUTS; i++)
+        for (int32_t i=0; i < DISTRHO_PLUGIN_NUM_INPUTS; i++)
             inputs[i] = portAudioIns[i];
 
-        for (uint32_t i=0; i < DISTRHO_PLUGIN_NUM_OUTPUTS; i++)
+        for (int32_t i=0; i < DISTRHO_PLUGIN_NUM_OUTPUTS; i++)
             outputs[i] = portAudioOuts[i];
 
-        m_plugin->d_run(inputs, outputs, samples, 0, nullptr);
+        m_plugin->d_run(inputs, outputs, samples, midiEventCount, midiEvents);
 
         // Update parameter outputs
         for (uint32_t i=0; i < m_plugin->d_parameterCount(); i++)
         {
             pinfo = m_plugin->d_parameterInfo(i);
             if (pinfo->hints & PARAMETER_IS_OUTPUT)
-            {
-                curValue = m_plugin->d_parameterValue(i);
-                *portControls[i] = curValue;
-                lastControlValues[i] = curValue;
-            }
+                lastControlValues[i] = *portControls[i] = m_plugin->d_parameterValue(i);
         }
+
+        *portLatency = m_plugin->__latency();
     }
 
 private:
+    // The plugin
     DistrhoPluginBase* m_plugin;
-    std::vector<float> lastControlValues;
+
+    // Temporary data
     uint32_t lastBufferSize;
+    std::vector<float> lastControlValues;
+    MidiEvent midiEvents[512];
 
     // LV2 ports
     LV2_Event_Buffer* portMidiIn;
     std::vector<float*> portAudioIns;
     std::vector<float*> portAudioOuts;
     std::vector<float*> portControls;
-    //float* portLatency;
+    float* portLatency;
 };
 
 // ---------------------------------------------------------------------------------------------
@@ -349,7 +381,7 @@ void lv2_generate_ttl()
     portIndex++;
 #endif
 
-    for (uint32_t i=0; i < DISTRHO_PLUGIN_NUM_INPUTS; i++)
+    for (int32_t i=0; i < DISTRHO_PLUGIN_NUM_INPUTS; i++)
     {
         if (i == 0)
             plugin_string += "    lv2:port [\n";
@@ -376,7 +408,7 @@ void lv2_generate_ttl()
             plugin_string += "    ],\n";
     }
 
-    for (uint32_t i=0; i < DISTRHO_PLUGIN_NUM_OUTPUTS; i++)
+    for (int32_t i=0; i < DISTRHO_PLUGIN_NUM_OUTPUTS; i++)
     {
         if (i == 0)
             plugin_string += "    lv2:port [\n";
@@ -449,16 +481,16 @@ void lv2_generate_ttl()
             plugin_string += "    ],\n";
     }
 
-    //     sprintf(portBuf, "%i", portIndex++);
-    //     plugin_string += "    lv2:port [\n";
-    //     plugin_string += "      a lv2:OutputPort, lv2:ControlPort ;\n";
-    //     plugin_string += "      lv2:index ";
-    //     plugin_string += portBuf;
-    //     plugin_string += " ;\n";
-    //     plugin_string += "      lv2:symbol \"lv2_latency\" ;\n";
-    //     plugin_string += "      lv2:name \"Latency\" ;\n";
-    //     plugin_string += "      lv2:portProperty lv2:reportsLatency ;\n";
-    //     plugin_string += "    ] ;\n\n";
+    sprintf(portBuf, "%i", portIndex++);
+    plugin_string += "    lv2:port [\n";
+    plugin_string += "      a lv2:OutputPort, lv2:ControlPort ;\n";
+    plugin_string += "      lv2:index ";
+    plugin_string += portBuf;
+    plugin_string += " ;\n";
+    plugin_string += "      lv2:symbol \"lv2_latency\" ;\n";
+    plugin_string += "      lv2:name \"Latency\" ;\n";
+    plugin_string += "      lv2:portProperty lv2:reportsLatency ;\n";
+    plugin_string += "    ] ;\n\n";
 
     plugin_string += "    doap:name \"";
     plugin_string += plugin_name;

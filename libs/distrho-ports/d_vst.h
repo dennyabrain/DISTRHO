@@ -26,6 +26,22 @@ enum VstPlugCategory {
   kPlugCategEffect = 0
 };
 
+enum VstEventType {
+    kVstNullType = 0,
+    kVstMidiType = 1
+};
+
+struct VstMidiEvent {
+    VstEventType type;
+    char midiData[4];
+    int32_t deltaFrames;
+};
+
+struct VstEvents {
+    int32_t numEvents;
+    VstMidiEvent* events[512];
+};
+
 typedef int32_t VstInt32;
 typedef void* audioMasterCallback;
 typedef DistrhoPluginBase AudioEffect;
@@ -53,6 +69,11 @@ static inline void name_to_symbol(char* text)
     }
 }
 
+static inline long CCONST(int a, int b, int c, int d)
+{
+    return (a << 24) | (b << 16) | (c << 8) | (d << 0);
+}
+
 // ---------------------------------------------------------------------------------------------
 
 class AudioEffectX : public DistrhoPluginBase
@@ -66,9 +87,12 @@ public:
         m_maker    = nullptr;
         m_license  = nullptr;
         m_uniqueId = 0;
+
+        vst_hints  = 0; // FIXME ?
+        vst_events.numEvents = 0;
     }
 
-    ~AudioEffectX()
+    virtual ~AudioEffectX()
     {
     }
 
@@ -197,13 +221,31 @@ public:
         suspend();
     }
 
-    void d_run(float** inputs, float** outputs, uint32_t frames, uint32_t /*midiEventCount*/, MidiEvent* /*midiEvents*/)
+    void d_run(float** inputs, float** outputs, uint32_t frames, uint32_t midiEventCount, MidiEvent* midiEvents)
     {
+        vst_events.numEvents = 0;
+
+        for (uint32_t i=0; i < midiEventCount && i < 512; i++)
+        {
+            vst_events.events[i]->deltaFrames = midiEvents[i].frame;
+            vst_events.events[i]->midiData[0] = midiEvents[i].buffer[0];
+            vst_events.events[i]->midiData[1] = midiEvents[i].buffer[1];
+            vst_events.events[i]->midiData[2] = midiEvents[i].buffer[2];
+            vst_events.events[i]->midiData[3] = 0;
+            vst_events.numEvents++;
+        }
+
+        if (vst_events.numEvents > 0)
+            processEvents(&vst_events);
+
         if (vst_hints & PLUGIN_CAN_REPLACE)
+        {
             processReplacing(inputs, outputs, frames);
+        }
         else
         {
-            memset(outputs, 0, sizeof(float) * DISTRHO_PLUGIN_NUM_OUTPUTS * frames);
+            for (int32_t i=0; i < DISTRHO_PLUGIN_NUM_OUTPUTS; i++)
+                memset(outputs[i], 0, sizeof(float) * frames);
             process(inputs, outputs, frames);
         }
     }
@@ -213,6 +255,10 @@ public:
 
 #ifdef DISTRHO_PLUGIN_BASE_VST_COMPAT
     void canMono()
+    {
+    }
+
+    void wantEvents()
     {
     }
 #endif
@@ -289,6 +335,7 @@ public:
     virtual void  getParameterLabel(long index, char* label) = 0;
     virtual void  process(float** inputs, float** outputs, long sampleFrames) = 0;
     virtual void  processReplacing(float** inputs, float** outputs, long sampleFrames) = 0;
+    virtual long  processEvents(VstEvents* /*events*/) { return 0; }
 #else
     virtual int32_t getVendorVersion() = 0;
     virtual void  setParameter(int32_t index, float value) = 0;
@@ -297,6 +344,7 @@ public:
     virtual void getParameterLabel(int32_t index, char* label) = 0;
     virtual void process(float** /*inputs*/, float** /*outputs*/, int32_t /*sampleFrames*/) {} // optional
     virtual void processReplacing(float** inputs, float** outputs, int32_t sampleFrames) = 0;
+    //virtual long  processEvents(VstEvents* events); // - TODO
 #endif
 
 private:
@@ -306,6 +354,7 @@ private:
     const char* m_license;
     long m_uniqueId;
     uint32_t vst_hints;
+    VstEvents vst_events;
 };
 
 #endif // __DISTRHO_PORT_VST__

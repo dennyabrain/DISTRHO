@@ -115,7 +115,7 @@ protected slots:
                 info = m_plugin->d_parameterInfo(i);
 
                 if (info && (info->hints & PARAMETER_IS_OUTPUT) > 0)
-                    m_ui->setParameterValue(i, m_plugin->d_parameterValue(i));
+                    m_ui->d_setParameterValue(i, m_plugin->d_parameterValue(i));
             }
         }
         QTimer::singleShot(25, this, SLOT(recheckParameters()));
