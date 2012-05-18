@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>166</width>
+    <height>47</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout"/>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>166</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu_File">
+    <property name="title">
+     <string>&amp;File</string>
+    </property>
+    <addaction name="act_file_load"/>
+    <addaction name="act_file_save"/>
+    <addaction name="act_file_save_as"/>
+    <addaction name="separator"/>
+    <addaction name="act_file_reset"/>
+    <addaction name="separator"/>
+    <addaction name="act_file_quit"/>
+   </widget>
+   <widget class="QMenu" name="menu_Presets">
+    <property name="title">
+     <string>&amp;Presets</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menu_Options">
+    <property name="title">
+     <string>&amp;Options</string>
+    </property>
+    <addaction name="act_options_midi"/>
+   </widget>
+   <addaction name="menu_File"/>
+   <addaction name="menu_Presets"/>
+   <addaction name="menu_Options"/>
+  </widget>
+  <action name="act_options_midi">
+   <property name="text">
+    <string>&amp;MIDI Settings...</string>
+   </property>
+  </action>
+  <action name="act_file_load">
+   <property name="text">
+    <string>&amp;Load a saved state...</string>
+   </property>
+  </action>
+  <action name="act_file_save">
+   <property name="text">
+    <string>&amp;Save current state</string>
+   </property>
+  </action>
+  <action name="act_file_save_as">
+   <property name="text">
+    <string>Save current state &amp;as...</string>
+   </property>
+  </action>
+  <action name="act_file_reset">
+   <property name="text">
+    <string>&amp;Reset to default state</string>
+   </property>
+  </action>
+  <action name="act_file_quit">
+   <property name="text">
+    <string>Quit</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>act_file_quit</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>193</x>
+     <y>152</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

@@ -16,6 +16,8 @@ ui_*.h
 *.make
 *.pro.user
 Makefile
+Makefile.Debug
+Makefile.Release
 
 .directory
 .fuse*
