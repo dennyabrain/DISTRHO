@@ -25,8 +25,10 @@ package.config["Debug"].defines      = { "DEBUG=1", "_DEBUG=1" }
 package.config["Debug"].links        = { "juce-core_debug", "juce-audio-basics_debug", "juce-audio-devices_debug", "juce-audio-formats_debug", "juce-audio-processors_debug", "juce-audio-utils_debug", "juce-data-structures_debug", "juce-events_debug", "juce-graphics_debug", "juce-gui-basics_debug" }
 
 if (windows) then
-  package.defines = { package.defines, "WINDOWS=1" }
-  package.config["Release"].buildoptions = { "-O2 -mtune=generic -ffast-math -fomit-frame-pointer -fpermissive -fvisibility=hidden -fPIC" }
+  package.defines     = { package.defines, "WINDOWS=1" }
+  package.links       = { "imm32", "ole32", "shlwapi", "uuid", "version", "wininet", "winmm", "ws2_32" }
+  package.linkoptions = { "-mwindows" }
+  package.config["Release"].buildoptions = { "-O2 -mtune=generic -msse -ffast-math -fomit-frame-pointer -fpermissive -fvisibility=hidden -fPIC" }
   package.config["Debug"].buildoptions   = { "-O0 -ggdb -fpermissive -fPIC" }
 else
   package.config["Release"].buildoptions = { "-O2 -mtune=generic -msse -ffast-math -fomit-frame-pointer -fvisibility=hidden -fPIC" }

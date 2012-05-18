@@ -4,7 +4,9 @@
 
 /* Fix for VST includes */
 #ifdef __linux__
+#ifndef __cdecl
 #define __cdecl
+#endif
 #endif
 
 #include "public.sdk/source/vst2.x/audioeffect.cpp"

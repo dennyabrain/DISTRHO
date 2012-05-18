@@ -21,6 +21,8 @@ package.config["Debug"].defines      = { "DEBUG=1", "_DEBUG=1" }
 
 if (windows) then
   package.defines = { "WINDOWS=1" }
+  package.config["Release"].buildoptions = { "-O2 -mtune=generic -ffast-math -fomit-frame-pointer -fpermissive -fvisibility=hidden -fPIC" }
+  package.config["Debug"].buildoptions   = { "-O0 -ggdb -fpermissive -fPIC" }
 else
   package.config["Release"].buildoptions = { "-O2 -mtune=generic -msse -ffast-math -fomit-frame-pointer -fvisibility=hidden -fPIC" }
   package.config["Debug"].buildoptions   = { "-O0 -ggdb -msse -fPIC" }

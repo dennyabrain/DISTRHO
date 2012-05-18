@@ -34,7 +34,9 @@
 #define JucePlugin_WantsLV2State 1
 #endif
 
-#if JUCE_LINUX
+#if JUCE_WINDOWS
+ #include <windows.h>
+#elif JUCE_LINUX
  #include <X11/Xlib.h>
  #include <X11/Xutil.h>
  #include <X11/Xatom.h>
@@ -165,7 +167,7 @@ String nameToSymbol(const String& name, const uint32 portIndex)
 /** Prevents NaN or out of 0.0<->1.0 bounds parameter values. */
 float safeParamValue(float value)
 {
-    if (isnan(value))
+    if (std::isnan(value))
         value = 0.0f;
     else if (value < 0.0f)
         value = 0.0f;
