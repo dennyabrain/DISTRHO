@@ -1059,7 +1059,9 @@ public:
 
             if (isStarted)
             {
+#ifndef JUCE_MINGW
                 JUCE_TRY
+#endif
                 {
                     callback->audioDeviceIOCallback (const_cast <const float**> (inputBuffers.getArrayOfChannels()),
                                                      inputBuffers.getNumChannels(),
@@ -1067,7 +1069,9 @@ public:
                                                      outputBuffers.getNumChannels(),
                                                      bufferSizeSamples);
                 }
+#ifndef JUCE_MINGW
                 JUCE_CATCH_EXCEPTION
+#endif
 
                 totalSamplesOut += bufferSizeSamples;
             }

@@ -33,7 +33,9 @@
 
 // Parameter Hints
 const uint32_t PARAMETER_IS_AUTOMABLE = 1 << 1;
-const uint32_t PARAMETER_IS_OUTPUT    = 1 << 2;
+const uint32_t PARAMETER_IS_BOOLEAN   = 1 << 2;
+const uint32_t PARAMETER_IS_INTEGER   = 1 << 3;
+const uint32_t PARAMETER_IS_OUTPUT    = 1 << 4;
 
 struct ParameterInfo {
     uint32_t hints;

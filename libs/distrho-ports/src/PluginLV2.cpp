@@ -475,6 +475,11 @@ void lv2_generate_ttl()
         plugin_string += portBuf;
         plugin_string += " ;\n";
 
+        if (pinfo->hints & PARAMETER_IS_BOOLEAN)
+            plugin_string += "      lv2:portProperty lv2:toggled ;\n";
+        else if (pinfo->hints & PARAMETER_IS_INTEGER)
+            plugin_string += "      lv2:portProperty lv2:integer ;\n";
+
         if (i+1 == plugin->d_parameterCount())
             plugin_string += "    ] ;\n\n";
         else

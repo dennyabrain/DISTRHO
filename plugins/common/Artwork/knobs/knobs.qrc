@@ -1,8 +1,0 @@
-<RCC version="1.0">
-    <qresource prefix="/">
-        <file>dial_01.png</file>
-        <file>dial_01d.png</file>
-        <file>dial_02.png</file>
-        <file>dial_02d.png</file>
-    </qresource>
-</RCC>

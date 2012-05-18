@@ -19,7 +19,7 @@
 
 #include <QtGui/QPainter>
 
-DigitalPeakMeter::DigitalPeakMeter(QWidget* parent) :
+DigitalPeakMeter::DigitalPeakMeter(QWidget* parent):
     QWidget(parent)
 {
     m_channels = 0;

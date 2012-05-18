@@ -26,6 +26,8 @@ package.config["Debug"].links        = { "juce-core_debug", "juce-audio-basics_d
 
 if (windows) then
   package.defines = { package.defines, "WINDOWS=1" }
+  package.config["Release"].buildoptions = { "-O2 -mtune=generic -ffast-math -fomit-frame-pointer -fpermissive -fvisibility=hidden -fPIC" }
+  package.config["Debug"].buildoptions   = { "-O0 -ggdb -fpermissive -fPIC" }
 else
   package.config["Release"].buildoptions = { "-O2 -mtune=generic -msse -ffast-math -fomit-frame-pointer -fvisibility=hidden -fPIC" }
   package.config["Debug"].buildoptions   = { "-O0 -ggdb -fPIC" }

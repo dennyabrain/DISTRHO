@@ -30,11 +30,7 @@
 /** Config: JUCE_WASAPI
     Enables WASAPI audio devices (Windows Vista and above).
 */
-#if WINDOWS
- #define JUCE_WASAPI 1
-#else
- #define JUCE_WASAPI 0
-#endif
+#define JUCE_WASAPI 0
 
 /** Config: JUCE_DIRECTSOUND
     Enables DirectSound audio (MS Windows only).

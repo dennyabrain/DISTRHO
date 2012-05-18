@@ -13,6 +13,7 @@ SOURCES     += $$PWD/src/d_vst.cpp
 
 DISTRHO_PLUGIN_TARGET_JACK {
 SOURCES     += $$PWD/src/PluginJACK.cpp
+FORMS       += $$PWD/src/PluginJACK.ui
 CONFIG      += link_pkgconfig
 PKGCONFIG   += jack
 }

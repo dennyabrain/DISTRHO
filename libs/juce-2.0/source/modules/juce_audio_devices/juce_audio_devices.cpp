@@ -59,11 +59,11 @@
  #if JUCE_WASAPI
   #pragma warning (push)
   #pragma warning (disable: 4201)
-  #include <MMReg.h>
+  #include <mmreg.h>
   #include <mmdeviceapi.h>
-  #include <Audioclient.h>
-  #include <Audiopolicy.h>
-  #include <Avrt.h>
+  #include <audioclient.h>
+  #include <audiopolicy.h>
+  #include <avrt.h>
   #include <functiondiscoverykeys.h>
   #pragma warning (pop)
  #endif

@@ -3,23 +3,34 @@
 #include "PluginBase.h"
 #include "UiBase.h"
 
+#if ! DISTRHO_PLUGIN_WANTS_UI
+#error JACK Standalone version requires UI
+#endif
+
 #include <cstdio>
 #include <jack/jack.h>
 
 #include <QtCore/QTimer>
 #include <QtGui/QApplication>
+#include <QtGui/QMainWindow>
+#include <QtGui/QVBoxLayout>
 
-#if ! DISTRHO_PLUGIN_WANTS_UI
-#error JACK Standalone version requires UI
-#endif
+#include "ui_PluginJACK.h"
 
-class DistrhoPluginJACK : public QObject
+namespace Ui {
+class MainWindow;
+}
+
+class DistrhoPluginJACK : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    DistrhoPluginJACK()
+    DistrhoPluginJACK() :
+        ui(new Ui::MainWindow)
     {
+        ui->setupUi(this);
+
         m_plugin = createDistrhoPlugin();
         m_plugin->d_init();
 
@@ -32,12 +43,14 @@ public:
 
             char port_name[11] = { 0 };
 
+#if DISTRHO_PLUGIN_NUM_INPUTS > 0
             for (uint32_t i=0; i < DISTRHO_PLUGIN_NUM_INPUTS; i++)
             {
                 sprintf(port_name, "input_%i", i);
                 jack_port_t* port = jack_port_register(j_client, port_name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput, 0);
                 j_ains.push_back(port);
             }
+#endif
 
             for (uint32_t i=0; i < DISTRHO_PLUGIN_NUM_OUTPUTS; i++)
             {
@@ -51,9 +64,13 @@ public:
         }
 
         m_ui = createDistrhoUI();
-        m_ui->show();
+        m_ui->setParent(this);
 
-        connect(m_ui, SIGNAL(parameterChanged(quint32,float)), this, SLOT(pluginParameterChanged(quint32,float)));
+        ui->centralwidget->layout()->addWidget(m_ui);
+        setWindowTitle(m_plugin->d_name());
+        adjustSize();
+
+        connect(m_ui, SIGNAL(d_parameterChanged(quint32,float)), this, SLOT(pluginParameterChanged(quint32,float)));
         QTimer::singleShot(0, this, SLOT(recheckParameters()));
     }
 
@@ -79,8 +96,10 @@ public:
         float* p_ains[DISTRHO_PLUGIN_NUM_INPUTS];
         float* p_aouts[DISTRHO_PLUGIN_NUM_OUTPUTS];
 
+#if DISTRHO_PLUGIN_NUM_INPUTS > 0
         for (uint32_t i=0; i < DISTRHO_PLUGIN_NUM_INPUTS; i++)
             p_ains[i] = (float*)jack_port_get_buffer(j_ains[i], nframes);
+#endif
 
         for (uint32_t i=0; i < DISTRHO_PLUGIN_NUM_OUTPUTS; i++)
             p_aouts[i] = (float*)jack_port_get_buffer(j_aouts[i], nframes);
@@ -98,6 +117,9 @@ public:
 
         return 0;
     }
+
+protected:
+    Ui::MainWindow* ui;
 
 protected slots:
     void pluginParameterChanged(quint32 index, float value)
@@ -136,5 +158,6 @@ int main(int argc, char* argv[])
 {
     QApplication app(argc, argv, true);
     DistrhoPluginJACK pGui;
+    pGui.show();
     app.exec();
 }

@@ -25,6 +25,10 @@ package.config["Debug"].links        = { "juce-core_debug", "juce-audio-basics_d
 
 if (windows) then
   package.defines = { package.defines, "WINDOWS=1" }
+  package.config["Release"].buildoptions = { "-O2 -mtune=generic -msse -ffast-math -fomit-frame-pointer -fpermissive -fvisibility=hidden -fPIC" }
+  package.config["Debug"].buildoptions   = { "-O0 -ggdb -fpermissive -fPIC" }
+  package.links        = { "shell32", "ole32", "vfw32", "winmm", "wininet", "ws2_32", "dsound", "wsock32", "wldap32", "kernel32", "uuid", "rpcrt4", "gdi32", "comdlg32", "version", "dsound", "imm32", "shlwapi" }
+  package.linkoptions  = { "-mwindows" }
 else
   package.config["Release"].buildoptions = { "-O2 -mtune=generic -msse -ffast-math -fomit-frame-pointer -fvisibility=hidden -fPIC" }
   package.config["Debug"].buildoptions   = { "-O0 -ggdb -fPIC" }
@@ -36,7 +40,7 @@ else
     package.defines = { package.defines, "LINUX=1" }
     package.links   = { "freetype", "pthread", "asound", "dl", "rt", "X11", "Xext" }
     package.buildoptions = { "`pkg-config --cflags freetype2`" }
-    package.linkoptions  = { "`pkg-config --libs freetype2`" }
+    package.linkoptions  = { "`pkg-config -", "ibs freetype2`" }
   end
 end
 

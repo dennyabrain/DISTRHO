@@ -50,7 +50,7 @@ public:
         controlPortOffset += DISTRHO_PLUGIN_NUM_INPUTS;
         controlPortOffset += DISTRHO_PLUGIN_NUM_OUTPUTS;
 
-        connect(m_ui, SIGNAL(parameterChanged(quint32,float)), this, SLOT(pluginParameterChanged(quint32,float)));
+        connect(m_ui, SIGNAL(d_parameterChanged(quint32,float)), this, SLOT(pluginParameterChanged(quint32,float)));
 
         osc_send_update();
     }

@@ -5,9 +5,10 @@ set -e
 LINUX=0
 MAC=0
 WINDOWS=0
+MINGW=0
 
 if [ "$1" = "" ]; then
-  echo "usage: $0 linux|mac|windows"
+  echo "usage: $0 linux|mac|windows|mingw"
   exit
 fi
 
@@ -17,6 +18,8 @@ elif [ "$1" = "mac" ]; then
   MAC=1
 elif [ "$1" = "windows" ]; then
   WINDOWS=1
+elif [ "$1" = "mingw" ]; then
+  MINGW=1
 else
   echo "parameter must be linux, mac or windows"
   exit
@@ -60,6 +63,11 @@ for i in $FILES; do
 
     echo sed \""s/\t\t\t\tEntryPointSymbol=\\\"mainCRTStartup\\\"//\"" -i `find . -name \*.vcproj`
     sed "s/\t\t\t\tEntryPointSymbol=\"mainCRTStartup\"//" -i `find . -name \*.vcproj`
+
+  elif [ $MINGW = 1 ]; then
+
+    echo premake --os windows --target gnu --cc gcc
+    premake --os windows --target gnu --cc gcc
 
   fi
 

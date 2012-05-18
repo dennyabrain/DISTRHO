@@ -22,7 +22,7 @@
 PixmapDial::PixmapDial(QWidget* parent):
     QDial(parent)
 {
-    m_pixmap.load(":/dial_01d.png");
+    m_pixmap.load(":/bitmaps/dial_01d.png");
     m_pixmap_n_str = "01";
 
     if (m_pixmap.width() > m_pixmap.height())
@@ -104,7 +104,7 @@ void PixmapDial::setPixmap(int pixmap_id)
     else
         m_pixmap_n_str = QString("0%1").arg(pixmap_id);
 
-    m_pixmap.load(QString(":/dial_%1%2.png").arg(m_pixmap_n_str).arg(isEnabled() ? "" : "d"));
+    m_pixmap.load(QString(":/bitmaps/dial_%1%2.png").arg(m_pixmap_n_str).arg(isEnabled() ? "" : "d"));
 
     if (m_pixmap.width() > m_pixmap.height())
         m_orientation = HORIZONTAL;

@@ -48,14 +48,14 @@ void StereoAudioGainUi::d_setParameterValue(quint32 index, float value)
     switch (index)
     {
     case StereoAudioGain::PARAMETER_LEFT:
-        blockSignals(true);
+        ui->dial_left->blockSignals(true);
         ui->dial_left->setValue((value*50)-50);
-        blockSignals(false);
+        ui->dial_left->blockSignals(false);
         break;
     case StereoAudioGain::PARAMETER_RIGHT:
-        blockSignals(true);
+        ui->dial_right->blockSignals(true);
         ui->dial_right->setValue((value*50)-50);
-        blockSignals(false);
+        ui->dial_right->blockSignals(false);
         break;
     case StereoAudioGain::PARAMETER_VU_LEFT:
         ui->lpeak->displayMeter(1, value);
