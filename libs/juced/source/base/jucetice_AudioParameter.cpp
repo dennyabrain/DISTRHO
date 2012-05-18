@@ -76,7 +76,7 @@ AudioParameter& AudioParameter::part (const int newPartNumber)
 AudioParameter& AudioParameter::name (const String& newName)
 {
 #if JUCE_WIN32
-    _snprintf (paramName, AudioParameterMaxNameLength, "%s", (const char*) newName);
+    _snprintf (paramName, AudioParameterMaxNameLength, "%s", (const char*) newName.toUTF8());
 #else
     //snprintf (paramName, AudioParameterMaxNameLength, "%s", (const char*) newName);
 #endif
@@ -87,7 +87,7 @@ AudioParameter& AudioParameter::name (const String& newName)
 AudioParameter& AudioParameter::unit (const String& newLabel)
 {
 #if JUCE_WIN32
-    _snprintf (paramLabel, AudioParameterMaxLabelLength, "%s", (const char*) newLabel);
+    _snprintf (paramLabel, AudioParameterMaxLabelLength, "%s", (const char*) newLabel.toUTF8());
 #else
     //snprintf (paramLabel, AudioParameterMaxLabelLength, "%s", (const char*) newLabel);
 #endif

@@ -33,7 +33,10 @@ String SystemStats::getJUCEVersion()
 {
     // Some basic tests, to keep an eye on things and make sure these types work ok
     // on all platforms. Let me know if any of these assertions fail on your system!
+#if defined(JUCE_MINGW) && defined(_WIN64)
+#else
     static_jassert (sizeof (pointer_sized_int) == sizeof (void*));
+#endif
     static_jassert (sizeof (int8) == 1);
     static_jassert (sizeof (uint8) == 1);
     static_jassert (sizeof (int16) == 2);

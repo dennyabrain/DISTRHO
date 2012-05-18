@@ -52,11 +52,14 @@ __int64 juce_InterlockedCompareExchange64 (volatile __int64* value, __int64 newV
 CriticalSection::CriticalSection() noexcept
 {
     // (just to check the MS haven't changed this structure and broken things...)
+#if defined(JUCE_MINGW) && defined(_WIN64)
+#else
   #if JUCE_VC7_OR_EARLIER
     static_jassert (sizeof (CRITICAL_SECTION) <= 24);
   #else
     static_jassert (sizeof (CRITICAL_SECTION) <= sizeof (internal));
   #endif
+#endif
 
     InitializeCriticalSection ((CRITICAL_SECTION*) internal);
 }

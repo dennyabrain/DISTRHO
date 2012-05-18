@@ -19,6 +19,10 @@ gen:
 	if [ -d bin/3BandSplitter.lv2/ ]; then cp static-lv2-ttl/3BandSplitter.ttl bin/3BandSplitter.lv2/; fi
 	if [ -d bin/Bitcrusher.lv2/ ]; then cp static-lv2-ttl/Bitcrusher.ttl bin/Bitcrusher.lv2/; fi
 
+mingw:
+	$(MAKE) -C libs/lv2-ttl-generator mingw
+	$(MAKE) -C plugins/JackAss/VST mingw
+
 clean:
 	$(MAKE) clean -C libs/juce-2.0
 	$(MAKE) clean -C libs/drowaudio
