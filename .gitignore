@@ -18,6 +18,8 @@ ui_*.h
 Makefile
 Makefile.Debug
 Makefile.Release
+object_script.*.Debug
+object_script.*.Release
 
 .directory
 .fuse*
