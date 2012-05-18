@@ -49,7 +49,7 @@ lv2:
 	$(MAKE) -C argotlunar/LV2
 	$(MAKE) -C bitmangler/LV2
 	$(MAKE) -C capsaicin/LV2
-	$(MAKE) -C cmt-bitcrusher/LV2
+# 	$(MAKE) -C cmt-bitcrusher/LV2
 	$(MAKE) -C drowaudio-distortion/LV2
 	$(MAKE) -C drowaudio-distortionshaper/LV2
 	$(MAKE) -C drowaudio-flanger/LV2
@@ -139,7 +139,7 @@ clean:
 	$(MAKE) clean -C argotlunar/LV2
 	$(MAKE) clean -C bitmangler/LV2
 	$(MAKE) clean -C capsaicin/LV2
-	$(MAKE) clean -C cmt-bitcrusher/LV2
+# 	$(MAKE) clean -C cmt-bitcrusher/LV2
 	$(MAKE) clean -C drowaudio-distortion/LV2
 	$(MAKE) clean -C drowaudio-distortionshaper/LV2
 	$(MAKE) clean -C drowaudio-flanger/LV2
