@@ -27,7 +27,7 @@ vst:
 	$(MAKE) -C 3BandEQ/VST
 	$(MAKE) -C 3BandSplitter/VST
 	$(MAKE) -C PingPongPan/VST
-	$(MAKE) -C JackAss/VST
+# 	$(MAKE) -C JackAss/VST
 
 clean:
 	# Standalone
@@ -45,7 +45,7 @@ clean:
 	$(MAKE) clean -C 3BandEQ/VST
 	$(MAKE) clean -C 3BandSplitter/VST
 	$(MAKE) clean -C PingPongPan/VST
-	$(MAKE) clean -C JackAss/VST
+# 	$(MAKE) clean -C JackAss/VST
 
 	rm -rf */Standalone/intermediate
 	rm -rf */LV2/intermediate
