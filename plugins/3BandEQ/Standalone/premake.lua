@@ -40,7 +40,7 @@ else
     package.defines = { package.defines, "LINUX=1" }
     package.links   = { "freetype", "pthread", "asound", "dl", "rt", "X11", "Xext" }
     package.buildoptions = { "`pkg-config --cflags freetype2`" }
-    package.linkoptions  = { "`pkg-config -", "ibs freetype2`" }
+    package.linkoptions  = { "`pkg-config --libs freetype2`" }
   end
 end
 

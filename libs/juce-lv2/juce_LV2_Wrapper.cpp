@@ -505,7 +505,7 @@ String makePresetsTtl(AudioProcessor* const filter)
     presets += "@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .\n";
 #if JucePlugin_WantsLV2State
     presets += "@prefix state: <" LV2_STATE_PREFIX "> .\n";
- #if JucePlugin_WantsLV2StateString
+ #if ! JucePlugin_WantsLV2StateString
     presets += "@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .\n";
  #endif
 #endif
