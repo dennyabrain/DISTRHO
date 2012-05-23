@@ -899,7 +899,8 @@ public:
             externalUI (nullptr),
             externalUIHost (nullptr),
             externalUIPos (100, 100),
-            uiTouch (nullptr)
+            uiTouch (nullptr),
+            hostPrograms (nullptr)
     {
         filter->addListener(this);
 
@@ -1235,6 +1236,9 @@ public:
 #endif
             uridMap (nullptr)
     {
+#if JUCE_LINUX
+        MessageManagerLock mmLock;
+#endif
         filter = createPluginFilter();
         jassert(filter != nullptr);
 
@@ -1287,6 +1291,9 @@ public:
 
     ~JuceLV2Wrapper()
     {
+#if JUCE_LINUX
+        MessageManagerLock mmLock;
+#endif
         filter = nullptr;
 
         channels.free();
@@ -1724,7 +1731,12 @@ public:
             filter->setCurrentProgramStateInformation (data, sizeInBytes);
 
         if (ui)
+        {
+           #if JUCE_LINUX
+            MessageManagerLock mmLock;
+           #endif
             ui->repaint();
+        }
     }
 
 #if JucePlugin_WantsLV2StateString
@@ -1744,7 +1756,12 @@ public:
         filter->setStateInformationString(data);
 
         if (ui)
+        {
+           #if JUCE_LINUX
+            MessageManagerLock mmLock;
+           #endif
             ui->repaint();
+        }
     }
 #endif
 
@@ -2206,10 +2223,6 @@ static const LV2UI_Descriptor JuceLv2UI_X11 = {
             return nullptr;
         }
     }
-
-    // don't put initialiseJuce_GUI or shutdownJuce_GUI in these... it will crash!
-    __attribute__((constructor)) void myPluginInit() {}
-    __attribute__((destructor))  void myPluginFini() {}
 
 //==============================================================================
 // Windows startup code..
