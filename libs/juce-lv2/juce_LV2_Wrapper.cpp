@@ -519,33 +519,35 @@ String makePresetsTtl(AudioProcessor* const filter)
         std::cout << "\nSaving preset " << i+1 << "/" << numPrograms+1 << "...";
         std::cout.flush();
 
+        String preset;
+
         // Label
         filter->setCurrentProgram(i);
-        presets += "<" JucePlugin_LV2URI "#preset" + String(i+1) + "> a pset:Preset ;\n";
-        presets += "    rdfs:label \"" + filter->getProgramName(i) + "\" ;\n";
+        preset += "<" JucePlugin_LV2URI "#preset" + String(i+1) + "> a pset:Preset ;\n";
+        preset += "    rdfs:label \"" + filter->getProgramName(i) + "\" ;\n";
 
         // State
 #if JucePlugin_WantsLV2State
-        presets += "    state:state [\n";
+        preset += "    state:state [\n";
  #if JucePlugin_WantsLV2StateString
-        presets += "        <" JUCE_LV2_STATE_STRING_URI ">\n";
-        presets += "\"\"\"\n";
-        presets += filter->getStateInformationString().replace("\r\n","\n");
-        presets += "\"\"\"\n";
+        preset += "        <" JUCE_LV2_STATE_STRING_URI ">\n";
+        preset += "\"\"\"\n";
+        preset += filter->getStateInformationString().replace("\r\n","\n");
+        preset += "\"\"\"\n";
  #else
         MemoryBlock chunkMemory;
         filter->getCurrentProgramStateInformation(chunkMemory);
         const String chunkString = Base64Encode(chunkMemory);
 
-        presets += "        <" JUCE_LV2_STATE_BINARY_URI "> [\n";
-        presets += "            a atom:Chunk ;\n";
-        presets += "            rdf:value\"\"\"" + chunkString + "\"\"\"^^xsd:base64Binary\n";
-        presets += "        ]\n";
+        preset += "        <" JUCE_LV2_STATE_BINARY_URI "> [\n";
+        preset += "            a atom:Chunk ;\n";
+        preset += "            rdf:value\"\"\"" + chunkString + "\"\"\"^^xsd:base64Binary\n";
+        preset += "        ]\n";
  #endif
         if (filter->getNumParameters() > 0)
-            presets += "    ] ;\n\n";
+            preset += "    ] ;\n\n";
         else
-            presets += "    ] .\n\n";
+            preset += "    ] .\n\n";
 #endif
 
         // Port values
@@ -554,19 +556,21 @@ String makePresetsTtl(AudioProcessor* const filter)
         for (int j=0; j < filter->getNumParameters(); j++)
         {
               if (j == 0)
-                presets += "    lv2:port [\n";
+                preset += "    lv2:port [\n";
             else
-                presets += "    [\n";
+                preset += "    [\n";
 
-            presets += "        lv2:symbol \"" + nameToSymbol(filter->getParameterName(j), j) + "\" ;\n";
-            presets += "        pset:value " + String(safeParamValue(filter->getParameter(j)), 8) + " ;\n";
+            preset += "        lv2:symbol \"" + nameToSymbol(filter->getParameterName(j), j) + "\" ;\n";
+            preset += "        pset:value " + String(safeParamValue(filter->getParameter(j)), 8) + " ;\n";
 
             if (j+1 == filter->getNumParameters())
-                presets += "    ] ";
+                preset += "    ] ";
             else
-                presets += "    ] ,\n";
+                preset += "    ] ,\n";
         }
-        presets += ".\n\n";
+        preset += ".\n\n";
+
+        presets += preset;
     }
 
     return presets;
