@@ -23,8 +23,8 @@ FOLDERS=`find . -name \*.lv2`
 for i in $FOLDERS; do
   echo cd $i
   cd $i
-  echo "if [ ! -f ./manifest.ttl ]; then $GEN ./*.$EXT; fi"
-  if [ ! -f ./manifest.ttl ]; then $GEN ./*.$EXT; fi
+  echo "$GEN ./*.$EXT"
+  $GEN ./*.$EXT
   echo cd ../..
   cd ../..
 done
