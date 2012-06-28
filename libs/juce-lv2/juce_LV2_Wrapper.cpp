@@ -30,8 +30,8 @@
  */
 
 #if JucePlugin_WantsLV2StateString && ! JucePlugin_WantsLV2State
-#undef JucePlugin_WantsLV2State
-#define JucePlugin_WantsLV2State 1
+ #undef JucePlugin_WantsLV2State
+ #define JucePlugin_WantsLV2State 1
 #endif
 
 #if JUCE_WINDOWS
@@ -227,7 +227,19 @@ String makeManifestTtl(AudioProcessor* const filter, const String& binary)
 #endif
         manifest += "\n";
 
-#if JUCE_LINUX
+#if JUCE_WINDOWS
+        manifest += "<" JucePlugin_LV2URI "#WindowsUI>\n";
+        manifest += "    a ui:WindowsUI ;\n";
+        manifest += "    ui:binary <" + binary + PLUGIN_EXT "> ;\n";
+ #if JucePlugin_WantsLV2InstanceAccess
+        manifest += "    lv2:requiredFeature <" LV2_INSTANCE_ACCESS_URI "> ;\n";
+ #else
+        if (filter->getNumPrograms() > 1)
+            manifest += "    lv2:extensionData <" LV2_PROGRAMS__UIInterface "> ;\n";
+ #endif
+        manifest += "    lv2:optionalFeature ui:noUserResize .\n";
+        manifest += "\n";
+#elif JUCE_LINUX
         manifest += "<" JucePlugin_LV2URI "#X11UI>\n";
         manifest += "    a ui:X11UI ;\n";
         manifest += "    ui:binary <" + binary + PLUGIN_EXT "> ;\n";
@@ -297,7 +309,10 @@ String makePluginTtl(AudioProcessor* const filter)
     {
         plugin += "    ui:ui <" JucePlugin_LV2URI "#ExternalUI> ,\n";
         plugin += "          <" JucePlugin_LV2URI "#ExternalOldUI> ";
-#if JUCE_LINUX
+#if JUCE_WINDOWS
+        plugin += ",\n";
+        plugin += "          <" JucePlugin_LV2URI "#WindowsUI> ;\n";
+#elif JUCE_LINUX
         plugin += ",\n";
         plugin += "          <" JucePlugin_LV2URI "#X11UI> ;\n";
 #else
@@ -822,13 +837,13 @@ private:
 
 //==============================================================================
 /**
-    Juce LV2 X11 UI container, listens for resize events and passes them to ui-resize
+    Juce LV2 Parent UI container, listens for resize events and passes them to ui-resize
 */
-#if JUCE_LINUX
-class JuceLV2X11Container : public Component
+#if JUCE_WINDOWS || JUCE_LINUX
+class JuceLV2ParentContainer : public Component
 {
 public:
-    JuceLV2X11Container (AudioProcessorEditor* const editor, LV2UI_Resize* uiResizeFeature_)
+    JuceLV2ParentContainer (AudioProcessorEditor* const editor, LV2UI_Resize* uiResizeFeature_)
         : uiResizeFeature(uiResizeFeature_)
     {
         setOpaque (true);
@@ -839,7 +854,7 @@ public:
         addAndMakeVisible (editor);
     }
 
-    ~JuceLV2X11Container()
+    ~JuceLV2ParentContainer()
     {
     }
 
@@ -851,7 +866,11 @@ public:
         const int cw = child->getWidth();
         const int ch = child->getHeight();
 
+#if ! JUCE_LINUX
+        setSize (cw, ch);
+#else
         XResizeWindow (display, (Window) getWindowHandle(), cw, ch);
+#endif
 
         if (uiResizeFeature)
             uiResizeFeature->ui_resize (uiResizeFeature->handle, cw, ch);
@@ -869,7 +888,7 @@ private:
     //==============================================================================
     LV2UI_Resize* uiResizeFeature;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (JuceLV2X11Container);
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (JuceLV2ParentContainer);
 };
 #endif
 
@@ -882,7 +901,7 @@ class JuceLV2UIWrapper : public AudioProcessorListener,
 {
 public:
     enum UIType {
-        UI_X11,
+        UI_PARENT,
         UI_EXTERNAL
     };
 
@@ -892,8 +911,8 @@ public:
             writeFunction (writeFunction_),
             controller (controller_),
             uiType (uiType_),
-#if JUCE_LINUX
-            x11Container (nullptr),
+#if JUCE_WINDOWS || JUCE_LINUX
+            parentContainer (nullptr),
             uiResizeFeature (nullptr),
 #endif
             externalUI (nullptr),
@@ -920,12 +939,12 @@ public:
 
             switch (uiType)
             {
-#if JUCE_LINUX
-            case UI_X11:
-                resetX11UI (features);
+#if JUCE_WINDOWS || JUCE_LINUX
+            case UI_PARENT:
+                resetParentUI (features);
 
-                if (x11Container)
-                    *widget = x11Container->getWindowHandle();
+                if (parentContainer)
+                    *widget = parentContainer->getWindowHandle();
                 else
                     *widget = nullptr;
 
@@ -984,8 +1003,8 @@ public:
 
         filter->removeListener(this);
 
-#if JUCE_LINUX
-        x11Container = nullptr;
+#if JUCE_WINDOWS || JUCE_LINUX
+        parentContainer = nullptr;
 #endif
         externalUI = nullptr;
         externalUIHost = nullptr;
@@ -1021,11 +1040,11 @@ public:
     void doCleanup()
     {
 #if JucePlugin_WantsLV2InstanceAccess
-        if (uiType == UI_X11)
+        if (uiType == UI_PARENT)
         {
- #if JUCE_LINUX
-            if (x11Container && x11Container->isOnDesktop())
-                x11Container->removeFromDesktop();
+ #if JUCE_WINDOWS || JUCE_LINUX
+            if (parentContainer && parentContainer->isOnDesktop())
+                parentContainer->removeFromDesktop();
  #endif
         }
         else if (uiType == UI_EXTERNAL)
@@ -1096,11 +1115,11 @@ public:
         writeFunction = writeFunction_;
         controller    = controller_;
 
-        if (uiType == UI_X11)
+        if (uiType == UI_PARENT)
         {
-#if JUCE_LINUX
-            resetX11UI (features);
-            *widget = x11Container->getWindowHandle();
+#if JUCE_WINDOWS || JUCE_LINUX
+            resetParentUI (features);
+            *widget = parentContainer->getWindowHandle();
 #endif
         }
         else if (uiType == UI_EXTERNAL)
@@ -1123,9 +1142,9 @@ public:
         if (editor)
             editor->repaint();
 
-#if JUCE_LINUX
-        if (x11Container)
-            x11Container->repaint();
+#if JUCE_WINDOWS || JUCE_LINUX
+        if (parentContainer)
+            parentContainer->repaint();
 #endif
 
         if (externalUI)
@@ -1140,8 +1159,8 @@ private:
     LV2UI_Controller controller;
     const UIType uiType;
 
-#if JUCE_LINUX
-    ScopedPointer<JuceLV2X11Container> x11Container;
+#if JUCE_WINDOWS || JUCE_LINUX
+    ScopedPointer<JuceLV2ParentContainer> parentContainer;
     LV2UI_Resize* uiResizeFeature;
 #endif
     ScopedPointer<JuceLV2ExternalUIWrapper> externalUI;
@@ -1155,8 +1174,8 @@ private:
     int lastProgramCount;
 
     //==============================================================================
-#if JUCE_LINUX
-    void resetX11UI(const LV2_Feature* const* features)
+#if JUCE_WINDOWS || JUCE_LINUX
+    void resetParentUI(const LV2_Feature* const* features)
     {
         void* parent = nullptr;
         uiResizeFeature = nullptr;
@@ -1172,21 +1191,26 @@ private:
 
         if (parent)
         {
-            if (x11Container == nullptr)
-                x11Container = new JuceLV2X11Container(editor, uiResizeFeature);
+            if (parentContainer == nullptr)
+                parentContainer = new JuceLV2ParentContainer(editor, uiResizeFeature);
 
-            if (x11Container->isOnDesktop())
-                x11Container->removeFromDesktop ();
+            if (parentContainer->isOnDesktop())
+                parentContainer->removeFromDesktop ();
 
-            x11Container->setVisible (false);
-            x11Container->addToDesktop (0);
+            parentContainer->setVisible (false);
+
+#if JUCE_WINDOWS
+            parentContainer->addToDesktop (0, parent);
+#else
+            parentContainer->addToDesktop (0);
 
             Window hostWindow = (Window) parent;
-            Window editorWnd  = (Window) x11Container->getWindowHandle();
+            Window editorWnd  = (Window) parentContainer->getWindowHandle();
             XReparentWindow (display, editorWnd, hostWindow, 0, 0);
+#endif
 
-            x11Container->setVisible (true);
-            x11Container->reset (uiResizeFeature);
+            parentContainer->setVisible (true);
+            parentContainer->reset (uiResizeFeature);
         }
     }
 #endif
@@ -2066,9 +2090,9 @@ LV2UI_Handle juceLV2UI_InstantiateExternal(const LV2UI_Descriptor* /*descriptor*
     return juceLV2UI_Instantiate(writeFunction, controller, widget, features, JuceLV2UIWrapper::UI_EXTERNAL);
 }
 
-LV2UI_Handle juceLV2UI_InstantiateX11(const LV2UI_Descriptor* /*descriptor*/, const char* /*plugin_uri*/, const char* /*bundle_path*/, LV2UI_Write_Function writeFunction, LV2UI_Controller controller, LV2UI_Widget* widget, const LV2_Feature* const* features)
+LV2UI_Handle juceLV2UI_InstantiateParent(const LV2UI_Descriptor* /*descriptor*/, const char* /*plugin_uri*/, const char* /*bundle_path*/, LV2UI_Write_Function writeFunction, LV2UI_Controller controller, LV2UI_Widget* widget, const LV2_Feature* const* features)
 {
-    return juceLV2UI_Instantiate(writeFunction, controller, widget, features, JuceLV2UIWrapper::UI_X11);
+    return juceLV2UI_Instantiate(writeFunction, controller, widget, features, JuceLV2UIWrapper::UI_PARENT);
 }
 
 void juceLV2UI_Cleanup(LV2UI_Handle instance)
@@ -2154,13 +2178,23 @@ static const LV2UI_Descriptor JuceLv2UI_ExternalOld = {
     juceLV2UI_ExtensionData
 };
 
-static const LV2UI_Descriptor JuceLv2UI_X11 = {
-    JucePlugin_LV2URI "#X11UI",
-    juceLV2UI_InstantiateX11,
+#if JUCE_WINDOWS
+static const LV2UI_Descriptor JuceLv2UI_Windows = {
+    JucePlugin_LV2URI "#WindowsUI",
+    juceLV2UI_InstantiateParent,
     juceLV2UI_Cleanup,
     juceLV2UI_PortEvent,
     juceLV2UI_ExtensionData
 };
+#elif JUCE_LINUX
+static const LV2UI_Descriptor JuceLv2UI_X11 = {
+    JucePlugin_LV2URI "#X11UI",
+    juceLV2UI_InstantiateParent,
+    juceLV2UI_Cleanup,
+    juceLV2UI_PortEvent,
+    juceLV2UI_ExtensionData
+};
+#endif
 
 //==============================================================================
 // Mac startup code..
@@ -2215,10 +2249,8 @@ static const LV2UI_Descriptor JuceLv2UI_X11 = {
             return &JuceLv2UI_External;
           case 1:
             return &JuceLv2UI_ExternalOld;
-#if JUCE_LINUX
           case 2:
             return &JuceLv2UI_X11;
-#endif
           default:
             return nullptr;
         }
@@ -2246,6 +2278,8 @@ static const LV2UI_Descriptor JuceLv2UI_X11 = {
             return &JuceLv2UI_External;
           case 1:
             return &JuceLv2UI_ExternalOld;
+          case 2:
+            return &JuceLv2UI_Windows;
           default:
             return nullptr;
         }

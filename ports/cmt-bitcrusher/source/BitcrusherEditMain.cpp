@@ -10,7 +10,8 @@
 //#include "c_radio_group.cpp"
 
 //-------------------------------------------------------------------------------------------------------
-AudioEffect* createEffectInstance (audioMasterCallback audioMaster)
+
+DistrhoPluginBase* createDistrhoPlugin()
 {
-    return new Bitcrusher (audioMaster);
+    return new Bitcrusher((void*)1); // make audioMaster ptr non-null
 }

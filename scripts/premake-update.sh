@@ -69,6 +69,9 @@ for i in $FILES; do
     echo premake --os windows --target gnu --cc gcc
     premake --os windows --target gnu --cc gcc
 
+    echo sed \""s/\\\$(LDFLAGS)/\\\$(LDFLAGS) \\\$(LDFLAGS)/\"" -i `find . -name \*.make`
+    sed "s/\$(LDFLAGS)/\$(LDFLAGS) \$(LDFLAGS)/" -i `find . -name \*.make`
+
   fi
 
   if [ -d ../libs ]; then

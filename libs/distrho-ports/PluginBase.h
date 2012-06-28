@@ -1,48 +1,45 @@
-// distrho base plugin class
+/*
+ * DISTHRO Plugin Toolkit (DPT)
+ * Copyright (C) 2012 Filipe Coelho <falktx@gmail.com>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of
+ * the License, or any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * A copy of the license is included with this software, or can be
+ * found online at www.gnu.org/licenses.
+ */
 
 #ifndef __DISTRHO_PLUGIN_BASE__
 #define __DISTRHO_PLUGIN_BASE__
 
-#include <cstdint>
-#include <cstdlib>
-#include <cstring>
+#include "src/includes.h"
 
-#include "DistrhoPlugin.h"
+START_NAMESPACE_DISTRHO
 
-#ifndef DISTRHO_PLUGIN_IS_SYNTH
-#error DISTRHO_PLUGIN_IS_SYNTH undefined!
+#if 0
+} /* adjust editor indent */
 #endif
 
-#ifndef DISTRHO_PLUGIN_WANTS_UI
-#error DISTRHO_PLUGIN_WANTS_UI undefined!
-#endif
-
-#ifndef DISTRHO_PLUGIN_NUM_INPUTS
-#error DISTRHO_PLUGIN_NUM_INPUTS undefined!
-#endif
-
-#ifndef DISTRHO_PLUGIN_NUM_OUTPUTS
-#error DISTRHO_PLUGIN_NUM_OUTPUTS undefined!
-#endif
-
-#if defined(__WIN32__) || defined(__WIN64__)
-#define DISTRHO_PLUGIN_EXPORT extern "C" __declspec (dllexport)
-#else
-#define DISTRHO_PLUGIN_EXPORT extern "C" __attribute__ ((visibility("default")))
-#endif
+// ---------------------------------------------------------------------------------------------
 
 // Parameter Hints
-const uint32_t PARAMETER_IS_AUTOMABLE = 1 << 1;
-const uint32_t PARAMETER_IS_BOOLEAN   = 1 << 2;
-const uint32_t PARAMETER_IS_INTEGER   = 1 << 3;
-const uint32_t PARAMETER_IS_OUTPUT    = 1 << 4;
+const uint32_t PARAMETER_IS_AUTOMABLE = 1 << 0;
+const uint32_t PARAMETER_IS_BOOLEAN   = 1 << 1;
+const uint32_t PARAMETER_IS_INTEGER   = 1 << 2;
+const uint32_t PARAMETER_IS_OUTPUT    = 1 << 3;
 
 struct ParameterInfo {
-    uint32_t hints;
+    uint32_t    hints;
     const char* name;
     const char* symbol;
     const char* unit;
-
     struct {
         float def;
         float min;
@@ -53,10 +50,13 @@ struct ParameterInfo {
     } range;
 };
 
-struct MidiEvent
-{
+struct MidiEvent {
     uint32_t frame;
     char buffer[3];
+};
+
+struct TimePos {
+    double bpm;
 };
 
 // ---------------------------------------------------------------------------------------------
@@ -93,29 +93,26 @@ public:
 
     // -------------------------------------------------
 
-    // Host state
-    double d_sampleRate();
-    uint32_t d_bufferSize();
-    void d_setLatency(uint32_t samples);
-
-    // TODO - time-pos
-
-    // -------------------------------------------------
-
     // Parameters
-    uint32_t d_parameterCount() const;
-    const ParameterInfo* d_parameterInfo(uint32_t index);
+    uint32_t             d_parameterCount() const;
+    const ParameterInfo* d_parameterInfo(uint32_t index) const;
 
     // Programs
-    uint32_t d_programCount() const;
-    const char* d_programName(uint32_t index);
+    uint32_t    d_programCount() const;
+    const char* d_programName(uint32_t index) const;
+
+    // Host state
+    uint32_t       d_bufferSize() const;
+    double         d_sampleRate() const;
+    const TimePos* d_timePos() const;
+    void           d_setLatency(uint32_t samples);
 
     // -------------------------------------------------
 
     // internal use only
     void __setSampleRate(double sampleRate);
     void __setBufferSize(uint32_t bufferSize);
-    uint32_t __latency();
+    uint32_t __latency() const;
 
 protected:
     ParameterInfo* p_paramsInfo;
@@ -124,13 +121,16 @@ protected:
 private:
     uint32_t m_parameterCount;
     uint32_t m_programCount;
-    double   m_sampleRate;
     uint32_t m_bufferSize;
+    double   m_sampleRate;
+    TimePos  m_timePos;
     uint32_t m_latency;
 };
 
 // ---------------------------------------------------------------------------------------------
 
 extern DistrhoPluginBase* createDistrhoPlugin();
+
+END_NAMESPACE_DISTRHO
 
 #endif // __DISTRHO_PLUGIN_BASE__

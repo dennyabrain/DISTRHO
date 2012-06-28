@@ -1,18 +1,38 @@
-// distrho vst redirect handler
+/*
+ * DISTHRO Plugin Toolkit (DPT)
+ * Copyright (C) 2012 Filipe Coelho <falktx@gmail.com>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of
+ * the License, or any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * A copy of the license is included with this software, or can be
+ * found online at www.gnu.org/licenses.
+ */
 
 #ifndef __DISTRHO_PORT_VST__
 #define __DISTRHO_PORT_VST__
 
 #include "PluginBase.h"
-#include "DistrhoPlugin.h"
 
 #include <cmath>
 #include <iostream>
 
-// Plugin Hints (VST only)
-const uint32_t PLUGIN_CAN_REPLACE = 1 << 1;
-
 // ---------------------------------------------------------------------------------------------
+
+using namespace DISTRHO;
+
+#if DISTRHO_PLUGIN_IS_SYNTH
+#define MAX_VST_EVENTS 512
+#else
+#define MAX_VST_EVENTS 0
+#endif
 
 #define vst_strncpy strncpy
 
@@ -22,25 +42,35 @@ const uint32_t PLUGIN_CAN_REPLACE = 1 << 1;
 #define kVstMaxProductStrLen 64
 #define kVstMaxEffectNameLen 32
 
-enum VstPlugCategory {
-  kPlugCategEffect = 0
-};
+#define VST_2_4_EXTENSIONS 1
+
+// VST Plugin Hints
+const uint32_t PLUGIN_CAN_REPLACE        = 1 << 0;
+const uint32_t PLUGIN_CAN_DOUBLE_REPLACE = 1 << 1;
+const uint32_t PLUGIN_USES_CHUNKS        = 1 << 2;
 
 enum VstEventType {
     kVstNullType = 0,
     kVstMidiType = 1
 };
 
+enum VstPlugCategory {
+  kPlugCategEffect = 0
+};
+
 struct VstMidiEvent {
     VstEventType type;
-    char midiData[4];
     int32_t deltaFrames;
+    char midiData[4];
 };
 
 struct VstEvents {
     int32_t numEvents;
-    VstMidiEvent* events[512];
+    VstMidiEvent* events[MAX_VST_EVENTS];
 };
+
+struct VstPinProperties {};
+struct VstTimeInfo {};
 
 typedef int32_t VstInt32;
 typedef void* audioMasterCallback;
@@ -56,7 +86,7 @@ static inline void name_to_symbol(char* text)
         {
             // to lower case
             if (text[i] <= 'Z')
-                text[i] += ('z' - 'Z');
+                text[i] += 'z' - 'Z';
         }
         else if (std::isdigit(text[i]))
         {
@@ -80,7 +110,8 @@ class AudioEffectX : public DistrhoPluginBase
 {
 public:
     AudioEffectX(audioMasterCallback, uint32_t programCount, uint32_t parameterCount) :
-        DistrhoPluginBase(parameterCount, programCount)
+        DistrhoPluginBase(parameterCount, programCount),
+        curProgram(0)
     {
         m_name     = nullptr;
         m_label    = nullptr;
@@ -88,8 +119,11 @@ public:
         m_license  = nullptr;
         m_uniqueId = 0;
 
-        vst_hints  = 0; // FIXME ?
+        vst_hints  = 0;
         vst_events.numEvents = 0;
+
+        for (uint32_t i=0; i < MAX_VST_EVENTS; i++)
+            vst_events.events[i] = &events[i];
     }
 
     virtual ~AudioEffectX()
@@ -145,10 +179,10 @@ public:
             setParameter(index, value);
     }
 
-    void d_setProgram(uint32_t /*index*/)
+    void d_setProgram(uint32_t index)
     {
-        //if (index < m_programCount)
-        // TODO
+        if (index < d_programCount())
+            setProgram(index);
     }
 
     // -------------------------------------------------
@@ -156,7 +190,7 @@ public:
 
     void d_init()
     {
-        char buf_str[255] = { 0 };
+        char buf_str[256] = { 0 };
 
         getEffectName(buf_str);
         m_name = strdup(buf_str);
@@ -169,6 +203,9 @@ public:
 
         for (uint32_t i = 0; i < d_parameterCount(); i++)
         {
+            // TODO
+            p_paramsInfo[i].hints |= PARAMETER_IS_AUTOMABLE;
+
             getParameterName(i, buf_str);
             p_paramsInfo[i].name = strdup(buf_str);
 
@@ -179,17 +216,20 @@ public:
             getParameterLabel(i, buf_str);
             p_paramsInfo[i].unit = strdup(buf_str);
 
-            p_paramsInfo[i].hints = PARAMETER_IS_AUTOMABLE; // FIXME
-            p_paramsInfo[i].range.def = getParameter(i);
+            p_paramsInfo[i].range.def  = getParameter(i);
+            p_paramsInfo[i].range.max  = 1.0f;
+            p_paramsInfo[i].range.step = 0.001f;
+            p_paramsInfo[i].range.stepSmall = 0.00001f;
+            p_paramsInfo[i].range.stepLarge = 0.01f;
         }
 
-        //for (uint32_t i = 0; i < m_programCount; i++)
-        //{
+        for (uint32_t i = 0; i < d_programCount(); i++)
+        {
             //buf_str[0] = 0;
             //getProgramName_(i, buf_str);
             //if (buf_str[0] != 0)
             //    p_programs[i] = strdup(buf_str);
-        //}
+        }
     }
 
     void d_cleanup()
@@ -225,14 +265,13 @@ public:
     {
         vst_events.numEvents = 0;
 
-        for (uint32_t i=0; i < midiEventCount && i < 512; i++)
+        for (uint32_t i=0; i < midiEventCount && i < MAX_VST_EVENTS; i++, vst_events.numEvents++)
         {
-            vst_events.events[i]->deltaFrames = midiEvents[i].frame;
-            vst_events.events[i]->midiData[0] = midiEvents[i].buffer[0];
-            vst_events.events[i]->midiData[1] = midiEvents[i].buffer[1];
-            vst_events.events[i]->midiData[2] = midiEvents[i].buffer[2];
-            vst_events.events[i]->midiData[3] = 0;
-            vst_events.numEvents++;
+            VstMidiEvent* const event = vst_events.events[i];
+            event->deltaFrames = midiEvents[i].frame;
+            event->midiData[0] = midiEvents[i].buffer[0];
+            event->midiData[1] = midiEvents[i].buffer[1];
+            event->midiData[2] = midiEvents[i].buffer[2];
         }
 
         if (vst_events.numEvents > 0)
@@ -246,6 +285,7 @@ public:
         {
             for (int32_t i=0; i < DISTRHO_PLUGIN_NUM_OUTPUTS; i++)
                 memset(outputs[i], 0, sizeof(float) * frames);
+
             process(inputs, outputs, frames);
         }
     }
@@ -254,27 +294,49 @@ public:
     // VST side compatibility calls
 
 #ifdef DISTRHO_PLUGIN_BASE_VST_COMPAT
-    void canMono()
-    {
-    }
-
-    void wantEvents()
-    {
-    }
+    void canMono() {}
+    void wantEvents() {}
 #endif
 
-    void canProcessReplacing()
+    void canProcessReplacing(bool yesno = true)
     {
-        vst_hints |= PLUGIN_CAN_REPLACE;
+        if (yesno)
+            vst_hints |= PLUGIN_CAN_REPLACE;
+        else
+            vst_hints &= ~PLUGIN_CAN_REPLACE;
     }
 
-    void canDoubleReplacing()
+    void canDoubleReplacing(bool yesno = true)
     {
+        if (yesno)
+            vst_hints |= PLUGIN_CAN_DOUBLE_REPLACE;
+        else
+            vst_hints &= ~PLUGIN_CAN_DOUBLE_REPLACE;
+    }
+
+    void programsAreChunks()
+    {
+        vst_hints |= PLUGIN_USES_CHUNKS;
+    }
+
+    int32_t canHostDo(const char* /*feature*/)
+    {
+        return 1;
     }
 
     void isSynth()
     {
         // already set with macro DISTRHO_PLUGIN_IS_SYNTH
+    }
+
+    void updateDisplay()
+    {
+        // todo - send some update msg
+    }
+
+    void setInitialDelay(int32_t samples)
+    {
+        d_setLatency(samples);
     }
 
     void setNumInputs(uint32_t /*numInputs*/)
@@ -302,8 +364,13 @@ public:
         return d_bufferSize();
     }
 
+    int32_t getProgram()
+    {
+        return curProgram;
+    }
+
     // unused conversion methods
-#ifdef DISTRHO_PLUGIN_BASE_VST_COMPAT
+#if DISTRHO_PLUGIN_BASE_VST_COMPAT
     virtual void dB2string(float, char*) {}
     virtual void Hz2string(float, char*) {}
     virtual void ms2string(float, char*) {}
@@ -325,11 +392,11 @@ public:
     virtual bool getEffectName(char* name) = 0;
     virtual bool getProductString(char* text) = 0;
     virtual bool getVendorString(char* text) = 0;
-    virtual void getProgramName (char* name) = 0;
 
-#ifdef DISTRHO_PLUGIN_BASE_VST_COMPAT
+#if DISTRHO_PLUGIN_BASE_VST_COMPAT
     virtual long  getVendorVersion() = 0;
     virtual void  setParameter(long index, float value) = 0;
+    virtual void  setProgram(long index) { curProgram = index; }
     virtual float getParameter(long index) = 0;
     virtual void  getParameterName(long index, char* text) = 0;
     virtual void  getParameterLabel(long index, char* label) = 0;
@@ -338,23 +405,28 @@ public:
     virtual long  processEvents(VstEvents* /*events*/) { return 0; }
 #else
     virtual int32_t getVendorVersion() = 0;
-    virtual void  setParameter(int32_t index, float value) = 0;
-    virtual float getParameter(int32_t index) = 0;
-    virtual void getParameterName(int32_t index, char* text) = 0;
-    virtual void getParameterLabel(int32_t index, char* label) = 0;
-    virtual void process(float** /*inputs*/, float** /*outputs*/, int32_t /*sampleFrames*/) {} // optional
-    virtual void processReplacing(float** inputs, float** outputs, int32_t sampleFrames) = 0;
-    //virtual long  processEvents(VstEvents* events); // - TODO
+    virtual void    setParameter(int32_t index, float value) = 0;
+    virtual float   getParameter(int32_t index) = 0;
+    virtual void    getParameterName(int32_t index, char* text) = 0;
+    virtual void    getParameterLabel(int32_t index, char* label) = 0;
+    virtual void    process(float** /*inputs*/, float** /*outputs*/, int32_t /*sampleFrames*/) {} // optional
+    virtual void    processReplacing(float** inputs, float** outputs, int32_t sampleFrames) = 0;
+    virtual int32_t processEvents(VstEvents* /*events*/) { return 0; }
 #endif
+
+protected:
+    int32_t curProgram;
 
 private:
     const char* m_name;
     const char* m_label;
     const char* m_maker;
     const char* m_license;
-    long m_uniqueId;
-    uint32_t vst_hints;
+    long        m_uniqueId;
+
+    uint32_t  vst_hints;
     VstEvents vst_events;
+    VstMidiEvent events[MAX_VST_EVENTS];
 };
 
 #endif // __DISTRHO_PORT_VST__

@@ -1,4 +1,20 @@
-// distrho lv2 plugin
+/*
+ * DISTHRO Plugin Toolkit (DPT)
+ * Copyright (C) 2012 Filipe Coelho <falktx@gmail.com>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of
+ * the License, or any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * A copy of the license is included with this software, or can be
+ * found online at www.gnu.org/licenses.
+ */
 
 #include "PluginBase.h"
 
@@ -19,6 +35,12 @@
 
 // ---------------------------------------------------------------------------------------------
 
+START_NAMESPACE_DISTRHO
+
+#if 0
+} /* adjust editor indent */
+#endif
+
 class DistrhoPluginLv2
 {
 public:
@@ -28,15 +50,17 @@ public:
         m_plugin->d_init();
 
         lastBufferSize = 512;
-        m_plugin->__setSampleRate(sampleRate);
         m_plugin->__setBufferSize(lastBufferSize);
+        m_plugin->__setSampleRate(sampleRate);
 
+#if DISTRHO_PLUGIN_IS_SYNTH
         portMidiIn = nullptr;
+#endif
 
-        for (int32_t i=0; i < DISTRHO_PLUGIN_NUM_INPUTS; i++)
+        for (uint32_t i=0; i < DISTRHO_PLUGIN_NUM_INPUTS; i++)
             portAudioIns.push_back(nullptr);
 
-        for (int32_t i=0; i < DISTRHO_PLUGIN_NUM_OUTPUTS; i++)
+        for (uint32_t i=0; i < DISTRHO_PLUGIN_NUM_OUTPUTS; i++)
             portAudioOuts.push_back(nullptr);
 
         for (uint32_t i=0; i < m_plugin->d_parameterCount(); i++)
@@ -79,7 +103,7 @@ public:
         }
 #endif
 
-        for (int32_t i=0; i < DISTRHO_PLUGIN_NUM_INPUTS; i++)
+        for (uint32_t i=0; i < DISTRHO_PLUGIN_NUM_INPUTS; i++)
         {
             if (portId == index++)
             {
@@ -88,7 +112,7 @@ public:
             }
         }
 
-        for (int32_t i=0; i < DISTRHO_PLUGIN_NUM_OUTPUTS; i++)
+        for (uint32_t i=0; i < DISTRHO_PLUGIN_NUM_OUTPUTS; i++)
         {
             if (portId == index++)
             {
@@ -137,7 +161,7 @@ public:
         {
             if (portControls[i] != nullptr)
             {
-                curValue = *(float*)portControls[i];
+                curValue = *portControls[i];
                 pinfo    = m_plugin->d_parameterInfo(i);
 
                 if (lastControlValues[i] != curValue && (pinfo->hints & PARAMETER_IS_OUTPUT) == 0)
@@ -151,6 +175,7 @@ public:
         // Get MIDI Events
         uint32_t midiEventCount = 0;
 
+#if DISTRHO_PLUGIN_IS_SYNTH
         if (portMidiIn)
         {
             LV2_Event* ev;
@@ -174,15 +199,16 @@ public:
                 lv2_event_increment(&iter);
             }
         }
+#endif
 
         // Run plugin for this cycle
         float* inputs[DISTRHO_PLUGIN_NUM_INPUTS];
         float* outputs[DISTRHO_PLUGIN_NUM_OUTPUTS];
 
-        for (int32_t i=0; i < DISTRHO_PLUGIN_NUM_INPUTS; i++)
+        for (uint32_t i=0; i < DISTRHO_PLUGIN_NUM_INPUTS; i++)
             inputs[i] = portAudioIns[i];
 
-        for (int32_t i=0; i < DISTRHO_PLUGIN_NUM_OUTPUTS; i++)
+        for (uint32_t i=0; i < DISTRHO_PLUGIN_NUM_OUTPUTS; i++)
             outputs[i] = portAudioOuts[i];
 
         m_plugin->d_run(inputs, outputs, samples, midiEventCount, midiEvents);
@@ -205,10 +231,16 @@ private:
     // Temporary data
     uint32_t lastBufferSize;
     std::vector<float> lastControlValues;
+#if DISTRHO_PLUGIN_IS_SYNTH
     MidiEvent midiEvents[512];
+#else
+    MidiEvent midiEvents[0];
+#endif
 
     // LV2 ports
+#if DISTRHO_PLUGIN_IS_SYNTH
     LV2_Event_Buffer* portMidiIn;
+#endif
     std::vector<float*> portAudioIns;
     std::vector<float*> portAudioOuts;
     std::vector<float*> portControls;
@@ -245,14 +277,15 @@ static void connect_port(LV2_Handle instance, uint32_t port, void* data)
     plugin->lv2_connect_port(port, data);
 }
 
-static void run(LV2_Handle instance, uint32_t n_samples)
+static void run(LV2_Handle instance, uint32_t nSamples)
 {
     DistrhoPluginLv2* plugin = (DistrhoPluginLv2*)instance;
-    plugin->lv2_run(n_samples);
+    plugin->lv2_run(nSamples);
 }
 
 static const void* extension_data(const char* /*uri*/)
 {
+    // TODO - presets
     return nullptr;
 }
 
@@ -289,6 +322,8 @@ void lv2_generate_ttl()
     strcpy(plugin_ttl, plugin_binary);
     strcat(plugin_ttl, ".ttl");
 
+    // ------------------------------------------------------
+
     std::cout << "Writing manifest.ttl..."; std::cout.flush();
     std::fstream manifest_file("manifest.ttl", std::ios::out);
 
@@ -311,6 +346,7 @@ void lv2_generate_ttl()
     manifest_string += "\n";
 
 #if DISTRHO_PLUGIN_WANTS_UI
+    // TODO - init UI and ask for resize
     manifest_string += "<" DISTRHO_PLUGIN_URI "#Qt4UI>\n";
     manifest_string += "    a ui:Qt4UI ;\n";
     manifest_string += "    ui:binary <";
@@ -332,6 +368,8 @@ void lv2_generate_ttl()
     manifest_file << manifest_string << std::endl;
     manifest_file.close();
     std::cout << " done!" << std::endl;
+
+    // ------------------------------------------------------
 
     std::cout << "Writing " << plugin_ttl << "..."; std::cout.flush();
     std::fstream plugin_file(plugin_ttl, std::ios::out);
@@ -381,7 +419,7 @@ void lv2_generate_ttl()
     portIndex++;
 #endif
 
-    for (int32_t i=0; i < DISTRHO_PLUGIN_NUM_INPUTS; i++)
+    for (uint32_t i=0; i < DISTRHO_PLUGIN_NUM_INPUTS; i++)
     {
         if (i == 0)
             plugin_string += "    lv2:port [\n";
@@ -408,7 +446,7 @@ void lv2_generate_ttl()
             plugin_string += "    ],\n";
     }
 
-    for (int32_t i=0; i < DISTRHO_PLUGIN_NUM_OUTPUTS; i++)
+    for (uint32_t i=0; i < DISTRHO_PLUGIN_NUM_OUTPUTS; i++)
     {
         if (i == 0)
             plugin_string += "    lv2:port [\n";
@@ -508,13 +546,27 @@ void lv2_generate_ttl()
     plugin_file.close();
     std::cout << " done!" << std::endl;
 
+    // ------------------------------------------------------
+
     free(plugin_binary);
     plugin->d_cleanup();
     delete plugin;
 }
 
+END_NAMESPACE_DISTRHO
+
+// -------------------------------------------------
+
 DISTRHO_PLUGIN_EXPORT
 const LV2_Descriptor* lv2_descriptor(uint32_t index)
 {
-    return (index == 0) ? &descriptor : nullptr;
+    return (index == 0) ? &DISTRHO::descriptor : nullptr;
 }
+
+#if 1
+int main()
+{
+    DISTRHO::lv2_generate_ttl();
+    return 0;
+}
+#endif

@@ -8,7 +8,8 @@ HEADERS     += $$PWD/UiBase.h
 SOURCES     += $$PWD/src/PluginBase.cpp
 
 DISTRHO_PLUGIN_BASE_VST {
-SOURCES     += $$PWD/src/d_vst.cpp
+HEADERS     += $$PWD/d_vst.h
+#SOURCES     += $$PWD/src/d_vst.cpp
 }
 
 DISTRHO_PLUGIN_TARGET_JACK {
