@@ -159,7 +159,7 @@ public:
             sourceGroup.addFile (mainCppFile, -1, true);
         }
 
-        project.createDefaultExporters();
+        project.createExporterForCurrentPlatform();
 
         return true;
     }
@@ -227,6 +227,8 @@ public:
 
             sourceGroup.addFile (mainCppFile, -1, true);
         }
+
+        project.createExporterForCurrentPlatform();
 
         return true;
     }
@@ -317,6 +319,8 @@ public:
         sourceGroup.addFile (editorCppFile, -1, true);
         sourceGroup.addFile (editorHFile, -1, false);
 
+        project.createExporterForCurrentPlatform();
+
         return true;
     }
 };
@@ -399,6 +403,7 @@ Project* NewProjectWizard::runWizard (Component* ownerWindow_,
     {
         project->setFile (projectFile);
         project->setTitle (appTitle);
+        project->getBundleIdentifier() = project->getDefaultBundleIdentifier();
 
         if (! initialiseProject (*project))
             return nullptr;
@@ -491,7 +496,7 @@ public:
             MainWindow* mw = dynamic_cast<MainWindow*> (getTopLevelComponent());
             jassert (mw != nullptr);
 
-            JucerApplication::getApp()->closeWindow (mw);
+            JucerApplication::getApp().mainWindowList.closeWindow (mw);
         }
     }
 

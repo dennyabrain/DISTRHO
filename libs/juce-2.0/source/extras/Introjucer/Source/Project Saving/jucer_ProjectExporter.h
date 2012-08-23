@@ -38,15 +38,15 @@ public:
     ProjectExporter (Project&, const ValueTree& settings);
     virtual ~ProjectExporter();
 
-    static int getNumExporters();
     static StringArray getExporterNames();
 
     static ProjectExporter* createNewExporter (Project&, const int index);
     static ProjectExporter* createNewExporter (Project&, const String& name);
     static ProjectExporter* createExporter (Project&, const ValueTree& settings);
     static ProjectExporter* createPlatformDefaultExporter (Project&);
+    static bool canProjectBeLaunched (Project*);
 
-    static StringArray getDefaultExporters();
+    static String getCurrentPlatformExporterName();
 
     //=============================================================================
     // return 0 if this can't be opened in the current OS, or a higher value, where higher numbers are more preferable.
@@ -73,19 +73,20 @@ public:
     Project& getProject() noexcept              { return project; }
     const Project& getProject() const noexcept  { return project; }
 
-    Value getSetting (const Identifier& name_)  { return settings.getPropertyAsValue (name_, project.getUndoManagerFor (settings)); }
+    Value getSetting (const Identifier& name)   { return settings.getPropertyAsValue (name, project.getUndoManagerFor (settings)); }
+    String getSettingString (const Identifier& name) const  { return settings [name]; }
 
     Value getJuceFolderValue()                  { return getSetting (Ids::juceFolder); }
-    String getJuceFolderString() const          { return settings [Ids::juceFolder]; }
+    String getJuceFolderString() const          { return getSettingString (Ids::juceFolder); }
 
     Value getTargetLocationValue()              { return getSetting (Ids::targetFolder); }
-    String getTargetLocationString() const      { return settings [Ids::targetFolder]; }
+    String getTargetLocationString() const      { return getSettingString (Ids::targetFolder); }
 
     Value getExtraCompilerFlags()               { return getSetting (Ids::extraCompilerFlags); }
-    String getExtraCompilerFlagsString() const  { return settings [Ids::extraCompilerFlags]; }
+    String getExtraCompilerFlagsString() const  { return getSettingString (Ids::extraCompilerFlags); }
 
     Value getExtraLinkerFlags()                 { return getSetting (Ids::extraLinkerFlags); }
-    String getExtraLinkerFlagsString() const    { return settings [Ids::extraLinkerFlags]; }
+    String getExtraLinkerFlagsString() const    { return getSettingString (Ids::extraLinkerFlags).replaceCharacters ("\r\n", "  "); }
 
     // This adds the quotes, and may return angle-brackets, eg: <foo/bar.h> or normal quotes.
     String getIncludePathForFileInJuceFolder (const String& pathFromJuceFolder, const File& targetIncludeFile) const;
@@ -102,7 +103,7 @@ public:
     String getExporterIdentifierMacro() const
     {
         return "JUCER_" + settings.getType().toString() + "_"
-                + String::toHexString (settings [Ids::targetFolder].toString().hashCode()).toUpperCase();
+                + String::toHexString (getSettingString (Ids::targetFolder).hashCode()).toUpperCase();
     }
 
     // An exception that can be thrown by the create() method.
@@ -123,14 +124,15 @@ public:
     RelativePath getJucePathFromProjectFolder() const;
 
     //==============================================================================
-    Array<Project::Item> groups;
+    void copyMainGroupFromProject();
+    Array<Project::Item>& getAllGroups() noexcept               { jassert (itemGroups.size() > 0); return itemGroups; }
+    const Array<Project::Item>& getAllGroups() const noexcept   { jassert (itemGroups.size() > 0); return itemGroups; }
     Project::Item& getModulesGroup();
 
     //==============================================================================
     String xcodePackageType, xcodeBundleSignature, xcodeBundleExtension;
     String xcodeProductType, xcodeProductInstallPath, xcodeFileType;
-    String xcodeShellScript, xcodeShellScriptTitle, xcodeOtherRezFlags;
-    String xcodeExcludedFiles64Bit;
+    String xcodeOtherRezFlags, xcodeExcludedFiles64Bit;
     bool xcodeIsBundle, xcodeCreatePList, xcodeCanUseDwarf;
     StringArray xcodeFrameworks;
     Array<RelativePath> xcodeExtraLibrariesDebug, xcodeExtraLibrariesRelease;
@@ -139,6 +141,7 @@ public:
     //==============================================================================
     String makefileTargetSuffix;
     bool makefileIsDLL;
+    StringArray linuxLibs;
 
     //==============================================================================
     String msvcTargetSuffix;
@@ -195,6 +198,8 @@ public:
         Value getValue (const Identifier& name)             { return config.getPropertyAsValue (name, getUndoManager()); }
         UndoManager* getUndoManager() const                 { return project.getUndoManagerFor (config); }
 
+        void removeFromExporter();
+
         //==============================================================================
         ValueTree config;
         Project& project;
@@ -207,7 +212,6 @@ public:
     };
 
     void addNewConfiguration (const BuildConfiguration* configToCopy);
-    void deleteConfiguration (int index);
     bool hasConfigurationNamed (const String& name) const;
     String getUniqueConfigName (String name) const;
 
@@ -256,7 +260,7 @@ public:
 
     //==============================================================================
     Value getExporterPreprocessorDefs()                 { return getSetting (Ids::extraDefs); }
-    String getExporterPreprocessorDefsString() const    { return settings [Ids::extraDefs]; }
+    String getExporterPreprocessorDefsString() const    { return getSettingString (Ids::extraDefs); }
 
     // includes exporter, project + config defs
     StringPairArray getAllPreprocessorDefs (const BuildConfiguration& config) const;
@@ -274,6 +278,9 @@ protected:
     const ProjectType& projectType;
     const String projectName;
     const File projectFolder;
+
+    mutable Array<Project::Item> itemGroups;
+    void initItemGroups() const;
     Project::Item* modulesGroup;
 
     virtual BuildConfiguration::Ptr createBuildConfig (const ValueTree&) const = 0;

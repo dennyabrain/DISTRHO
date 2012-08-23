@@ -85,8 +85,8 @@ public:
     void create (const OwnedArray<LibraryModule>&) const
     {
         Array<RelativePath> files;
-        for (int i = 0; i < groups.size(); ++i)
-            findAllFilesToCompile (groups.getReference(i), files);
+        for (int i = 0; i < getAllGroups().size(); ++i)
+            findAllFilesToCompile (getAllGroups().getReference(i), files);
 
         MemoryOutputStream mo;
         writeMakefile (mo, files);
@@ -181,11 +181,8 @@ private:
 
         out << config.getGCCLibraryPathFlags();
 
-        const char* defaultLibs[] = { "dl", "freetype", "pthread", "rt", "X11", "GL", "Xinerama", "asound", "Xext", 0 };
-        StringArray libs (defaultLibs);
-
-        for (int i = 0; i < libs.size(); ++i)
-            out << " -l" << libs[i];
+        for (int i = 0; i < linuxLibs.size(); ++i)
+            out << " -l" << linuxLibs[i];
 
         out << " " << replacePreprocessorTokens (config, getExtraLinkerFlagsString()).trim()
             << newLine;

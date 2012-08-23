@@ -117,8 +117,7 @@ public:
                             const Colour& backgroundColour,
                             bool escapeKeyTriggersCloseButton,
                             bool shouldBeResizable = false,
-                            bool useBottomRightCornerResizer = false,
-                            bool useNativeTitleBar = false);
+                            bool useBottomRightCornerResizer = false);
 
     /** Easy way of quickly showing a dialog box containing a given component.
 
@@ -162,8 +161,7 @@ public:
                                 const Colour& backgroundColour,
                                 bool escapeKeyTriggersCloseButton,
                                 bool shouldBeResizable = false,
-                                bool useBottomRightCornerResizer = false,
-                                bool useNativeTitleBar = false);
+                                bool useBottomRightCornerResizer = false);
    #endif
 
 protected:

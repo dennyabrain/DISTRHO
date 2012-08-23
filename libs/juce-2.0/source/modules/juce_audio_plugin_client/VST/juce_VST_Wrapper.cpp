@@ -84,7 +84,6 @@
 #include "../utility/juce_IncludeModuleHeaders.h"
 #include "../utility/juce_FakeMouseMoveGenerator.h"
 #include "../utility/juce_PluginHostType.h"
-#include "modules/juce_audio_processors/format_types/juce_VSTMidiEventList.h"
 
 #ifdef _MSC_VER
  #pragma pack (pop)
@@ -312,7 +311,7 @@ public:
             deleteTempChannels();
 
             jassert (activePlugins.contains (this));
-            activePlugins.removeValue (this);
+            activePlugins.removeFirstMatchingValue (this);
         }
 
         if (activePlugins.size() == 0)
@@ -653,10 +652,7 @@ public:
             AudioEffectX::suspend();
 
             filter->releaseResources();
-
-            #if JucePlugin_ProducesMidiOutput
-             outgoingEvents.freeEvents();
-            #endif
+            outgoingEvents.freeEvents();
 
             isProcessing = false;
             channels.free();
@@ -1256,19 +1252,19 @@ public:
             editor->setTopLeftPosition (0, 0);
             addAndMakeVisible (editor);
 
-          #if JUCE_WINDOWS
+           #if JUCE_WINDOWS
             if (! getHostType().isReceptor())
                 addMouseListener (this, true);
 
             registerMouseWheelHook();
-          #endif
+           #endif
         }
 
         ~EditorCompWrapper()
         {
-          #if JUCE_WINDOWS
+           #if JUCE_WINDOWS
             unregisterMouseWheelHook();
-          #endif
+           #endif
 
             deleteAllChildren(); // note that we can't use a ScopedPointer because the editor may
                                  // have been transferred to another parent which takes over ownership.
@@ -1313,6 +1309,10 @@ public:
 
             const int cw = child->getWidth();
             const int ch = child->getHeight();
+
+           #if JUCE_MAC && JUCE_64BIT
+            setTopLeftPosition (0, getHeight() - ch);
+           #endif
 
             wrapper.resizeHostWindow (cw, ch);
 
@@ -1365,9 +1365,7 @@ private:
     ScopedPointer<EditorCompWrapper> editorComp;
     ERect editorSize;
     MidiBuffer midiEvents;
-    #if JucePlugin_ProducesMidiOutput
-     VSTMidiEventList outgoingEvents;
-    #endif
+    VSTMidiEventList outgoingEvents;
     VstSpeakerArrangementType speakerIn, speakerOut;
     int numInChans, numOutChans;
     bool isProcessing, hasShutdown, firstProcessCallback, shouldDeleteEditor;

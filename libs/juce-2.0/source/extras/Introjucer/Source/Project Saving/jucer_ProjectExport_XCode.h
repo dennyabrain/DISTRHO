@@ -61,8 +61,6 @@ public:
 
         if (getTargetLocationString().isEmpty())
             getTargetLocationValue() = getDefaultBuildsRootFolder() + (iOS ? "iOS" : "MacOSX");
-
-        setValueIfVoid (getObjCSuffixValue(), createAlphaNumericUID());
     }
 
     static XCodeProjectExporter* createForSettings (Project& project, const ValueTree& settings)
@@ -76,14 +74,14 @@ public:
     }
 
     //==============================================================================
-    Value getObjCSuffixValue()              { return getSetting ("objCExtraSuffix"); }
-    String getObjCSuffixString() const      { return settings ["objCExtraSuffix"]; }
-
     Value getPListToMergeValue()            { return getSetting ("customPList"); }
-    String getPListToMergeString() const    { return settings ["customPList"]; }
+    String getPListToMergeString() const    { return settings   ["customPList"]; }
 
     Value getExtraFrameworksValue()         { return getSetting (Ids::extraFrameworks); }
-    String getExtraFrameworksString() const { return settings [Ids::extraFrameworks]; }
+    String getExtraFrameworksString() const { return settings   [Ids::extraFrameworks]; }
+
+    Value  getPostBuildScriptValue()        { return getSetting (Ids::postbuildCommand); }
+    String getPostBuildScript() const       { return settings   [Ids::postbuildCommand]; }
 
     int getLaunchPreferenceOrderForCurrentOS()
     {
@@ -113,15 +111,11 @@ public:
     {
         ProjectExporter::createPropertyEditors (props);
 
-        props.add (new TextPropertyComponent (getObjCSuffixValue(), "Objective-C class name suffix", 64, false),
-                   "Because objective-C linkage is done by string-matching, you can get horrible linkage mix-ups when different modules containing the "
-                   "same class-names are loaded simultaneously. This setting lets you provide a unique string that will be used in naming "
-                   "the obj-C classes in your executable to avoid this.");
-
         if (projectType.isGUIApplication() && ! iOS)
         {
             props.add (new TextPropertyComponent (getSetting ("documentExtensions"), "Document file extensions", 128, false),
-                       "A comma-separated list of file extensions for documents that your app can open.");
+                       "A comma-separated list of file extensions for documents that your app can open. "
+                       "Using a leading '.' is optional, and the extensions are not case-sensitive.");
         }
         else if (iOS)
         {
@@ -148,6 +142,9 @@ public:
             props.add (new ChoicePropertyComponent (getLibraryType(), "Library Type",
                                                     StringArray (libTypes), Array<var> (libTypeValues)));
         }
+
+        props.add (new TextPropertyComponent (getPostBuildScriptValue(), "Post-build shell script", 32768, true),
+                   "Some shell-script that will be run after a build completes.");
     }
 
     void launchProject()
@@ -187,57 +184,95 @@ protected:
     class XcodeBuildConfiguration  : public BuildConfiguration
     {
     public:
-        XcodeBuildConfiguration (Project& project, const ValueTree& settings)
-            : BuildConfiguration (project, settings)
+        XcodeBuildConfiguration (Project& project, const ValueTree& settings, const bool iOS_)
+            : BuildConfiguration (project, settings), iOS (iOS_)
         {
+            if (iOS)
+            {
+                if (getiOSCompatibilityVersion().isEmpty())
+                    getiOSCompatibilityVersionValue() = osxVersionDefault;
+            }
+            else
+            {
+                if (getMacSDKVersion().isEmpty())
+                    getMacSDKVersionValue() = osxVersionDefault;
+
+                if (getMacCompatibilityVersion().isEmpty())
+                    getMacCompatibilityVersionValue() = osxVersionDefault;
+
+                if (getMacArchitecture().isEmpty())
+                    getMacArchitectureValue() = osxArch_Default;
+            }
         }
 
-        Value getMacSDKVersionValue()                  { return getValue (Ids::osxSDK); }
-        String getMacSDKVersion() const                { return config [Ids::osxSDK]; }
-        Value getMacCompatibilityVersionValue()        { return getValue (Ids::osxCompatibility); }
-        String getMacCompatibilityVersion() const      { return config [Ids::osxCompatibility]; }
-        Value getMacArchitectureValue()                { return getValue (Ids::osxArchitecture); }
-        String getMacArchitecture() const              { return config [Ids::osxArchitecture]; }
-        Value getCustomXcodeFlagsValue()               { return getValue (Ids::customXcodeFlags); }
-        String getCustomXcodeFlags() const             { return config [Ids::customXcodeFlags]; }
+        Value  getMacSDKVersionValue()                 { return getValue (Ids::osxSDK); }
+        String getMacSDKVersion() const                { return config   [Ids::osxSDK]; }
+        Value  getMacCompatibilityVersionValue()       { return getValue (Ids::osxCompatibility); }
+        String getMacCompatibilityVersion() const      { return config   [Ids::osxCompatibility]; }
+        Value  getiOSCompatibilityVersionValue()       { return getValue (Ids::iosCompatibility); }
+        String getiOSCompatibilityVersion() const      { return config   [Ids::iosCompatibility]; }
+        Value  getMacArchitectureValue()               { return getValue (Ids::osxArchitecture); }
+        String getMacArchitecture() const              { return config   [Ids::osxArchitecture]; }
+        Value  getCustomXcodeFlagsValue()              { return getValue (Ids::customXcodeFlags); }
+        String getCustomXcodeFlags() const             { return config   [Ids::customXcodeFlags]; }
+        Value  getCppLibTypeValue()                    { return getValue (Ids::cppLibType); }
+        String getCppLibType() const                   { return config   [Ids::cppLibType]; }
 
         void createPropertyEditors (PropertyListBuilder& props)
         {
             createBasicPropertyEditors (props);
 
-            if (getMacSDKVersion().isEmpty())
-                getMacSDKVersionValue() = osxVersionDefault;
+            if (iOS)
+            {
+                const char* iosVersions[]      = { "Use Default",     "3.2", "4.0", "4.1", "4.2", "4.3", "5.0", "5.1", 0 };
+                const char* iosVersionValues[] = { osxVersionDefault, "3.2", "4.0", "4.1", "4.2", "4.3", "5.0", "5.1", 0 };
 
-            const char* osxVersions[] = { "Use Default", osxVersion10_4, osxVersion10_5, osxVersion10_6, osxVersion10_7, 0 };
-            const char* osxVersionValues[] = { osxVersionDefault, osxVersion10_4, osxVersion10_5, osxVersion10_6, osxVersion10_7, 0 };
+                props.add (new ChoicePropertyComponent (getiOSCompatibilityVersionValue(), "iOS Deployment Target",
+                                                        StringArray (iosVersions), Array<var> (iosVersionValues)),
+                           "The minimum version of iOS that the target binary will run on.");
+            }
+            else
+            {
+                const char* osxVersions[]      = { "Use Default",     osxVersion10_5, osxVersion10_6, osxVersion10_7, 0 };
+                const char* osxVersionValues[] = { osxVersionDefault, osxVersion10_5, osxVersion10_6, osxVersion10_7, 0 };
 
-            props.add (new ChoicePropertyComponent (getMacSDKVersionValue(), "OSX Base SDK Version", StringArray (osxVersions), Array<var> (osxVersionValues)),
-                       "The version of OSX to link against in the XCode build.");
+                props.add (new ChoicePropertyComponent (getMacSDKVersionValue(), "OSX Base SDK Version",
+                                                        StringArray (osxVersions), Array<var> (osxVersionValues)),
+                           "The version of OSX to link against in the XCode build.");
 
-            if (getMacCompatibilityVersion().isEmpty())
-                getMacCompatibilityVersionValue() = osxVersionDefault;
+                props.add (new ChoicePropertyComponent (getMacCompatibilityVersionValue(), "OSX Compatibility Version",
+                                                        StringArray (osxVersions), Array<var> (osxVersionValues)),
+                           "The minimum version of OSX that the target binary will be compatible with.");
 
-            props.add (new ChoicePropertyComponent (getMacCompatibilityVersionValue(), "OSX Compatibility Version", StringArray (osxVersions), Array<var> (osxVersionValues)),
-                       "The minimum version of OSX that the target binary will be compatible with.");
+                const char* osxArch[] = { "Use Default", "Native architecture of build machine",
+                                          "Universal Binary (32-bit)", "Universal Binary (64-bit)", "64-bit Intel", 0 };
+                const char* osxArchValues[] = { osxArch_Default, osxArch_Native, osxArch_32BitUniversal,
+                                                osxArch_64BitUniversal, osxArch_64Bit, 0 };
 
-            const char* osxArch[] = { "Use Default", "Native architecture of build machine", "Universal Binary (32-bit)", "Universal Binary (64-bit)", "64-bit Intel", 0 };
-            const char* osxArchValues[] = { osxArch_Default, osxArch_Native, osxArch_32BitUniversal, osxArch_64BitUniversal, osxArch_64Bit, 0 };
-
-            if (getMacArchitecture().isEmpty())
-                getMacArchitectureValue() = osxArch_Default;
-
-            props.add (new ChoicePropertyComponent (getMacArchitectureValue(), "OSX Architecture", StringArray (osxArch), Array<var> (osxArchValues)),
-                       "The type of OSX binary that will be produced.");
+                props.add (new ChoicePropertyComponent (getMacArchitectureValue(), "OSX Architecture",
+                                                        StringArray (osxArch), Array<var> (osxArchValues)),
+                           "The type of OSX binary that will be produced.");
+            }
 
             props.add (new TextPropertyComponent (getCustomXcodeFlagsValue(), "Custom Xcode flags", 8192, false),
                        "A comma-separated list of custom Xcode setting flags which will be appended to the list of generated flags, "
                        "e.g. MACOSX_DEPLOYMENT_TARGET_i386 = 10.5, VALID_ARCHS = \"ppc i386 x86_64\"");
+
+            const char* cppLibNames[] = { "Use Default", "Use LLVM libc++", 0 };
+            Array<var> cppLibValues;
+            cppLibValues.add (var::null);
+            cppLibValues.add ("libc++");
+
+            props.add (new ChoicePropertyComponent (getCppLibTypeValue(), "C++ Library", StringArray (cppLibNames), cppLibValues),
+                       "The type of C++ std lib that will be linked.");
         }
+
+        bool iOS;
     };
 
     BuildConfiguration::Ptr createBuildConfig (const ValueTree& settings) const
     {
-        return new XcodeBuildConfiguration (project, settings);
+        return new XcodeBuildConfiguration (project, settings, iOS);
     }
 
 private:
@@ -281,9 +316,13 @@ private:
         {
             StringArray topLevelGroupIDs;
 
-            for (int i = 0; i < groups.size(); ++i)
-                if (groups.getReference(i).getNumChildren() > 0)
-                    topLevelGroupIDs.add (addProjectItem (groups.getReference(i)));
+            for (int i = 0; i < getAllGroups().size(); ++i)
+            {
+                const Project::Item& group = getAllGroups().getReference(i);
+
+                if (group.getNumChildren() > 0)
+                    topLevelGroupIDs.add (addProjectItem (group));
+            }
 
             { // Add 'resources' group
                 String resourcesGroupID (createID ("__resources"));
@@ -310,8 +349,9 @@ private:
 
         for (ConstConfigIterator config (*this); config.next();)
         {
-            addProjectConfig (config->getName(), getProjectSettings (*config));
-            addTargetConfig  (config->getName(), getTargetSettings (dynamic_cast <const XcodeBuildConfiguration&> (*config)));
+            const XcodeBuildConfiguration& xcodeConfig = dynamic_cast <const XcodeBuildConfiguration&> (*config);
+            addProjectConfig (config->getName(), getProjectSettings (xcodeConfig));
+            addTargetConfig  (config->getName(), getTargetSettings (xcodeConfig));
         }
 
         addConfigList (projectConfigs, createID ("__projList"));
@@ -336,7 +376,7 @@ private:
 
     static Image fixMacIconImageSize (Image& image)
     {
-        const int validSizes[] = { 16, 32, 48, 128 };
+        const int validSizes[] = { 16, 32, 48, 128, 256, 512, 1024 };
 
         const int w = image.getWidth();
         const int h = image.getHeight();
@@ -355,57 +395,71 @@ private:
         return rescaleImageForIcon (image, bestSize);
     }
 
+    static void writeOldIconFormat (MemoryOutputStream& out, const Image& image, const char* type, const char* maskType)
+    {
+        const int w = image.getWidth();
+        const int h = image.getHeight();
+
+        out.write (type, 4);
+        out.writeIntBigEndian (8 + 4 * w * h);
+
+        const Image::BitmapData bitmap (image, Image::BitmapData::readOnly);
+
+        for (int y = 0; y < h; ++y)
+        {
+            for (int x = 0; x < w; ++x)
+            {
+                const Colour pixel (bitmap.getPixelColour (x, y));
+                out.writeByte ((char) pixel.getAlpha());
+                out.writeByte ((char) pixel.getRed());
+                out.writeByte ((char) pixel.getGreen());
+                out.writeByte ((char) pixel.getBlue());
+            }
+        }
+
+        out.write (maskType, 4);
+        out.writeIntBigEndian (8 + w * h);
+
+        for (int y = 0; y < h; ++y)
+        {
+            for (int x = 0; x < w; ++x)
+            {
+                const Colour pixel (bitmap.getPixelColour (x, y));
+                out.writeByte ((char) pixel.getAlpha());
+            }
+        }
+    }
+
+    static void writeNewIconFormat (MemoryOutputStream& out, const Image& image, const char* type)
+    {
+        MemoryOutputStream pngData;
+        PNGImageFormat pngFormat;
+        pngFormat.writeImageToStream (image, pngData);
+
+        out.write (type, 4);
+        out.writeIntBigEndian (8 + pngData.getDataSize());
+        out << pngData;
+    }
+
     void writeIcnsFile (const Array<Image>& images, OutputStream& out) const
     {
         MemoryOutputStream data;
 
         for (int i = 0; i < images.size(); ++i)
         {
-            Image image (fixMacIconImageSize (images.getReference (i)));
+            const Image image (fixMacIconImageSize (images.getReference (i)));
+            jassert (image.getWidth() == image.getHeight());
 
-            const int w = image.getWidth();
-            const int h = image.getHeight();
-            jassert (w == h);
-
-            const char* type = nullptr;
-            const char* maskType = nullptr;
-
-            if (w == 16)  { type = "is32"; maskType = "s8mk"; }
-            if (w == 32)  { type = "il32"; maskType = "l8mk"; }
-            if (w == 48)  { type = "ih32"; maskType = "h8mk"; }
-            if (w == 128) { type = "it32"; maskType = "t8mk"; }
-
-            if (type != nullptr)
+            switch (image.getWidth())
             {
-                data.write (type, 4);
-                data.writeIntBigEndian (8 + 4 * w * h);
-
-                const Image::BitmapData bitmap (image, Image::BitmapData::readOnly);
-
-                int y;
-                for (y = 0; y < h; ++y)
-                {
-                    for (int x = 0; x < w; ++x)
-                    {
-                        const Colour pixel (bitmap.getPixelColour (x, y));
-                        data.writeByte ((char) pixel.getAlpha());
-                        data.writeByte ((char) pixel.getRed());
-                        data.writeByte ((char) pixel.getGreen());
-                        data.writeByte ((char) pixel.getBlue());
-                    }
-                }
-
-                data.write (maskType, 4);
-                data.writeIntBigEndian (8 + w * h);
-
-                for (y = 0; y < h; ++y)
-                {
-                    for (int x = 0; x < w; ++x)
-                    {
-                        const Colour pixel (bitmap.getPixelColour (x, y));
-                        data.writeByte ((char) pixel.getAlpha());
-                    }
-                }
+                case 16:   writeOldIconFormat (data, image, "is32", "s8mk"); break;
+                case 32:   writeOldIconFormat (data, image, "il32", "l8mk"); break;
+                case 48:   writeOldIconFormat (data, image, "ih32", "h8mk"); break;
+                case 128:  writeOldIconFormat (data, image, "it32", "t8mk"); break;
+                case 256:  writeNewIconFormat (data, image, "ic08"); break;
+                case 512:  writeNewIconFormat (data, image, "ic09"); break;
+                case 1024: writeNewIconFormat (data, image, "ic10"); break;
+                default:   break;
             }
         }
 
@@ -465,6 +519,7 @@ private:
         addPlistDictionaryKey (dict, "CFBundleShortVersionString",  project.getVersionString());
         addPlistDictionaryKey (dict, "CFBundleVersion",             project.getVersionString());
         addPlistDictionaryKey (dict, "NSHumanReadableCopyright",    project.getCompanyName().toString());
+        addPlistDictionaryKeyBool (dict, "NSHighResolutionCapable", true);
 
         StringArray documentExtensions;
         documentExtensions.addTokens (replacePreprocessorDefs (getAllPreprocessorDefs(), settings ["documentExtensions"]),
@@ -476,6 +531,7 @@ private:
         {
             dict->createNewChildElement ("key")->addTextElement ("CFBundleDocumentTypes");
             XmlElement* dict2 = dict->createNewChildElement ("array")->createNewChildElement ("dict");
+            XmlElement* arrayTag = nullptr;
 
             for (int i = 0; i < documentExtensions.size(); ++i)
             {
@@ -483,11 +539,17 @@ private:
                 if (ex.startsWithChar ('.'))
                     ex = ex.substring (1);
 
-                dict2->createNewChildElement ("key")->addTextElement ("CFBundleTypeExtensions");
-                dict2->createNewChildElement ("array")->createNewChildElement ("string")->addTextElement (ex);
-                addPlistDictionaryKey (dict2, "CFBundleTypeName", ex);
-                addPlistDictionaryKey (dict2, "CFBundleTypeRole", "Editor");
-                addPlistDictionaryKey (dict2, "NSPersistentStoreTypeKey", "XML");
+                if (arrayTag == nullptr)
+                {
+                    dict2->createNewChildElement ("key")->addTextElement ("CFBundleTypeExtensions");
+                    arrayTag = dict2->createNewChildElement ("array");
+
+                    addPlistDictionaryKey (dict2, "CFBundleTypeName", ex);
+                    addPlistDictionaryKey (dict2, "CFBundleTypeRole", "Editor");
+                    addPlistDictionaryKey (dict2, "NSPersistentStoreTypeKey", "XML");
+                }
+
+                arrayTag->createNewChildElement ("string")->addTextElement (ex);
             }
         }
 
@@ -514,15 +576,23 @@ private:
         return searchPaths;
     }
 
-    static void getLinkerFlagsForStaticLibrary (const RelativePath& library, StringArray& flags, StringArray& librarySearchPaths)
+    void getLinkerFlagsForStaticLibrary (const RelativePath& library, StringArray& flags, StringArray& librarySearchPaths) const
     {
         jassert (library.getFileNameWithoutExtension().substring (0, 3) == "lib");
 
         flags.add ("-l" + library.getFileNameWithoutExtension().substring (3));
 
         String searchPath (library.toUnixStyle().upToLastOccurrenceOf ("/", false, false));
+
         if (! library.isAbsolute())
-            searchPath = "$(SRCROOT)/" + searchPath;
+        {
+            String srcRoot (rebaseFromProjectFolderToBuildTarget (RelativePath (".", RelativePath::projectFolder)).toUnixStyle());
+
+            if (srcRoot.endsWith ("/."))      srcRoot = srcRoot.dropLastCharacters (2);
+            if (! srcRoot.endsWithChar ('/')) srcRoot << '/';
+
+            searchPath = srcRoot + searchPath;
+        }
 
         librarySearchPaths.add (sanitisePath (searchPath));
     }
@@ -542,7 +612,7 @@ private:
         flags.removeEmptyStrings (true);
     }
 
-    StringArray getProjectSettings (const BuildConfiguration& config) const
+    StringArray getProjectSettings (const XcodeBuildConfiguration& config) const
     {
         StringArray s;
         s.add ("ALWAYS_SEARCH_USER_PATHS = NO");
@@ -571,6 +641,10 @@ private:
             s.add ("\"CODE_SIGN_IDENTITY[sdk=iphoneos*]\" = \"iPhone Developer\"");
             s.add ("SDKROOT = iphoneos");
             s.add ("TARGETED_DEVICE_FAMILY = \"1,2\"");
+
+            const String iosVersion (config.getiOSCompatibilityVersion());
+            if (iosVersion.isNotEmpty() && iosVersion != osxVersionDefault)
+                s.add ("IPHONEOS_DEPLOYMENT_TARGET = " + iosVersion);
         }
 
         s.add ("ZERO_LINK = NO");
@@ -585,14 +659,6 @@ private:
     StringArray getTargetSettings (const XcodeBuildConfiguration& config) const
     {
         StringArray s;
-
-        {
-            String srcRoot = rebaseFromProjectFolderToBuildTarget (RelativePath (".", RelativePath::projectFolder)).toUnixStyle();
-            if (srcRoot.endsWith ("/."))
-                srcRoot = srcRoot.dropLastCharacters (2);
-
-            s.add ("SRCROOT = " + srcRoot.quoted());
-        }
 
         const String arch (config.getMacArchitecture());
         if (arch == osxArch_Native)                s.add ("ARCHS = \"$(ARCHS_NATIVE)\"");
@@ -643,7 +709,7 @@ private:
             const String sdk (config.getMacSDKVersion());
             const String sdkCompat (config.getMacCompatibilityVersion());
 
-            if (sdk == osxVersion10_5)     s.add ("SDKROOT = macosx10.5");
+            if (sdk == osxVersion10_5)          s.add ("SDKROOT = macosx10.5");
             else if (sdk == osxVersion10_6)     s.add ("SDKROOT = macosx10.6");
             else if (sdk == osxVersion10_7)     s.add ("SDKROOT = macosx10.7");
 
@@ -664,7 +730,9 @@ private:
 
         s.add ("GCC_VERSION = " + gccVersion);
         s.add ("CLANG_CXX_LANGUAGE_STANDARD = \"c++0x\"");
-        //s.add ("CLANG_CXX_LIBRARY = \"libc++\"");
+
+        if (config.getCppLibType().isNotEmpty())
+            s.add ("CLANG_CXX_LIBRARY = " + config.getCppLibType().quoted());
 
         {
             StringArray linkerFlags, librarySearchPaths;
@@ -693,7 +761,11 @@ private:
         {
             defines.set ("_DEBUG", "1");
             defines.set ("DEBUG", "1");
-            s.add ("ONLY_ACTIVE_ARCH = YES");
+
+            if (config.getMacArchitecture() == osxArch_Default
+                 || config.getMacArchitecture().isEmpty())
+                s.add ("ONLY_ACTIVE_ARCH = YES");
+
             s.add ("COPY_PHASE_STRIP = NO");
             s.add ("GCC_DYNAMIC_NO_PIC = NO");
         }
@@ -703,12 +775,6 @@ private:
             defines.set ("NDEBUG", "1");
             s.add ("GCC_GENERATE_DEBUGGING_SYMBOLS = NO");
             s.add ("GCC_SYMBOLS_PRIVATE_EXTERN = YES");
-        }
-
-        {
-            const String objCSuffix (getObjCSuffixString().trim());
-            if (objCSuffix.isNotEmpty())
-                defines.set ("JUCE_ObjCExtraSuffix", replacePreprocessorTokens (config, objCSuffix));
         }
 
         {
@@ -1106,15 +1172,15 @@ private:
 
     void addShellScriptPhase() const
     {
-        if (xcodeShellScript.isNotEmpty())
+        if (getPostBuildScript().isNotEmpty())
         {
             ValueTree* const v = addBuildPhase ("PBXShellScriptBuildPhase", StringArray());
-            v->setProperty (Ids::name, xcodeShellScriptTitle, 0);
+            v->setProperty (Ids::name, "Post-build script", 0);
             v->setProperty ("shellPath", "/bin/sh", 0);
-            v->setProperty ("shellScript", xcodeShellScript.replace ("\\", "\\\\")
-                                                           .replace ("\"", "\\\"")
-                                                           .replace ("\r\n", "\\n")
-                                                           .replace ("\n", "\\n"), 0);
+            v->setProperty ("shellScript", getPostBuildScript().replace ("\\", "\\\\")
+                                                               .replace ("\"", "\\\"")
+                                                               .replace ("\r\n", "\\n")
+                                                               .replace ("\n", "\\n"), 0);
         }
     }
 

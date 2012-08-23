@@ -538,12 +538,6 @@ public:
     */
     virtual void setCurrentProgramStateInformation (const void* data, int sizeInBytes);
 
-    //==============================================================================
-    /** LV2 specific calls, saving/restore as string. */
-
-    virtual String getStateInformationString ();
-
-    virtual void setStateInformationString (const String& data);
 
     //==============================================================================
     /** Adds a listener that will be called when an aspect of this processor changes. */

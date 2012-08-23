@@ -73,16 +73,12 @@ public:
     {
         pthread_cond_init (&condition, 0);
 
-      #if JUCE_LINUX
-        pthread_mutex_init (&mutex, 0);
-      #else
         pthread_mutexattr_t atts;
         pthread_mutexattr_init (&atts);
        #if ! JUCE_ANDROID
         pthread_mutexattr_setprotocol (&atts, PTHREAD_PRIO_INHERIT);
        #endif
         pthread_mutex_init (&mutex, &atts);
-      #endif
     }
 
     ~WaitableEventImpl()
@@ -417,8 +413,6 @@ int64 juce_fileSetPosition (void* handle, int64 pos)
 
 void FileInputStream::openHandle()
 {
-    totalSize = file.getSize();
-
     const int f = open (file.getFullPathName().toUTF8(), O_RDONLY, 00644);
 
     if (f != -1)
@@ -529,6 +523,17 @@ Result FileOutputStream::truncate()
 
     flush();
     return getResultForReturnValue (ftruncate (getFD (fileHandle), (off_t) currentPosition));
+}
+
+//==============================================================================
+String SystemStats::getEnvironmentVariable (const String& name, const String& defaultValue)
+{
+    const char* s = ::getenv (name.toUTF8());
+
+    if (s != nullptr)
+        return String::fromUTF8 (s);
+
+    return defaultValue;
 }
 
 //==============================================================================

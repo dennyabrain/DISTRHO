@@ -51,7 +51,7 @@ static inline CharPointer_wchar_t castToCharPointer_wchar_t (const void* t) noex
 class StringHolder
 {
 public:
-    StringHolder()
+    StringHolder() noexcept
         : refCount (0x3fffffff), allocatedNumBytes (sizeof (*text))
     {
         text[0] = 0;
@@ -61,7 +61,7 @@ public:
     typedef String::CharPointerType::CharType CharType;
 
     //==============================================================================
-    static const CharPointerType createUninitialisedBytes (const size_t numBytes)
+    static CharPointerType createUninitialisedBytes (const size_t numBytes)
     {
         StringHolder* const s = reinterpret_cast <StringHolder*> (new char [sizeof (StringHolder) - sizeof (CharType) + numBytes]);
         s->refCount.value = 0;
@@ -70,7 +70,7 @@ public:
     }
 
     template <class CharPointer>
-    static const CharPointerType createFromCharPointer (const CharPointer& text)
+    static CharPointerType createFromCharPointer (const CharPointer& text)
     {
         if (text.getAddress() == nullptr || text.isEmpty())
             return getEmpty();
@@ -87,7 +87,7 @@ public:
     }
 
     template <class CharPointer>
-    static const CharPointerType createFromCharPointer (const CharPointer& text, size_t maxChars)
+    static CharPointerType createFromCharPointer (const CharPointer& text, size_t maxChars)
     {
         if (text.getAddress() == nullptr || text.isEmpty() || maxChars == 0)
             return getEmpty();
@@ -108,7 +108,7 @@ public:
     }
 
     template <class CharPointer>
-    static const CharPointerType createFromCharPointer (const CharPointer& start, const CharPointer& end)
+    static CharPointerType createFromCharPointer (const CharPointer& start, const CharPointer& end)
     {
         if (start.getAddress() == nullptr || start.isEmpty())
             return getEmpty();
@@ -128,14 +128,26 @@ public:
         return dest;
     }
 
-    static const CharPointerType createFromFixedLength (const char* const src, const size_t numChars)
+    static CharPointerType createFromCharPointer (const CharPointerType& start, const CharPointerType& end)
+    {
+        if (start.getAddress() == nullptr || start.isEmpty())
+            return getEmpty();
+
+        const size_t numBytes = end.getAddress() - start.getAddress();
+        const CharPointerType dest (createUninitialisedBytes (numBytes + 1));
+        memcpy (dest.getAddress(), start, numBytes);
+        dest.getAddress()[numBytes] = 0;
+        return dest;
+    }
+
+    static CharPointerType createFromFixedLength (const char* const src, const size_t numChars)
     {
         const CharPointerType dest (createUninitialisedBytes (numChars * sizeof (CharType) + sizeof (CharType)));
         CharPointerType (dest).writeWithCharLimit (CharPointer_UTF8 (src), (int) (numChars + 1));
         return dest;
     }
 
-    static inline const CharPointerType getEmpty() noexcept
+    static inline CharPointerType getEmpty() noexcept
     {
         return CharPointerType (empty.text);
     }
@@ -443,7 +455,7 @@ namespace NumberToStringConverters
         else
         {
             // Use a locale-free sprintf where possible (not available on linux AFAICT)
-           #if JUCE_WINDOWS && !JUCE_MINGW
+           #if JUCE_WINDOWS
             len = (size_t) _sprintf_l (buffer, "%.9g", _create_locale (LC_NUMERIC, "C"), n);
            #elif JUCE_MAC || JUCE_IOS
             len = (size_t)  sprintf_l (buffer, nullptr, "%.9g", n);
@@ -710,6 +722,7 @@ JUCE_API String& JUCE_CALLTYPE operator<< (String& s1, const String& s2)        
 JUCE_API String& JUCE_CALLTYPE operator<< (String& s1, const short number)        { return s1 += (int) number; }
 JUCE_API String& JUCE_CALLTYPE operator<< (String& s1, const int number)          { return s1 += number; }
 JUCE_API String& JUCE_CALLTYPE operator<< (String& s1, const long number)         { return s1 += (int) number; }
+JUCE_API String& JUCE_CALLTYPE operator<< (String& s1, const int64 number)        { return s1 << String (number); }
 JUCE_API String& JUCE_CALLTYPE operator<< (String& s1, const float number)        { return s1 += String (number); }
 JUCE_API String& JUCE_CALLTYPE operator<< (String& s1, const double number)       { return s1 += String (number); }
 
@@ -2085,6 +2098,8 @@ public:
             memset (buffer, 0xff, sizeof (buffer));
             CharPointerType (buffer).writeAll (s.toUTF8());
             test.expectEquals (String (CharPointerType (buffer)), s);
+
+            test.expect (CharPointerType::isValidString (buffer, strlen ((const char*) buffer)));
         }
     };
 

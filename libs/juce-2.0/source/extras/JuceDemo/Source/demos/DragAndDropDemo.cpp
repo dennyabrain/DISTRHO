@@ -97,7 +97,8 @@ public:
 
 class DragAndDropDemoTarget  : public Component,
                                public DragAndDropTarget,
-                               public FileDragAndDropTarget
+                               public FileDragAndDropTarget,
+                               public TextDragAndDropTarget
 {
 public:
     //==============================================================================
@@ -126,7 +127,7 @@ public:
 
         g.setColour (Colours::black);
         g.setFont (14.0f);
-        g.drawFittedText (message, 10, 0, getWidth() - 20, getHeight(), Justification::centred, 4);
+        g.drawFittedText (message, getLocalBounds().reduced (10, 0), Justification::centred, 4);
     }
 
     //==============================================================================
@@ -196,6 +197,38 @@ public:
     void filesDropped (const StringArray& files, int /*x*/, int /*y*/)
     {
         message = "files dropped: " + files.joinIntoString ("\n");
+
+        somethingIsBeingDraggedOver = false;
+        repaint();
+    }
+
+    // These methods implement the TextDragAndDropTarget interface, and allow our component
+    // to accept drag-and-drop of text..
+
+    bool isInterestedInTextDrag (const String& /*text*/)
+    {
+        return true;
+    }
+
+    void textDragEnter (const String& /*text*/, int /*x*/, int /*y*/)
+    {
+        somethingIsBeingDraggedOver = true;
+        repaint();
+    }
+
+    void textDragMove (const String& /*text*/, int /*x*/, int /*y*/)
+    {
+    }
+
+    void textDragExit (const String& /*text*/)
+    {
+        somethingIsBeingDraggedOver = false;
+        repaint();
+    }
+
+    void textDropped (const String& text, int /*x*/, int /*y*/)
+    {
+        message = "text dropped:\n" + text;
 
         somethingIsBeingDraggedOver = false;
         repaint();

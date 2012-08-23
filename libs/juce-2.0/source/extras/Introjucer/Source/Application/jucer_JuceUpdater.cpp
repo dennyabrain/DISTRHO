@@ -59,6 +59,7 @@ JuceUpdater::JuceUpdater (ModuleList& moduleList_, const String& message)
 
     addAndMakeVisible (&availableVersionsList);
     availableVersionsList.setModel (this);
+    availableVersionsList.setColour (ListBox::backgroundColourId, Colours::white.withAlpha (0.4f));
 
     updateInstallButtonStatus();
     versionsToDownload = ValueTree ("modules");
@@ -125,7 +126,9 @@ void JuceUpdater::resized()
 
 void JuceUpdater::paint (Graphics& g)
 {
-    g.fillAll (Colours::white);
+    g.setGradientFill (ColourGradient (Colour::greyLevel (0.85f), 0, 0,
+                                       Colour::greyLevel (0.65f), 0, (float) getHeight(), false));
+    g.fillAll();
 }
 
 void JuceUpdater::buttonClicked (Button* b)
@@ -273,7 +276,6 @@ Component* JuceUpdater::refreshComponentForRow (int rowNumber, bool isRowSelecte
             : updater (updater_)
         {
             addChildComponent (&toggle);
-            toggle.setBounds ("2, 2, parent.height - 2, parent.height - 2");
             toggle.setWantsKeyboardFocus (false);
             setInterceptsMouseClicks (false, true);
         }
@@ -315,9 +317,6 @@ Component* JuceUpdater::refreshComponentForRow (int rowNumber, bool isRowSelecte
 
         void paint (Graphics& g)
         {
-            g.setColour (Colours::green.withAlpha (0.12f));
-
-            g.fillRect (0, 1, getWidth(), getHeight() - 2);
             g.setColour (Colours::black);
             g.setFont (getHeight() * 0.7f);
 
@@ -326,6 +325,11 @@ Component* JuceUpdater::refreshComponentForRow (int rowNumber, bool isRowSelecte
 
             g.drawText (status, getWidth() / 2, 0, getWidth() / 2, getHeight(),
                         Justification::centredLeft, true);
+        }
+
+        void resized()
+        {
+            toggle.setBounds (2, 2, getHeight() - 4, getHeight() - 4);
         }
 
     private:

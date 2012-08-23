@@ -52,7 +52,6 @@
  #import <IOKit/pwr_mgt/IOPMLib.h>
 
 #elif JUCE_LINUX
- #include <unistd.h>
  #include <X11/Xlib.h>
  #include <X11/Xresource.h>
  #include <X11/Xutil.h>
@@ -82,7 +81,6 @@ namespace juce
 //==============================================================================
 #if JUCE_MAC
  #include "../juce_core/native/juce_osx_ObjCHelpers.h"
- #include "../juce_core/native/juce_mac_ObjCSuffix.h"
  #include "native/juce_osx_MessageQueue.h"
  #include "native/juce_mac_MessageManager.mm"
 

@@ -293,6 +293,7 @@ private:
         XmlElement* act = app->createNewChildElement ("activity");
         act->setAttribute ("android:name", getActivityName());
         act->setAttribute ("android:label", "@string/app_name");
+        act->setAttribute ("android:configChanges", "keyboardHidden|orientation");
 
         XmlElement* intent = act->createNewChildElement ("intent-filter");
         intent->createNewChildElement ("action")->setAttribute ("android:name", "android.intent.action.MAIN");
@@ -394,7 +395,7 @@ private:
            << "# Don't edit this file! Your changes will be overwritten when you re-save the Introjucer project!" << newLine
            << newLine
            << "APP_STL := gnustl_static" << newLine
-           << "APP_CPPFLAGS += -fsigned-char -fexceptions -frtti" << newLine
+           << "APP_CPPFLAGS += -fsigned-char -fexceptions -frtti -Wno-psabi" << newLine
            << "APP_PLATFORM := " << getAppPlatform() << newLine;
 
         overwriteFileIfDifferentOrThrow (file, mo);
@@ -404,8 +405,8 @@ private:
     {
         Array<RelativePath> files;
 
-        for (int i = 0; i < groups.size(); ++i)
-            findAllFilesToCompile (groups.getReference(i), files);
+        for (int i = 0; i < getAllGroups().size(); ++i)
+            findAllFilesToCompile (getAllGroups().getReference(i), files);
 
         MemoryOutputStream mo;
         writeAndroidMk (mo, files);
@@ -529,17 +530,6 @@ private:
 
         proj->createNewChildElement ("loadproperties")->setAttribute ("srcFile", "local.properties");
         proj->createNewChildElement ("loadproperties")->setAttribute ("srcFile", "project.properties");
-
-        XmlElement* path = proj->createNewChildElement ("path");
-        path->setAttribute ("id", "android.antlibs");
-        path->createNewChildElement ("pathelement")->setAttribute ("path", "${sdk.dir}/tools/lib/anttasks.jar");
-        path->createNewChildElement ("pathelement")->setAttribute ("path", "${sdk.dir}/tools/lib/sdklib.jar");
-        path->createNewChildElement ("pathelement")->setAttribute ("path", "${sdk.dir}/tools/lib/androidprefs.jar");
-
-        XmlElement* taskdef = proj->createNewChildElement ("taskdef");
-        taskdef->setAttribute ("name", "setup");
-        taskdef->setAttribute ("classname", "com.android.ant.SetupTask");
-        taskdef->setAttribute ("classpathref", "android.antlibs");
 
         {
             XmlElement* target = proj->createNewChildElement ("target");

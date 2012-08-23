@@ -104,7 +104,15 @@ static RLimitInitialiser rLimitInitialiser;
 //==============================================================================
 SystemStats::OperatingSystemType SystemStats::getOperatingSystemType()
 {
-    return MacOSX;
+   #if JUCE_IOS
+    return iOS;
+   #else
+    SInt32 versionMinor = 0;
+    OSErr err = Gestalt (gestaltSystemVersionMinor, &versionMinor);
+    (void) err;
+    jassert (err == noErr);
+    return (OperatingSystemType) (versionMinor + MacOSX_10_4 - 4);
+   #endif
 }
 
 String SystemStats::getOperatingSystemName()
@@ -122,17 +130,6 @@ String SystemStats::getOperatingSystemName()
    #endif
 }
 
-#if ! JUCE_IOS
-int SystemStats::getOSXMinorVersionNumber()
-{
-    SInt32 versionMinor = 0;
-    OSErr err = Gestalt (gestaltSystemVersionMinor, &versionMinor);
-    (void) err;
-    jassert (err == noErr);
-    return (int) versionMinor;
-}
-#endif
-
 bool SystemStats::isOperatingSystem64Bit()
 {
    #if JUCE_IOS
@@ -140,7 +137,7 @@ bool SystemStats::isOperatingSystem64Bit()
    #elif JUCE_64BIT
     return true;
    #else
-    return getOSXMinorVersionNumber() >= 6;
+    return getOperatingSystemType() >= MacOSX_10_6;
    #endif
 }
 
@@ -213,6 +210,14 @@ static String getLocaleValue (CFStringRef key)
 String SystemStats::getUserLanguage()   { return getLocaleValue (kCFLocaleLanguageCode); }
 String SystemStats::getUserRegion()     { return getLocaleValue (kCFLocaleCountryCode); }
 
+String SystemStats::getDisplayLanguage()
+{
+    CFArrayRef cfPrefLangs = CFLocaleCopyPreferredLanguages();
+    const String result (String::fromCFString ((CFStringRef) CFArrayGetValueAtIndex (cfPrefLangs, 0)));
+    CFRelease (cfPrefLangs);
+    return result;
+}
+
 //==============================================================================
 class HiResCounterHandler
 {
@@ -224,12 +229,12 @@ public:
 
         if (timebase.numer % 1000000 == 0)
         {
-            numerator = timebase.numer / 1000000;
+            numerator   = timebase.numer / 1000000;
             denominator = timebase.denom;
         }
         else
         {
-            numerator = timebase.numer;
+            numerator   = timebase.numer;
             denominator = timebase.denom * (int64) 1000000;
         }
 

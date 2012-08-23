@@ -146,7 +146,7 @@ File ModuleList::getLocalModulesFolder (Project* project)
 {
     File defaultJuceFolder (getDefaultModulesFolder (project));
 
-    File f (StoredSettings::getInstance()->getProps().getValue ("lastJuceFolder", defaultJuceFolder.getFullPathName()));
+    File f (getGlobalProperties().getValue ("lastJuceFolder", defaultJuceFolder.getFullPathName()));
     f = getModulesFolderForJuceOrModulesFolder (f);
 
     if ((! ModuleList::isModulesFolder (f)) && ModuleList::isModulesFolder (defaultJuceFolder))
@@ -163,7 +163,7 @@ File ModuleList::getModuleFolder (const String& uid) const
 void ModuleList::setLocalModulesFolder (const File& file)
 {
     //jassert (FileHelpers::isJuceFolder (file));
-    StoredSettings::getInstance()->getProps().setValue ("lastJuceFolder", file.getFullPathName());
+    getGlobalProperties().setValue ("lastJuceFolder", file.getFullPathName());
 }
 
 struct ModuleSorter
@@ -382,11 +382,6 @@ bool LibraryModule::isPluginClient() const                          { return get
 bool LibraryModule::isAUPluginHost (const Project& project) const   { return getID() == "juce_audio_processors" && project.isConfigFlagEnabled ("JUCE_PLUGINHOST_AU"); }
 bool LibraryModule::isVSTPluginHost (const Project& project) const  { return getID() == "juce_audio_processors" && project.isConfigFlagEnabled ("JUCE_PLUGINHOST_VST"); }
 
-File LibraryModule::getLocalIncludeFolder (ProjectSaver& projectSaver) const
-{
-    return projectSaver.getGeneratedCodeFolder().getChildFile ("modules").getChildFile (getID());
-}
-
 File LibraryModule::getInclude (const File& folder) const
 {
     return folder.getChildFile (moduleInfo ["include"]);
@@ -412,12 +407,12 @@ RelativePath LibraryModule::getModuleOrLocalCopyRelativeToProject (ProjectExport
 //==============================================================================
 void LibraryModule::writeIncludes (ProjectSaver& projectSaver, OutputStream& out)
 {
-    const File localModuleFolder (getLocalIncludeFolder (projectSaver));
+    const File localModuleFolder (projectSaver.getLocalModuleFolder (*this));
     const File localHeader (getInclude (localModuleFolder));
 
     if (projectSaver.getProject().shouldCopyModuleFilesLocally (getID()).getValue())
     {
-        moduleFolder.copyDirectoryTo (localModuleFolder);
+        projectSaver.copyFolder (moduleFolder, localModuleFolder);
     }
     else
     {
@@ -501,7 +496,7 @@ void LibraryModule::prepareExporter (ProjectExporter& exporter, ProjectSaver& pr
 
     File localFolder (moduleFolder);
     if (project.shouldCopyModuleFilesLocally (getID()).getValue())
-        localFolder = getLocalIncludeFolder (projectSaver);
+        localFolder = projectSaver.getLocalModuleFolder (*this);
 
     {
         Array<File> compiled;
@@ -522,13 +517,21 @@ void LibraryModule::prepareExporter (ProjectExporter& exporter, ProjectSaver& pr
         const String frameworks (moduleInfo [exporter.isOSX() ? "OSXFrameworks" : "iOSFrameworks"].toString());
         exporter.xcodeFrameworks.addTokens (frameworks, ", ", String::empty);
     }
+    else if (exporter.isLinux())
+    {
+        const String libs (moduleInfo ["LinuxLibs"].toString());
+        exporter.linuxLibs.addTokens (libs, ", ", String::empty);
+        exporter.linuxLibs.trim();
+        exporter.linuxLibs.sort (false);
+        exporter.linuxLibs.removeDuplicates (false);
+    }
 
     if (isPluginClient())
     {
         if (shouldBuildVST  (project).getValue())  VSTHelpers::prepareExporter (exporter, projectSaver);
         if (shouldBuildAU   (project).getValue())  AUHelpers::prepareExporter (exporter, projectSaver);
-        if (shouldBuildRTAS (project).getValue())  RTASHelpers::prepareExporter (exporter, projectSaver, localFolder);
         if (shouldBuildAAX  (project).getValue())  AAXHelpers::prepareExporter (exporter, projectSaver, localFolder);
+        if (shouldBuildRTAS (project).getValue())  RTASHelpers::prepareExporter (exporter, projectSaver, localFolder);
     }
 }
 
@@ -586,12 +589,24 @@ void LibraryModule::getConfigFlags (Project& project, OwnedArray<Project::Config
 //==============================================================================
 static bool exporterTargetMatches (const String& test, String target)
 {
-    target = target.trim();
+    StringArray validTargets;
+    validTargets.addTokens (target, ",;", "");
+    validTargets.trim();
+    validTargets.removeEmptyStrings();
 
-    if (target.startsWithChar ('!'))
-        return ! exporterTargetMatches (test, target.substring (1).trimStart());
+    if (validTargets.size() == 0)
+        return true;
 
-    return target == test || target.isEmpty();
+    for (int i = validTargets.size(); --i >= 0;)
+    {
+        const String& target = validTargets[i];
+
+        if (target == test
+             || (target.startsWithChar ('!') && test != target.substring (1).trimStart()))
+            return true;
+    }
+
+    return false;
 }
 
 bool LibraryModule::fileTargetMatches (ProjectExporter& exporter, const String& target)
