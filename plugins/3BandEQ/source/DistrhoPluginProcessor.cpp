@@ -1,10 +1,12 @@
 
 #include "DistrhoPluginProcessor.h"
-#include "DistrhoPluginEditor.h"
+//#include "DistrhoPluginEditor.h"
 
 #define AMP_DB 8.656170245f
 #define DC_ADD 1e-30f
 #define PI 3.141592654f
+
+#include <math.h>
 
 #ifndef WINDOWS
 inline float abs (float x)
@@ -25,6 +27,7 @@ inline float max (float x, float y)
 
 //==============================================================================
 DistrhoPluginAudioProcessor::DistrhoPluginAudioProcessor()
+    : DISTRHO::Plugin(pMAX, 0)
 {
     // Default values
     fLow = 0.5;
@@ -44,14 +47,13 @@ DistrhoPluginAudioProcessor::DistrhoPluginAudioProcessor()
 
     out1LP = out2LP = out1HP = out2HP = 0;
     tmp1LP = tmp2LP = tmp1HP = tmp2HP = 0;
-
-    initialized = false;
 }
 
 DistrhoPluginAudioProcessor::~DistrhoPluginAudioProcessor()
 {
 }
 
+#if 0
 //==============================================================================
 const String DistrhoPluginAudioProcessor::getName() const
 {
@@ -310,3 +312,172 @@ AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new DistrhoPluginAudioProcessor();
 }
+#endif
+
+// -------------------------------------------------
+// Init
+
+void DistrhoPluginAudioProcessor::d_initParameter(uint32_t index, DISTRHO::Parameter& parameter)
+{
+    switch (index)
+    {
+    case pLow:
+        parameter.hints      = DISTRHO::PARAMETER_IS_AUTOMABLE;
+        parameter.name       = strdup("Low");
+        parameter.symbol     = strdup("low");
+        parameter.ranges.def = fLow;
+        parameter.ranges.min = 0.0f;
+        parameter.ranges.max = 1.0f;
+        break;
+
+    case pMid:
+        parameter.hints      = DISTRHO::PARAMETER_IS_AUTOMABLE;
+        parameter.name       = strdup("Mid");
+        parameter.symbol     = strdup("mid");
+        parameter.ranges.def = fMid;
+        parameter.ranges.min = 0.0f;
+        parameter.ranges.max = 1.0f;
+        break;
+
+    case pHigh:
+        parameter.hints      = DISTRHO::PARAMETER_IS_AUTOMABLE;
+        parameter.name       = strdup("High");
+        parameter.symbol     = strdup("high");
+        parameter.ranges.def = fHigh;
+        parameter.ranges.min = 0.0f;
+        parameter.ranges.max = 1.0f;
+        break;
+
+    case pMaster:
+        parameter.hints      = DISTRHO::PARAMETER_IS_AUTOMABLE;
+        parameter.name       = strdup("Master");
+        parameter.symbol     = strdup("master");
+        parameter.ranges.def = fMaster;
+        parameter.ranges.min = 0.0f;
+        parameter.ranges.max = 1.0f;
+        break;
+
+    case pLowMidFreq:
+        parameter.hints      = DISTRHO::PARAMETER_IS_AUTOMABLE;
+        parameter.name       = strdup("Low-Mid Freq");
+        parameter.symbol     = strdup("low_mid");
+        parameter.ranges.def = fLowMidFreq;
+        parameter.ranges.min = 0.0f;
+        parameter.ranges.max = 1.0f;
+        break;
+
+    case pMidHighFreq:
+        parameter.hints      = DISTRHO::PARAMETER_IS_AUTOMABLE;
+        parameter.name       = strdup("Mid-High Freq");
+        parameter.symbol     = strdup("mid_high");
+        parameter.ranges.def = fMidHighFreq;
+        parameter.ranges.min = 0.0f;
+        parameter.ranges.max = 1.0f;
+        break;
+
+    default:
+        break;
+    }
+}
+
+// -------------------------------------------------
+// Internal data
+
+float DistrhoPluginAudioProcessor::d_parameterValue(uint32_t index)
+{
+    switch (index)
+    {
+      case pLow:
+        return fLow;
+      case pMid:
+        return fMid;
+      case pHigh:
+        return fHigh;
+      case pMaster:
+        return fMaster;
+      case pLowMidFreq:
+        return fLowMidFreq;
+      case pMidHighFreq:
+        return fMidHighFreq;
+    }
+    return 0.0f;
+}
+
+void DistrhoPluginAudioProcessor::d_setParameterValue(uint32_t index, float value)
+{
+    if (d_sampleRate() <= 0)
+      return;
+
+    switch (index)
+    {
+      case pLow:
+        fLow = value;
+        lowVol = exp( (fLow - 0.5f) * 48 / AMP_DB);
+        break;
+      case pMid:
+        fMid = value;
+        midVol = exp( (fMid - 0.5f) * 48 / AMP_DB);
+        break;
+      case pHigh:
+        fHigh = value;
+        highVol = exp( (fHigh - 0.5f) * 48 / AMP_DB);
+        break;
+      case pMaster:
+        fMaster = value;
+        outVol = exp( (fMaster - 0.5f) * 48 / AMP_DB);
+        break;
+      case pLowMidFreq:
+        fLowMidFreq = min(value, fMidHighFreq);
+        freqLP = fLowMidFreq * fLowMidFreq * fLowMidFreq * 24000.0f;
+        xLP  = exp(-2.0 * PI * freqLP / d_sampleRate());
+        a0LP = 1.0 - xLP;
+        b1LP = -xLP;
+        break;
+      case pMidHighFreq:
+        fMidHighFreq = max(value, fLowMidFreq);
+        freqHP = fMidHighFreq * fMidHighFreq * fMidHighFreq * 24000.0f;
+        xHP  = exp(-2.0 * PI * freqHP / d_sampleRate());
+        a0HP = 1.0 - xHP;
+        b1HP = -xHP;
+        break;
+    }
+}
+
+// -------------------------------------------------
+// Process
+
+void DistrhoPluginAudioProcessor::d_activate()
+{
+    xLP  = exp(-2.0 * PI * freqLP / d_sampleRate());
+    a0LP = 1.0f - xLP;
+    b1LP = -xLP;
+
+    xHP  = exp(-2.0 * PI * freqHP / d_sampleRate());
+    a0HP = 1.0 - xHP;
+    b1HP = -xHP;
+}
+
+void DistrhoPluginAudioProcessor::d_deactivate()
+{
+    out1LP = out2LP = out1HP = out2HP = 0.0f;
+    tmp1LP = tmp2LP = tmp1HP = tmp2HP = 0.0f;
+}
+
+void DistrhoPluginAudioProcessor::d_run(const float* const* inputs, float* const* outputs, uint32_t frames, uint32_t, const DISTRHO::MidiEvent*)
+{
+    const float* const p_inL = inputs[0];
+    const float* const p_inR = inputs[1];
+    float* const p_outL = outputs[0];
+    float* const p_outR = outputs[1];
+}
+
+// -------------------------------------------------
+
+START_NAMESPACE_DISTRHO
+
+Plugin* createPlugin()
+{
+    return new DistrhoPluginAudioProcessor();
+}
+
+END_NAMESPACE_DISTRHO

@@ -24,9 +24,9 @@
 //#include "../build-video/AppConfig.h"
 
 #if JucePlugin_Build_Standalone
- #include "../build-audio-devices_full/AppConfig.h"
+# include "../build-audio-devices_full/AppConfig.h"
 #else
- #include "../build-audio-devices/AppConfig.h"
+# include "../build-audio-devices/AppConfig.h"
 #endif
 
 #endif // __DISTRHO_PLUGIN_APPCONFIG_H__
