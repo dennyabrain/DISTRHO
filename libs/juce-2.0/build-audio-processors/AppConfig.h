@@ -26,8 +26,6 @@
 
     @see AudioUnitPluginFormat, AudioPluginFormat, AudioPluginFormatManager, JUCE_PLUGINHOST_VST
 */
-#if MAC
- #define JUCE_PLUGINHOST_AU 0
-#endif
+#define JUCE_PLUGINHOST_AU 0
 
 #endif // __DISTRHO_JUCE_AUDIO_PROCESSORS_APPCONFIG_H__

@@ -11,6 +11,7 @@
 
 #include "../build-events/AppConfig.h"
 #include "../build-audio-basics/AppConfig.h"
+#include "../build-audio-formats/AppConfig.h"
 
 //=============================================================================
 /** Config: JUCE_ASIO
@@ -42,6 +43,11 @@
     Enables JACK audio devices (Linux only).
 */
 #define JUCE_JACK 0
+
+/** Config: JUCE_USE_ANDROID_OPENSLES
+    Enables OpenSLES devices (Android only).
+*/
+#define JUCE_USE_ANDROID_OPENSLES 0
 
 //=============================================================================
 /** Config: JUCE_USE_CDREADER

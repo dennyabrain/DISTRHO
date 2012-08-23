@@ -9,7 +9,6 @@
 #ifndef __DISTRHO_JUCE_GUI_EXTRA_APPCONFIG_H__
 #define __DISTRHO_JUCE_GUI_EXTRA_APPCONFIG_H__
 
-#include "../build-core/AppConfig.h"
 #include "../build-gui-basics/AppConfig.h"
 
 //=============================================================================

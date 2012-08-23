@@ -40,7 +40,7 @@ static void* juce_loadJackFunction (const char* const name)
     static fn_name##_ptr_t fn = nullptr;                                          \
     if (fn == nullptr) { fn = (fn_name##_ptr_t)juce_loadJackFunction(#fn_name); } \
     if (fn) return (*fn)arguments;                                                \
-    else return nullptr;                                                          \
+    else return 0;                                                          \
   }
 
 #define JUCE_DECL_VOID_JACK_FUNCTION(fn_name, argument_types, arguments)          \

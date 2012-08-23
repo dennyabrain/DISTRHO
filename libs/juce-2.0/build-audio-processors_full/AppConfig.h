@@ -29,6 +29,8 @@
 */
 #if MAC
  #define JUCE_PLUGINHOST_AU 1
+#else
+ #define JUCE_PLUGINHOST_AU 0
 #endif
 
 #endif // __DISTRHO_JUCE_AUDIO_PROCESSORS_FULL_APPCONFIG_H__

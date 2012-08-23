@@ -130,12 +130,7 @@ public:
 
     JUCE_COMRESULT QueryInterface (REFIID refId, void** result)
     {
-       #if ! JUCE_MINGW
         if (refId == __uuidof (ComClass))   { AddRef(); *result = dynamic_cast <ComClass*> (this); return S_OK; }
-       #else
-        jassertfalse; // need to find a mingw equivalent of __uuidof to make this possible
-       #endif
-
         if (refId == IID_IUnknown)          { AddRef(); *result = dynamic_cast <IUnknown*> (this); return S_OK; }
 
         *result = 0;

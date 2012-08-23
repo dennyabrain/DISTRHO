@@ -212,14 +212,14 @@ public:
     }
 
     //==============================================================================
-    const StringArray getMenuBarNames()
+    StringArray getMenuBarNames()
     {
         const char* const names[] = { "File", "Presets", "Options", 0 };
 
         return StringArray (names);
     }
 
-    const PopupMenu getMenuForIndex (int topLevelMenuIndex, const String& /*menuName*/)
+    PopupMenu getMenuForIndex (int topLevelMenuIndex, const String& /*menuName*/)
     {
         PopupMenu menu;
 

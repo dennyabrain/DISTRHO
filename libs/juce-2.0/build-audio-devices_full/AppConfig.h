@@ -11,6 +11,24 @@
 
 #include "../build-events/AppConfig.h"
 #include "../build-audio-basics/AppConfig.h"
+#include "../build-audio-formats/AppConfig.h"
+
+#if LINUX
+#include "../build-gui-basics/AppConfig.h"
+#include "../source/modules/juce_gui_basics/juce_gui_basics.h"
+
+static inline
+const char* jucelinux__getAppName()
+{
+    using namespace juce;
+    JUCEApplication* app = JUCEApplication::getInstance();
+
+    if (app)
+        return app->getApplicationName().toUTF8();
+
+    return "JuceApp";
+}
+#endif
 
 //=============================================================================
 /** Config: JUCE_ASIO
@@ -46,8 +64,10 @@
 */
 #if LINUX
  #define JUCE_ALSA 1
- //#define JUCE_ALSA_MIDI_INPUT_NAME  JucePlugin_Name
- //#define JUCE_ALSA_MIDI_OUTPUT_NAME JucePlugin_Name
+ #define JUCE_ALSA_MIDI_INPUT_NAME  jucelinux__getAppName()
+ #define JUCE_ALSA_MIDI_OUTPUT_NAME jucelinux__getAppName()
+ #define JUCE_ALSA_MIDI_INPUT_PORT_NAME  "Midi In"
+ #define JUCE_ALSA_MIDI_OUTPUT_PORT_NAME "Midi Out"
 #else
  #define JUCE_ALSA 0
 #endif
@@ -57,7 +77,7 @@
 */
 #if LINUX
  #define JUCE_JACK 1
- //#define JUCE_JACK_CLIENT_NAME JucePlugin_Name
+ #define JUCE_JACK_CLIENT_NAME jucelinux__getAppName()
 #else
  #define JUCE_JACK 0
 #endif
