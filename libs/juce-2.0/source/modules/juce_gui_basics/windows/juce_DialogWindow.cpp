@@ -61,7 +61,8 @@ public:
                       const Colour& colour,
                       const bool escapeKeyTriggersCloseButton_,
                       const bool shouldBeResizable,
-                      const bool useBottomRightCornerResizer)
+                      const bool useBottomRightCornerResizer,
+                      const bool useNativeTitleBar)
         : DialogWindow (title, colour, escapeKeyTriggersCloseButton_, true)
     {
         if (! JUCEApplication::isStandaloneApp())
@@ -70,6 +71,7 @@ public:
         setContentNonOwned (contentComponent_, true);
         centreAroundComponent (componentToCentreAround, getWidth(), getHeight());
         setResizable (shouldBeResizable, useBottomRightCornerResizer);
+        setUsingNativeTitleBar (useNativeTitleBar);
     }
 
     void closeButtonPressed()
@@ -89,11 +91,12 @@ void DialogWindow::showDialog (const String& dialogTitle,
                                const Colour& backgroundColour,
                                const bool escapeKeyTriggersCloseButton,
                                const bool shouldBeResizable,
-                               const bool useBottomRightCornerResizer)
+                               const bool useBottomRightCornerResizer,
+                               const bool useNativeTitleBar)
 {
     TempDialogWindow* dw = new TempDialogWindow (dialogTitle, contentComponent, componentToCentreAround,
                                                  backgroundColour, escapeKeyTriggersCloseButton,
-                                                 shouldBeResizable, useBottomRightCornerResizer);
+                                                 shouldBeResizable, useBottomRightCornerResizer, useNativeTitleBar);
 
     dw->enterModalState (true, 0, true);
 }
@@ -105,11 +108,12 @@ int DialogWindow::showModalDialog (const String& dialogTitle,
                                    const Colour& backgroundColour,
                                    const bool escapeKeyTriggersCloseButton,
                                    const bool shouldBeResizable,
-                                   const bool useBottomRightCornerResizer)
+                                   const bool useBottomRightCornerResizer,
+                                   const bool useNativeTitleBar)
 {
     TempDialogWindow dw (dialogTitle, contentComponent, componentToCentreAround,
                          backgroundColour, escapeKeyTriggersCloseButton,
-                         shouldBeResizable, useBottomRightCornerResizer);
+                         shouldBeResizable, useBottomRightCornerResizer, useNativeTitleBar);
 
     return dw.runModalLoop();
 }
