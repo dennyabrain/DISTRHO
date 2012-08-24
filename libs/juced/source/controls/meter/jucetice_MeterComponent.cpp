@@ -340,6 +340,7 @@ void MeterComponent::paint (Graphics& g)
     }
 
     // Bevel outline for the entire draw area
+    /*
     if(m_inset)
         g.drawBevel(
             0,
@@ -349,6 +350,7 @@ void MeterComponent::paint (Graphics& g)
             m_inset,
             m_raised?Colours::white.withAlpha(0.4f):Colours::black.withAlpha(0.4f),
             m_raised?Colours::black.withAlpha(0.4f):Colours::white.withAlpha(0.4f));
+            */
 
     // Blit our prebuilt image
     g.setOpacity(1.0f);

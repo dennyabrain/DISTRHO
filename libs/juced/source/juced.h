@@ -39,6 +39,9 @@
 #include "../../juce-2.0/source/modules/juce_gui_basics/juce_gui_basics.h"
 #include "../../juce-2.0/source/modules/juce_gui_extra/juce_gui_extra.h"
 
+#define BEGIN_JUCE_NAMESPACE namespace juce {
+#define END_JUCE_NAMESPACE }
+
 //=============================================================================
 /** Config: JUCE_LASH
 	Enables LASH support on Linux.

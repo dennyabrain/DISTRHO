@@ -20,14 +20,14 @@
 
 #if DROWAUDIO_USE_SOUNDTOUCH
 
-BEGIN_JUCE_NAMESPACE
+
 
 AudioFilePlayerExt::AudioFilePlayerExt()
     : AudioFilePlayer()
 {
     loopingAudioSource = new LoopingAudioSource (audioTransportSource, false);
-    reversibleAudioSource = new ReversibleAudioSource (audioTransportSource, false);
-    filteringAudioSource = new FilteringAudioSource (reversibleAudioSource, false);
+    //reversibleAudioSource = new ReversibleAudioSource (audioTransportSource, false);
+    filteringAudioSource = new FilteringAudioSource (audioTransportSource, false);
     
     masterSource = filteringAudioSource;
 }
@@ -123,6 +123,6 @@ bool AudioFilePlayerExt::setSourceWithReader (AudioFormatReader* reader)
     return false;    
 }
 
-END_JUCE_NAMESPACE
+
 
 #endif

@@ -25,15 +25,17 @@
     typedef FFTSetup FFTConfig;
     typedef DSPSplitComplex SplitComplex;
 #elif DROWAUDIO_USE_FFTREAL
-    END_JUCE_NAMESPACE
-    #include "fftreal/FFTReal.h"
-    BEGIN_JUCE_NAMESPACE
+    
+    //#include "fftreal/FFTReal.h"
+    
     typedef ScopedPointer< ffft::FFTReal<float> > FFTConfig;
     struct SplitComplex {
         float* realp;
         float* imagp;
     };
 #endif
+
+#if JUCE_MAC || JUCE_IOS || DROWAUDIO_USE_FFTREAL
 
 //==============================================================================
 class FFTProperties
@@ -111,4 +113,5 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FFTOperation);
 };
 
+#endif // JUCE_MAC || JUCE_IOS || DROWAUDIO_USE_FFTREAL
 #endif //__DROWAUDIO_FFTOPERATION__

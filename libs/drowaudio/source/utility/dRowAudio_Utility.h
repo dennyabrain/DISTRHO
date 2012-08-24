@@ -49,7 +49,11 @@ inline static String stripFileProtocolForLocal (String pathToStrip)
 {
 	if (pathToStrip.startsWith ("file://localhost"))
 	{
+#if JUCE_WINDOWS
+		String temp (pathToStrip.substring (pathToStrip.indexOf (7, "/") + 1));
+#else
 		String temp (pathToStrip.substring (pathToStrip.indexOf (7, "/")));
+#endif   
 		return temp.replace ("%20", " ").replace ("%5B", "[").replace ("%5D", "]").replace ("%23", "#");
 	}
 	
@@ -232,7 +236,7 @@ static bool writeValueTreeToFile (ValueTree& treeToWrite, File& fileToWriteTo, b
     attempt to read it as binary. If this also fails it will return an invalid
     ValueTree.
  */
-static ValueTree readValueTreeFromFile (File& fileToReadFrom)
+static ValueTree readValueTreeFromFile (const File& fileToReadFrom)
 {
     ScopedPointer<XmlElement> treeAsXml (XmlDocument::parse (fileToReadFrom));
     if (treeAsXml != nullptr)

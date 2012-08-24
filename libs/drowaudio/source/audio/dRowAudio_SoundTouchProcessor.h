@@ -25,7 +25,7 @@
 
 #include "soundtouch/SoundTouch.h"
 
-using namespace soundtouch;
+//using namespace soundtouch;
 
 //==============================================================================
 /** Wraps a SoundTouch object to enable pitch and tempo adjustments to an audio buffer;
@@ -115,13 +115,23 @@ public:
      */
     PlaybackSettings getPlaybackSettings()                      {   return settings;                            }
     
+    /** Sets a custom SoundTouch setting.
+        See SoundTouch.h for details.
+     */
+    void setSoundTouchSetting (int settingId, int settingValue);
+    
+    /** Gets a custom SoundTouch setting.
+        See SoundTouch.h for details.
+     */
+    int getSoundTouchSetting (int settingId);
+    
     /** Returns the effective playback ratio i.e. the number of output samples produced per input sample.
      */
     double getEffectivePlaybackRatio()                          {   return (double) soundTouch.getEffectiveRate() * soundTouch.getEffectiveTempo(); }
             
 private:
     //==============================================================================
-    SoundTouch soundTouch;
+    soundtouch::SoundTouch soundTouch;
     
     CriticalSection lock;
     HeapBlock<float> interleavedInputBuffer, interleavedOutputBuffer;

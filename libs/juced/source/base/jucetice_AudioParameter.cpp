@@ -222,8 +222,10 @@ void AudioParameter::removeListener (AudioParameterListener* const listener)
     {
         listener->detachedFromParameter (this, index);
     }
-	
-    listeners.removeValue (listener);
+
+    int index = listeners.indexOf (listener);
+    if (index >= 0)
+        listeners.remove (index);
 }
 
 void AudioParameter::removeAllListeners ()

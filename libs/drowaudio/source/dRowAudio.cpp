@@ -32,7 +32,7 @@
 // and your header search path must make it accessible to the module's files.
 #include "AppConfig.h"
 
-#include "../../juce-2.0/source/modules/juce_core/native/juce_BasicNativeHeaders.h"
+#include "modules/juce_core/native/juce_BasicNativeHeaders.h"
 
 #if JUCE_MAC || JUCE_IOS
     #import <Foundation/Foundation.h>
@@ -41,9 +41,12 @@
 
 #if JUCE_IOS
     #import <AVFoundation/AVFoundation.h>
+    #import <MediaPlayer/MediaPlayer.h>
 #endif
 
 #include "dRowAudio.h"
+
+namespace drow {
 
 // Audio
 #include "audio/dRowAudio_AudioFilePlayer.cpp"
@@ -72,27 +75,38 @@
 #include "audio/fft/dRowAudio_mac_FFTOperation.cpp"
 #include "audio/fft/dRowAudio_ios_FFTOperation.cpp"
 #include "audio/fft/dRowAudio_FFTReal_FFTOperation.cpp"
+#include "audio/fft/dRowAudio_LTAS.cpp"
 
 // Gui
 #include "gui/dRowAudio_AudioFileDropTarget.cpp"
 #include "gui/dRowAudio_GraphicalComponent.cpp"
 #include "gui/dRowAudio_AudioOscilloscope.cpp"
+#include "gui/dRowAudio_AudioTransportCursor.cpp"
 #include "gui/dRowAudio_SegmentedMeter.cpp"
 #include "gui/dRowAudio_Sonogram.cpp"
 #include "gui/dRowAudio_Spectroscope.cpp"
+#include "gui/dRowAudio_TriggeredScope.cpp"
 #include "gui/dRowAudio_CpuMeter.cpp"
 #include "gui/dRowAudio_Clock.cpp"
-#include "gui/dRowAudio_CentreAlignViewport.cpp"
+//#include "gui/dRowAudio_CentreAlignViewport.cpp"
 #include "gui/dRowAudio_MusicLibraryTable.cpp"
 #include "gui/filebrowser/dRowAudio_BasicFileBrowser.cpp"
 #include "gui/filebrowser/dRowAudio_ColumnFileBrowser.cpp"
 #include "gui/audiothumbnail/dRowAudio_AudioThumbnailImage.cpp"
+#include "gui/audiothumbnail/dRowAudio_ColouredAudioThumbnail.cpp"
 #include "gui/audiothumbnail/dRowAudio_PositionableWaveDisplay.cpp"
 #include "gui/audiothumbnail/dRowAudio_DraggableWaveDisplay.cpp"
 
 // maths
 #include "maths/dRowAudio_MathsUnitTests.cpp"
 
+// native
+#if JUCE_IOS
+ #include "native/dRowAudio_AudioPicker.mm"
+ #include "native/dRowAudio_AVAssetAudioFormat.mm"
+ #include "native/dRowAudio_IOSAudioConverter.mm"
+#endif
+    
 // network
 #include "network/dRowAudio_CURLManager.cpp"
 #include "network/dRowAudio_CURLEasySession.cpp"
@@ -105,3 +119,5 @@
 #include "utility/dRowAudio_ITunesLibrary.cpp"
 #include "utility/dRowAudio_ITunesLibraryParser.cpp"
 #include "parameters/dRowAudio_PluginParameter.cpp"
+
+}

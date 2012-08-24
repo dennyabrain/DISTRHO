@@ -18,7 +18,7 @@
   ==============================================================================
 */
 
-BEGIN_JUCE_NAMESPACE
+#if JUCE_MAC || JUCE_IOS || DROWAUDIO_USE_FFTREAL
 
 Sonogram::Sonogram (int fftSizeLog2)
 :	fftEngine       (fftSizeLog2),
@@ -156,4 +156,4 @@ void Sonogram::renderScopeLine()
     }
 }
 
-END_JUCE_NAMESPACE
+#endif // JUCE_MAC || JUCE_IOS || DROWAUDIO_USE_FFTREAL

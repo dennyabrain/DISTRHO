@@ -18,7 +18,7 @@
   ==============================================================================
 */
 
-BEGIN_JUCE_NAMESPACE
+
 
 //==============================================================================
 CentreAlignViewport::CentreAlignViewport (const String& componentName)
@@ -317,10 +317,10 @@ void CentreAlignViewport::scrollBarMoved (ScrollBar* scrollBarThatHasMoved, doub
     }
 }
 
-void CentreAlignViewport::mouseWheelMove (const MouseEvent& e, const float wheelIncrementX, const float wheelIncrementY)
+void CentreAlignViewport::mouseWheelMove (const MouseEvent& e, const MouseWheelDetails& wheel)
 {
-    if (! useMouseWheelMoveIfNeeded (e, wheelIncrementX, wheelIncrementY))
-        Component::mouseWheelMove (e, wheelIncrementX, wheelIncrementY);
+    if (! useMouseWheelMoveIfNeeded (e, wheel.deltaX, wheel.deltaY))
+        Component::mouseWheelMove (e, wheel);
 }
 
 bool CentreAlignViewport::useMouseWheelMoveIfNeeded (const MouseEvent& e, float wheelIncrementX, float wheelIncrementY)
@@ -397,4 +397,3 @@ bool CentreAlignViewport::keyPressed (const KeyPress& key)
     return false;
 }
 
-END_JUCE_NAMESPACE

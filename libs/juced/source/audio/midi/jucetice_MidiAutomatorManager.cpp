@@ -164,10 +164,10 @@ void MidiAutomatorManager::registerMidiAutomatable (MidiAutomatable* object)
     for (int i = 0; i < 128; i++)
     {
         Array<void*>* array = controllers.getUnchecked (i);
-        
+
         if (array->contains (object))
         {
-            array->removeValue (object);
+            array->remove (array->indexOf (object));
             break;
         }
     }
@@ -192,7 +192,7 @@ void MidiAutomatorManager::removeMidiAutomatable (MidiAutomatable* object)
         
         if (array->contains (object))
         {
-            array->removeValue (object);
+            array->remove (array->indexOf (object));
             break;
         }
     }

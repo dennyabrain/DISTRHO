@@ -20,7 +20,7 @@
 
 #if JUCE_MODULE_AVAILABLE_juce_cryptography
 
-BEGIN_JUCE_NAMESPACE
+
 
 EncryptedString::EncryptedString()
 {
@@ -39,7 +39,7 @@ String EncryptedString::encrypt (const String& stringToEncrypt, const String& pu
 
     BigInteger stringAsData;
     stringAsData.loadFromMemoryBlock (stringMemoryBlock);
-    
+
     rsaKey.applyToValue (stringAsData);
     
     if (resultAsHex)
@@ -77,7 +77,7 @@ String EncryptedString::decrypt (const String& encryptedString, const String& pr
 }
 
 //==============================================================================
-#if JUCE_UNIT_TESTS
+#if DROWAUDIO_UNIT_TESTS
 
 class EncryptedStringTests  : public UnitTest
 {
@@ -115,10 +115,10 @@ public:
 
 static EncryptedStringTests encryptedStringTests;
 
-#endif
+#endif // DROWAUDIO_UNIT_TESTS
 
 //==============================================================================
 
-END_JUCE_NAMESPACE
+
 
 #endif //JUCE_MODULE_AVAILABLE_juce_cryptography

@@ -69,7 +69,7 @@ MidiGrid::MidiGrid ()
 {
     addAndMakeVisible (header = new PianoGridHeader (this));
     addAndMakeVisible (indicator = new PianoGridIndicator (this));
-    addAndMakeVisible (lassoComponent = new LassoComponent<MidiGridItem*> (2));
+    addAndMakeVisible (lassoComponent = new LassoComponent<MidiGridItem*> ());
 
     setIndicatorPosition (0);
 }

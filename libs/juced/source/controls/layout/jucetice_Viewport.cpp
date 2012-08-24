@@ -78,7 +78,9 @@ void JuceticeViewport::addListener (ViewportListener* const newListener) throw()
 
 void JuceticeViewport::removeListener (ViewportListener* const listenerToRemove) throw()
 {
-    viewportListeners.removeValue (listenerToRemove);
+    int index = viewportListeners.indexOf (listenerToRemove);
+    if (index >= 0)
+        viewportListeners.remove (index);
 }
 
 void JuceticeViewport::notifyComponentChanged ()

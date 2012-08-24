@@ -20,7 +20,7 @@
 
 #if DROWAUDIO_USE_CURL
 
-BEGIN_JUCE_NAMESPACE
+
 
 juce_ImplementSingleton (CURLManager);
 
@@ -29,8 +29,7 @@ CURLManager::CURLManager()
 {
 	CURLcode result = curl_global_init (CURL_GLOBAL_ALL);
     
-	if (result != CURLE_OK)
-		DBG("Error loading cURL - " << curl_easy_strerror (result));
+	jassert (result == CURLE_OK);
 }
 
 CURLManager::~CURLManager()
@@ -51,6 +50,6 @@ void CURLManager::cleanUpEasyCurlHandle (CURL* handle)
 	handle = nullptr;
 }
 
-END_JUCE_NAMESPACE
+
 
 #endif

@@ -18,7 +18,7 @@
   ==============================================================================
 */
 
-BEGIN_JUCE_NAMESPACE
+
 
 //==================================================================================
 class BrowserColumn : public BasicFileBrowser,
@@ -285,10 +285,18 @@ bool ColumnFileBrowserContents::keyPressed (const KeyPress& key)
             
             FileListComponent* list = dynamic_cast<FileListComponent*> (columns[newActiveColumn]->getDisplayComponent());
 
-            if (list->getNumRows() > 0)
+            if (list != nullptr)
             {
-                columns[newActiveColumn]->grabKeyboardFocus();
-                list->selectRow (0);
+                ListBoxModel* model = list->getModel();
+                
+                if (model != nullptr)
+                {
+                    if (model->getNumRows() > 0)
+                    {
+                        columns[newActiveColumn]->grabKeyboardFocus();
+                        list->selectRow (0);
+                    }
+                }
             }
         }
         
@@ -328,15 +336,14 @@ void ColumnFileBrowser::visibleAreaChanged (const juce::Rectangle<int>& /*newVis
     resized();
 }
 
-void ColumnFileBrowser::mouseWheelMove (const MouseEvent& e, float wheelIncrementX, float wheelIncrementY)
+void ColumnFileBrowser::mouseWheelMove (const MouseEvent& e, const MouseWheelDetails& wheel)
 {
     if (! (e.mods.isAltDown() || e.mods.isCtrlDown()))
     {
         if (getHorizontalScrollBar()->isVisible())
-            Viewport::useMouseWheelMoveIfNeeded (e, wheelIncrementX, 0);
+            Viewport::useMouseWheelMoveIfNeeded (e, wheel);
         else
-            Viewport::useMouseWheelMoveIfNeeded (e, wheelIncrementX, wheelIncrementY);
+            Viewport::useMouseWheelMoveIfNeeded (e, wheel);
     }
 }
 
-END_JUCE_NAMESPACE

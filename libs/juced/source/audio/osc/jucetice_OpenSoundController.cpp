@@ -80,7 +80,9 @@ void OpenSoundController::addListener (OpenSoundControllerListener* const listen
 
 void OpenSoundController::removeListener (OpenSoundControllerListener* const listener)
 {
-    listeners.removeValue (listener);
+    int index = listeners.indexOf (listener);
+    if (index >= 0)
+        listeners.remove (index);
 }
 
 //==============================================================================

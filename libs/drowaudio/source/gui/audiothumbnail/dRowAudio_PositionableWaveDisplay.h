@@ -23,6 +23,7 @@
 
 #include "../../utility/dRowAudio_StateVariable.h"
 #include "../../audio/dRowAudio_AudioUtility.h"
+#include "../dRowAudio_AudioTransportCursor.h"
 
 //====================================================================================
 /** A class to display the entire waveform of an audio file.
@@ -31,15 +32,17 @@
 	reposition the transport source.
  */
 class PositionableWaveDisplay : public Component,
-								public Timer,
-                                public AudioThumbnailImage::Listener
+                                public AudioThumbnailImage::Listener,
+                                public TimeSliceClient,
+                                public AsyncUpdater
 {
 public:
 	//====================================================================================
 	/** Creates the display.
 		The AudioThumbnailImage associated with the display must be passed in.
 	 */
-	explicit PositionableWaveDisplay (AudioThumbnailImage& sourceToBeUsed);
+	explicit PositionableWaveDisplay (AudioThumbnailImage& sourceToBeUsed,
+                                      TimeSliceThread& threadToUse_);
 	
 	/** Destructor.
      */
@@ -77,52 +80,39 @@ public:
 	/** @internal */
     void imageChanged (AudioThumbnailImage* audioThumbnailImage);
 
-	/** @internal */
-    void imageUpdated (AudioThumbnailImage* audioThumbnailImage);
-    
-	/** @internal */
-    void imageFinished (AudioThumbnailImage* audioThumbnailImage);
-    
 	//====================================================================================
 	/** @internal */
     void resized ();
 	
 	/** @internal */
 	void paint (Graphics &g);
-
-	/** @internal */
-	void mouseDown (const MouseEvent &e);
-	
-	/** @internal */
-	void mouseUp (const MouseEvent &e);
-	
-	/** @internal */
-	void mouseDrag (const MouseEvent &e);
     
-	//====================================================================================
 	/** @internal */
-	void timerCallback();
-		
+    int useTimeSlice();
+
+    /** @internal */
+    void handleAsyncUpdate();
+    
 private:
 	//==============================================================================
-	void refreshWaveform();
-	
+    AudioThumbnailImage& audioThumbnailImage;
+    TimeSliceThread& threadToUse;
+    CriticalSection imageLock;
+
+    AudioFilePlayer& audioFilePlayer;
 	double fileLength, oneOverFileLength, currentSampleRate;
     double zoomRatio, startOffsetRatio, verticalZoomRatio;
 	
-    AudioThumbnailImage& audioThumbnailImage;
-    Colour backgroundColour;
-    Colour waveformColour;
-    AudioFilePlayer* audioFilePlayer;
+    Colour backgroundColour, waveformColour;
 	Image cachedImage, cursorImage;
 	
-	StateVariable<int> transportLineXCoord;
-	float currentXScale;
-	bool showTransportCursor;
+    StateVariable<double> drawTimes;
     
-	bool interestedInDrag;
-	double currentMouseX;
-	
+    AudioTransportCursor audioTransportCursor;
+
+    //==============================================================================
+    void refreshCachedImage();
+    
 	//==============================================================================
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PositionableWaveDisplay);
 };

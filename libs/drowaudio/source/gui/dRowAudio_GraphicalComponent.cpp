@@ -18,7 +18,7 @@
   ==============================================================================
 */
 
-BEGIN_JUCE_NAMESPACE
+
 
 GraphicalComponent::GraphicalComponent()
     : paused (false),
@@ -55,7 +55,7 @@ int GraphicalComponent::useTimeSlice()
 	}
 }
 
-void GraphicalComponent::copySamples (float *values, int numSamples_)
+void GraphicalComponent::copySamples (const float *values, int numSamples_)
 {
 		// allocate new memory only if needed
 		if (numSamples != numSamples_)
@@ -113,4 +113,3 @@ void GraphicalComponent::copySamples (float **values, int numSamples_, int numCh
 	needToProcess = true;
 }
 
-END_JUCE_NAMESPACE

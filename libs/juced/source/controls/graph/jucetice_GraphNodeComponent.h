@@ -271,7 +271,7 @@ protected:
     int originalX, originalY;
     int lastX, lastY;
 
-    DropShadower dropShadower;
+    //DropShadower dropShadower;
 };
 
 #endif

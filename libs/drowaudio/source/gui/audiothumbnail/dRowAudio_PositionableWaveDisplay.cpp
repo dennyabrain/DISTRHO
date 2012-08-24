@@ -18,18 +18,20 @@
   ==============================================================================
 */
 
-BEGIN_JUCE_NAMESPACE
 
-PositionableWaveDisplay::PositionableWaveDisplay (AudioThumbnailImage& sourceToBeUsed)
-    : currentSampleRate     (44100.0),
+
+PositionableWaveDisplay::PositionableWaveDisplay (AudioThumbnailImage& sourceToBeUsed,
+                                                  TimeSliceThread& threadToUse_)
+    : audioThumbnailImage   (sourceToBeUsed),
+      threadToUse           (threadToUse_),
+      audioFilePlayer       (*audioThumbnailImage.getAudioFilePlayer()),
+      currentSampleRate     (44100.0),
       zoomRatio             (1.0),
       startOffsetRatio      (0.0),
       verticalZoomRatio     (1.0),
-      audioThumbnailImage   (sourceToBeUsed),
       backgroundColour      (Colours::black),
       waveformColour        (Colours::green),
-      audioFilePlayer       (audioThumbnailImage.getAudioFilePlayer()),
-      showTransportCursor   (true)
+      audioTransportCursor  (audioFilePlayer)
 {
     setOpaque (true);
     
@@ -37,12 +39,15 @@ PositionableWaveDisplay::PositionableWaveDisplay (AudioThumbnailImage& sourceToB
     
     cachedImage = Image (Image::RGB, 1, 1, false);
     cachedImage.clear (cachedImage.getBounds(), backgroundColour);
+    
+    addAndMakeVisible (&audioTransportCursor);
 }
 
 PositionableWaveDisplay::~PositionableWaveDisplay()
 {
+    threadToUse.removeTimeSliceClient (this);
+    
     audioThumbnailImage.removeListener (this);
-	stopTimer();
 }
 
 void PositionableWaveDisplay::setZoomRatio (double newZoomRatio)
@@ -54,12 +59,16 @@ void PositionableWaveDisplay::setZoomRatio (double newZoomRatio)
     }
 
     zoomRatio = newZoomRatio;
-    repaint();
+    audioTransportCursor.setZoomRatio (newZoomRatio);
+    
+    resized();
 }
 
 void PositionableWaveDisplay::setStartOffsetRatio (double newStartOffsetRatio)
 {
     startOffsetRatio = newStartOffsetRatio;
+    audioTransportCursor.setStartOffsetRatio (startOffsetRatio);
+
     repaint();
 }
 
@@ -71,12 +80,7 @@ void PositionableWaveDisplay::setVerticalZoomRatio (double newVerticalZoomRatio)
 
 void PositionableWaveDisplay::setCursorDisplayed (bool shoudldDisplayCursor)
 {
-    showTransportCursor = shoudldDisplayCursor;
-    
-    if (showTransportCursor)
-		startTimer (40);		
-    else
-        stopTimer();
+    audioTransportCursor.setCursorDisplayed (shoudldDisplayCursor);
 }
 
 void PositionableWaveDisplay::setBackgroundColour (Colour newBackgroundColour)
@@ -96,18 +100,14 @@ void PositionableWaveDisplay::setWaveformColour (Colour newWaveformColour)
 //====================================================================================
 void PositionableWaveDisplay::resized()
 {
-    cursorImage = Image (Image::RGB, 3, jmax (1, getHeight()), true);
-    Graphics g (cursorImage);
-    g.fillAll (Colours::black);
-    g.setColour (Colours::white);
-	g.drawVerticalLine (1, 0.0f, (float) cursorImage.getHeight());
+    const ScopedLock sl (imageLock);
     
-    if (audioThumbnailImage.hasFinishedLoading()) 
-    {
-        cachedImage = audioThumbnailImage.getImage();
-        cachedImage.duplicateIfShared();
-        cachedImage = cachedImage.rescaled (getWidth(), getHeight());
-    }
+    cachedImage = Image (Image::RGB, jmax (1, int (getWidth() / zoomRatio)), jmax (1, getHeight()), false);
+    cachedImage.clear (cachedImage.getBounds(), backgroundColour);
+
+    refreshCachedImage();
+    
+    audioTransportCursor.setBounds (getLocalBounds());
 }
 
 void PositionableWaveDisplay::paint(Graphics &g)
@@ -118,34 +118,16 @@ void PositionableWaveDisplay::paint(Graphics &g)
     g.setColour (backgroundColour);	
     g.fillAll();
         
+    const int newWidth = roundToInt (w / zoomRatio);
     const int startPixelX = roundToInt (w * startOffsetRatio);
     const int newHeight = roundToInt (verticalZoomRatio * h);
     const int startPixelY = roundToInt ((h * 0.5f) - (newHeight * 0.5f));
 
-	g.drawImage (cachedImage,
-                 startPixelX, startPixelY, w, newHeight,
-                 0, 0, roundToInt (cachedImage.getWidth() * zoomRatio), cachedImage.getHeight(), 
+    const ScopedLock sl (imageLock);
+    g.drawImage (cachedImage,
+                 startPixelX, startPixelY, newWidth, newHeight,
+                 0, 0, cachedImage.getWidth(), cachedImage.getHeight(), 
                  false);
-
-    if (showTransportCursor)
-        g.drawImageAt (cursorImage, transportLineXCoord.getCurrent() - 1, 0);
-}
-
-//====================================================================================
-void PositionableWaveDisplay::timerCallback()
-{
-    const int w = getWidth();
-    const int h = getHeight();
-
-    const int startPixel = roundToInt (w * startOffsetRatio);
-    transportLineXCoord = startPixel + roundToInt ((w * oneOverFileLength * audioFilePlayer->getCurrentPosition()) / zoomRatio);
-    
-    // if the line has moved repaint the old and new positions of it
-    if (! transportLineXCoord.areEqual())
-    {
-        repaint (transportLineXCoord.getPrevious() - 2, 0, 5, h);
-        repaint (transportLineXCoord.getCurrent() - 2, 0, 5, h);
-	}
 }
 
 //====================================================================================
@@ -153,88 +135,63 @@ void PositionableWaveDisplay::imageChanged (AudioThumbnailImage* changedAudioThu
 {
 	if (changedAudioThumbnailImage == &audioThumbnailImage)
 	{
-        cachedImage = Image::null;
-
-        AudioFormatReaderSource* readerSource = audioFilePlayer->getAudioFormatReaderSource();
+        {
+            const ScopedLock sl (imageLock);
+            cachedImage.clear (cachedImage.getBounds(), backgroundColour);
+        }
+        
+        AudioFormatReaderSource* readerSource = audioFilePlayer.getAudioFormatReaderSource();
+        
         AudioFormatReader* reader = nullptr;
         if (readerSource != nullptr)
             reader = readerSource->getAudioFormatReader();
         
-        if (reader != nullptr && reader->sampleRate > 0.0)
+        if (reader != nullptr && reader->sampleRate > 0.0
+            && audioFilePlayer.getLengthInSeconds() > 0.0)
         {
             currentSampleRate = reader->sampleRate;
-            fileLength = audioFilePlayer->getLengthInSeconds();
+            fileLength = audioFilePlayer.getLengthInSeconds();
             oneOverFileLength = 1.0 / fileLength;
-            
-            if (showTransportCursor)
-                startTimer (40);		
+
+            refreshCachedImage();
         }
         else 
         {
             currentSampleRate = 44100;
             fileLength = 0.0;
-            oneOverFileLength = 1.0 / fileLength;
+            oneOverFileLength = 1.0;
         }
 	}
 }
 
-void PositionableWaveDisplay::imageUpdated (AudioThumbnailImage* changedAudioThumbnailImage)
+int PositionableWaveDisplay::useTimeSlice()
 {
-    if (changedAudioThumbnailImage == &audioThumbnailImage)
+    const ScopedLock sl (imageLock);
+
+    drawTimes = audioThumbnailImage.getTimeRendered();
+    
+    if (! drawTimes.areEqual())
     {
-        cachedImage = audioThumbnailImage.getImage();
-        repaint();
-    }
-}
-
-void PositionableWaveDisplay::imageFinished (AudioThumbnailImage* changedAudioThumbnailImage)
-{
-    if (changedAudioThumbnailImage == &audioThumbnailImage)
-    {
-        resized();
-    }
-}
-
-//==============================================================================
-void PositionableWaveDisplay::mouseDown (const MouseEvent &e)
-{
-    if (showTransportCursor)
-    {
-        setMouseCursor (MouseCursor::IBeamCursor);
-        currentMouseX = e.x;
-
-        const int w = getWidth();
-        currentXScale = (float) ((fileLength / w) * zoomRatio);
-
-        const int startPixel = roundToInt (w * startOffsetRatio);
-        double position = currentXScale * (currentMouseX - startPixel);
-        audioFilePlayer->setPosition (position, true);
-
-        repaint();
-    }
-}
-
-void PositionableWaveDisplay::mouseUp (const MouseEvent& /*e*/)
-{
-    if (showTransportCursor)
-    {
-        setMouseCursor (MouseCursor::NormalCursor);
-    }
-}
-
-void PositionableWaveDisplay::mouseDrag (const MouseEvent& e)
-{
-    if (showTransportCursor)
-    {
-        currentMouseX = e.x;
+        cachedImage = audioThumbnailImage.getImage()
+                       .rescaled (cachedImage.getWidth(), cachedImage.getHeight());
         
-        const int w = getWidth();
-        const int startPixel = roundToInt (w * startOffsetRatio);
-        double position = currentXScale * (currentMouseX - startPixel);
-        audioFilePlayer->setPosition (position, false);
+        triggerAsyncUpdate();
     }
-//	double position = currentXScale * currentMouseX;
-//	audioFilePlayer->setPositionIgnoringLoop (position);
+    
+    if (audioThumbnailImage.hasFinishedLoading())
+        threadToUse.removeTimeSliceClient (this);
+    
+    return 100;
 }
 
-END_JUCE_NAMESPACE
+void PositionableWaveDisplay::handleAsyncUpdate()
+{
+    repaint();
+}
+
+//====================================================================================
+void PositionableWaveDisplay::refreshCachedImage()
+{
+    drawTimes.setBoth (0.0);
+    threadToUse.addTimeSliceClient (this);
+}

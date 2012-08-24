@@ -18,9 +18,8 @@
   ==============================================================================
 */
 
-#if JUCE_UNIT_TESTS
+#if DROWAUDIO_UNIT_TESTS
 
-BEGIN_JUCE_NAMESPACE
 
 //==============================================================================
 class CumulativeMovingAverageTests  : public UnitTest
@@ -64,6 +63,6 @@ public:
 static MathsUnitTests mathsUnitTests;
 
 //==============================================================================
-END_JUCE_NAMESPACE
 
-#endif //JUCE_UNIT_TEST
+
+#endif // DROWAUDIO_UNIT_TESTS

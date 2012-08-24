@@ -51,7 +51,7 @@ public:
 	explicit AudioThumbnailImage (AudioFilePlayer* sourceToBeUsed,
                                   TimeSliceThread& backgroundThread,
                                   AudioThumbnailCache* cacheToUse = nullptr,
-                                  AudioThumbnail* thumbnailToUse = nullptr,
+                                  AudioThumbnailBase* thumbnailToUse = nullptr,
                                   int sourceSamplesPerThumbnailSample = 512);
 	
 	/** Destructor. */
@@ -81,7 +81,11 @@ public:
     
     /** Returns the AudioFilePlayer currently being used.
      */
-    AudioFilePlayer* getAudioFilePlayer()           {   return filePlayer;  }
+    AudioFilePlayer* getAudioFilePlayer()           {   return filePlayer;      }
+    
+    /** Retuns the ammount of time that has been rendered.
+     */
+    double getTimeRendered()                        {   return lastTimeDrawn;   }
     
     /** Returns true if the Image has finished rendering;
      */
@@ -154,10 +158,10 @@ private:
 	double fileLength, oneOverFileLength, currentSampleRate, oneOverSampleRate;
 	
 	// thumbnail classes
-    CriticalSection lock;
+    ReadWriteLock imageLock;
     TimeSliceThread& backgroundThread;
 	OptionalScopedPointer<AudioThumbnailCache> audioThumbnailCache;
-	OptionalScopedPointer<AudioThumbnail> audioThumbnail;
+	OptionalScopedPointer<AudioThumbnailBase> audioThumbnail;
     int sourceSamplesPerThumbnailSample;
 	
 	Image waveformImage, tempSectionImage;

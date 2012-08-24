@@ -217,12 +217,14 @@ void Joystick::paint (Graphics& g)
     g.drawEllipse (draw_x - 4, draw_y - 4, 9, 9, 1.0);
 
     // Draw inset bevel --------------------------------
+    /*
     g.drawBevel (0, 0,
                  getWidth(), getHeight(),
                  2,
                  insetDarkColour,
                  insetLightColour,
                  true);
+                 */
 }
 
 //==============================================================================
@@ -419,7 +421,9 @@ void Joystick::addListener (JoystickListener* const listener)
 
 void Joystick::removeListener (JoystickListener* const listener)
 {
-    listeners.removeValue (listener);
+    int index = listeners.indexOf (listener);
+    if (index >= 0)
+        listeners.remove (index);
 }
 
 void Joystick::sendChanges()

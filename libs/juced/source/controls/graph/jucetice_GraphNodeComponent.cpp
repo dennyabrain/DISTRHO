@@ -41,8 +41,8 @@ GraphNodeComponent::GraphNodeComponent ()
     originalX (0),
     originalY (0),
     lastX (0),
-    lastY (0),
-    dropShadower (0.5f, 0, 1, 2.0f)
+    lastY (0)/*,
+    dropShadower (0.5f, 0, 1, 2.0f)*/
 {
     setBufferedToImage (false);
     setOpaque (true);
@@ -50,7 +50,7 @@ GraphNodeComponent::GraphNodeComponent ()
 
     constrainer.setMinimumOnscreenAmounts (9999,9999,9999,9999);
 
-    dropShadower.setOwner (this);
+    //dropShadower.setOwner (this);
 }
 
 GraphNodeComponent::~GraphNodeComponent()
