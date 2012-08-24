@@ -1,5 +1,9 @@
 #include "RotatingToggleButton.h"
 
+#if JUCE_MINGW
+ #define M_PI 3.14159265358979323846
+#endif
+
 RotatingToggleButton::RotatingToggleButton(const String& buttonText):
 	ToggleButton(buttonText), rotationState(0.0)
 {

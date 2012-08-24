@@ -28,9 +28,8 @@
 #include <omp.h>
 #endif
 
-#ifdef _WINDOWS
+#if JUCE_WINDOWS
 #include <malloc.h>
-#define alloca _alloca
 #else
 #include <alloca.h>
 #endif

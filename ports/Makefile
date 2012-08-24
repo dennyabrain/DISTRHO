@@ -19,18 +19,18 @@ standalone:
 	$(MAKE) -C arctican-pilgrim/Standalone
 	$(MAKE) -C argotlunar/Standalone
 	$(MAKE) -C bitmangler/Standalone
-	$(MAKE) -C capsaicin/Standalone
-	$(MAKE) -C drowaudio-distortion/Standalone
-	$(MAKE) -C drowaudio-distortionshaper/Standalone
-	$(MAKE) -C drowaudio-flanger/Standalone
-	$(MAKE) -C drowaudio-reverb/Standalone
-	$(MAKE) -C drowaudio-tremolo/Standalone
+# 	$(MAKE) -C capsaicin/Standalone
+# 	$(MAKE) -C drowaudio-distortion/Standalone
+# 	$(MAKE) -C drowaudio-distortionshaper/Standalone
+# 	$(MAKE) -C drowaudio-flanger/Standalone
+# 	$(MAKE) -C drowaudio-reverb/Standalone
+# 	$(MAKE) -C drowaudio-tremolo/Standalone
 	$(MAKE) -C drumsynth/Standalone
-	$(MAKE) -C eqinox/Standalone
-	$(MAKE) -C highlife/Standalone
+# 	$(MAKE) -C eqinox/Standalone
+# 	$(MAKE) -C highlife/Standalone
 	$(MAKE) -C hybridreverb2/Standalone
 	$(MAKE) -C juce-demo-plugin/Standalone
-	$(MAKE) -C juce_pitcher/Standalone
+# 	$(MAKE) -C juce_pitcher/Standalone
 	$(MAKE) -C sDelay/Standalone
 	$(MAKE) -C tal-dub-3/Standalone
 	$(MAKE) -C tal-filter/Standalone
@@ -40,7 +40,7 @@ standalone:
 	$(MAKE) -C tal-reverb-2/Standalone
 	$(MAKE) -C tal-reverb-3/Standalone
 	$(MAKE) -C tal-vocoder-2/Standalone
-	$(MAKE) -C vex/Standalone
+# 	$(MAKE) -C vex/Standalone
 	$(MAKE) -C wolpertinger/Standalone
 
 lv2:

@@ -55,7 +55,7 @@ public:
 
 		g.setColour(Colour((const juce::uint8)200, (const juce::uint8)200, (const juce::uint8)200));	
 
-		g.setFont(12.0f, Font::plain);
+		g.setFont(12.0f);
 		if (!customValueText)
 		{
 			valueText = juce::String(getValue(), 2); //  << T("dB");

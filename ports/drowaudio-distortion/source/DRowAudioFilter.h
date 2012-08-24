@@ -34,6 +34,8 @@
 
 #include "includes.h"
 #include "Parameters.h"
+#include "dRowAudio_PluginParameter.h"
+#include "dRowAudio_OnePoleFilter.h"
 
 //==============================================================================
 /**

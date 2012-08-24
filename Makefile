@@ -45,7 +45,7 @@ standalone:
 	$(MAKE) -C libs/juce-2.0
 	$(MAKE) -C libs/drowaudio
 	$(MAKE) -C libs/juced
-	$(MAKE) standalone -C plugins
+# 	$(MAKE) standalone -C plugins
 	$(MAKE) standalone -C ports
 
 lv2:
