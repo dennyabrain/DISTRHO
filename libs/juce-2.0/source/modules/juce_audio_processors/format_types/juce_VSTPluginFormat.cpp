@@ -46,6 +46,11 @@
 #if JUCE_MSVC
  #pragma warning (push)
  #pragma warning (disable: 4996)
+#elif JUCE_MINGW
+ extern "C" {
+   void _fpreset();
+   void _clearfp();
+ }
 #else
  #define __cdecl
 #endif

@@ -133,4 +133,8 @@ private:
     const StandaloneFilterApplication& operator= (const StandaloneFilterApplication&);
 };
 
+#if JUCE_WINDOWS
+ #include <windows.h>
+#endif
+
 START_JUCE_APPLICATION(StandaloneFilterApplication)

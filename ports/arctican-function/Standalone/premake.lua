@@ -28,6 +28,10 @@ package.config["Debug"].buildoptions   = { "-O0 -ggdb" }
 if (windows) then
   package.defines      = { package.defines, "WINDOWS=1" }
   package.buildoptions = { "-fpermissive -std=c++0x" }
+  package.links        = { "kernel32", "user32", "gdi32", "comdlg32", "advapi32", "shell32", "ole32", "oleaut32", "uuid", "winmm", "wsock32", "ws2_32", "shlwapi", "version", "imm32", "gdi32", "wininet" }
+  package.linkoptions  = { "-static -mwindows" }
+--   kernel32 -luser32 -lgdi32 -lcomdlg32 -ladvapi32 -lshell32
+-- -lole32 -loleaut32 -luuid -limm32 -lwinmm -lwsock32
 elseif (macosx) then
   package.defines      = { package.defines, "MAC=1" }
   package.buildoptions = { "-ObjC++" }
