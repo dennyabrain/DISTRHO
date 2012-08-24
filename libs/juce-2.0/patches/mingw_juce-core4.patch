@@ -1,0 +1,13 @@
+diff --git a/modules/juce_core/native/juce_BasicNativeHeaders.h b/modules/juce_core/native/juce_BasicNativeHeaders.h
+index 074506f..5e2ba74 100644
+--- a/modules/juce_core/native/juce_BasicNativeHeaders.h
++++ b/modules/juce_core/native/juce_BasicNativeHeaders.h
+@@ -84,7 +84,7 @@
+  #define STRICT 1
+  #define WIN32_LEAN_AND_MEAN 1
+  #if JUCE_MINGW
+-  #define _WIN32_WINNT 0x0501
++  #define _WIN32_WINNT 0x0502
+  #else
+   #define _WIN32_WINNT 0x0600
+  #endif
