@@ -46,7 +46,7 @@
 
 /** The name of your plugin. (Try to keep this as short as possible)
 */
-#define JucePlugin_Name                     "dRowAudio: Distortion"
+#define JucePlugin_Name                     "dRowAudio Distortion"
 
 /** A longer decription of your plugin.
 */
@@ -270,6 +270,8 @@
     don't put a slash on the end.
 */
 #define JucePlugin_WinBag_path              "C:\\essentials\\PT_73_SDK\\WinBag"
+
+#define JucePlugin_TailLengthSeconds 0
 
 #define JucePlugin_LV2URI               "http://www.drowaudio.co.uk/audio/audio_plugins/distortion"
 #define JucePlugin_LV2Category          "DistortionPlugin"

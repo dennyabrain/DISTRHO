@@ -284,8 +284,6 @@ void DRowAudioFilter::releaseResources()
 void DRowAudioFilter::processBlock (AudioSampleBuffer& buffer,
 									MidiBuffer& midiMessages)
 {
-      using namespace drow;
-
 	smoothParameters();
 	const int numInputChannels = getNumInputChannels();
 	int numSamples = buffer.getNumSamples();		
@@ -462,7 +460,7 @@ void DRowAudioFilter::refillBuffer()
 	{
 		x += bufferIncriment;
 		x = jlimit(0.0f, 1.0f, x);
-		distortionBuffer[i] = drow::BezierCurve::cubicBezierNearlyThroughTwoPoints(x,
+		distortionBuffer[i] = BezierCurve::cubicBezierNearlyThroughTwoPoints(x,
 																			 params[X1].getValue(),
 																			 params[Y1].getValue(),
 																			 params[X2].getValue(),

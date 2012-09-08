@@ -90,13 +90,13 @@ DRowAudioEditorComponent::DRowAudioEditorComponent (DRowAudioFilter* const owner
 		addAndMakeVisible(buttons[i]);
 	}
 	buttons[0]->setClickingTogglesState(true);
-	buttons[0]->addButtonListener(this);
+	buttons[0]->addListener(this);
 	
 	buttons[1]->setClickingTogglesState(true);
-	buttons[1]->addButtonListener(this);
+	buttons[1]->addListener(this);
 	
 	buttons[2]->setClickingTogglesState(true);
-	buttons[2]->addButtonListener(this);
+	buttons[2]->addListener(this);
 	
 	// set up the meters
 	addAndMakeVisible(meterLeft = new MeterComponent(&ownerFilter->RMSLeft, &ownerFilter->peakLeft, &ownerFilter->getCallbackLock()));

@@ -33,8 +33,6 @@
 #define _DROWAUDIOFILTER_H_
 
 #include "Parameters.h"
-#include "dRowAudio_PluginParameter.h"
-#include "dRowAudio_OnePoleFilter.h"
 
 //==============================================================================
 /**

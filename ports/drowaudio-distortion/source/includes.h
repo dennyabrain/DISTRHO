@@ -34,3 +34,4 @@
 #include "dRowAudio.h"
 
 using namespace juce;
+using namespace drow;

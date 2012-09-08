@@ -20,10 +20,10 @@ standalone:
 	$(MAKE) -C argotlunar/Standalone
 	$(MAKE) -C bitmangler/Standalone
 	$(MAKE) -C capsaicin/Standalone
-# 	$(MAKE) -C drowaudio-distortion/Standalone
-# 	$(MAKE) -C drowaudio-distortionshaper/Standalone
-# 	$(MAKE) -C drowaudio-flanger/Standalone
-# 	$(MAKE) -C drowaudio-reverb/Standalone
+	$(MAKE) -C drowaudio-distortion/Standalone
+	$(MAKE) -C drowaudio-distortionshaper/Standalone
+	$(MAKE) -C drowaudio-flanger/Standalone
+	$(MAKE) -C drowaudio-reverb/Standalone
 	$(MAKE) -C drowaudio-tremolo/Standalone
 	$(MAKE) -C drumsynth/Standalone
 	$(MAKE) -C eqinox/Standalone

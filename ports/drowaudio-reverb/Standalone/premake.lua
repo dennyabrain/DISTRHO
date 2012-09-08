@@ -43,8 +43,8 @@ end
 
 package.includepaths = {
   "../source",
-  "../../../libs/juce-2.0/source",
   "../../../libs/drowaudio/source",
+  "../../../libs/juce-2.0/source",
   "../../../libs/juce-plugin"
 }
 
