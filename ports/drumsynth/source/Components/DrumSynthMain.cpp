@@ -86,13 +86,13 @@ DrumSynthMain::DrumSynthMain (DrumSynthPlugin* plugin_, DrumSynthComponent* edit
     addAndMakeVisible (importButton = new TextButton (String::empty));
     importButton->setButtonText (T("preset"));
     importButton->setConnectedEdges (Button::ConnectedOnBottom);
-    importButton->addButtonListener (this);
+    importButton->addListener (this);
     importButton->setColour (TextButton::buttonColourId, Colour (0xffc8c8c8));
 
     addAndMakeVisible (exportButton = new TextButton (String::empty));
     exportButton->setButtonText (T("preset"));
     exportButton->setConnectedEdges (Button::ConnectedOnBottom);
-    exportButton->addButtonListener (this);
+    exportButton->addListener (this);
     exportButton->setColour (TextButton::buttonColourId, Colour (0xff7c7c7c));
 
     addAndMakeVisible (currentDrum = new Slider (String::empty));
@@ -187,12 +187,12 @@ DrumSynthMain::DrumSynthMain (DrumSynthPlugin* plugin_, DrumSynthComponent* edit
 
     addAndMakeVisible (filterButton = new ParameterLedButton (String::empty));
     filterButton->setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight);
-    filterButton->addButtonListener (this);
+    filterButton->addListener (this);
     filterButton->setColour (TextButton::buttonColourId, Colour (0xab000000));
 
     addAndMakeVisible (hipassButton = new ParameterLedButton (String::empty));
     hipassButton->setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight);
-    hipassButton->addButtonListener (this);
+    hipassButton->addListener (this);
     hipassButton->setColour (TextButton::buttonColourId, Colour (0xab000000));
 
     addAndMakeVisible (envelopeTabs = new TabbedComponent (TabbedButtonBar::TabsAtBottom));
@@ -208,7 +208,7 @@ DrumSynthMain::DrumSynthMain (DrumSynthPlugin* plugin_, DrumSynthComponent* edit
 
     addAndMakeVisible (panicButton = new TextButton (String::empty));
     panicButton->setButtonText (T("Panic"));
-    panicButton->addButtonListener (this);
+    panicButton->addListener (this);
     panicButton->setColour (TextButton::buttonColourId, Colour (0xffedb292));
 
     addAndMakeVisible (toneLevelSlider = new ParameterSlider (String::empty));
@@ -263,12 +263,12 @@ DrumSynthMain::DrumSynthMain (DrumSynthPlugin* plugin_, DrumSynthComponent* edit
 
     addAndMakeVisible (toneOnButton = new ParameterLedButton (String::empty));
     toneOnButton->setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight);
-    toneOnButton->addButtonListener (this);
+    toneOnButton->addListener (this);
     toneOnButton->setColour (TextButton::buttonColourId, Colour (0xab000000));
 
     addAndMakeVisible (overOnButton = new ParameterLedButton (String::empty));
     overOnButton->setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight);
-    overOnButton->addButtonListener (this);
+    overOnButton->addListener (this);
     overOnButton->setColour (TextButton::buttonColourId, Colour (0xab000000));
 
     addAndMakeVisible (overLevelSlider = new ParameterSlider (String::empty));
@@ -293,22 +293,22 @@ DrumSynthMain::DrumSynthMain (DrumSynthPlugin* plugin_, DrumSynthComponent* edit
 
     addAndMakeVisible (overFilterButton = new ParameterLedButton (String::empty));
     overFilterButton->setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight);
-    overFilterButton->addButtonListener (this);
+    overFilterButton->addListener (this);
     overFilterButton->setColour (TextButton::buttonColourId, Colour (0xab000000));
 
     addAndMakeVisible (overMethod1Button = new ParameterLedButton (String::empty));
     overMethod1Button->setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight);
-    overMethod1Button->addButtonListener (this);
+    overMethod1Button->addListener (this);
     overMethod1Button->setColour (TextButton::buttonColourId, Colour (0xab000000));
 
     addAndMakeVisible (overMethod2Button = new ParameterLedButton (String::empty));
     overMethod2Button->setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight);
-    overMethod2Button->addButtonListener (this);
+    overMethod2Button->addListener (this);
     overMethod2Button->setColour (TextButton::buttonColourId, Colour (0xab000000));
 
     addAndMakeVisible (overMethod3Button = new ParameterLedButton (String::empty));
     overMethod3Button->setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight);
-    overMethod3Button->addButtonListener (this);
+    overMethod3Button->addListener (this);
     overMethod3Button->setColour (TextButton::buttonColourId, Colour (0xab000000));
 
     addAndMakeVisible (overFreq1Slider = new ParameterSlider (String::empty));
@@ -333,12 +333,12 @@ DrumSynthMain::DrumSynthMain (DrumSynthPlugin* plugin_, DrumSynthComponent* edit
 
     addAndMakeVisible (overTrack1Button = new ParameterLedButton (String::empty));
     overTrack1Button->setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight);
-    overTrack1Button->addButtonListener (this);
+    overTrack1Button->addListener (this);
     overTrack1Button->setColour (TextButton::buttonColourId, Colour (0xab000000));
 
     addAndMakeVisible (overTrack2Button = new ParameterLedButton (String::empty));
     overTrack2Button->setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight);
-    overTrack2Button->addButtonListener (this);
+    overTrack2Button->addListener (this);
     overTrack2Button->setColour (TextButton::buttonColourId, Colour (0xab000000));
 
     addAndMakeVisible (overWave1Slider = new ParameterSlider (String::empty));
@@ -393,12 +393,12 @@ DrumSynthMain::DrumSynthMain (DrumSynthPlugin* plugin_, DrumSynthComponent* edit
 
     addAndMakeVisible (band1OnButton = new ParameterLedButton (String::empty));
     band1OnButton->setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight);
-    band1OnButton->addButtonListener (this);
+    band1OnButton->addListener (this);
     band1OnButton->setColour (TextButton::buttonColourId, Colour (0xab000000));
 
     addAndMakeVisible (band2OnButton = new ParameterLedButton (String::empty));
     band2OnButton->setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight);
-    band2OnButton->addButtonListener (this);
+    band2OnButton->addListener (this);
     band2OnButton->setColour (TextButton::buttonColourId, Colour (0xab000000));
 
     addAndMakeVisible (band2LevelSlider = new ParameterSlider (String::empty));
@@ -433,7 +433,7 @@ DrumSynthMain::DrumSynthMain (DrumSynthPlugin* plugin_, DrumSynthComponent* edit
 
     addAndMakeVisible (noiseOnButton = new ParameterLedButton (String::empty));
     noiseOnButton->setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight);
-    noiseOnButton->addButtonListener (this);
+    noiseOnButton->addListener (this);
     noiseOnButton->setColour (TextButton::buttonColourId, Colour (0xab000000));
 
     addAndMakeVisible (noiseLevelSlider = new ParameterSlider (String::empty));
@@ -459,13 +459,13 @@ DrumSynthMain::DrumSynthMain (DrumSynthPlugin* plugin_, DrumSynthComponent* edit
     addAndMakeVisible (importBankButton = new TextButton (String::empty));
     importBankButton->setButtonText (T("bank"));
     importBankButton->setConnectedEdges (Button::ConnectedOnTop);
-    importBankButton->addButtonListener (this);
+    importBankButton->addListener (this);
     importBankButton->setColour (TextButton::buttonColourId, Colour (0xffc8c8c8));
 
     addAndMakeVisible (exportBankButton = new TextButton (String::empty));
     exportBankButton->setButtonText (T("bank"));
     exportBankButton->setConnectedEdges (Button::ConnectedOnTop);
-    exportBankButton->addButtonListener (this);
+    exportBankButton->addListener (this);
     exportBankButton->setColour (TextButton::buttonColourId, Colour (0xff7c7c7c));
 
 

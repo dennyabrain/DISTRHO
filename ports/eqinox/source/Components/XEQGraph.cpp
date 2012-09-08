@@ -197,12 +197,13 @@ void EQGraph::paint (Graphics& g)
     g.fillEllipse (0.0f, (float) (-80), getWidth (), 158.0f);
 
     // draw bevel
-    g.drawBevel (0, 0,
-                 getWidth(), getHeight(),
-                 2,
-                 Colour (0xff828282).darker (0.5f),
-                 Colour (0xff828282).brighter (0.5f),
-                 true);
+    LookAndFeel::drawBevel (g,
+                            0, 0,
+                            getWidth(), getHeight(),
+                            2,
+                            Colour (0xff828282).darker (0.5f),
+                            Colour (0xff828282).brighter (0.5f),
+                            true);
 }
 
 void EQGraph::resized ()

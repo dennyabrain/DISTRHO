@@ -86,7 +86,7 @@ XSynthMixerStrip::XSynthMixerStrip (XSynthPlugin* plugin_, Master* master_, cons
     addAndMakeVisible (editButton = new TextButton (String::empty));
     editButton->setButtonText (T("EDIT"));
     editButton->setConnectedEdges (Button::ConnectedOnBottom);
-    editButton->addButtonListener (this);
+    editButton->addListener (this);
 
     addAndMakeVisible (volumeLabel = new Label (T("new label"),
                                                 T("GAIN")));
@@ -111,7 +111,7 @@ XSynthMixerStrip::XSynthMixerStrip (XSynthPlugin* plugin_, Master* master_, cons
     addAndMakeVisible (muteButton = new TextButton (String::empty));
     muteButton->setButtonText (T("MUTE"));
     muteButton->setConnectedEdges (Button::ConnectedOnTop | Button::ConnectedOnBottom);
-    muteButton->addButtonListener (this);
+    muteButton->addListener (this);
     muteButton->setColour (TextButton::buttonColourId, Colours::grey);
     muteButton->setColour (TextButton::buttonOnColourId, Colour (0xff970600));
     muteButton->setColour (TextButton::textColourOnId, Colours::black);
@@ -119,7 +119,7 @@ XSynthMixerStrip::XSynthMixerStrip (XSynthPlugin* plugin_, Master* master_, cons
     addAndMakeVisible (soloButton = new TextButton (String::empty));
     soloButton->setButtonText (T("SOLO"));
     soloButton->setConnectedEdges (Button::ConnectedOnTop);
-    soloButton->addButtonListener (this);
+    soloButton->addListener (this);
     soloButton->setColour (TextButton::buttonColourId, Colours::grey);
     soloButton->setColour (TextButton::buttonOnColourId, Colour (0xff055c0d));
     soloButton->setColour (TextButton::textColourOnId, Colours::black);

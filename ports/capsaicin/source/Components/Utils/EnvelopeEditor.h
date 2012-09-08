@@ -146,12 +146,13 @@ public:
         }
 
         // draw bevel inside
-        g.drawBevel (0, 0,
-                     getWidth(), getHeight(),
-                     2,
-                     Colour (0xff827474).darker (0.5f),
-                     Colour (0xff827474).brighter (0.5f),
-                     true);
+        LookAndFeel::drawBevel (g,
+                                0, 0,
+                                getWidth(), getHeight(),
+                                2,
+                                Colour (0xff827474).darker (0.5f),
+                                Colour (0xff827474).brighter (0.5f),
+                                true);
     }
 
     //==============================================================================

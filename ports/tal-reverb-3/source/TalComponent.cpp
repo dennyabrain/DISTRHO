@@ -76,7 +76,7 @@ ImageToggleButton* TalComponent::addNormalButton(Component *component, int x, in
 	component->addAndMakeVisible(imageToggleButton = new ImageToggleButton("Toggle Button", buttonImage, false, isKickButton, parameter));
     imageToggleButton->setBounds(x, y, buttonImage.getWidth(), buttonImage.getHeight() / 2);
 	imageToggleButton->setToggleState(ownerFilter->getParameter(parameter) > 0.0f, false);
-	imageToggleButton->addButtonListener(this);
+	imageToggleButton->addListener(this);
 	return imageToggleButton;
 }
 

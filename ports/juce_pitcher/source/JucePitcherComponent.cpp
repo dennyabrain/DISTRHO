@@ -280,7 +280,7 @@ JucePitcherComponent::JucePitcherComponent (JucePitcherFilter* const ownerFilter
 
     addAndMakeVisible (voxRemoveToggle = new ToggleButton (T("vox Remove Toggle")));
     voxRemoveToggle->setButtonText (String::empty);
-    voxRemoveToggle->addButtonListener (this);
+    voxRemoveToggle->addListener (this);
 
     addAndMakeVisible (label16 = new Label (T("new label"),
                                             T("Enable")));
@@ -302,12 +302,12 @@ JucePitcherComponent::JucePitcherComponent (JucePitcherFilter* const ownerFilter
 
     addAndMakeVisible (filter0EnableToggle = new ToggleButton (T("vox Remove Toggle")));
     filter0EnableToggle->setButtonText (String::empty);
-    filter0EnableToggle->addButtonListener (this);
+    filter0EnableToggle->addListener (this);
     filter0EnableToggle->setToggleState (true, false);
 
     addAndMakeVisible (filter1EnableToggle = new ToggleButton (T("vox Remove Toggle")));
     filter1EnableToggle->setButtonText (String::empty);
-    filter1EnableToggle->addButtonListener (this);
+    filter1EnableToggle->addListener (this);
     filter1EnableToggle->setToggleState (true, false);
 
     addAndMakeVisible (label18 = new Label (T("new label"),
@@ -339,7 +339,7 @@ JucePitcherComponent::JucePitcherComponent (JucePitcherFilter* const ownerFilter
 
     addAndMakeVisible (pitchShiftEnable = new ToggleButton (T("pitchShiftEnable")));
     pitchShiftEnable->setButtonText (String::empty);
-    pitchShiftEnable->addButtonListener (this);
+    pitchShiftEnable->addListener (this);
 
     addAndMakeVisible (label20 = new Label (T("new label"),
                                             T("Enable")));

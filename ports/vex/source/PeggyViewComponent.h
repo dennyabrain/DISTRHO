@@ -134,7 +134,7 @@ public:
 		
 		addAndMakeVisible (onOffBtn = new ToggleButton (T("new button")));
 		onOffBtn->setButtonText (String(T("On")));
-		onOffBtn->addButtonListener (this);
+		onOffBtn->addListener (this);
 		onOffBtn->setClickingTogglesState(true);
 		onOffBtn->setToggleState(false,false);
 

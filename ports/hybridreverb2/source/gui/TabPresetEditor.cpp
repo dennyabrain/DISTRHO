@@ -162,7 +162,7 @@ TabPresetEditor::TabPresetEditor (MasterAndCommander *m)
 
     addAndMakeVisible (textButtonChooserLL = new TextButton (T("new button")));
     textButtonChooserLL->setButtonText (T("..."));
-    textButtonChooserLL->addButtonListener (this);
+    textButtonChooserLL->addListener (this);
 
     addAndMakeVisible (textEditorFileLL = new TextEditor (T("textEditorFileLL")));
     textEditorFileLL->setMultiLine (false);
@@ -202,15 +202,15 @@ TabPresetEditor::TabPresetEditor (MasterAndCommander *m)
 
     addAndMakeVisible (textButtonChooserLR = new TextButton (T("new button")));
     textButtonChooserLR->setButtonText (T("..."));
-    textButtonChooserLR->addButtonListener (this);
+    textButtonChooserLR->addListener (this);
 
     addAndMakeVisible (textButtonChooserRL = new TextButton (T("new button")));
     textButtonChooserRL->setButtonText (T("..."));
-    textButtonChooserRL->addButtonListener (this);
+    textButtonChooserRL->addListener (this);
 
     addAndMakeVisible (textButtonChooserRR = new TextButton (T("new button")));
     textButtonChooserRR->setButtonText (T("..."));
-    textButtonChooserRR->addButtonListener (this);
+    textButtonChooserRR->addListener (this);
 
     addAndMakeVisible (textEditorNotes = new TextEditor (T("textEditorNotes")));
     textEditorNotes->setMultiLine (true);
@@ -268,27 +268,27 @@ TabPresetEditor::TabPresetEditor (MasterAndCommander *m)
 
     addAndMakeVisible (textButtonSave = new TextButton (T("new button")));
     textButtonSave->setButtonText (T("Save"));
-    textButtonSave->addButtonListener (this);
+    textButtonSave->addListener (this);
 
     addAndMakeVisible (textButtonSaveAs = new TextButton (T("new button")));
     textButtonSaveAs->setButtonText (T("Save as..."));
-    textButtonSaveAs->addButtonListener (this);
+    textButtonSaveAs->addListener (this);
 
     addAndMakeVisible (textButtonApply = new TextButton (T("new button")));
     textButtonApply->setButtonText (T("Apply"));
-    textButtonApply->addButtonListener (this);
+    textButtonApply->addListener (this);
 
     addAndMakeVisible (textButtonOpen = new TextButton (T("new button")));
     textButtonOpen->setButtonText (T("Open..."));
-    textButtonOpen->addButtonListener (this);
+    textButtonOpen->addListener (this);
 
     addAndMakeVisible (textButtonAdd = new TextButton (T("new button")));
     textButtonAdd->setButtonText (T("Add"));
-    textButtonAdd->addButtonListener (this);
+    textButtonAdd->addListener (this);
 
     addAndMakeVisible (textButtonDelete = new TextButton (T("new button")));
     textButtonDelete->setButtonText (T("Delete"));
-    textButtonDelete->addButtonListener (this);
+    textButtonDelete->addListener (this);
 
 
     //[UserPreSize]

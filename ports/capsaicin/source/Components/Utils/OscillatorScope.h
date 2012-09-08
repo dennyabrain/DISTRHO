@@ -103,12 +103,13 @@ public:
         g.setColour (Colours::lightblue);
         g.strokePath (path, PathStrokeType (2.0f));
 
-        g.drawBevel (0, 0,
-                     getWidth(), getHeight(),
-                     2,
-                     Colour (0xff827474).darker (0.5f),
-                     Colour (0xff827474).brighter (0.5f),
-                     true);
+        LookAndFeel::drawBevel (g,
+                                0, 0,
+                                getWidth(), getHeight(),
+                                2,
+                                Colour (0xff827474).darker (0.5f),
+                                Colour (0xff827474).brighter (0.5f),
+                                true);
     }
 
     //==============================================================================

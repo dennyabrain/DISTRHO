@@ -42,21 +42,21 @@ XSynthTitleBar::XSynthTitleBar (XSynthPlugin* const plugin_, Master* const maste
     addAndMakeVisible (panicButton = new TextButton (String::empty));
     panicButton->setButtonText (T("Stop"));
     panicButton->setConnectedEdges (Button::ConnectedOnLeft);
-    panicButton->addButtonListener (this);
+    panicButton->addListener (this);
     panicButton->setColour (TextButton::buttonColourId, Colour (0xffcd4545));
     panicButton->setColour (TextButton::textColourOnId, Colours::black);
 
     addAndMakeVisible (loadButton = new TextButton (String::empty));
     loadButton->setButtonText (T("Load"));
     loadButton->setConnectedEdges (Button::ConnectedOnRight);
-    loadButton->addButtonListener (this);
+    loadButton->addListener (this);
     loadButton->setColour (TextButton::buttonColourId, Colour (0xff9cc5df));
     loadButton->setColour (TextButton::textColourOnId, Colours::black);
 
     addAndMakeVisible (saveButton = new TextButton (String::empty));
     saveButton->setButtonText (T("Save"));
     saveButton->setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight);
-    saveButton->addButtonListener (this);
+    saveButton->addListener (this);
     saveButton->setColour (TextButton::buttonColourId, Colour (0xff9cc5df));
     saveButton->setColour (TextButton::textColourOnId, Colours::black);
 

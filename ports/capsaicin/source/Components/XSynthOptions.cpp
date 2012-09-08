@@ -41,7 +41,7 @@ XSynthOptions::XSynthOptions ()
 
     addAndMakeVisible (keysVisible = new ToggleButton (String::empty));
     keysVisible->setButtonText (T("Midi keyboard visible"));
-    keysVisible->addButtonListener (this);
+    keysVisible->addListener (this);
 
 
     //[UserPreSize]

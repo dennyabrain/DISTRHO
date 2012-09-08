@@ -45,7 +45,7 @@ TalComponent::TalComponent (TalCore* const ownerFilter)
 	// Register change listener after initialisation
 	drySlider->addListener (this);
 	wetSlider->addListener (this);
-	realStereoModeButton->addButtonListener (this);
+	realStereoModeButton->addListener (this);
 
     // register ourselves with the filter - it will use its ChangeBroadcaster base
     // class to tell us when something has changed, and this will call our changeListenerCallback()

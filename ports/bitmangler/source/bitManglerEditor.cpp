@@ -52,12 +52,12 @@ bitManglerEditor::bitManglerEditor (DemoJuceFilter* const ownerFilter)
 {
     addAndMakeVisible (andBitMod = new ToggleButton (T("new toggle button")));
     andBitMod->setButtonText (T("mod"));
-    andBitMod->addButtonListener (this);
+    andBitMod->addListener (this);
     andBitMod->setColour (ToggleButton::textColourId, Colours::white);
 
     addAndMakeVisible (xorBitMod = new ToggleButton (T("new toggle button")));
     xorBitMod->setButtonText (T("mod"));
-    xorBitMod->addButtonListener (this);
+    xorBitMod->addListener (this);
     xorBitMod->setColour (ToggleButton::textColourId, Colours::white);
 
     addAndMakeVisible (bitDisplayInput = new Label (T("Bit Display"),
@@ -84,7 +84,7 @@ bitManglerEditor::bitManglerEditor (DemoJuceFilter* const ownerFilter)
 
     addAndMakeVisible (processButton = new ImageButton (T("Process")));
     processButton->setButtonText (T("new button"));
-    processButton->addButtonListener (this);
+    processButton->addListener (this);
 
     processButton->setImages (false, true, true,
                               ImageCache::getFromMemory (power_off_png, power_off_pngSize), 0.8428f, Colour (0x0),
@@ -128,22 +128,22 @@ bitManglerEditor::bitManglerEditor (DemoJuceFilter* const ownerFilter)
 
     addAndMakeVisible (xorToggle = new ToggleButton (T("new toggle button")));
     xorToggle->setButtonText (T("XOR"));
-    xorToggle->addButtonListener (this);
+    xorToggle->addListener (this);
     xorToggle->setColour (ToggleButton::textColourId, Colours::white);
 
     addAndMakeVisible (andToggle = new ToggleButton (T("new toggle button")));
     andToggle->setButtonText (T("AND"));
-    andToggle->addButtonListener (this);
+    andToggle->addListener (this);
     andToggle->setColour (ToggleButton::textColourId, Colours::white);
 
     addAndMakeVisible (clearToggle = new ToggleButton (T("new toggle button")));
     clearToggle->setButtonText (T("CLR"));
-    clearToggle->addButtonListener (this);
+    clearToggle->addListener (this);
     clearToggle->setColour (ToggleButton::textColourId, Colours::white);
 
     addAndMakeVisible (setToggle = new ToggleButton (T("new toggle button")));
     setToggle->setButtonText (T("SET"));
-    setToggle->addButtonListener (this);
+    setToggle->addListener (this);
     setToggle->setColour (ToggleButton::textColourId, Colours::white);
 
     addAndMakeVisible (xorSlider = new Slider (String::empty));

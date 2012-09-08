@@ -140,8 +140,8 @@ TalComponent::TalComponent (TalCore* const ownerFilter)
 	envelopeIntesityKnob->addListener (this);
 	envelopeSpeedKnob->addListener (this);
 	lfoWidthKnob->addListener (this);
-	midiLearnButton->addButtonListener (this);	
-	midiTriggerButton->addButtonListener (this);	
+	midiLearnButton->addListener (this);
+	midiTriggerButton->addListener (this);
 
 	filterTypeComboBox->addListener (this);
 	lfoWaveformComboBox->addListener (this);

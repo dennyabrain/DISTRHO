@@ -73,14 +73,14 @@ TabPreferences::TabPreferences (MasterAndCommander *m)
     toggleButtonUniform->setTooltip (T("slightly higher, but constant processing load"));
     toggleButtonUniform->setButtonText (T("Uniform Processing Load"));
     toggleButtonUniform->setRadioGroupId (7007);
-    toggleButtonUniform->addButtonListener (this);
+    toggleButtonUniform->addListener (this);
     toggleButtonUniform->setToggleState (true, false);
 
     addAndMakeVisible (toggleButtonLowest = new ToggleButton (T("new toggle button")));
     toggleButtonLowest->setTooltip (T("lowest overal processing load with load peaks"));
     toggleButtonLowest->setButtonText (T("Lowest Mean Processing Load"));
     toggleButtonLowest->setRadioGroupId (7007);
-    toggleButtonLowest->addButtonListener (this);
+    toggleButtonLowest->addListener (this);
 
     addAndMakeVisible (labelLatency = new Label (T("new label"),
                                                  T("Latency:")));
@@ -117,7 +117,7 @@ TabPreferences::TabPreferences (MasterAndCommander *m)
     addAndMakeVisible (textButton = new TextButton (T("new button")));
     textButton->setTooltip (T("file chooser"));
     textButton->setButtonText (T("..."));
-    textButton->addButtonListener (this);
+    textButton->addListener (this);
 
     addAndMakeVisible (label = new Label (T("new label"),
                                           T("FIG1: Generation of a sound field as simulated in a virtual environment\nat a given listener position by a virtual coincidence microphone array with the outlined directivity pattern")));

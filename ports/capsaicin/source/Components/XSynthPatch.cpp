@@ -129,25 +129,25 @@ XSynthPatch::XSynthPatch (XSynthPlugin* plugin_, Master* master_)
     addAndMakeVisible (osc1Select = new TextButton (String::empty));
     osc1Select->setButtonText (T("1"));
     osc1Select->setConnectedEdges (Button::ConnectedOnRight | Button::ConnectedOnBottom);
-    osc1Select->addButtonListener (this);
+    osc1Select->addListener (this);
     osc1Select->setColour (TextButton::buttonColourId, Colour (0xff827474));
 
     addAndMakeVisible (osc2Select = new TextButton (String::empty));
     osc2Select->setButtonText (T("2"));
     osc2Select->setConnectedEdges (Button::ConnectedOnRight | Button::ConnectedOnBottom);
-    osc2Select->addButtonListener (this);
+    osc2Select->addListener (this);
     osc2Select->setColour (TextButton::buttonColourId, Colour (0xff827474));
 
     addAndMakeVisible (osc3Select = new TextButton (String::empty));
     osc3Select->setButtonText (T("3"));
     osc3Select->setConnectedEdges (Button::ConnectedOnRight | Button::ConnectedOnBottom);
-    osc3Select->addButtonListener (this);
+    osc3Select->addListener (this);
     osc3Select->setColour (TextButton::buttonColourId, Colour (0xff827474));
 
     addAndMakeVisible (osc4Select = new TextButton (String::empty));
     osc4Select->setButtonText (T("4"));
     osc4Select->setConnectedEdges (Button::ConnectedOnRight | Button::ConnectedOnBottom);
-    osc4Select->addButtonListener (this);
+    osc4Select->addListener (this);
     osc4Select->setColour (TextButton::buttonColourId, Colour (0xff827474));
 
     addAndMakeVisible (chorusGroup = new GroupComponent (String::empty,
@@ -365,7 +365,7 @@ XSynthPatch::XSynthPatch (XSynthPlugin* plugin_, Master* master_)
 
     addAndMakeVisible (enableButton = new ParameterToggleButton (String::empty));
     enableButton->setButtonText (T("ON"));
-    enableButton->addButtonListener (this);
+    enableButton->addListener (this);
 
     addAndMakeVisible (partNumberSlider = new Slider (String::empty));
     partNumberSlider->setTooltip (T("Part number"));
@@ -454,11 +454,11 @@ XSynthPatch::XSynthPatch (XSynthPlugin* plugin_, Master* master_)
 
     addAndMakeVisible (portaButton = new ParameterToggleButton (String::empty));
     portaButton->setButtonText (T("PORTA"));
-    portaButton->addButtonListener (this);
+    portaButton->addListener (this);
 
     addAndMakeVisible (polyButton = new ParameterToggleButton (String::empty));
     polyButton->setButtonText (T("POLY"));
-    polyButton->addButtonListener (this);
+    polyButton->addListener (this);
 
     addAndMakeVisible (masterLabel = new Label (String::empty,
                                                 T("G P     KEYS RANGE")));
@@ -473,7 +473,7 @@ XSynthPatch::XSynthPatch (XSynthPlugin* plugin_, Master* master_)
 
     addAndMakeVisible (stereoButton = new ParameterToggleButton (String::empty));
     stereoButton->setButtonText (T("STEREO"));
-    stereoButton->addButtonListener (this);
+    stereoButton->addListener (this);
 
     addAndMakeVisible (chorusFreqSlider = new ImageSlider (String::empty));
     chorusFreqSlider->setTooltip (T("Chorus frequency"));
@@ -769,25 +769,25 @@ XSynthPatch::XSynthPatch (XSynthPlugin* plugin_, Master* master_)
     addAndMakeVisible (osc1SelectPhase = new TextButton (String::empty));
     osc1SelectPhase->setButtonText (T("1P"));
     osc1SelectPhase->setConnectedEdges (Button::ConnectedOnRight | Button::ConnectedOnTop);
-    osc1SelectPhase->addButtonListener (this);
+    osc1SelectPhase->addListener (this);
     osc1SelectPhase->setColour (TextButton::buttonColourId, Colour (0xff805f8b));
 
     addAndMakeVisible (osc2SelectPhase = new TextButton (String::empty));
     osc2SelectPhase->setButtonText (T("2P"));
     osc2SelectPhase->setConnectedEdges (Button::ConnectedOnRight | Button::ConnectedOnTop);
-    osc2SelectPhase->addButtonListener (this);
+    osc2SelectPhase->addListener (this);
     osc2SelectPhase->setColour (TextButton::buttonColourId, Colour (0xff805f8b));
 
     addAndMakeVisible (osc3SelectPhase = new TextButton (String::empty));
     osc3SelectPhase->setButtonText (T("3P"));
     osc3SelectPhase->setConnectedEdges (Button::ConnectedOnRight | Button::ConnectedOnTop);
-    osc3SelectPhase->addButtonListener (this);
+    osc3SelectPhase->addListener (this);
     osc3SelectPhase->setColour (TextButton::buttonColourId, Colour (0xff805f8b));
 
     addAndMakeVisible (osc4SelectPhase = new TextButton (String::empty));
     osc4SelectPhase->setButtonText (T("4P"));
     osc4SelectPhase->setConnectedEdges (Button::ConnectedOnRight | Button::ConnectedOnTop);
-    osc4SelectPhase->addButtonListener (this);
+    osc4SelectPhase->addListener (this);
     osc4SelectPhase->setColour (TextButton::buttonColourId, Colour (0xff805f8b));
 
     addAndMakeVisible (eqBw1Slider = new ParameterSlider (String::empty));

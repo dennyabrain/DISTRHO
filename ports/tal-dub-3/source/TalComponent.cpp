@@ -114,7 +114,7 @@ ImageToggleButton* TalComponent::addToggleButton(int x, int y, TalCore* const ow
 	addAndMakeVisible(toggleButton, 0);
 	if (parameter >= 0)
 		toggleButton->setToggleState(ownerFilter->getParameter(parameter), false);
-	toggleButton->addButtonListener (this);
+	toggleButton->addListener (this);
 	return toggleButton;
 }
 
@@ -129,7 +129,7 @@ ImageTabButton* TalComponent::addTabButton(int x, int y, TalCore* const ownerFil
 	addAndMakeVisible(tabButton, 0);
 	if (parameter >= 0)
 		tabButton->setToggleState(ownerFilter->getParameter(parameter), false);
-	tabButton->addButtonListener (this);
+	tabButton->addListener (this);
 	return tabButton;
 }
 

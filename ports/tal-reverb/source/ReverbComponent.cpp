@@ -79,7 +79,7 @@ ReverbComponent::ReverbComponent (TalCore* const ownerFilter)
 	stereoWithKnob->addListener (this);
 	drySlider->addListener (this);
 	wetSlider->addListener (this);
-	midiLearnButton->addButtonListener (this);
+	midiLearnButton->addListener (this);
 
     // register ourselves with the filter - it will use its ChangeBroadcaster base
     // class to tell us when something has changed, and this will call our changeListenerCallback()
