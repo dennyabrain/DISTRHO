@@ -57,6 +57,7 @@ package.libpaths = {
 package.files = {
   matchfiles (
     "../source/*.cpp",
+    "../source/Common/*.cpp",
     "../../../libs/juce-plugin/JucePluginMain.cpp"
   )
 }
