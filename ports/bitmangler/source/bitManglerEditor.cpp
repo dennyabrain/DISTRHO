@@ -239,6 +239,9 @@ bitManglerEditor::~bitManglerEditor()
     deleteAndZero (setSlider);
     //ImageCache::release (cachedImage_metal2_png);
 
+    deleteAndZero (lcdSmallFont);
+    deleteAndZero (lcdBigFont);
+
     //[Destructor]. You can add your own custom destruction code here..
 	owner->removeChangeListener (this);
     //[/Destructor]
