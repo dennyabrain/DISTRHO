@@ -74,9 +74,15 @@ XSynthEditor::~XSynthEditor()
     getFilter()->removeChangeListener (this);
     // getFilter()->removeListenerToParameters (this);
 
+    // remove piano component
+    if (midiKeyboard)
+    {
+        removeChildComponent (midiKeyboard);
+        deleteAndZero (midiKeyboard);
+    }
+
     deleteAndZero (titlebarComponent);
     deleteAndZero (mainTab);
-    deleteAndZero (midiKeyboard);
 }
 
 //==============================================================================
@@ -137,7 +143,7 @@ void XSynthEditor::setKeyboardVisible (const bool isVisible)
     if (isVisible)
     {
         // add piano component
-        if (midiKeyboard == 0)
+        if (! midiKeyboard)
         {
             addAndMakeVisible (midiKeyboard = new MidiKeyboardComponent (getFilter()->keyboardState,
                                                                         MidiKeyboardComponent::horizontalKeyboard));
@@ -155,7 +161,7 @@ void XSynthEditor::setKeyboardVisible (const bool isVisible)
     else
     {
         // remove piano component
-        if (midiKeyboard != 0)
+        if (midiKeyboard)
         {
             removeChildComponent (midiKeyboard);
             deleteAndZero (midiKeyboard);

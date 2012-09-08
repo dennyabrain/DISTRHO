@@ -54,6 +54,7 @@ XSynthTabPanel::~XSynthTabPanel()
     clearTabs ();
     deleteAndZero (patchComponent);
     deleteAndZero (mixerComponent);
+    deleteAndZero (presetComponent);
     deleteAndZero (optionsComponent);
     deleteAndZero (aboutComponent);
 }
