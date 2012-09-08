@@ -75,33 +75,33 @@ lv2:
 # 	$(MAKE) -C wolpertinger/LV2
 
 vst:
-# 	$(MAKE) -C arctican-function/VST
-# 	$(MAKE) -C arctican-pilgrim/VST
-# 	$(MAKE) -C argotlunar/VST
-# 	$(MAKE) -C bitmangler/VST
-# 	$(MAKE) -C capsaicin/VST
-# 	$(MAKE) -C drowaudio-distortion/VST
-# 	$(MAKE) -C drowaudio-distortionshaper/VST
-# 	$(MAKE) -C drowaudio-flanger/VST
-# 	$(MAKE) -C drowaudio-reverb/VST
-# 	$(MAKE) -C drowaudio-tremolo/VST
-# 	$(MAKE) -C drumsynth/VST
-# 	$(MAKE) -C eqinox/VST
-# 	$(MAKE) -C highlife/VST
-# 	$(MAKE) -C hybridreverb2/VST
-# 	$(MAKE) -C juce-demo-plugin/VST
-# 	$(MAKE) -C juce_pitcher/VST
-# 	$(MAKE) -C sDelay/VST
-# 	$(MAKE) -C tal-dub-3/VST
-# 	$(MAKE) -C tal-filter/VST
-# 	$(MAKE) -C tal-filter-2/VST
-# 	$(MAKE) -C tal-noisemaker/VST
-# 	$(MAKE) -C tal-reverb/VST
-# 	$(MAKE) -C tal-reverb-2/VST
-# 	$(MAKE) -C tal-reverb-3/VST
-# 	$(MAKE) -C tal-vocoder-2/VST
-# 	$(MAKE) -C vex/VST
-# 	$(MAKE) -C wolpertinger/VST
+	$(MAKE) -C arctican-function/VST
+	$(MAKE) -C arctican-pilgrim/VST
+	$(MAKE) -C argotlunar/VST
+	$(MAKE) -C bitmangler/VST
+	$(MAKE) -C capsaicin/VST
+	$(MAKE) -C drowaudio-distortion/VST
+	$(MAKE) -C drowaudio-distortionshaper/VST
+	$(MAKE) -C drowaudio-flanger/VST
+	$(MAKE) -C drowaudio-reverb/VST
+	$(MAKE) -C drowaudio-tremolo/VST
+	$(MAKE) -C drumsynth/VST
+	$(MAKE) -C eqinox/VST
+	$(MAKE) -C highlife/VST
+	$(MAKE) -C hybridreverb2/VST
+	$(MAKE) -C juce-demo-plugin/VST
+	$(MAKE) -C juce_pitcher/VST
+	$(MAKE) -C sDelay/VST
+	$(MAKE) -C tal-dub-3/VST
+	$(MAKE) -C tal-filter/VST
+	$(MAKE) -C tal-filter-2/VST
+	$(MAKE) -C tal-noisemaker/VST
+	$(MAKE) -C tal-reverb/VST
+	$(MAKE) -C tal-reverb-2/VST
+	$(MAKE) -C tal-reverb-3/VST
+	$(MAKE) -C tal-vocoder-2/VST
+	$(MAKE) -C vex/VST
+	$(MAKE) -C wolpertinger/VST
 
 clean:
 	# Standalone
