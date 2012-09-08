@@ -73,28 +73,13 @@ public:
     }
 
     //==============================================================================
-    int getLaunchPreferenceOrderForCurrentOS()
-    {
-       #if JUCE_ANDROID
-        return 1;
-       #else
-        return 0;
-       #endif
-    }
-
+    bool launchProject()                        { return false; }
     bool isAndroid() const                      { return true; }
-    bool isPossibleForCurrentProject()          { return projectType.isGUIApplication(); }
     bool usesMMFiles() const                    { return false; }
     bool canCopeWithDuplicateFiles()            { return false; }
 
-    void launchProject()
+    void createExporterProperties (PropertyListBuilder& props)
     {
-    }
-
-    void createPropertyEditors (PropertyListBuilder& props)
-    {
-        ProjectExporter::createPropertyEditors (props);
-
         props.add (new TextPropertyComponent (getActivityClassPathValue(), "Android Activity class name", 256, false),
                    "The full java class name to use for the app's Activity class.");
 
@@ -238,10 +223,8 @@ protected:
         Value getArchitecturesValue()           { return getValue (Ids::androidArchitectures); }
         String getArchitectures() const         { return config [Ids::androidArchitectures]; }
 
-        void createPropertyEditors (PropertyListBuilder& props)
+        void createConfigProperties (PropertyListBuilder& props)
         {
-            createBasicPropertyEditors (props);
-
             props.add (new TextPropertyComponent (getArchitecturesValue(), "Architectures", 256, false),
                        "A list of the ARM architectures to build (for a fat binary).");
         }

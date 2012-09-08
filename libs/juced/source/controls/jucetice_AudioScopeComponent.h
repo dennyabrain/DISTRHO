@@ -60,16 +60,17 @@ public:
     void paint (Graphics& g)
     {
         g.fillAll (Colours::black);
-/*
-        g.drawBevel (0,
-                     0,
-                     getWidth(),
-                     getHeight(),
-                     1,
-                     Colours::white,
-                     Colours::grey,
-                     false);
-*/
+
+        LookAndFeel::drawBevel (g,
+                                0,
+                                0,
+                                getWidth(),
+                                getHeight(),
+                                1,
+                                Colours::white,
+                                Colours::grey,
+                                false);
+
         g.setColour (Colours::lightgreen);
 
         const float halfHeight = getHeight() * 0.5f;

@@ -65,6 +65,8 @@ public:
 
     bool goToPreviousFile();
     bool goToNextFile();
+    bool canGoToCounterpart() const;
+    bool goToCounterpart();
 
     bool saveProject();
     void closeProject();
@@ -76,6 +78,7 @@ public:
 
     void updateMissingFileStatuses();
     virtual void createProjectTabs();
+    void deleteProjectTabs();
 
     void showBubbleMessage (const Rectangle<int>& pos, const String& text);
 

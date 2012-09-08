@@ -8,6 +8,9 @@
 
 #include "juce_StandaloneFilterWindow.h"
 
+// resources
+#include "icon/DistrhoIcon.cpp"
+
 //==============================================================================
 /**
     A class that can be used to run a simple standalone application containing your filter.
@@ -59,6 +62,7 @@ public:
         // create the window
         window = new StandaloneFilterWindow (pluginWindowName, Colour (32, 32, 32), appProperties->getUserSettings(), commandLine);
 
+        window->initIcon ();
         window->toFront (true);
         window->setVisible (true);
 

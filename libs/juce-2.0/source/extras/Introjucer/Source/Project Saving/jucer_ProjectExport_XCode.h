@@ -83,15 +83,6 @@ public:
     Value  getPostBuildScriptValue()        { return getSetting (Ids::postbuildCommand); }
     String getPostBuildScript() const       { return settings   [Ids::postbuildCommand]; }
 
-    int getLaunchPreferenceOrderForCurrentOS()
-    {
-       #if JUCE_MAC
-        return iOS ? 1 : 2;
-       #else
-        return 0;
-       #endif
-    }
-
     bool isAvailableOnCurrentOS()
     {
        #if JUCE_MAC
@@ -101,16 +92,13 @@ public:
        #endif
     }
 
-    bool isPossibleForCurrentProject()      { return projectType.isGUIApplication() || ! iOS; }
     bool usesMMFiles() const                { return true; }
     bool isXcode() const                    { return true; }
     bool isOSX() const                      { return ! iOS; }
     bool canCopeWithDuplicateFiles()        { return true; }
 
-    void createPropertyEditors (PropertyListBuilder& props)
+    void createExporterProperties (PropertyListBuilder& props)
     {
-        ProjectExporter::createPropertyEditors (props);
-
         if (projectType.isGUIApplication() && ! iOS)
         {
             props.add (new TextPropertyComponent (getSetting ("documentExtensions"), "Document file extensions", 128, false),
@@ -147,9 +135,13 @@ public:
                    "Some shell-script that will be run after a build completes.");
     }
 
-    void launchProject()
+    bool launchProject()
     {
-        getProjectBundle().startAsProcess();
+       #if JUCE_MAC
+        return getProjectBundle().startAsProcess();
+       #else
+        return false;
+       #endif
     }
 
     //==============================================================================
@@ -218,10 +210,8 @@ protected:
         Value  getCppLibTypeValue()                    { return getValue (Ids::cppLibType); }
         String getCppLibType() const                   { return config   [Ids::cppLibType]; }
 
-        void createPropertyEditors (PropertyListBuilder& props)
+        void createConfigProperties (PropertyListBuilder& props)
         {
-            createBasicPropertyEditors (props);
-
             if (iOS)
             {
                 const char* iosVersions[]      = { "Use Default",     "3.2", "4.0", "4.1", "4.2", "4.3", "5.0", "5.1", 0 };

@@ -35,6 +35,9 @@
 #include "modules/juce_audio_utils/juce_audio_utils.h"
 #include "modules/juce_gui_basics/juce_gui_basics.h"
 
+// resources
+#include "icon/DistrhoIcon.h"
+
 using namespace juce;
 
 //==============================================================================
@@ -209,6 +212,17 @@ public:
 #endif
 
         deleteFilter();
+    }
+
+    void initIcon()
+    {
+        ComponentPeer* const peer = getPeer();
+
+        if (peer)
+        {
+            icon = ImageFileFormat::loadFrom (DistrhoIcon::logo_png, DistrhoIcon::logo_pngSize);
+            peer->setIcon (icon);
+        }
     }
 
     //==============================================================================
@@ -416,6 +430,7 @@ private:
     AudioProcessorPlayer player;
     bool nativeTitleBarCheck;
     String saveFileName;
+    Image icon;
 
     void deleteFilter()
     {

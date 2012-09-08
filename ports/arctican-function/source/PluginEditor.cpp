@@ -71,12 +71,12 @@ TheFunctionAudioProcessorEditor::TheFunctionAudioProcessorEditor (TheFunctionAud
 
 // Phase Button
 	addAndMakeVisible (&phaseButtonL);
-    phaseButtonL.addButtonListener (this);
+    phaseButtonL.addListener (this);
 	phaseButtonL.setClickingTogglesState(true);
 	phaseButtonL.setConnectedEdges(15);
     
 	addAndMakeVisible (&phaseButtonR);
-	phaseButtonR.addButtonListener (this);
+	phaseButtonR.addListener (this);
 	phaseButtonR.setClickingTogglesState(true);
 	phaseButtonR.setConnectedEdges(15);
 
@@ -94,8 +94,8 @@ TheFunctionAudioProcessorEditor::~TheFunctionAudioProcessorEditor()
 	gainRSlider.removeListener(this);
 	panLSlider.removeListener(this);
 	panRSlider.removeListener(this);
-	phaseButtonL.removeButtonListener(this);
-	phaseButtonR.removeButtonListener(this);
+	phaseButtonL.removeListener(this);
+	phaseButtonR.removeListener(this);
 	removeAllChildren();
 }
 

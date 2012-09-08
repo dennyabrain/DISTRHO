@@ -50,6 +50,37 @@ public:
     String getState() const                         { return lastState != nullptr ? lastState->toString() : String::empty; }
     void restoreState (const String& state)         { lastState = new CodeEditorComponent::State (state); }
 
+    File getCounterpartFile() const
+    {
+        const File file (getFile());
+
+        if (file.hasFileExtension ("cpp;c;mm;m"))
+        {
+            const char* extensions[] = { "h", "hpp", nullptr };
+            return findCounterpart (file, extensions);
+        }
+        else if (file.hasFileExtension ("h;hpp"))
+        {
+            const char* extensions[] = { "cpp", "mm", "cc", "cxx", "c", "m", nullptr };
+            return findCounterpart (file, extensions);
+        }
+
+        return File::nonexistent;
+    }
+
+    static File findCounterpart (const File& file, const char** extensions)
+    {
+        while (*extensions != nullptr)
+        {
+            const File f (file.withFileExtension (*extensions++));
+
+            if (f.existsAsFile())
+                return f;
+        }
+
+        return File::nonexistent;
+    }
+
     void reloadFromFile();
     bool save();
 
@@ -64,7 +95,19 @@ public:
     //==============================================================================
     struct Type  : public OpenDocumentManager::DocumentType
     {
-        bool canOpenFile (const File& file)                     { return file.hasFileExtension ("cpp;h;hpp;mm;m;c;cc;cxx;txt;inc;tcc;xml;plist;rtf;html;htm;php;py;rb;cs"); }
+        bool canOpenFile (const File& file)
+        {
+            if (file.hasFileExtension ("cpp;h;hpp;mm;m;c;cc;cxx;txt;inc;tcc;xml;plist;rtf;html;htm;php;py;rb;cs"))
+                return true;
+
+            MemoryBlock mb;
+            if (file.loadFileAsData (mb)
+                 && CharPointer_UTF8::isValidString (static_cast <const char*> (mb.getData()), mb.getSize()))
+                return true;
+
+            return false;
+        }
+
         Document* openFile (Project* project, const File& file) { return new SourceCodeDocument (project, file); }
     };
 

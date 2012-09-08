@@ -109,20 +109,6 @@ File ModuleList::getDefaultModulesFolder (Project* project)
 {
     if (project != nullptr)
     {
-        {
-            // Try the platform default exporter first..
-            ScopedPointer <ProjectExporter> exp (ProjectExporter::createPlatformDefaultExporter (*project));
-
-            if (exp != nullptr)
-            {
-                const File f (getModulesFolderForExporter (*exp));
-
-                if (ModuleList::isModulesFolder (f))
-                    return f;
-            }
-        }
-
-        // If that didn't work, try all the other exporters..
         for (Project::ExporterIterator exporter (*project); exporter.next();)
         {
             const File f (getModulesFolderForExporter (*exporter));
@@ -153,11 +139,6 @@ File ModuleList::getLocalModulesFolder (Project* project)
         f = defaultJuceFolder;
 
     return f;
-}
-
-File ModuleList::getModuleFolder (const String& uid) const
-{
-    return getModulesFolder().getChildFile (uid);
 }
 
 void ModuleList::setLocalModulesFolder (const File& file)
@@ -196,7 +177,8 @@ void ModuleList::rescan (const File& newModulesFolder)
 
         while (iter.next())
         {
-            const File moduleDef (iter.getFile().getChildFile (LibraryModule::getInfoFileName()));
+            const File moduleDef (iter.getFile().getLinkedTarget()
+                                    .getChildFile (LibraryModule::getInfoFileName()));
 
             if (moduleDef.exists())
             {

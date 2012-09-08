@@ -57,28 +57,13 @@ public:
     }
 
     //==============================================================================
-    int getLaunchPreferenceOrderForCurrentOS()
-    {
-       #if JUCE_LINUX
-        return 1;
-       #else
-        return 0;
-       #endif
-    }
-
-    bool isPossibleForCurrentProject()          { return true; }
+    bool launchProject()                        { return false; }
     bool usesMMFiles() const                    { return false; }
     bool isLinux() const                        { return true; }
     bool canCopeWithDuplicateFiles()            { return false; }
 
-    void launchProject()
+    void createExporterProperties (PropertyListBuilder&)
     {
-        // what to do on linux?
-    }
-
-    void createPropertyEditors (PropertyListBuilder& props)
-    {
-        ProjectExporter::createPropertyEditors (props);
     }
 
     //==============================================================================
@@ -105,9 +90,8 @@ protected:
             setValueIfVoid (getLibrarySearchPathValue(), "/usr/X11R6/lib/");
         }
 
-        void createPropertyEditors (PropertyListBuilder& props)
+        void createConfigProperties (PropertyListBuilder&)
         {
-            createBasicPropertyEditors (props);
         }
     };
 
