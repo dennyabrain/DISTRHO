@@ -24,7 +24,7 @@ standalone:
 # 	$(MAKE) -C drowaudio-distortionshaper/Standalone
 # 	$(MAKE) -C drowaudio-flanger/Standalone
 # 	$(MAKE) -C drowaudio-reverb/Standalone
-# 	$(MAKE) -C drowaudio-tremolo/Standalone
+	$(MAKE) -C drowaudio-tremolo/Standalone
 	$(MAKE) -C drumsynth/Standalone
 	$(MAKE) -C eqinox/Standalone
 	$(MAKE) -C highlife/Standalone

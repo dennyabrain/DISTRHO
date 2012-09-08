@@ -12,13 +12,32 @@
 
 #include "JuceHeader.h"
 
+//==============================================================================
 class PluginLookAndFeel :   public LookAndFeel
 {
 public:
-//	dRowAudioLookAndFeel();
-//	
-//	~dRowAudioLookAndFeel();
-		
+    //==============================================================================
+    enum ColourIds
+    {
+        backgroundColourId = 0xd00001
+    };
+    
+    //==============================================================================
+    PluginLookAndFeel();
+    
+    //==============================================================================
+    static void drawPluginBackgroundBase (Graphics& g, Component& editor);
+    
+    static void drawPluginBackgroundHighlights (Graphics& g, Component& editor);
+
+    static void drawInsetLine (Graphics& g,
+							   const float startX,
+							   const float startY,
+							   const float endX,
+							   const float endY,
+							   const float lineThickness);
+
+    //==============================================================================
 	virtual void drawRotarySlider (Graphics& g,
                                    int x, int y,
                                    int width, int height,
@@ -38,14 +57,6 @@ public:
      If the label's background is not transparent then it will draw a 3D label.
 	 */
 	virtual void drawLabel (Graphics& g, Label& label);
-
-    static void drawInsetLine (Graphics& g,
-							   const float startX,
-							   const float startY,
-							   const float endX,
-							   const float endY,
-							   const float lineThickness);
-    
 };
 
 #endif

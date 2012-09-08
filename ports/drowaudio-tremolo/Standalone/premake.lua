@@ -43,8 +43,8 @@ end
 
 package.includepaths = {
   "../source",
-  "../../../libs/juce-2.0/source",
   "../../../libs/drowaudio/source",
+  "../../../libs/juce-2.0/source",
   "../../../libs/juce-plugin"
 }
 
@@ -55,6 +55,7 @@ package.libpaths = {
 package.files = {
   matchfiles (
     "../source/*.cpp",
+    "../source/Common/*.cpp",
     "../../../libs/juce-plugin/JucePluginMain.cpp"
   )
 }
