@@ -1022,7 +1022,7 @@ public:
 #endif
 
         jassert (activeUIs.contains (this));
-        activeUIs.removeValue (this);
+        activeUIs.remove(activeUIs.indexOf(this));
     }
 
     void doPortEvent(const uint32 portIndex, const float value)
@@ -1327,7 +1327,7 @@ public:
         lastControlValues.clear();
 
         jassert (activePlugins.contains (this));
-        activePlugins.removeValue (this);
+        activePlugins.remove(activePlugins.indexOf(this));
     }
 
     //==============================================================================
