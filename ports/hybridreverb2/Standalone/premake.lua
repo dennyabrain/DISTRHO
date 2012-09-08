@@ -25,8 +25,8 @@ package.config["Release"].links        = { "juce-core", "juce-audio-basics", "ju
 package.config["Debug"].target         = project.name .. "_debug"
 package.config["Debug"].objdir         = "intermediate/Debug"
 package.config["Debug"].defines        = { "DEBUG=1", "_DEBUG=1" }
-package.config["Debug"].links          = { "juce-core_debug", "juce-audio-basics_debug", "juce-audio-devices_full_debug", "juce-audio-formats_debug", "juce-audio-processors_debug", "juce-audio-utils_debug", "juce-data-structures_debug", "juce-events_debug", "juce-graphics_debug", "juce-gui-basics_debug" }
 package.config["Debug"].buildoptions   = { "-O0 -ggdb -msse" }
+package.config["Debug"].links          = { "juce-core_debug", "juce-audio-basics_debug", "juce-audio-devices_full_debug", "juce-audio-formats_debug", "juce-audio-processors_debug", "juce-audio-utils_debug", "juce-data-structures_debug", "juce-events_debug", "juce-graphics_debug", "juce-gui-basics_debug" }
 
 if (windows) then
   package.defines      = { package.defines, "WINDOWS=1", "NO_OMP" }
