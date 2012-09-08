@@ -40,7 +40,7 @@ elseif (macosx) then
 else
   package.defines      = { package.defines, "LINUX=1" }
   package.buildoptions = { package.buildoptions, "-std=c++0x" }
-  package.links        = { "freetype", "pthread", "asound", "dl", "rt", "X11", "Xext", "gomp" }
+  package.links        = { "pthread", "asound", "dl", "rt", "X11", "Xext", "gomp" }
   package.linkoptions  = { package.linkoptions, "`pkg-config --libs freetype2`" }
 end
 

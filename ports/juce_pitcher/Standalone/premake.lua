@@ -36,7 +36,7 @@ elseif (macosx) then
   package.linkoptions  = { "-framework AudioToolbox -framework Cocoa -framework CoreAudio -framework CoreMidi -framework QuartzCore" }
 else
   package.defines      = { package.defines, "LINUX=1" }
-  package.links        = { "freetype", "pthread", "asound", "dl", "rt", "m", "X11", "Xext" }
+  package.links        = { "pthread", "asound", "dl", "rt", "m", "X11", "Xext" }
   package.buildoptions = { "-std=c++0x" }
   package.linkoptions  = { "`pkg-config --libs freetype2`" }
 end

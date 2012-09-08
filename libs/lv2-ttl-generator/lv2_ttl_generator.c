@@ -4,56 +4,56 @@
 
 #include <stdio.h>
 
-#if defined(_WIN32) || defined (_WIN64)
-#include <windows.h>
-#define TTL_GENERATOR_WINDOWS
+#ifdef _WIN32
+ #include <windows.h>
+ #define TTL_GENERATOR_WINDOWS
 #else
-#include <dlfcn.h>
+ #include <dlfcn.h>
 #endif
 
 #ifndef nullptr
-#define nullptr 0
+ #define nullptr (0)
 #endif
 
 typedef void (*TTL_Generator_Function)(void);
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     if (argc != 2)
     {
-        printf("usage: %s /path/to/binary.so\n", argv[0]);
+        printf("usage: %s /path/to/plugin-DLL\n", argv[0]);
         return 1;
     }
 
 #ifdef TTL_GENERATOR_WINDOWS
-    void* handle = LoadLibrary(argv[1]);
+    const HMODULE handle = LoadLibrary(argv[1]);
 #else
-    void* handle = dlopen(argv[1], RTLD_LAZY);
+    void* const handle = dlopen(argv[1], RTLD_LAZY);
 #endif
 
     if (! handle)
     {
 #ifdef TTL_GENERATOR_WINDOWS
-        printf("Failed to open library\n");
+        printf("Failed to open plugin DLL\n");
 #else
-        printf("Failed to open library, error was:\n%s\n", dlerror());
+        printf("Failed to open plugin DLL, error was:\n%s\n", dlerror());
 #endif
         return 2;
     }
 
 #ifdef TTL_GENERATOR_WINDOWS
-    TTL_Generator_Function ttl_fcn = (TTL_Generator_Function)GetProcAddress((HMODULE)handle, "lv2_generate_ttl");
+    const TTL_Generator_Function ttlFn = (TTL_Generator_Function)GetProcAddress(handle, "lv2_generate_ttl");
 #else
-    TTL_Generator_Function ttl_fcn = (TTL_Generator_Function)dlsym(handle, "lv2_generate_ttl");
+    const TTL_Generator_Function ttlFn = (TTL_Generator_Function)dlsym(handle, "lv2_generate_ttl");
 #endif
 
-    if (ttl_fcn)
-        ttl_fcn();
+    if (ttlFn)
+        ttlFn();
     else
         printf("Failed to find 'lv2_generate_ttl' function\n");
 
 #ifdef TTL_GENERATOR_WINDOWS
-    FreeLibrary((HMODULE)handle);
+    FreeLibrary(handle);
 #else
     dlclose(handle);
 #endif
