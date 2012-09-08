@@ -76,11 +76,11 @@ String PianoGridKeyboard::getWhiteNoteText (const int midiNoteNumber)
 }
 
 //==============================================================================
-void PianoGridKeyboard::mouseWheelMove (const MouseEvent&, float ix, float iy)
+void PianoGridKeyboard::mouseWheelMove (const MouseEvent&, const MouseWheelDetails& wheel)
 {
     int newNote = getLowestVisibleKey();
 
-    if ((ix != 0 ? ix : iy) < 0)
+    if ((wheel.deltaX != 0 ? wheel.deltaX : wheel.deltaY) < 0)
         newNote = (newNote - 1) / 12;
     else
         newNote = newNote / 12 + 1;

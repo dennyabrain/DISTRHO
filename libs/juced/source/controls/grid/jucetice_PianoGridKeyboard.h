@@ -46,7 +46,7 @@ public:
 
     //==============================================================================
     /** @internal */
-    void mouseWheelMove (const MouseEvent& e, float ix, float iy);
+    void mouseWheelMove (const MouseEvent& e, const MouseWheelDetails& wheel);
 
 protected:
 };

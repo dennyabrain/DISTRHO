@@ -9,7 +9,7 @@ build:
 	$(MAKE) -C libs/juced
 	$(MAKE) -C libs/lv2-ttl-generator
 # 	$(MAKE) plugins -C plugins
-# 	$(MAKE) plugins -C ports
+	$(MAKE) plugins -C ports
 
 gen:
 	@./scripts/generate-ttl.sh
@@ -54,11 +54,11 @@ lv2:
 	$(MAKE) -C libs/juced
 	$(MAKE) -C libs/lv2-ttl-generator
 # 	$(MAKE) lv2 -C plugins
-# 	$(MAKE) lv2 -C ports
+	$(MAKE) lv2 -C ports
 
 vst:
 	$(MAKE) -C libs/drowaudio
 	$(MAKE) -C libs/juce-2.0
 	$(MAKE) -C libs/juced
 # 	$(MAKE) vst -C plugins
-# 	$(MAKE) vst -C ports
+	$(MAKE) vst -C ports

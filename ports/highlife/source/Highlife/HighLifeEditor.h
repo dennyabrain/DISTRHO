@@ -67,7 +67,7 @@ public:
     virtual void 	mouseDown (const MouseEvent &e);
     virtual void 	mouseDrag (const MouseEvent &e);
     virtual void 	mouseUp (const MouseEvent &e);
-    virtual void    mouseWheelMove (const MouseEvent &e, float wheelX, float wheelY);
+    virtual void    mouseWheelMove (const MouseEvent &e, const MouseWheelDetails& wheel);
     virtual void 	paint (Graphics &g);
     virtual void 	timerCallback ();
     virtual void    resized ();

@@ -331,7 +331,7 @@ void CHighLifeEditor::mouseUp (const MouseEvent &e)
     gui_mouse_up (e.x, e.y, e);
 }
 
-void CHighLifeEditor::mouseWheelMove (const MouseEvent &e, float wheelX, float wheelY)
+void CHighLifeEditor::mouseWheelMove (const MouseEvent &e, const MouseWheelDetails& wheel)
 {
     // gui_mouse_wheel (e.x, e.y, wheelY, e);
 }

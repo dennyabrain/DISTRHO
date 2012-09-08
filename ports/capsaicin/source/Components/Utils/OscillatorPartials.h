@@ -148,7 +148,7 @@ public:
     }
 
     //==============================================================================
-    void mouseWheelMove    (const MouseEvent& e, float ix, float iy)
+    void mouseWheelMove    (const MouseEvent& e, const MouseWheelDetails& wheel)
     {
         if (! oscillator) return;
 
@@ -160,13 +160,13 @@ public:
 
         if (visualMode == MagnitudeMode)
         {
-            oscillator->Phmag [clickedPartial] -= (int8) (iy * 33);
+            oscillator->Phmag [clickedPartial] -= (int8) (wheel.deltaY * 33);
             oscillator->Phmag [clickedPartial] =
                 jmin (jmax ((int) oscillator->Phmag [clickedPartial], 0), 127);
         }
         else
         {
-            oscillator->Phphase [clickedPartial] -= (int8) (iy * 33);
+            oscillator->Phphase [clickedPartial] -= (int8) (wheel.deltaY * 33);
             oscillator->Phphase [clickedPartial] =
                 jmin (jmax ((int) oscillator->Phphase [clickedPartial], 0), 127);
         }
