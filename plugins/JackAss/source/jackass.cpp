@@ -4,9 +4,9 @@
 
 /* Fix for VST includes */
 #ifdef __linux__
-#ifndef __cdecl
-#define __cdecl
-#endif
+ #ifndef __cdecl
+  #define __cdecl
+ #endif
 #endif
 
 #include "public.sdk/source/vst2.x/audioeffect.cpp"
@@ -31,99 +31,98 @@ struct midi_data_t {
     unsigned char data1;
     unsigned char data2;
     VstInt32 time;
+
+    midi_data_t()
+        : status(0),
+          data1(0),
+          data2(0),
+          time(0) {}
 };
 
 // -------------------------------------------------
 // Global JACK client
 
 static jack_client_t* global_client = nullptr;
+static bool need_resend = false;
 
 // -------------------------------------------------
-// JackAss instance, containing 1 JACK MIDI port
+// single JackAss instance, containing 1 MIDI port
 
 class JackAssInstance
 {
 public:
-    JackAssInstance(jack_port_t* port) :
-        jport(port)
+    JackAssInstance(jack_port_t* const port)
+        : jport(port)
     {
-        pthread_mutex_init(&midi_mutex, nullptr);
-        clear_events();
+        pthread_mutex_init(&mutex, nullptr);
     }
 
     ~JackAssInstance()
     {
-        clear_events();
-        pthread_mutex_destroy(&midi_mutex);
+        pthread_mutex_destroy(&mutex);
 
-        jack_port_unregister(global_client, jport);
+        if (global_client && jport)
+            jack_port_unregister(global_client, jport);
     }
 
-    void clear_events()
+    void putEvent(const unsigned char status, const unsigned char data1, const unsigned char data2, const VstInt32 time)
     {
-        pthread_mutex_lock(&midi_mutex);
-        memset(&midi_data, 0, sizeof(midi_data_t)*MAX_MIDI_EVENTS);
-        pthread_mutex_unlock(&midi_mutex);
-    }
+        pthread_mutex_lock(&mutex);
 
-    void put_event(unsigned char status, unsigned char data1, unsigned char data2, VstInt32 time)
-    {
-        pthread_mutex_lock(&midi_mutex);
-
-        for (int i=0; i<MAX_MIDI_EVENTS; i++)
+        for (int i=0; i < MAX_MIDI_EVENTS; i++)
         {
-            if (midi_data[i].status == 0)
+            if (data[i].status == 0)
             {
-                midi_data[i].status = status;
-                midi_data[i].data1  = data1;
-                midi_data[i].data2  = data2;
-                midi_data[i].time   = time;
+                data[i].status = status;
+                data[i].data1  = data1;
+                data[i].data2  = data2;
+                data[i].time   = time;
                 break;
             }
         }
 
-        pthread_mutex_unlock(&midi_mutex);
+        pthread_mutex_unlock(&mutex);
     }
 
-    void process(jack_nframes_t nframes)
+    void process(const jack_nframes_t nframes)
     {
-        unsigned char* buffer;
-        void* port_buffer = jack_port_get_buffer(jport, nframes);
-        jack_midi_clear_buffer(port_buffer);
+        void* portBuffer = jack_port_get_buffer(jport, nframes);
+        jack_midi_clear_buffer(portBuffer);
 
-        pthread_mutex_lock(&midi_mutex);
+        pthread_mutex_lock(&mutex);
 
         for (int i=0; i<MAX_MIDI_EVENTS; i++)
         {
-            if (midi_data[i].status != 0)
+            if (data[i].status != 0)
             {
-                buffer = jack_midi_event_reserve(port_buffer, midi_data[i].time, 3);
-                buffer[0] = midi_data[i].status;
-                buffer[1] = midi_data[i].data1;
-                buffer[2] = midi_data[i].data2;
+                unsigned char* const buffer = jack_midi_event_reserve(portBuffer, data[i].time, 3);
+                buffer[0] = data[i].status;
+                buffer[1] = data[i].data1;
+                buffer[2] = data[i].data2;
 
-                midi_data[i].status = 0;
+                data[i].status = 0;
             }
             else
                 break;
         }
 
-        pthread_mutex_unlock(&midi_mutex);
+        pthread_mutex_unlock(&mutex);
     }
 
 private:
-    midi_data_t midi_data[MAX_MIDI_EVENTS];
-    pthread_mutex_t midi_mutex;
     jack_port_t* const jport;
+
+    midi_data_t     data[MAX_MIDI_EVENTS];
+    pthread_mutex_t mutex;
 };
 
-static std::list<JackAssInstance*> instances;
+static  std::list<JackAssInstance*> instances;
 typedef std::list<JackAssInstance*>::iterator ins;
 
 // -------------------------------------------------
 // JACK calls
 
-static int jprocess_callback(jack_nframes_t nframes, void *arg)
+static int jprocess_callback(const jack_nframes_t nframes, void*)
 {
     for (ins it = instances.begin(); it != instances.end(); ++it)
         (*it)->process(nframes);
@@ -131,24 +130,34 @@ static int jprocess_callback(jack_nframes_t nframes, void *arg)
     return 0;
 }
 
-void init_jack(const char* client_name)
+static void jconnect_callback(const jack_port_id_t a, const jack_port_id_t b, const int connect, void*)
 {
-    if (! global_client)
-    {
-        global_client = jack_client_open(client_name, JackNullOption, nullptr);
-        jack_set_process_callback(global_client, jprocess_callback, nullptr);
-        jack_activate(global_client);
-    }
+    if (! connect)
+        return;
+
+    if (jack_port_is_mine(global_client, jack_port_by_id(global_client, a)) || jack_port_is_mine(global_client, jack_port_by_id(global_client, b)))
+        need_resend = true;
+}
+
+void init_jack(const char* const clientName)
+{
+    if (global_client)
+        return;
+
+    global_client = jack_client_open(clientName, JackNullOption, nullptr);
+    jack_set_port_connect_callback(global_client, jconnect_callback, nullptr);
+    jack_set_process_callback(global_client, jprocess_callback, nullptr);
+    jack_activate(global_client);
 }
 
 void close_jack()
 {
-    if (global_client && instances.size() == 0)
-    {
-        jack_deactivate(global_client);
-        jack_client_close(global_client);
-        global_client = nullptr;
-    }
+    if (instances.size() > 0 || ! global_client)
+        return;
+
+    jack_deactivate(global_client);
+    jack_client_close(global_client);
+    global_client = nullptr;
 }
 
 // -------------------------------------------------
@@ -157,40 +166,40 @@ void close_jack()
 class JackAss : public AudioEffectX
 {
 public:
-    JackAss(audioMasterCallback audioMaster) :
-        AudioEffectX(audioMaster, 0, 0),
-        instance(nullptr)
+    JackAss(audioMasterCallback audioMaster)
+        : AudioEffectX(audioMaster, 0, paramCount),
+          instance(nullptr)
     {
-        if (audioMaster)
-        {
-            isSynth();
+        for (int i=0; i < paramCount; i++)
+            paramBuffers[i] = 0.0f;
 
-            setNumInputs(0);
-            setNumOutputs(2); // For Hosts that don't support MIDI plugins
-            setUniqueID(CCONST('J', 'A', 's', 's'));
+        paramBuffers[7]  = float(100)/127; // volume
+        paramBuffers[8]  = 0.5f;           // balance (centered)
+        paramBuffers[10] = 0.5f;           // pan (centered)
 
-            char buf_str[64] = { 0 };
+        if (! audioMaster)
+            return;
 
-            // Register global JACK client if needed
-            if (getHostProductString(buf_str) == false)
-                strcpy(buf_str, "JackAss");
+        isSynth();
 
-            init_jack(buf_str);
+        setNumInputs(0);
+        setNumOutputs(2); // For Hosts that don't support MIDI plugins
+        setUniqueID(CCONST('J', 'A', 's', 's'));
 
-            // Create instance+port for this plugin
-#if __LP64__
-            sprintf(buf_str, "midi-out_%02lu", instances.size()+1);
-#else
-            sprintf(buf_str, "midi-out_%02lu", instances.size()+1);
-#endif
+        char strBuf[kVstMaxProductStrLen] = { 0 };
 
-            //jack_deactivate(global_client);
-            jack_port_t* jport = jack_port_register(global_client, buf_str, JACK_DEFAULT_MIDI_TYPE, JackPortIsOutput, 0);
-            //jack_activate(global_client);
+        // Register global JACK client if needed
+        if (! getHostProductString(strBuf))
+            strcpy(strBuf, "JackAss");
 
-            instance = new JackAssInstance(jport);
-            instances.push_back(instance);
-        }
+        init_jack(strBuf);
+
+        // Create instance+port for this plugin
+        sprintf(strBuf, "midi-out_%02lu", instances.size()+1);
+        jack_port_t* const jport = jack_port_register(global_client, strBuf, JACK_DEFAULT_MIDI_TYPE, JackPortIsOutput, 0);
+
+        instance = new JackAssInstance(jport);
+        instances.push_back(instance);
     }
 
     ~JackAss()
@@ -200,44 +209,108 @@ public:
             instances.remove(instance);
             delete instance;
         }
+
         close_jack();
     }
 
-    void processReplacing(float** /*inputs*/, float** outputs, VstInt32 sampleFrames)
+    void processReplacing(float** /*inputs*/, float** const outputs, const VstInt32 sampleFrames)
     {
         // Silent output
         float* out1 = outputs[0];
         float* out2 = outputs[1];
         memset(out1, 0, sizeof(float)*sampleFrames);
         memset(out2, 0, sizeof(float)*sampleFrames);
+
+        if (need_resend)
+        {
+            for (int i=0; i < paramCount; i++)
+                instance->putEvent(0xB0, i, int(paramBuffers[i]*127), 0);
+
+            need_resend = false;
+        }
     }
 
-    VstInt32 processEvents(VstEvents* ev)
+    VstInt32 processEvents(VstEvents* const ev)
     {
         for (VstInt32 i=0; i < ev->numEvents; i++)
         {
             if (ev->events[i]->type == kVstMidiType)
             {
                 const VstMidiEvent* event = (VstMidiEvent*)ev->events[i];
-                instance->put_event(event->midiData[0], event->midiData[1], event->midiData[2], event->deltaFrames);
+                instance->putEvent(event->midiData[0], event->midiData[1], event->midiData[2], event->deltaFrames);
             }
         }
+
         return 0;
     }
 
-    bool getEffectName(char* name)
+    void setParameter(const VstInt32 index, const float value)
+    {
+        if (index >= paramCount)
+            return;
+
+        paramBuffers[index] = value;
+        instance->putEvent(0xB0, index, int(value*127), 0);
+    }
+
+    float getParameter(const VstInt32 index)
+    {
+        if (index < paramCount)
+            return paramBuffers[index];
+
+        return 0.0f;
+    }
+
+    void getParameterLabel(const VstInt32 index, char* const label)
+    {
+        AudioEffectX::getParameterLabel(index, label);
+    }
+
+    void getParameterDisplay(const VstInt32 index, char* const text)
+    {
+        if (index < paramCount)
+        {
+            char strBuf[kVstMaxParamStrLen] = { 0 };
+            snprintf(strBuf,kVstMaxParamStrLen,  "%i", int(paramBuffers[index]*127));
+
+            vst_strncpy(text, strBuf, kVstMaxParamStrLen);
+        }
+        else
+            AudioEffectX::getParameterDisplay(index, text);
+    }
+
+    void getParameterName(const VstInt32 index, char* const text)
+    {
+        switch (index)
+        {
+        case 0:
+            vst_strncpy(text, "Bank Select", kVstMaxParamStrLen);
+            break;
+        case 1:
+            vst_strncpy(text, "Modulation", kVstMaxParamStrLen);
+            break;
+        case 2:
+            vst_strncpy(text, "Breath", kVstMaxParamStrLen);
+            break;
+        default:
+            AudioEffectX::getParameterName(index, text);
+            break;
+        }
+    }
+
+    bool getEffectName(char* const name)
     {
         vst_strncpy(name, "JackAss", kVstMaxEffectNameLen);
         return true;
     }
 
-    bool getProductString(char* text)
+    bool getProductString(char* const text)
     {
         vst_strncpy(text, "JackAss", kVstMaxProductStrLen);
         return true;
     }
 
-    bool getVendorString(char* text)
+    bool getVendorString(char* const text)
     {
         vst_strncpy(text, "falkTX", kVstMaxVendorStrLen);
         return true;
@@ -248,7 +321,7 @@ public:
         return 1000;
     }
 
-    VstInt32 canDo(char* text)
+    VstInt32 canDo(char* const text)
     {
         if (strcmp(text, "receiveVstEvents") == 0)
             return 1;
@@ -270,6 +343,9 @@ public:
 
 private:
     JackAssInstance* instance;
+
+    static const int paramCount = 32;
+    float paramBuffers[paramCount];
 };
 
 // -------------------------------------------------
