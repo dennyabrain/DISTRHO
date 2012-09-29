@@ -171,8 +171,7 @@ public:
 
     void resized()
     {
-        Component* const child = getChildComponent (0);
-        if (child != nullptr)
+        if (Component* const child = getChildComponent (0))
             child->setBounds (getLocalBounds().reduced (2, 0));
     }
 
@@ -216,13 +215,13 @@ class PopupMenu::Window  : public Component,
                            private Timer
 {
 public:
-    Window (const PopupMenu& menu, Window* const window,
+    Window (const PopupMenu& menu, Window* const parentWindow,
             const Options& opts,
             const bool alignToRectangle,
             const bool shouldDismissOnMouseUp,
             ApplicationCommandManager** const manager)
        : Component ("menu"),
-         owner (window),
+         owner (parentWindow),
          options (opts),
          activeSubMenu (nullptr),
          managerOfChosenCommand (manager),
@@ -248,8 +247,11 @@ public:
         setMouseClickGrabsKeyboardFocus (false);
         setAlwaysOnTop (true);
 
-        setLookAndFeel (menu.lookAndFeel);
-        setOpaque (getLookAndFeel().findColour (PopupMenu::backgroundColourId).isOpaque() || ! Desktop::canUseSemiTransparentWindows());
+        setLookAndFeel (owner != nullptr ? &(owner->getLookAndFeel())
+                                         : menu.lookAndFeel);
+
+        setOpaque (getLookAndFeel().findColour (PopupMenu::backgroundColourId).isOpaque()
+                     || ! Desktop::canUseSemiTransparentWindows());
 
         for (int i = 0; i < menu.items.size(); ++i)
         {
@@ -479,10 +481,9 @@ public:
             return;
         }
 
-        Window* currentlyModalWindow = dynamic_cast <Window*> (Component::getCurrentlyModalComponent());
-
-        if (currentlyModalWindow != nullptr && ! treeContains (currentlyModalWindow))
-            return;
+        if (Window* currentlyModalWindow = dynamic_cast <Window*> (Component::getCurrentlyModalComponent()))
+            if (! treeContains (currentlyModalWindow))
+                return;
 
         startTimer (PopupMenuSettings::timerInterval);  // do this in case it was called from a mouse
                                                         // move rather than a real timer callback
@@ -1192,9 +1193,7 @@ void PopupMenu::addCommandItem (ApplicationCommandManager* commandManager,
 {
     jassert (commandManager != nullptr && commandID != 0);
 
-    const ApplicationCommandInfo* const registeredInfo = commandManager->getCommandForID (commandID);
-
-    if (registeredInfo != nullptr)
+    if (const ApplicationCommandInfo* const registeredInfo = commandManager->getCommandForID (commandID))
     {
         ApplicationCommandInfo info (*registeredInfo);
         ApplicationCommandTarget* const target = commandManager->getTargetForCommand (commandID, info);
@@ -1257,8 +1256,8 @@ public:
 
     void resized()
     {
-        if (getChildComponent(0) != nullptr)
-            getChildComponent(0)->setBounds (getLocalBounds());
+        if (Component* const child = getChildComponent(0))
+            child->setBounds (getLocalBounds());
     }
 
 private:
@@ -1536,16 +1535,12 @@ int PopupMenu::showAt (Component* componentToAttachTo,
 
 bool JUCE_CALLTYPE PopupMenu::dismissAllActiveMenus()
 {
-    Array<Window*>& windows = Window::getActiveWindows();
-
+    const Array<Window*>& windows = Window::getActiveWindows();
     const int numWindows = windows.size();
-    for (int i = numWindows; --i >= 0;)
-    {
-        Window* const pmw = windows[i];
 
-        if (pmw != nullptr)
+    for (int i = numWindows; --i >= 0;)
+        if (Window* const pmw = windows[i])
             pmw->dismissMenu (nullptr);
-    }
 
     return numWindows > 0;
 }
@@ -1566,10 +1561,10 @@ bool PopupMenu::containsCommandItem (const int commandID) const
 {
     for (int i = items.size(); --i >= 0;)
     {
-        const Item* const mi = items.getUnchecked (i);
+        const Item& mi = *items.getUnchecked (i);
 
-        if ((mi->itemID == commandID && mi->commandManager != nullptr)
-             || (mi->subMenu != nullptr && mi->subMenu->containsCommandItem (commandID)))
+        if ((mi.itemID == commandID && mi.commandManager != nullptr)
+             || (mi.subMenu != nullptr && mi.subMenu->containsCommandItem (commandID)))
         {
             return true;
         }
@@ -1582,14 +1577,14 @@ bool PopupMenu::containsAnyActiveItems() const noexcept
 {
     for (int i = items.size(); --i >= 0;)
     {
-        const Item* const mi = items.getUnchecked (i);
+        const Item& mi = *items.getUnchecked (i);
 
-        if (mi->subMenu != nullptr)
+        if (mi.subMenu != nullptr)
         {
-            if (mi->subMenu->containsAnyActiveItems())
+            if (mi.subMenu->containsAnyActiveItems())
                 return true;
         }
-        else if (mi->isActive)
+        else if (mi.isActive)
         {
             return true;
         }
@@ -1622,13 +1617,9 @@ void PopupMenu::CustomComponent::setHighlighted (bool shouldBeHighlighted)
 
 void PopupMenu::CustomComponent::triggerMenuItem()
 {
-    PopupMenu::ItemComponent* const mic = dynamic_cast <PopupMenu::ItemComponent*> (getParentComponent());
-
-    if (mic != nullptr)
+    if (PopupMenu::ItemComponent* const mic = dynamic_cast <PopupMenu::ItemComponent*> (getParentComponent()))
     {
-        PopupMenu::Window* const pmw = dynamic_cast <PopupMenu::Window*> (mic->getParentComponent());
-
-        if (pmw != nullptr)
+        if (PopupMenu::Window* const pmw = dynamic_cast <PopupMenu::Window*> (mic->getParentComponent()))
         {
             pmw->dismissMenu (&mic->itemInfo);
         }

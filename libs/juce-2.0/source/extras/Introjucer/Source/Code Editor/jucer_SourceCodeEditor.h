@@ -101,11 +101,22 @@ public:
                 return true;
 
             MemoryBlock mb;
-            if (file.loadFileAsData (mb)
-                 && CharPointer_UTF8::isValidString (static_cast <const char*> (mb.getData()), mb.getSize()))
+            if (file.loadFileAsData (mb) && seemsToBeText (static_cast <const char*> (mb.getData()), (int) mb.getSize()))
                 return true;
 
             return false;
+        }
+
+        static bool seemsToBeText (const char* const chars, const int num) noexcept
+        {
+            for (int i = 0; i < num; ++i)
+            {
+                const char c = chars[i];
+                if ((c < 32 && c != '\t' && c != '\r' && c != '\n') || chars[i] > 126)
+                    return false;
+            }
+
+            return true;
         }
 
         Document* openFile (Project* project, const File& file) { return new SourceCodeDocument (project, file); }
@@ -132,7 +143,8 @@ public:
     void createEditor (CodeDocument& codeDocument);
     void setEditor (CodeEditorComponent*);
 
-    void highlightLine (int lineNum, int characterIndex);
+    void scrollToKeepRangeOnScreen (const Range<int>& range);
+    void highlight (const Range<int>& range, bool cursorAtStart);
 
     ScopedPointer<CodeEditorComponent> editor;
 
@@ -153,19 +165,51 @@ private:
 
 
 //==============================================================================
-class CppCodeEditorComponent  : public CodeEditorComponent
+class GenericCodeEditorComponent  : public CodeEditorComponent
 {
 public:
-    CppCodeEditorComponent (const File& file, CodeDocument& codeDocument);
-
-    void handleReturnKey();
-    void insertTextAtCaret (const String& newText);
+    GenericCodeEditorComponent (const File&, CodeDocument&, CodeTokeniser*);
+    ~GenericCodeEditorComponent();
 
     void addPopupMenuItems (PopupMenu&, const MouseEvent*);
     void performPopupMenuAction (int menuItemID);
 
+    void getAllCommands (Array<CommandID>&);
+    void getCommandInfo (CommandID, ApplicationCommandInfo&);
+    bool perform (const InvocationInfo&);
+
+    void showFindPanel();
+    void hideFindPanel();
+    void findSelection();
+    void findNext (bool forwards, bool skipCurrentSelection);
+    void handleEscapeKey();
+
+    void resized();
+
+    static String getSearchString()                 { return getAppSettings().getGlobalProperties().getValue ("searchString"); }
+    static void setSearchString (const String& s)   { getAppSettings().getGlobalProperties().setValue ("searchString", s); }
+    static bool isCaseSensitiveSearch()             { return getAppSettings().getGlobalProperties().getBoolValue ("searchCaseSensitive"); }
+    static void setCaseSensitiveSearch (bool b)     { getAppSettings().getGlobalProperties().setValue ("searchCaseSensitive", b); }
+
 private:
     File file;
+    class FindPanel;
+    ScopedPointer<FindPanel> findPanel;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GenericCodeEditorComponent);
+};
+
+//==============================================================================
+class CppCodeEditorComponent  : public GenericCodeEditorComponent
+{
+public:
+    CppCodeEditorComponent (const File& file, CodeDocument& codeDocument);
+    ~CppCodeEditorComponent();
+
+    void handleReturnKey();
+    void insertTextAtCaret (const String& newText);
+
+private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CppCodeEditorComponent);
 };
 

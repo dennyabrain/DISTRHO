@@ -36,8 +36,6 @@ public:
     StoredSettings();
     ~StoredSettings();
 
-    void initialise();
-
     PropertiesFile& getGlobalProperties();
     PropertiesFile& getProjectProperties (const String& projectUID);
 
@@ -71,6 +69,7 @@ public:
 private:
     OwnedArray<PropertiesFile> propertyFiles;
 
+    void updateGlobalProps();
     void loadSwatchColours();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (StoredSettings);

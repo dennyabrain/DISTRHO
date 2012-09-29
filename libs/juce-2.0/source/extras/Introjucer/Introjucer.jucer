@@ -220,10 +220,16 @@
             resource="1" file="Source/BinaryData/jucer_AudioPluginFilterTemplate.cpp"/>
       <FILE id="pvgTmND" name="jucer_AudioPluginFilterTemplate.h" compile="0"
             resource="1" file="Source/BinaryData/jucer_AudioPluginFilterTemplate.h"/>
+      <FILE id="xl685P" name="jucer_ContentCompTemplate.cpp" compile="0"
+            resource="1" file="Source/BinaryData/jucer_ContentCompTemplate.cpp"/>
+      <FILE id="gFj8Jl" name="jucer_ContentCompTemplate.h" compile="0" resource="1"
+            file="Source/BinaryData/jucer_ContentCompTemplate.h"/>
       <FILE id="pizYtv9" name="jucer_MainConsoleAppTemplate.cpp" compile="0"
             resource="1" file="Source/BinaryData/jucer_MainConsoleAppTemplate.cpp"/>
-      <FILE id="gJwHD6A" name="jucer_MainTemplate.cpp" compile="0" resource="1"
-            file="Source/BinaryData/jucer_MainTemplate.cpp"/>
+      <FILE id="tZCXSl" name="jucer_MainTemplate_NoWindow.cpp" compile="0"
+            resource="1" file="Source/BinaryData/jucer_MainTemplate_NoWindow.cpp"/>
+      <FILE id="W9iwHx" name="jucer_MainTemplate_Window.cpp" compile="0"
+            resource="1" file="Source/BinaryData/jucer_MainTemplate_Window.cpp"/>
       <FILE id="fWEsCu" name="jucer_NewComponentTemplate.cpp" compile="0"
             resource="1" file="Source/BinaryData/jucer_NewComponentTemplate.cpp"/>
       <FILE id="ljPBjw" name="jucer_NewComponentTemplate.h" compile="0" resource="1"
@@ -234,17 +240,14 @@
             file="Source/BinaryData/jucer_NewCppFileTemplate.h"/>
       <FILE id="teqnin" name="jucer_NewInlineComponentTemplate.h" compile="0"
             resource="1" file="Source/BinaryData/jucer_NewInlineComponentTemplate.h"/>
-      <FILE id="qk3GRQF" name="jucer_WindowTemplate.cpp" compile="0" resource="1"
-            file="Source/BinaryData/jucer_WindowTemplate.cpp"/>
-      <FILE id="2WpRpdr" name="jucer_WindowTemplate.h" compile="0" resource="1"
-            file="Source/BinaryData/jucer_WindowTemplate.h"/>
     </GROUP>
   </MAINGROUP>
   <JUCEOPTIONS JUCE_ASIO="disabled" JUCE_WASAPI="disabled" JUCE_DIRECTSOUND="disabled"
                JUCE_ALSA="disabled" JUCE_QUICKTIME="disabled" JUCE_OPENGL="disabled"
                JUCE_USE_FLAC="disabled" JUCE_USE_CDBURNER="disabled" JUCE_USE_CDREADER="disabled"
                JUCE_USE_CAMERA="disabled" JUCE_PLUGINHOST_VST="disabled" JUCE_PLUGINHOST_AU="disabled"
-               JUCE_USE_OGGVORBIS="disabled" JUCE_USE_COREIMAGE_LOADER="disabled"/>
+               JUCE_USE_OGGVORBIS="disabled" JUCE_USE_COREIMAGE_LOADER="disabled"
+               JUCE_LOG_ASSERTIONS="enabled"/>
   <MODULES>
     <MODULE id="juce_core" showAllCode="1"/>
     <MODULE id="juce_events" showAllCode="1"/>

@@ -47,14 +47,15 @@ namespace Tags
 const char* Project::projectFileExtension = ".jucer";
 
 //==============================================================================
-Project::Project (const File& file_)
+Project::Project (const File& f)
     : FileBasedDocument (projectFileExtension,
                          String ("*") + projectFileExtension,
                          "Choose a Jucer project to load",
                          "Save Jucer project"),
       projectRoot (Tags::projectRoot)
 {
-    setFile (file_);
+    Logger::writeToLog ("Loading project: " + f.getFullPathName());
+    setFile (f);
     removeDefunctExporters();
     setMissingDefaultValues();
 
@@ -440,8 +441,6 @@ Project::Item Project::Item::createCopy()         { Item i (*this); i.state = i.
 
 String Project::Item::getID() const               { return state [Ids::ID]; }
 void Project::Item::setID (const String& newID)   { state.setProperty (Ids::ID, newID, nullptr); }
-
-String Project::Item::getImageFileID() const      { return "id:" + getID(); }
 
 Image Project::Item::loadAsImageFile() const
 {

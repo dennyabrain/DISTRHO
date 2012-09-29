@@ -78,7 +78,8 @@ public:
 
     void updateMissingFileStatuses();
     virtual void createProjectTabs();
-    void deleteProjectTabs();
+    virtual void deleteProjectTabs();
+    void rebuildProjectTabs();
 
     void showBubbleMessage (const Rectangle<int>& pos, const String& text);
 

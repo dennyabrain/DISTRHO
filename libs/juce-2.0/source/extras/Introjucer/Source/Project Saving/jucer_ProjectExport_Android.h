@@ -252,7 +252,9 @@ private:
         //screens->setAttribute ("android:xlargeScreens", "true");
         screens->setAttribute ("android:anyDensity", "true");
 
-        manifest->createNewChildElement ("uses-sdk")->setAttribute ("android:minSdkVersion", getMinimumSDKVersionString());
+        XmlElement* sdk = manifest->createNewChildElement ("uses-sdk");
+        sdk->setAttribute ("android:minSdkVersion", getMinimumSDKVersionString());
+        sdk->setAttribute ("android:targetSdkVersion", "11");
 
         {
             const StringArray permissions (getPermissionsRequired());
@@ -271,6 +273,7 @@ private:
         XmlElement* app = manifest->createNewChildElement ("application");
         app->setAttribute ("android:label", "@string/app_name");
         app->setAttribute ("android:icon", "@drawable/icon");
+        app->setAttribute ("android:hardwareAccelerated", "false"); // (using the 2D acceleration slows down openGL)
 
         XmlElement* act = app->createNewChildElement ("activity");
         act->setAttribute ("android:name", getActivityName());

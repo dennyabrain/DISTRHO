@@ -38,7 +38,7 @@ class IntrojucerApp   : public JUCEApplication
 {
 public:
     //==============================================================================
-    IntrojucerApp() {}
+    IntrojucerApp() :  isRunningCommandLine (false) {}
     ~IntrojucerApp() {}
 
     //==============================================================================
@@ -46,7 +46,6 @@ public:
     {
         LookAndFeel::setDefaultLookAndFeel (&lookAndFeel);
         settings = new StoredSettings();
-        settings->initialise();
 
         if (commandLine.isNotEmpty())
         {
@@ -54,11 +53,14 @@ public:
 
             if (appReturnCode != commandLineNotPerformed)
             {
+                isRunningCommandLine = true;
                 setApplicationReturnValue (appReturnCode);
                 quit();
                 return;
             }
         }
+
+        initialiseLogger ("log_");
 
         if (sendCommandLineToPreexistingInstance())
         {
@@ -71,6 +73,12 @@ public:
 
         commandManager = new ApplicationCommandManager();
         commandManager->registerAllCommandsForTarget (this);
+
+        {
+            CodeDocument doc;
+            CppCodeEditorComponent ed (File::nonexistent, doc);
+            commandManager->registerAllCommandsForTarget (&ed);
+        }
 
         menuModel = new MainMenuModel();
 
@@ -110,25 +118,30 @@ public:
         settings = nullptr;
 
         LookAndFeel::setDefaultLookAndFeel (nullptr);
+
+        if (! isRunningCommandLine)
+            Logger::writeToLog ("Shutdown");
+
+        deleteLogger();
     }
 
     //==============================================================================
     void systemRequestedQuit()
     {
-        if ((! triggerAsyncQuitIfModalCompsActive())
-             && mainWindowList.askAllWindowsToClose())
-            quit();
+        closeModalCompsAndQuit();
     }
 
-    bool triggerAsyncQuitIfModalCompsActive()
+    void closeModalCompsAndQuit()
     {
         if (cancelAnyModalComponents())
         {
             new AsyncQuitRetrier();
-            return true;
         }
-
-        return false;
+        else
+        {
+            if (closeAllMainWindows())
+                quit();
+        }
     }
 
     //==============================================================================
@@ -262,13 +275,10 @@ public:
         menu.addCommandItem (commandManager, StandardApplicationCommandIDs::selectAll);
         menu.addCommandItem (commandManager, StandardApplicationCommandIDs::deselectAll);
         menu.addSeparator();
-        menu.addCommandItem (commandManager, CommandIDs::toFront);
-        menu.addCommandItem (commandManager, CommandIDs::toBack);
-        menu.addSeparator();
-        menu.addCommandItem (commandManager, CommandIDs::group);
-        menu.addCommandItem (commandManager, CommandIDs::ungroup);
-        menu.addSeparator();
-        menu.addCommandItem (commandManager, CommandIDs::bringBackLostItems);
+        menu.addCommandItem (commandManager, CommandIDs::showFindPanel);
+        menu.addCommandItem (commandManager, CommandIDs::findSelection);
+        menu.addCommandItem (commandManager, CommandIDs::findNext);
+        menu.addCommandItem (commandManager, CommandIDs::findPrevious);
     }
 
     virtual void createViewMenu (PopupMenu& menu)
@@ -311,7 +321,6 @@ public:
         for (int i = 0; i < numDocs; ++i)
         {
             OpenDocumentManager::Document* doc = getApp().openDocumentManager.getOpenDocument(i);
-
             menu.addItem (activeDocumentsBaseID + i, doc->getName());
         }
 
@@ -332,7 +341,6 @@ public:
 
         const CommandID ids[] = { CommandIDs::newProject,
                                   CommandIDs::open,
-                                  CommandIDs::showPrefs,
                                   CommandIDs::closeAllDocuments,
                                   CommandIDs::saveAll,
                                   CommandIDs::updateModules,
@@ -354,11 +362,6 @@ public:
         case CommandIDs::open:
             result.setInfo ("Open...", "Opens a Jucer project", CommandCategories::general, 0);
             result.defaultKeypresses.add (KeyPress ('o', ModifierKeys::commandModifier, 0));
-            break;
-
-        case CommandIDs::showPrefs:
-            result.setInfo ("Preferences...", "Shows the preferences panel.", CommandCategories::general, 0);
-            result.defaultKeypresses.add (KeyPress (',', ModifierKeys::commandModifier, 0));
             break;
 
         case CommandIDs::showAppearanceSettings:
@@ -395,7 +398,6 @@ public:
         {
             case CommandIDs::newProject:                createNewProject(); break;
             case CommandIDs::open:                      askUserToOpenFile(); break;
-            case CommandIDs::showPrefs:                 showPrefsPanel(); break;
             case CommandIDs::saveAll:                   openDocumentManager.saveAll(); break;
             case CommandIDs::closeAllDocuments:         closeAllDocuments (true); break;
             case CommandIDs::showUTF8Tool:              showUTF8ToolWindow (utf8Window); break;
@@ -408,11 +410,6 @@ public:
     }
 
     //==============================================================================
-    void showPrefsPanel()
-    {
-        jassertfalse;
-    }
-
     void createNewProject()
     {
         if (makeSureUserHasSelectedModuleFolder())
@@ -441,6 +438,11 @@ public:
     bool closeAllDocuments (bool askUserToSave)
     {
         return openDocumentManager.closeAll (askUserToSave);
+    }
+
+    virtual bool closeAllMainWindows()
+    {
+        return mainWindowList.askAllWindowsToClose();
     }
 
     bool makeSureUserHasSelectedModuleFolder()
@@ -473,8 +475,58 @@ public:
     }
 
     //==============================================================================
+    void initialiseLogger (const char* filePrefix)
+    {
+        if (logger == nullptr)
+        {
+            logger = FileLogger::createDateStampedLogger (getLogFolderName(), filePrefix, ".txt",
+                                                          getApplicationName() + " " + getApplicationVersion()
+                                                            + "  ---  Build date: " __DATE__);
+            Logger::setCurrentLogger (logger);
+        }
+    }
+
+    struct FileWithTime
+    {
+        FileWithTime (const File& f) : file (f), time (f.getLastModificationTime()) {}
+        FileWithTime() {}
+
+        bool operator<  (const FileWithTime& other) const    { return time <  other.time; }
+        bool operator== (const FileWithTime& other) const    { return time == other.time; }
+
+        File file;
+        Time time;
+    };
+
+    void deleteLogger()
+    {
+        const int maxNumLogFilesToKeep = 50;
+
+        Logger::setCurrentLogger (nullptr);
+
+        if (logger != nullptr)
+        {
+            Array<File> logFiles;
+            logger->getLogFile().getParentDirectory().findChildFiles (logFiles, File::findFiles, false);
+
+            if (logFiles.size() > maxNumLogFilesToKeep)
+            {
+                Array <FileWithTime> files;
+
+                for (int i = 0; i < logFiles.size(); ++i)
+                    files.addUsingDefaultSort (logFiles.getReference(i));
+
+                for (int i = 0; i < files.size() - maxNumLogFilesToKeep; ++i)
+                    files.getReference(i).file.deleteFile();
+            }
+        }
+
+        logger = nullptr;
+    }
+
     virtual void doExtraInitialisation() {}
     virtual void addExtraConfigItems (Project&, TreeViewItem&) {}
+    virtual String getLogFolderName() const    { return "com.juce.introjucer"; }
 
     virtual Component* createProjectContentComponent() const
     {
@@ -494,6 +546,10 @@ public:
 
     ScopedPointer<Component> appearanceEditorWindow, utf8Window;
 
+    ScopedPointer<FileLogger> logger;
+
+    bool isRunningCommandLine;
+
 private:
     class AsyncQuitRetrier  : private Timer
     {
@@ -505,9 +561,8 @@ private:
             stopTimer();
             delete this;
 
-            JUCEApplication* app = JUCEApplication::getInstance();
-            if (app != nullptr)
-                app->systemRequestedQuit();
+            if (JUCEApplication::getInstance() != nullptr)
+                IntrojucerApp::getApp().closeModalCompsAndQuit();
         }
 
         JUCE_DECLARE_NON_COPYABLE (AsyncQuitRetrier);

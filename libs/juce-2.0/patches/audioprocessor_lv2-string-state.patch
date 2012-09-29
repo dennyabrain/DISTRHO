@@ -1,38 +1,18 @@
-diff --git a/modules/juce_audio_processors/processors/juce_AudioProcessor.cpp b/modules/juce_audio_processors/processors/juce_AudioProcessor.cpp
-index a49e41d..c1ea56b 100644
---- a/modules/juce_audio_processors/processors/juce_AudioProcessor.cpp
-+++ b/modules/juce_audio_processors/processors/juce_AudioProcessor.cpp
-@@ -251,6 +251,16 @@ void AudioProcessor::setCurrentProgramStateInformation (const void* data, int si
- }
- 
- //==============================================================================
-+String AudioProcessor::getStateInformationString ()
-+{
-+    return String::empty;
-+}
-+
-+void AudioProcessor::setStateInformationString (const String& /* data */)
-+{
-+}
-+
-+//==============================================================================
- // magic number to identify memory blocks that we've stored as XML
- const uint32 magicXmlNumber = 0x21324356;
- 
 diff --git a/modules/juce_audio_processors/processors/juce_AudioProcessor.h b/modules/juce_audio_processors/processors/juce_AudioProcessor.h
-index 71f3fb4..0bf01e6 100644
+index 6eb3479..2b1f7e2 100644
 --- a/modules/juce_audio_processors/processors/juce_AudioProcessor.h
 +++ b/modules/juce_audio_processors/processors/juce_AudioProcessor.h
-@@ -538,6 +538,12 @@ public:
-     */
-     virtual void setCurrentProgramStateInformation (const void* data, int sizeInBytes);
- 
-+    //==============================================================================
-+    /** LV2 specific calls, saving/restore as string. */
-+
-+    virtual String getStateInformationString ();
-+
-+    virtual void setStateInformationString (const String& data);
+@@ -534,6 +534,13 @@ public:
+     virtual void numChannelsChanged();
  
      //==============================================================================
++    /** LV2 specific calls, saving/restore as string. */
++
++    virtual String getStateInformationString () { return String::empty; }
++
++    virtual void setStateInformationString (const String& data) {}
++
++    //==============================================================================
      /** Adds a listener that will be called when an aspect of this processor changes. */
+     void addListener (AudioProcessorListener* newListener);
+ 

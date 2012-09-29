@@ -27,8 +27,8 @@
 #include "../Application/jucer_OpenDocumentManager.h"
 
 //==============================================================================
-SourceCodeDocument::SourceCodeDocument (Project* project_, const File& file_)
-    : modDetector (file_), project (project_)
+SourceCodeDocument::SourceCodeDocument (Project* p, const File& f)
+    : modDetector (f), project (p)
 {
 }
 
@@ -97,8 +97,8 @@ void SourceCodeDocument::applyLastState (CodeEditorComponent& editor) const
 }
 
 //==============================================================================
-SourceCodeEditor::SourceCodeEditor (OpenDocumentManager::Document* document_)
-    : DocumentEditorComponent (document_)
+SourceCodeEditor::SourceCodeEditor (OpenDocumentManager::Document* doc)
+    : DocumentEditorComponent (doc)
 {
 }
 
@@ -106,9 +106,7 @@ SourceCodeEditor::~SourceCodeEditor()
 {
     getAppSettings().appearance.settings.removeListener (this);
 
-    SourceCodeDocument* doc = dynamic_cast <SourceCodeDocument*> (getDocument());
-
-    if (doc != nullptr)
+    if (SourceCodeDocument* doc = dynamic_cast <SourceCodeDocument*> (getDocument()))
         doc->updateLastState (*editor);
 }
 
@@ -117,7 +115,7 @@ void SourceCodeEditor::createEditor (CodeDocument& codeDocument)
     if (document->getFile().hasFileExtension (sourceOrHeaderFileExtensions))
         setEditor (new CppCodeEditorComponent (document->getFile(), codeDocument));
     else
-        setEditor (new CodeEditorComponent (codeDocument, nullptr));
+        setEditor (new GenericCodeEditorComponent (document->getFile(), codeDocument, nullptr));
 }
 
 void SourceCodeEditor::setEditor (CodeEditorComponent* newEditor)
@@ -131,16 +129,28 @@ void SourceCodeEditor::setEditor (CodeEditorComponent* newEditor)
     getAppSettings().appearance.settings.addListener (this);
 }
 
-void SourceCodeEditor::highlightLine (int lineNum, int characterIndex)
+void SourceCodeEditor::scrollToKeepRangeOnScreen (const Range<int>& range)
 {
-    if (lineNum <= editor->getFirstLineOnScreen()
-         || lineNum >= editor->getFirstLineOnScreen() + editor->getNumLinesOnScreen() - 1)
-    {
-        editor->scrollToLine (jmax (0, jmin (lineNum - editor->getNumLinesOnScreen() / 3,
-                                             editor->getDocument().getNumLines() - editor->getNumLinesOnScreen())));
-    }
+    const int space = jmin (10, editor->getNumLinesOnScreen() / 3);
+    const CodeDocument::Position start (editor->getDocument(), range.getStart());
+    const CodeDocument::Position end   (editor->getDocument(), range.getEnd());
 
-    editor->moveCaretTo (CodeDocument::Position (editor->getDocument(), lineNum - 1, characterIndex), false);
+    editor->scrollToKeepLinesOnScreen (Range<int> (start.getLineNumber() - space, end.getLineNumber() + space));
+}
+
+void SourceCodeEditor::highlight (const Range<int>& range, bool cursorAtStart)
+{
+    scrollToKeepRangeOnScreen (range);
+
+    if (cursorAtStart)
+    {
+        editor->moveCaretTo (CodeDocument::Position (editor->getDocument(), range.getEnd()),   false);
+        editor->moveCaretTo (CodeDocument::Position (editor->getDocument(), range.getStart()), true);
+    }
+    else
+    {
+        editor->setHighlightedRegion (range);
+    }
 }
 
 void SourceCodeEditor::resized()
@@ -159,16 +169,313 @@ void SourceCodeEditor::valueTreeRedirected (ValueTree&)                         
 
 
 //==============================================================================
+GenericCodeEditorComponent::GenericCodeEditorComponent (const File& f, CodeDocument& codeDocument,
+                                                        CodeTokeniser* tokeniser)
+   : CodeEditorComponent (codeDocument, tokeniser), file (f)
+{
+    setCommandManager (commandManager);
+}
+
+GenericCodeEditorComponent::~GenericCodeEditorComponent() {}
+
+enum { showInFinderID = 0x2fe821e3 };
+
+void GenericCodeEditorComponent::addPopupMenuItems (PopupMenu& menu, const MouseEvent* e)
+{
+    menu.addItem (showInFinderID,
+                 #if JUCE_MAC
+                  "Reveal " + file.getFileName() + " in Finder");
+                 #else
+                  "Reveal " + file.getFileName() + " in Explorer");
+                 #endif
+    menu.addSeparator();
+
+    CodeEditorComponent::addPopupMenuItems (menu, e);
+}
+
+void GenericCodeEditorComponent::performPopupMenuAction (int menuItemID)
+{
+    if (menuItemID == showInFinderID)
+        file.revealToUser();
+    else
+        CodeEditorComponent::performPopupMenuAction (menuItemID);
+}
+
+void GenericCodeEditorComponent::getAllCommands (Array <CommandID>& commands)
+{
+    CodeEditorComponent::getAllCommands (commands);
+
+    const CommandID ids[] = { CommandIDs::showFindPanel,
+                              CommandIDs::findSelection,
+                              CommandIDs::findNext,
+                              CommandIDs::findPrevious };
+
+    commands.addArray (ids, numElementsInArray (ids));
+}
+
+void GenericCodeEditorComponent::getCommandInfo (const CommandID commandID, ApplicationCommandInfo& result)
+{
+    const bool anythingSelected = isHighlightActive();
+
+    switch (commandID)
+    {
+        case CommandIDs::showFindPanel:
+            result.setInfo (TRANS ("Find"), TRANS ("Searches for text in the current document."), "Editing", 0);
+            result.defaultKeypresses.add (KeyPress ('f', ModifierKeys::commandModifier, 0));
+            break;
+
+        case CommandIDs::findSelection:
+            result.setInfo (TRANS ("Find Selection"), TRANS ("Searches for the currently selected text."), "Editing", 0);
+            result.setActive (anythingSelected);
+            result.defaultKeypresses.add (KeyPress ('l', ModifierKeys::commandModifier, 0));
+            break;
+
+        case CommandIDs::findNext:
+            result.setInfo (TRANS ("Find Next"), TRANS ("Searches for the next occurrence of the current search-term."), "Editing", 0);
+            result.defaultKeypresses.add (KeyPress ('g', ModifierKeys::commandModifier, 0));
+            break;
+
+        case CommandIDs::findPrevious:
+            result.setInfo (TRANS ("Find Previous"), TRANS ("Searches for the previous occurrence of the current search-term."), "Editing", 0);
+            result.defaultKeypresses.add (KeyPress ('g', ModifierKeys::commandModifier | ModifierKeys::shiftModifier, 0));
+            result.defaultKeypresses.add (KeyPress ('d', ModifierKeys::commandModifier, 0));
+            break;
+
+        default:
+            CodeEditorComponent::getCommandInfo (commandID, result);
+            break;
+    }
+}
+
+bool GenericCodeEditorComponent::perform (const InvocationInfo& info)
+{
+    switch (info.commandID)
+    {
+        case CommandIDs::showFindPanel:     showFindPanel();         return true;
+        case CommandIDs::findSelection:     findSelection();         return true;
+        case CommandIDs::findNext:          findNext (true, true);   return true;
+        case CommandIDs::findPrevious:      findNext (false, false); return true;
+        default:                            break;
+    }
+
+    return CodeEditorComponent::perform (info);
+}
+
+//==============================================================================
+class GenericCodeEditorComponent::FindPanel  : public Component,
+                                               private TextEditor::Listener,
+                                               private Button::Listener
+{
+public:
+    FindPanel()
+        : caseButton ("Case-sensitive"),
+          findPrev ("<"),
+          findNext (">")
+    {
+        editor.setColour (CaretComponent::caretColourId, Colours::black);
+
+        addAndMakeVisible (&editor);
+        label.setText ("Find:", false);
+        label.setColour (Label::textColourId, Colours::white);
+        label.attachToComponent (&editor, false);
+
+        addAndMakeVisible (&caseButton);
+        caseButton.setColour (ToggleButton::textColourId, Colours::white);
+        caseButton.setToggleState (isCaseSensitiveSearch(), false);
+        caseButton.addListener (this);
+
+        findPrev.setConnectedEdges (Button::ConnectedOnRight);
+        findNext.setConnectedEdges (Button::ConnectedOnLeft);
+        addAndMakeVisible (&findPrev);
+        addAndMakeVisible (&findNext);
+
+        setWantsKeyboardFocus (false);
+        setFocusContainer (true);
+        findPrev.setWantsKeyboardFocus (false);
+        findNext.setWantsKeyboardFocus (false);
+
+        editor.setText (getSearchString());
+        editor.addListener (this);
+    }
+
+    void setCommandManager (ApplicationCommandManager* cm)
+    {
+        findPrev.setCommandToTrigger (cm, CommandIDs::findPrevious, true);
+        findNext.setCommandToTrigger (cm, CommandIDs::findNext, true);
+    }
+
+    void paint (Graphics& g)
+    {
+        Path outline;
+        outline.addRoundedRectangle (1.0f, 1.0f, getWidth() - 2.0f, getHeight() - 2.0f, 8.0f);
+
+        g.setColour (Colours::black.withAlpha (0.6f));
+        g.fillPath (outline);
+        g.setColour (Colours::white.withAlpha (0.8f));
+        g.strokePath (outline, PathStrokeType (1.0f));
+    }
+
+    void resized()
+    {
+        int y = 30;
+        editor.setBounds (10, y, getWidth() - 20, 24);
+        y += 30;
+        caseButton.setBounds (10, y, getWidth() / 2 - 10, 22);
+        findNext.setBounds (getWidth() - 40, y, 30, 22);
+        findPrev.setBounds (getWidth() - 70, y, 30, 22);
+    }
+
+    void buttonClicked (Button*)
+    {
+        setCaseSensitiveSearch (caseButton.getToggleState());
+    }
+
+    void textEditorTextChanged (TextEditor&)
+    {
+        setSearchString (editor.getText());
+
+        if (CppCodeEditorComponent* ed = getOwner())
+            ed->findNext (true, false);
+    }
+
+    void textEditorFocusLost (TextEditor&) {}
+
+    void textEditorReturnKeyPressed (TextEditor&)
+    {
+        commandManager->invokeDirectly (CommandIDs::findNext, true);
+    }
+
+    void textEditorEscapeKeyPressed (TextEditor&)
+    {
+        if (CppCodeEditorComponent* ed = getOwner())
+            ed->hideFindPanel();
+    }
+
+    CppCodeEditorComponent* getOwner() const
+    {
+        return findParentComponentOfClass <CppCodeEditorComponent>();
+    }
+
+    TextEditor editor;
+    Label label;
+    ToggleButton caseButton;
+    TextButton findPrev, findNext;
+};
+
+void GenericCodeEditorComponent::resized()
+{
+    CodeEditorComponent::resized();
+
+    if (findPanel != nullptr)
+    {
+        findPanel->setSize (jmin (260, getWidth() - 32), 100);
+        findPanel->setTopRightPosition (getWidth() - 16, 8);
+    }
+}
+
+void GenericCodeEditorComponent::showFindPanel()
+{
+    if (findPanel == nullptr)
+    {
+        findPanel = new FindPanel();
+        findPanel->setCommandManager (commandManager);
+
+        addAndMakeVisible (findPanel);
+        resized();
+    }
+
+    findPanel->editor.grabKeyboardFocus();
+    findPanel->editor.selectAll();
+}
+
+void GenericCodeEditorComponent::hideFindPanel()
+{
+    findPanel = nullptr;
+}
+
+void GenericCodeEditorComponent::findSelection()
+{
+    const String selected (getTextInRange (getHighlightedRegion()));
+
+    if (selected.isNotEmpty())
+    {
+        setSearchString (selected);
+        findNext (true, true);
+    }
+}
+
+void GenericCodeEditorComponent::findNext (bool forwards, bool skipCurrentSelection)
+{
+    const Range<int> highlight (getHighlightedRegion());
+    const CodeDocument::Position startPos (getDocument(), skipCurrentSelection ? highlight.getEnd()
+                                                                               : highlight.getStart());
+    int lineNum = startPos.getLineNumber();
+    int linePos = startPos.getIndexInLine();
+
+    const int totalLines = getDocument().getNumLines();
+    const String searchText (getSearchString());
+    const bool caseSensitive = isCaseSensitiveSearch();
+
+    for (int linesToSearch = totalLines; --linesToSearch >= 0;)
+    {
+        String line (getDocument().getLine (lineNum));
+        int index;
+
+        if (forwards)
+        {
+            index = caseSensitive ? line.indexOf (linePos, searchText)
+                                  : line.indexOfIgnoreCase (linePos, searchText);
+        }
+        else
+        {
+            if (linePos >= 0)
+                line = line.substring (0, linePos);
+
+            index = caseSensitive ? line.lastIndexOf (searchText)
+                                  : line.lastIndexOfIgnoreCase (searchText);
+        }
+
+        if (index >= 0)
+        {
+            const CodeDocument::Position p (getDocument(), lineNum, index);
+            selectRegion (p, p.movedBy (searchText.length()));
+            break;
+        }
+
+        if (forwards)
+        {
+            linePos = 0;
+            lineNum = (lineNum + 1) % totalLines;
+        }
+        else
+        {
+            if (--lineNum < 0)
+                lineNum = totalLines - 1;
+
+            linePos = -1;
+        }
+    }
+}
+
+void GenericCodeEditorComponent::handleEscapeKey()
+{
+    CodeEditorComponent::handleEscapeKey();
+    hideFindPanel();
+}
+
+//==============================================================================
 static CPlusPlusCodeTokeniser cppTokeniser;
 
-CppCodeEditorComponent::CppCodeEditorComponent (const File& f, CodeDocument& codeDocument)
-    : CodeEditorComponent (codeDocument, &cppTokeniser), file (f)
+CppCodeEditorComponent::CppCodeEditorComponent (const File& f, CodeDocument& doc)
+    : GenericCodeEditorComponent (f, doc, &cppTokeniser)
 {
 }
 
+CppCodeEditorComponent::~CppCodeEditorComponent() {}
+
 void CppCodeEditorComponent::handleReturnKey()
 {
-    CodeEditorComponent::handleReturnKey();
+    GenericCodeEditorComponent::handleReturnKey();
 
     CodeDocument::Position pos (getCaretPos());
 
@@ -216,7 +523,7 @@ void CppCodeEditorComponent::insertTextAtCaret (const String& newText)
             String blockIndent, lastLineIndent;
             if (CodeHelpers::getIndentForCurrentBlock (pos, getTabString (getTabSize()), blockIndent, lastLineIndent))
             {
-                CodeEditorComponent::insertTextAtCaret (blockIndent);
+                GenericCodeEditorComponent::insertTextAtCaret (blockIndent);
 
                 if (newText == "{")
                     insertTabAtCaret();
@@ -224,28 +531,5 @@ void CppCodeEditorComponent::insertTextAtCaret (const String& newText)
         }
     }
 
-    CodeEditorComponent::insertTextAtCaret (newText);
-}
-
-enum { showInFinderID = 0x2fe821e3 };
-
-void CppCodeEditorComponent::addPopupMenuItems (PopupMenu& menu, const MouseEvent* e)
-{
-    menu.addItem (showInFinderID,
-                 #if JUCE_MAC
-                  "Reveal " + file.getFileName() + " in Finder");
-                 #else
-                  "Reveal " + file.getFileName() + " in Explorer");
-                 #endif
-    menu.addSeparator();
-
-    CodeEditorComponent::addPopupMenuItems (menu, e);
-}
-
-void CppCodeEditorComponent::performPopupMenuAction (int menuItemID)
-{
-    if (menuItemID == showInFinderID)
-        file.revealToUser();
-    else
-        CodeEditorComponent::performPopupMenuAction (menuItemID);
+    GenericCodeEditorComponent::insertTextAtCaret (newText);
 }
