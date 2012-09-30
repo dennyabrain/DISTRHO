@@ -1,0 +1,384 @@
+/*
+ * DISTHRO Plugin Toolkit (DPT)
+ * Copyright (C) 2012 Filipe Coelho <falktx@gmail.com>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of
+ * the License, or any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * A copy of the license is included with this software, or can be
+ * found online at www.gnu.org/licenses.
+ */
+
+#include "DistrhoPluginInfo.h"
+
+#if defined(DISTRHO_PLUGIN_TARGET_DSSI) && DISTRHO_PLUGIN_HAS_UI
+
+#include "DistrhoUIInternal.h"
+//#include "DistrhoUtils.h"
+
+#include "dssi/dssi-ui.h"
+
+#include <QtGui/QApplication>
+#include <QtGui/QDialog>
+#include <QtGui/QVBoxLayout>
+
+#include <lo/lo.h>
+
+// -------------------------------------------------
+
+START_NAMESPACE_DISTRHO
+
+struct OscData {
+    const char* path;
+    lo_address addr;
+};
+
+void osc_send_configure(const OscData* oscData, const char* const key, const char* const value)
+{
+    char targetPath[strlen(oscData->path)+11];
+    strcpy(targetPath, oscData->path);
+    strcat(targetPath, "/configure");
+    lo_send(oscData->addr, targetPath, "ss", key, value);
+}
+
+void osc_send_control(const OscData* oscData, const int32_t index, const float value)
+{
+    char targetPath[strlen(oscData->path)+9];
+    strcpy(targetPath, oscData->path);
+    strcat(targetPath, "/control");
+    lo_send(oscData->addr, targetPath, "if", index, value);
+}
+
+void osc_send_update(const OscData* oscData, const char* const url)
+{
+    char targetPath[strlen(oscData->path)+8];
+    strcpy(targetPath, oscData->path);
+    strcat(targetPath, "/update");
+    lo_send(oscData->addr, targetPath, "s", url);
+}
+
+void osc_send_exiting(const OscData* oscData)
+{
+    char targetPath[strlen(oscData->path)+9];
+    strcpy(targetPath, oscData->path);
+    strcat(targetPath, "/exiting");
+    lo_send(oscData->addr, targetPath, "");
+}
+
+class UIDssi : public QObject
+{
+public:
+    UIDssi(const OscData* oscData_, const char* title)
+        : ui(this, changeStateCallback, setParameterValueCallback, uiResizeCallback),
+          dialog(nullptr),
+          vbLayout(&dialog),
+          oscData(oscData_)
+    {
+        dialog.setLayout(&vbLayout);
+        vbLayout.addWidget(ui.getNativeWidget());
+        vbLayout.setContentsMargins(0, 0, 0, 0);
+
+        //ui.createWindow((PuglNativeWindow)dialog.winId());
+
+        dialog.setFixedSize(ui.getWidth(), ui.getHeight());
+        dialog.setWindowTitle(title);
+
+        uiTimer = startTimer(30);
+    }
+
+    ~UIDssi()
+    {
+        if (uiTimer)
+        {
+            killTimer(uiTimer);
+            osc_send_exiting(oscData);
+        }
+
+        dialog.close();
+        //ui.destroyWindow();
+    }
+
+    // ---------------------------------------------
+
+#if DISTRHO_PLUGIN_WANT_STATE
+    void dssiui_configure(const char* key, const char* value)
+    {
+        ui.stateChanged(key, value);
+    }
+#endif
+
+    void dssiui_control(unsigned long index, float value)
+    {
+        ui.parameterChanged(index - DISTRHO_PLUGIN_NUM_INPUTS - DISTRHO_PLUGIN_NUM_OUTPUTS, value);
+    }
+
+#if DISTRHO_PLUGIN_WANT_PROGRAMS
+    void dssiui_program(unsigned long bank, unsigned long program)
+    {
+        unsigned long index = bank * 128 + program;
+        ui.programChanged(index);
+    }
+#endif
+
+#if DISTRHO_PLUGIN_IS_SYNTH
+    void dssiui_midi(unsigned char data[4])
+    {
+        // TODO
+    }
+#endif
+
+    void dssiui_show()
+    {
+        dialog.show();
+    }
+
+    void dssiui_hide()
+    {
+        dialog.hide();
+    }
+
+    void dssiui_quit()
+    {
+        if (uiTimer)
+        {
+            killTimer(uiTimer);
+            uiTimer = 0;
+        }
+    }
+
+    // ---------------------------------------------
+
+protected:
+    void changeState(const char* key, const char* value)
+    {
+        osc_send_configure(oscData, key, value);
+    }
+
+    void setParameterValue(uint32_t index, float value)
+    {
+        osc_send_control(oscData, index, value);
+    }
+
+    void uiResize(unsigned int width, unsigned int height)
+    {
+        dialog.setFixedSize(width, height);
+    }
+
+    void timerEvent(QTimerEvent* event)
+    {
+        if (event->timerId() == uiTimer)
+            ui.idle();
+
+        QObject::timerEvent(event);
+    }
+
+private:
+    UIInternal ui;
+
+    // Qt4 stuff
+    QDialog dialog;
+    QVBoxLayout vbLayout;
+    int uiTimer;
+
+    const OscData* const oscData;
+
+    // ---------------------------------------------
+    // Callbacks
+
+    static void changeStateCallback(void* ptr, const char* key, const char* value)
+    {
+        UIDssi* const _this_ = (UIDssi*)ptr;
+        assert(_this_);
+
+        _this_->changeState(key, value);
+    }
+
+    static void setParameterValueCallback(void* ptr, uint32_t index, float value)
+    {
+        UIDssi* const _this_ = (UIDssi*)ptr;
+        assert(_this_);
+
+        _this_->setParameterValue(index, value);
+    }
+
+    static void uiResizeCallback(void* ptr, unsigned int width, unsigned int height)
+    {
+        UIDssi* const _this_ = (UIDssi*)ptr;
+        assert(_this_);
+
+        _this_->uiResize(width, height);
+    }
+};
+
+// -------------------------------------------------
+
+void osc_error_handler(const int num, const char* const msg, const char* const path)
+{
+    qCritical("osc_error_handler(%i, \"%s\", \"%s\")", num, msg, path);
+}
+
+#if DISTRHO_PLUGIN_WANT_STATE
+int osc_configure_handler(const char* const, const char* const, lo_arg** const argv, const int, const lo_message, void* const data)
+{
+    UIDssi* const ui = (UIDssi*)data;
+
+    const char* const key   = &argv[0]->s;
+    const char* const value = &argv[1]->s;
+
+    ui->dssiui_configure(key, value);
+
+    return 0;
+}
+#endif
+
+int osc_control_handler(const char* const, const char* const, lo_arg** const argv, const int, const lo_message, void* const data)
+{
+    UIDssi* const ui = (UIDssi*)data;
+
+    const int32_t index = argv[0]->i;
+    const float   value = argv[1]->f;
+
+    ui->dssiui_control(index, value);
+
+    return 0;
+}
+
+#if DISTRHO_PLUGIN_WANT_PROGRAMS
+int osc_program_handler(const char* const, const char* const, lo_arg** const argv, const int, const lo_message, void* const data)
+{
+    UIDssi* const ui = (UIDssi*)data;
+
+    const int32_t bank    = argv[0]->i;
+    const int32_t program = argv[1]->f;
+
+    ui->dssiui_program(bank, program);
+
+    return 0;
+}
+#endif
+
+#if DISTRHO_PLUGIN_IS_SYNTH
+int osc_midi_handler(const char* const path, const char* const types, lo_arg** const argv, const int argc, const lo_message msg, void* const data)
+{
+    UIDssi* const ui = (UIDssi*)data;
+
+    const uint8_t* data = argv[0]->m;
+
+    ui->dssiui_midi(data);
+
+    return 0;
+}
+#endif
+
+int osc_show_handler(const char* const, const char* const, lo_arg** const, const int, const lo_message, void* const data)
+{
+    UIDssi* const ui = (UIDssi*)data;
+
+    ui->dssiui_show();
+
+    return 0;
+}
+
+int osc_hide_handler(const char* const, const char* const, lo_arg** const, const int, const lo_message, void* const data)
+{
+    UIDssi* const ui = (UIDssi*)data;
+
+    ui->dssiui_hide();
+
+    return 0;
+}
+
+int osc_quit_handler(const char* const, const char* const, lo_arg** const, const int, const lo_message, void* const data)
+{
+    UIDssi* const ui = (UIDssi*)data;
+
+    ui->dssiui_quit();
+    delete ui;
+
+    return 0;
+}
+
+END_NAMESPACE_DISTRHO
+
+int main(int argc, char* argv[])
+{
+    USE_NAMESPACE_DISTRHO
+
+    if (argc != 5)
+    {
+        qWarning("Usage: %s <osc-url> <so-file> <plugin-label> <instance-name>", argv[0]);
+        return 1;
+    }
+
+    const char* oscUrl  = argv[1];
+    const char* label   = argv[3];
+    const char* uiTitle = argv[4];
+
+    lo_address oscAddr  = lo_address_new_from_url(oscUrl);
+    const int oscProto  = lo_address_get_protocol(oscAddr);
+    char* const oscPath = lo_url_get_path(oscUrl);
+
+    OscData oscData = { oscPath, oscAddr };
+
+    QApplication app(argc, argv);
+    UIDssi ui(&oscData, uiTitle);
+
+    lo_server_thread serverThread = lo_server_thread_new_with_proto(nullptr, oscProto, osc_error_handler);
+
+#if DISTRHO_PLUGIN_WANT_STATE
+    lo_server_thread_add_method(serverThread, "/configure", "ss", osc_configure_handler, &ui);
+#endif
+    lo_server_thread_add_method(serverThread, "/control", "if", osc_control_handler, &ui);
+#if DISTRHO_PLUGIN_WANT_PROGRAMS
+    lo_server_thread_add_method(serverThread, "/program", "ii", osc_program_handler, &ui);
+#endif
+#if DISTRHO_PLUGIN_IS_SYNTH
+    lo_server_thread_add_method(serverThread, "/midi", "m", osc_midi_handler, &ui);
+#endif
+    lo_server_thread_add_method(serverThread, "/show", "", osc_show_handler, &ui);
+    lo_server_thread_add_method(serverThread, "/hide", "", osc_hide_handler, &ui);
+    lo_server_thread_add_method(serverThread, "/quit", "", osc_quit_handler, &ui);
+    lo_server_thread_start(serverThread);
+
+    char* const threadPath = lo_server_thread_get_url(serverThread);
+    char* const serverPath = strdup(QString("%1%2").arg(threadPath).arg(label).toUtf8().constData());
+    free(threadPath);
+
+    osc_send_update(&oscData, serverPath);
+
+    ui.dssiui_show();
+    int ret = app.exec();
+
+    lo_server_thread_stop(serverThread);
+#if DISTRHO_PLUGIN_WANT_STATE
+    lo_server_thread_del_method(serverThread, "/configure", "ss");
+#endif
+    lo_server_thread_del_method(serverThread, "/control", "if");
+#if DISTRHO_PLUGIN_WANT_PROGRAMS
+    lo_server_thread_del_method(serverThread, "/program", "ii");
+#endif
+#if DISTRHO_PLUGIN_IS_SYNTH
+    lo_server_thread_del_method(serverThread, "/midi", "m");
+#endif
+    lo_server_thread_del_method(serverThread, "/show", "");
+    lo_server_thread_del_method(serverThread, "/hide", "");
+    lo_server_thread_del_method(serverThread, "/quit", "");
+    lo_server_thread_free(serverThread);
+
+    free(serverPath);
+    free(oscPath);
+    lo_address_free(oscAddr);
+
+    return ret;
+}
+
+// -------------------------------------------------
+
+#endif // DISTRHO_PLUGIN_TARGET_DSSI && DISTRHO_PLUGIN_HAS_UI
