@@ -8,7 +8,7 @@ build:
 	$(MAKE) -C libs/juce-2.0
 	$(MAKE) -C libs/juced
 	$(MAKE) -C libs/lv2-ttl-generator
-# 	$(MAKE) plugins -C plugins
+	$(MAKE) plugins -C plugins
 	$(MAKE) plugins -C ports
 
 gen:
@@ -17,11 +17,10 @@ gen:
 	# Copy manually modified ttls with extra data
 # 	if [ -d bin/3BandEQ.lv2/ ]; then cp static-lv2-ttl/3BandEQ.ttl bin/3BandEQ.lv2/; fi
 # 	if [ -d bin/3BandSplitter.lv2/ ]; then cp static-lv2-ttl/3BandSplitter.ttl bin/3BandSplitter.lv2/; fi
-	if [ -d bin/Bitcrusher.lv2/ ]; then cp static-lv2-ttl/Bitcrusher.ttl bin/Bitcrusher.lv2/; fi
+# 	if [ -d bin/Bitcrusher.lv2/ ]; then cp static-lv2-ttl/Bitcrusher.ttl bin/Bitcrusher.lv2/; fi
 
 mingw:
 	$(MAKE) -C libs/lv2-ttl-generator mingw
-	$(MAKE) -C plugins/JackAss/VST mingw
 
 clean:
 	$(MAKE) clean -C libs/drowaudio
@@ -45,7 +44,7 @@ standalone:
 	$(MAKE) -C libs/drowaudio
 	$(MAKE) -C libs/juce-2.0
 	$(MAKE) -C libs/juced
-# 	$(MAKE) standalone -C plugins
+	$(MAKE) standalone -C plugins
 	$(MAKE) standalone -C ports
 
 lv2:
@@ -53,12 +52,12 @@ lv2:
 	$(MAKE) -C libs/juce-2.0
 	$(MAKE) -C libs/juced
 	$(MAKE) -C libs/lv2-ttl-generator
-# 	$(MAKE) lv2 -C plugins
+	$(MAKE) lv2 -C plugins
 	$(MAKE) lv2 -C ports
 
 vst:
 	$(MAKE) -C libs/drowaudio
 	$(MAKE) -C libs/juce-2.0
 	$(MAKE) -C libs/juced
-# 	$(MAKE) vst -C plugins
+	$(MAKE) vst -C plugins
 	$(MAKE) vst -C ports
