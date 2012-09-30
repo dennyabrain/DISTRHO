@@ -16,12 +16,11 @@
  * found online at www.gnu.org/licenses.
  */
 
-#include "DistrhoPluginInfo.h"
+#include "DistrhoDefines.h"
 
 #if defined(DISTRHO_PLUGIN_TARGET_DSSI) && DISTRHO_PLUGIN_HAS_UI
 
 #include "DistrhoUIInternal.h"
-//#include "DistrhoUtils.h"
 
 #include "dssi/dssi-ui.h"
 
@@ -36,8 +35,9 @@
 START_NAMESPACE_DISTRHO
 
 struct OscData {
+    lo_address  addr;
     const char* path;
-    lo_address addr;
+    lo_server   server;
 };
 
 void osc_send_configure(const OscData* oscData, const char* const key, const char* const value)
@@ -116,6 +116,9 @@ public:
 
     void dssiui_control(unsigned long index, float value)
     {
+        if (long(index - DISTRHO_PLUGIN_NUM_INPUTS - DISTRHO_PLUGIN_NUM_OUTPUTS) < 0)
+            return;
+
         ui.parameterChanged(index - DISTRHO_PLUGIN_NUM_INPUTS - DISTRHO_PLUGIN_NUM_OUTPUTS, value);
     }
 
@@ -151,6 +154,7 @@ public:
             killTimer(uiTimer);
             uiTimer = 0;
         }
+        qApp->quit();
     }
 
     // ---------------------------------------------
@@ -174,7 +178,11 @@ protected:
     void timerEvent(QTimerEvent* event)
     {
         if (event->timerId() == uiTimer)
+        {
             ui.idle();
+
+            while (lo_server_recv_noblock(oscData->server, 0) != 0) {}
+        }
 
         QObject::timerEvent(event);
     }
@@ -231,6 +239,7 @@ int osc_configure_handler(const char* const, const char* const, lo_arg** const a
 
     const char* const key   = &argv[0]->s;
     const char* const value = &argv[1]->s;
+    qDebug("osc_configure_handler(\"%s\", \"%s\")", key, value);
 
     ui->dssiui_configure(key, value);
 
@@ -244,6 +253,7 @@ int osc_control_handler(const char* const, const char* const, lo_arg** const arg
 
     const int32_t index = argv[0]->i;
     const float   value = argv[1]->f;
+    qDebug("osc_control_handler(%i, %f)", index, value);
 
     ui->dssiui_control(index, value);
 
@@ -257,6 +267,7 @@ int osc_program_handler(const char* const, const char* const, lo_arg** const arg
 
     const int32_t bank    = argv[0]->i;
     const int32_t program = argv[1]->f;
+    qDebug("osc_program_handler(%i, %i)", bank, program);
 
     ui->dssiui_program(bank, program);
 
@@ -270,6 +281,7 @@ int osc_midi_handler(const char* const path, const char* const types, lo_arg** c
     UIDssi* const ui = (UIDssi*)data;
 
     const uint8_t* data = argv[0]->m;
+    qDebug("osc_midi_handler(%p)", data);
 
     ui->dssiui_midi(data);
 
@@ -281,6 +293,8 @@ int osc_show_handler(const char* const, const char* const, lo_arg** const, const
 {
     UIDssi* const ui = (UIDssi*)data;
 
+    qDebug("osc_show_handler()");
+
     ui->dssiui_show();
 
     return 0;
@@ -289,6 +303,8 @@ int osc_show_handler(const char* const, const char* const, lo_arg** const, const
 int osc_hide_handler(const char* const, const char* const, lo_arg** const, const int, const lo_message, void* const data)
 {
     UIDssi* const ui = (UIDssi*)data;
+
+    qDebug("osc_hide_handler()");
 
     ui->dssiui_hide();
 
@@ -299,8 +315,17 @@ int osc_quit_handler(const char* const, const char* const, lo_arg** const, const
 {
     UIDssi* const ui = (UIDssi*)data;
 
+    qDebug("osc_quit_handler()");
+
     ui->dssiui_quit();
     delete ui;
+
+    return 0;
+}
+
+int osc_debug_handler(const char* const path, const char* const, lo_arg** const, const int, const lo_message, void* const)
+{
+    qDebug("osc_debug_handler(\"%s\")", path);
 
     return 0;
 }
@@ -318,62 +343,95 @@ int main(int argc, char* argv[])
     }
 
     const char* oscUrl  = argv[1];
-    const char* label   = argv[3];
     const char* uiTitle = argv[4];
 
-    lo_address oscAddr  = lo_address_new_from_url(oscUrl);
-    const int oscProto  = lo_address_get_protocol(oscAddr);
+    char* const oscHost = lo_url_get_hostname(oscUrl);
+    char* const oscPort = lo_url_get_port(oscUrl);
     char* const oscPath = lo_url_get_path(oscUrl);
+    lo_address  oscAddr = lo_address_new(oscHost, oscPort);
+    size_t oscPathSize  = strlen(oscPath);
+    lo_server oscServer = lo_server_new(nullptr, osc_error_handler);
 
-    OscData oscData = { oscPath, oscAddr };
+    OscData oscData = { oscAddr, oscPath, oscServer };
 
     QApplication app(argc, argv);
-    UIDssi ui(&oscData, uiTitle);
-
-    lo_server_thread serverThread = lo_server_thread_new_with_proto(nullptr, oscProto, osc_error_handler);
+    UIDssi* const ui = new UIDssi(&oscData, uiTitle);
 
 #if DISTRHO_PLUGIN_WANT_STATE
-    lo_server_thread_add_method(serverThread, "/configure", "ss", osc_configure_handler, &ui);
+    char oscPathConfigure[oscPathSize+11];
+    strcpy(oscPathConfigure, oscPath);
+    strcat(oscPathConfigure, "/configure");
+    lo_server_add_method(oscServer, oscPathConfigure, "ss", osc_configure_handler, ui);
 #endif
-    lo_server_thread_add_method(serverThread, "/control", "if", osc_control_handler, &ui);
+
+    char oscPathControl[oscPathSize+9];
+    strcpy(oscPathControl, oscPath);
+    strcat(oscPathControl, "/control");
+    lo_server_add_method(oscServer, oscPathControl, "if", osc_control_handler, ui);
+
 #if DISTRHO_PLUGIN_WANT_PROGRAMS
-    lo_server_thread_add_method(serverThread, "/program", "ii", osc_program_handler, &ui);
+    char oscPathProgram[oscPathSize+9];
+    strcpy(oscPathProgram, oscPath);
+    strcat(oscPathProgram, "/program");
+    lo_server_add_method(oscServer, oscPathProgram, "ii", osc_program_handler, ui);
 #endif
+
 #if DISTRHO_PLUGIN_IS_SYNTH
-    lo_server_thread_add_method(serverThread, "/midi", "m", osc_midi_handler, &ui);
+    char oscPathMidi[oscPathSize+6];
+    strcpy(oscPathMidi, oscPath);
+    strcat(oscPathMidi, "/midi");
+    lo_server_add_method(oscServer, oscPathMidi, "m", osc_midi_handler, ui);
 #endif
-    lo_server_thread_add_method(serverThread, "/show", "", osc_show_handler, &ui);
-    lo_server_thread_add_method(serverThread, "/hide", "", osc_hide_handler, &ui);
-    lo_server_thread_add_method(serverThread, "/quit", "", osc_quit_handler, &ui);
-    lo_server_thread_start(serverThread);
 
-    char* const threadPath = lo_server_thread_get_url(serverThread);
-    char* const serverPath = strdup(QString("%1%2").arg(threadPath).arg(label).toUtf8().constData());
-    free(threadPath);
+    char oscPathShow[oscPathSize+6];
+    strcpy(oscPathShow, oscPath);
+    strcat(oscPathShow, "/show");
+    lo_server_add_method(oscServer, oscPathShow, "", osc_show_handler, ui);
 
-    osc_send_update(&oscData, serverPath);
+    char oscPathHide[oscPathSize+6];
+    strcpy(oscPathHide, oscPath);
+    strcat(oscPathHide, "/hide");
+    lo_server_add_method(oscServer, oscPathHide, "", osc_hide_handler, ui);
 
-    ui.dssiui_show();
+    char oscPathQuit[oscPathSize+6];
+    strcpy(oscPathQuit, oscPath);
+    strcat(oscPathQuit, "/quit");
+    lo_server_add_method(oscServer, oscPathQuit, "", osc_quit_handler, ui);
+
+    lo_server_add_method(oscServer, nullptr, nullptr, osc_debug_handler, nullptr);
+
+    char* const serverPath = lo_server_get_url(oscServer);
+    char* const pluginPath = strdup(QString("%1%2").arg(serverPath).arg(oscPathSize > 1 ? oscPath + 1 : oscPath).toUtf8().constData());
+    free(serverPath);
+
+    osc_send_update(&oscData, pluginPath);
+
+    ui->dssiui_show();
     int ret = app.exec();
 
-    lo_server_thread_stop(serverThread);
 #if DISTRHO_PLUGIN_WANT_STATE
-    lo_server_thread_del_method(serverThread, "/configure", "ss");
+    lo_server_del_method(oscServer, oscPathConfigure, "ss");
 #endif
-    lo_server_thread_del_method(serverThread, "/control", "if");
+    lo_server_del_method(oscServer, oscPathControl, "if");
 #if DISTRHO_PLUGIN_WANT_PROGRAMS
-    lo_server_thread_del_method(serverThread, "/program", "ii");
+    lo_server_del_method(oscServer, oscPathProgram, "ii");
 #endif
 #if DISTRHO_PLUGIN_IS_SYNTH
-    lo_server_thread_del_method(serverThread, "/midi", "m");
+    lo_server_del_method(oscServer, oscPathMidi, "m");
 #endif
-    lo_server_thread_del_method(serverThread, "/show", "");
-    lo_server_thread_del_method(serverThread, "/hide", "");
-    lo_server_thread_del_method(serverThread, "/quit", "");
-    lo_server_thread_free(serverThread);
+    lo_server_del_method(oscServer, oscPathShow, "");
+    lo_server_del_method(oscServer, oscPathHide, "");
+    lo_server_del_method(oscServer, oscPathQuit, "");
 
-    free(serverPath);
+    delete ui;
+
+    lo_server_free(oscServer);
+
+    free(oscHost);
+    free(oscPort);
     free(oscPath);
+    free(pluginPath);
+
     lo_address_free(oscAddr);
 
     return ret;

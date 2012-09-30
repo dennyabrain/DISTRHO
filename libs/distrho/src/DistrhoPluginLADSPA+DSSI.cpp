@@ -16,7 +16,7 @@
  * found online at www.gnu.org/licenses.
  */
 
-#include "DistrhoPluginInfo.h"
+#include "DistrhoDefines.h"
 
 #if defined(DISTRHO_PLUGIN_TARGET_LADSPA) || defined(DISTRHO_PLUGIN_TARGET_DSSI)
 

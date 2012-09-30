@@ -58,14 +58,16 @@ protected:
     virtual void d_stateChanged(const char* key, const char* value) = 0;
 #endif
 
-private:
-    Qt4UIPrivateData* data;
+    // UI Callbacks
+    virtual void d_uiIdle();
 
-    // Implement some calls internally
+    // Implement resize internally
+    virtual void resizeEvent(QResizeEvent*);
     unsigned int d_width() { return width(); }
     unsigned int d_height() { return height(); }
-    void d_uiIdle();
-    void resizeEvent(QResizeEvent*);
+
+private:
+    Qt4UIPrivateData* data;
 };
 
 // -------------------------------------------------
