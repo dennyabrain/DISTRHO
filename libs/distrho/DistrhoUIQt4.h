@@ -9,15 +9,14 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * A copy of the license is included with this software, or can be
- * found online at www.gnu.org/licenses.
+ * For a full copy of the license see the GPL.txt file
  */
 
-#ifndef __DISTRHO_QT4_UI_H__
-#define __DISTRHO_QT4_UI_H__
+#ifndef __DISTRHO_UI_QT4_H__
+#define __DISTRHO_UI_QT4_H__
 
 #include "src/DistrhoDefines.h"
 
@@ -39,6 +38,11 @@ class Qt4UI : public UI,
 public:
     Qt4UI(uint32_t parameterCount);
     virtual ~Qt4UI();
+
+    // ---------------------------------------------
+
+    // Host UI State
+    // TODO - d_uiTouch/edit/automate
 
     // ---------------------------------------------
 
@@ -76,4 +80,4 @@ END_NAMESPACE_DISTRHO
 
 #endif // DISTRHO_UI_QT4
 
-#endif // __DISTRHO_QT4_UI_H__
+#endif // __DISTRHO_UI_QT4_H__

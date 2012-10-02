@@ -9,22 +9,23 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * A copy of the license is included with this software, or can be
- * found online at www.gnu.org/licenses.
+ * For a full copy of the license see the GPL.txt file
  */
 
 #ifndef __DISTRHO_UI_INTERNAL_H__
 #define __DISTRHO_UI_INTERNAL_H__
 
-//#ifdef DISTRHO_UI_OPENGL
-# include "DistrhoUIOpenGL.h"
+#include "DistrhoDefines.h"
+
+#ifdef DISTRHO_UI_OPENGL
+# include "DistrhoUIOpenGLExt.h"
 # include "pugl/pugl.h"
-//#else
+#else
 # include "DistrhoUIQt4.h"
-//#endif
+#endif
 
 #include <cassert>
 
@@ -32,11 +33,11 @@ START_NAMESPACE_DISTRHO
 
 // -------------------------------------------------
 
-//#ifdef DISTRHO_UI_OPENGL
-//typedef PuglView* NativeWidget;
-//#else
+#ifdef DISTRHO_UI_OPENGL
+typedef PuglView* NativeWidget;
+#else
 typedef QWidget*  NativeWidget;
-//#endif
+#endif
 
 typedef void (*changeStateFunc)(void* ptr, const char* key, const char* value);
 typedef void (*setParameterValueFunc)(void* ptr, uint32_t index, float value);
@@ -60,7 +61,7 @@ struct UIPrivateData {
 
     UIPrivateData()
         : parameterCount(0),
-          sampleRate(44100),
+          sampleRate(44100.0),
           ptr(nullptr),
           widget(nullptr),
           changeStateCallbackFunc(nullptr),
@@ -95,7 +96,7 @@ struct UIPrivateData {
 class UIInternal
 {
 public:
-    UIInternal(void* ptr, changeStateFunc changeStateCall, setParameterValueFunc setParameterValueCall, uiResizeFunc uiResizeCall)
+    UIInternal(void* ptr, intptr_t winId, changeStateFunc changeStateCall, setParameterValueFunc setParameterValueCall, uiResizeFunc uiResizeCall)
         : ui(createUI()),
           data(nullptr)
     {
@@ -116,58 +117,19 @@ public:
         data->uiResizeCallbackFunc          = uiResizeCall;
 
 #ifdef DISTRHO_UI_OPENGL
-        initiated = false;
+        gl_initiated = false;
+        gl_createWindow(winId);
+#else
+        data->widget = (Qt4UI*)ui;
+        Q_UNUSED(winId);
 #endif
+    }
+
+    ~UIInternal()
+    {
     }
 
     // ---------------------------------------------
-
-#if 0
-    void createWindow(PuglNativeWindow parent)
-    {
-        if ((data && data->view) || ! ui)
-            return;
-
-        data->view = puglCreate(parent, ui->d_title(), ui->d_width(), ui->d_height(), false);
-        assert(data->view);
-
-        if (! data->view)
-            return;
-
-        puglSetHandle(data->view, this);
-        puglSetCloseFunc(data->view, onCloseCallback);
-        puglSetDisplayFunc(data->view, onDisplayCallback);
-        puglSetKeyboardFunc(data->view, onKeyboardCallback);
-        puglSetMotionFunc(data->view, onMotionCallback);
-        puglSetMouseFunc(data->view, onMouseCallback);
-        puglSetScrollFunc(data->view, onScrollCallback);
-        puglSetSpecialFunc(data->view, onSpecialCallback);
-        puglSetReshapeFunc(data->view, onReshapeCallback);
-    }
-
-    void destroyWindow()
-    {
-        if (ui)
-            ui->d_onClose();
-
-        if (data && data->view)
-        {
-            puglDestroy(data->view);
-            data->view = nullptr;
-        }
-    }
-
-    PuglStatus processEvents()
-    {
-        return (data && data->view) ? puglProcessEvents(data->view) : PUGL_SUCCESS;
-    }
-#endif
-
-    NativeWidget getNativeWidget()
-    {
-        return data ? data->widget : nullptr;
-        //return (data && data->view) ? puglGetNativeWindow(data->view) : 0;
-    }
 
     void idle()
     {
@@ -183,6 +145,11 @@ public:
     unsigned int getHeight()
     {
         return ui ? ui->d_height() : 0;
+    }
+
+    NativeWidget getNativeWidget()
+    {
+        return data ? data->widget : nullptr;
     }
 
     // ---------------------------------------------
@@ -212,69 +179,192 @@ public:
     // ---------------------------------------------
 
 #ifdef DISTRHO_UI_OPENGL
-    void onClose()
+    void gl_createWindow(PuglNativeWindow parent)
     {
-        if (ui)
-            ((OpenGLUI*)ui)->d_onClose();
+        if ((data && data->widget) || ! ui)
+            return;
+
+        data->widget = puglCreate(parent, ui->d_title(), ui->d_width(), ui->d_height(), false);
+
+        assert(data->widget);
+
+        if (! data->widget)
+            return;
+
+        puglSetHandle(data->widget, this);
+        puglSetDisplayFunc(data->widget, gl_onDisplayCallback);
+        puglSetKeyboardFunc(data->widget, gl_onKeyboardCallback);
+        puglSetMotionFunc(data->widget, gl_onMotionCallback);
+        puglSetMouseFunc(data->widget, gl_onMouseCallback);
+        puglSetScrollFunc(data->widget, gl_onScrollCallback);
+        puglSetSpecialFunc(data->widget, gl_onSpecialCallback);
+        puglSetReshapeFunc(data->widget, gl_onReshapeCallback);
+        puglSetCloseFunc(data->widget, gl_onCloseCallback);
     }
 
-    void onDisplay()
+    void gl_destroyWindowGL()
     {
-        if (ui)
-            ui->d_onDisplay();
-    }
+        OpenGLUI* const uiGL = (OpenGLUI*)ui;
+        assert(uiGL);
 
-    void onKeyboard(bool press, uint32_t key)
-    {
-        if (ui)
-            ui->d_onKeyboard(press, key);
-    }
+        if (uiGL)
+            uiGL->d_onClose();
 
-    void onMotion(int x, int y)
-    {
-        if (ui)
-            ui->d_onMotion(x, y);
-    }
-
-    void onMouse(int button, bool press, int x, int y)
-    {
-        if (ui)
-            ui->d_onMouse(button, press, x, y);
-    }
-
-    void onReshape(int width, int height)
-    {
-        if (ui)
+        if (data && data->widget)
         {
-            //if (! initiated)
-            //{
-            //    ui->d_onInit();
-            //    initiated = true;
-            //}
-            //else
-            ui->d_onReshape(width, height);
+            puglDestroy(data->widget);
+            data->widget = nullptr;
         }
     }
 
-    void onScroll(float dx, float dy)
+    PuglNativeWindow gl_getNativeWindow()
     {
-        if (ui)
-            ui->d_onScroll(dx, dy);
+        return (data && data->widget) ? puglGetNativeWindow(data->widget) : 0;
     }
 
-    void onSpecial(bool press, Key key)
+    // ---------------------------------------------
+
+    void gl_onDisplay()
     {
-        if (ui)
-            ui->d_onSpecial(press, key);
+        OpenGLUI* const uiGL = (OpenGLUI*)ui;
+        assert(uiGL);
+
+        if (uiGL)
+            uiGL->d_onDisplay();
+    }
+
+    void gl_onKeyboard(bool press, uint32_t key)
+    {
+        OpenGLUI* const uiGL = (OpenGLUI*)ui;
+        assert(uiGL);
+
+        if (uiGL)
+            uiGL->d_onKeyboard(press, key);
+    }
+
+    void gl_onMotion(int x, int y)
+    {
+        OpenGLUI* const uiGL = (OpenGLUI*)ui;
+        assert(uiGL);
+
+        if (uiGL)
+            uiGL->d_onMotion(x, y);
+    }
+
+    void gl_onMouse(int button, bool press, int x, int y)
+    {
+        OpenGLUI* const uiGL = (OpenGLUI*)ui;
+        assert(uiGL);
+
+        if (uiGL)
+            uiGL->d_onMouse(button, press, x, y);
+    }
+
+    void gl_onReshape(int width, int height)
+    {
+        OpenGLUI* const uiGL = (OpenGLUI*)ui;
+        assert(uiGL);
+
+        if (uiGL)
+        {
+            if (! gl_initiated)
+            {
+                uiGL->d_onInit();
+                gl_initiated = true;
+            }
+            else
+                uiGL->d_onReshape(width, height);
+        }
+    }
+
+    void gl_onScroll(float dx, float dy)
+    {
+        OpenGLUI* const uiGL = (OpenGLUI*)ui;
+        assert(uiGL);
+
+        if (uiGL)
+            uiGL->d_onScroll(dx, dy);
+    }
+
+    void gl_onSpecial(bool press, Key key)
+    {
+        OpenGLUI* const uiGL = (OpenGLUI*)ui;
+        assert(uiGL);
+
+        if (uiGL)
+            uiGL->d_onSpecial(press, key);
+    }
+
+    void gl_onClose()
+    {
+        OpenGLUI* const uiGL = (OpenGLUI*)ui;
+        assert(uiGL);
+
+        if (uiGL)
+            uiGL->d_onClose();
+    }
+
+    // ---------------------------------------------
+
+    static void gl_onDisplayCallback(PuglView* view)
+    {
+        UIInternal* const _this_ = (UIInternal*)puglGetHandle(view);
+        _this_->gl_onDisplay();
+    }
+
+    static void gl_onKeyboardCallback(PuglView* view, bool press, uint32_t key)
+    {
+        UIInternal* const _this_ = (UIInternal*)puglGetHandle(view);
+        _this_->gl_onKeyboard(press, key);
+    }
+
+    static void gl_onMotionCallback(PuglView* view, int x, int y)
+    {
+        UIInternal* const _this_ = (UIInternal*)puglGetHandle(view);
+        _this_->gl_onMotion(x, y);
+    }
+
+    static void gl_onMouseCallback(PuglView* view, int button, bool press, int x, int y)
+    {
+        UIInternal* const _this_ = (UIInternal*)puglGetHandle(view);
+        _this_->gl_onMouse(button, press, x, y);
+    }
+
+    static void gl_onReshapeCallback(PuglView* view, int width, int height)
+    {
+        UIInternal* const _this_ = (UIInternal*)puglGetHandle(view);
+        _this_->gl_onReshape(width, height);
+    }
+
+    static void gl_onScrollCallback(PuglView* view, float dx, float dy)
+    {
+        UIInternal* const _this_ = (UIInternal*)puglGetHandle(view);
+        _this_->gl_onScroll(dx, dy);
+    }
+
+    static void gl_onSpecialCallback(PuglView* view, bool press, PuglKey key)
+    {
+        UIInternal* const _this_ = (UIInternal*)puglGetHandle(view);
+        _this_->gl_onSpecial(press, (Key)key);
+    }
+
+    static void gl_onCloseCallback(PuglView* view)
+    {
+        UIInternal* const _this_ = (UIInternal*)puglGetHandle(view);
+        _this_->gl_onClose();
     }
 #endif
+
+    // ---------------------------------------------
 
 protected:
     UI* const ui;
     UIPrivateData* data;
 
+#ifdef DISTRHO_UI_OPENGL
 private:
-    bool initiated;
+    bool gl_initiated;
+#endif
 };
 
 // -------------------------------------------------

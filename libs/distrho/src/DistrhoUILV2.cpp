@@ -9,17 +9,17 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * A copy of the license is included with this software, or can be
- * found online at www.gnu.org/licenses.
+ * For a full copy of the license see the GPL.txt file
  */
 
-#ifdef DISTRHO_PLUGIN_TARGET_LV2
+#include "DistrhoDefines.h"
+
+#if defined(DISTRHO_PLUGIN_TARGET_LV2) && DISTRHO_PLUGIN_HAS_UI
 
 #include "DistrhoUIInternal.h"
-#include "DistrhoUtils.h"
 
 #include "lv2-sdk/lv2.h"
 //#include "lv2-sdk/atom.h"
@@ -31,6 +31,7 @@
 #include "lv2-sdk/urid.h"
 #include "lv2-sdk/ui.h"
 
+#include <cassert>
 #include <cstring>
 #include <thread>
 
@@ -44,7 +45,7 @@
 
 START_NAMESPACE_DISTRHO
 
-class UILv2
+class UILv2 : public QObject
 {
 public:
     UILv2(LV2UI_Write_Function writeFunction, LV2UI_Controller controller, LV2UI_Widget* widget, const LV2_Feature* const* features)
@@ -55,11 +56,17 @@ public:
 #if DISTRHO_PLUGIN_WANT_STATE
           uridIdPatchMessage(0),
 #endif
+#ifdef DISTRHO_UI_QT4
+          uiTimer(0)
+#else
           threadExitNow(false),
           threadRunning(false),
           thread(uiThreadCallback, this)
+#endif
     {
+#ifndef DISTRHO_UI_QT4
         PuglNativeWindow parent = 0;
+#endif
 
         // Get Features
         for (uint32_t i = 0; features[i]; i++)
@@ -71,31 +78,46 @@ public:
                 uridIdPatchMessage = uridMap->map(uridMap->handle, LV2_PATCH__Message);
 #endif
             }
+#ifndef DISTRHO_UI_QT4
             else if (strcmp(features[i]->URI, LV2_UI__parent) == 0)
                 parent = (PuglNativeWindow)features[i]->data;
+#endif
 
             else if (strcmp(features[i]->URI, LV2_UI__resize) == 0)
                 lv2UiResize = (LV2UI_Resize*)features[i]->data;
         }
 
+#ifndef DISTRHO_UI_QT4
         assert(parent);
 
         if (parent == 0)
             return;
 
-        ui.createWindow((PuglNativeWindow)parent);
-        //thread.join();
+        //ui.createWindow((PuglNativeWindow)parent);
+        //thread.join(); // was commented
+#endif
 
         if (lv2UiResize)
             lv2UiResize->ui_resize(lv2UiResize->handle, ui.getWidth(), ui.getHeight());
 
-        *widget = (void*)ui.getNativeWindow();
+#ifdef DISTRHO_UI_QT4
+        *widget = ui.getNativeWidget();
+#else
+        //*widget = (void*)ui.getNativeWindow();
+#endif
+
+        uiTimer = startTimer(30);
     }
 
     ~UILv2()
     {
+#ifdef DISTRHO_UI_QT4
+        if (uiTimer)
+            killTimer(uiTimer);
+#else
         uiThreadClose();
-        ui.destroyWindow();
+#endif
+        //ui.destroyWindow();
     }
 
     // ---------------------------------------------
@@ -106,9 +128,16 @@ public:
         {
             if (bufferSize != sizeof(float))
                 return;
+            if (int32_t(portIndex - DISTRHO_PLUGIN_NUM_INPUTS - DISTRHO_PLUGIN_NUM_OUTPUTS) < 0)
+                return;
 
             float value = *(float*)buffer;
             ui.parameterChanged(portIndex - DISTRHO_PLUGIN_NUM_INPUTS - DISTRHO_PLUGIN_NUM_OUTPUTS, value);
+        }
+        else if (format == 1) // TODO
+        {
+             // TODO
+            ui.stateChanged(key, value);
         }
     }
 
@@ -128,6 +157,11 @@ protected:
         // TODO
         (void)key;
         (void)value;
+
+        if (lv2WriteFunction && uridMap)
+        {
+
+        }
     }
 
     void setParameterValue(uint32_t index, float value)
@@ -142,13 +176,22 @@ protected:
             lv2UiResize->ui_resize(lv2UiResize->handle, width, height);
     }
 
+#ifdef DISTRHO_UI_QT4
+    void timerEvent(QTimerEvent* event)
+    {
+        if (event->timerId() == uiTimer)
+            ui.idle();
+
+        QObject::timerEvent(event);
+    }
+#else
     void uiThreadRun()
     {
         threadRunning = true;
 
         while (! threadExitNow)
         {
-            ui.processEvents();
+            ui.idle();
             d_msleep(1000 / 25); // 25 FPS
         }
 
@@ -163,6 +206,7 @@ protected:
         while (threadRunning)
             d_msleep(1000 / 25); // 25 FPS
     }
+#endif
 
 private:
     UIInternal  ui;
@@ -177,9 +221,13 @@ private:
 #endif
 
     // UI Thread
+#ifdef DISTRHO_UI_QT4
+    int uiTimer;
+#else
     bool threadExitNow;
     bool threadRunning;
     std::thread thread;
+#endif
 
     // ---------------------------------------------
     // Callbacks
@@ -208,12 +256,14 @@ private:
         _this_->uiResize(width, height);
     }
 
+#ifndef DISTRHO_UI_QT4
     static void uiThreadCallback(UILv2* _this_)
     {
         assert(_this_);
 
-        _this_->uiThread();
+        _this_->uiThreadRun();
     }
+#endif
 };
 
 // -------------------------------------------------
@@ -292,4 +342,4 @@ const LV2UI_Descriptor* lv2ui_descriptor(uint32_t index)
 
 // -------------------------------------------------
 
-#endif // DISTRHO_PLUGIN_TARGET_LV2
+#endif // DISTRHO_PLUGIN_TARGET_LV2 && DISTRHO_PLUGIN_HAS_UI

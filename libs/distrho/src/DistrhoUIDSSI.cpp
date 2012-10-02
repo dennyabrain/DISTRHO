@@ -9,11 +9,10 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * A copy of the license is included with this software, or can be
- * found online at www.gnu.org/licenses.
+ * For a full copy of the license see the GPL.txt file
  */
 
 #include "DistrhoDefines.h"
@@ -21,8 +20,6 @@
 #if defined(DISTRHO_PLUGIN_TARGET_DSSI) && DISTRHO_PLUGIN_HAS_UI
 
 #include "DistrhoUIInternal.h"
-
-#include "dssi/dssi-ui.h"
 
 #include <QtGui/QApplication>
 #include <QtGui/QDialog>
@@ -40,6 +37,7 @@ struct OscData {
     lo_server   server;
 };
 
+#if DISTRHO_PLUGIN_WANT_STATE
 void osc_send_configure(const OscData* oscData, const char* const key, const char* const value)
 {
     char targetPath[strlen(oscData->path)+11];
@@ -47,6 +45,7 @@ void osc_send_configure(const OscData* oscData, const char* const key, const cha
     strcat(targetPath, "/configure");
     lo_send(oscData->addr, targetPath, "ss", key, value);
 }
+#endif
 
 void osc_send_control(const OscData* oscData, const int32_t index, const float value)
 {
@@ -55,6 +54,16 @@ void osc_send_control(const OscData* oscData, const int32_t index, const float v
     strcat(targetPath, "/control");
     lo_send(oscData->addr, targetPath, "if", index, value);
 }
+
+#if DISTRHO_PLUGIN_IS_SYNTH
+void osc_send_midi(const OscData* oscData, unsigned char data[4])
+{
+    char targetPath[strlen(oscData->path)+6];
+    strcpy(targetPath, oscData->path);
+    strcat(targetPath, "/midi");
+    lo_send(oscData->addr, targetPath, "m", data);
+}
+#endif
 
 void osc_send_update(const OscData* oscData, const char* const url)
 {
@@ -76,16 +85,18 @@ class UIDssi : public QObject
 {
 public:
     UIDssi(const OscData* oscData_, const char* title)
-        : ui(this, changeStateCallback, setParameterValueCallback, uiResizeCallback),
-          dialog(nullptr),
+        : dialog(nullptr),
+#ifdef DISTRHO_UI_QT4
           vbLayout(&dialog),
+#endif
+          ui(this, dialog.winId(), changeStateCallback, setParameterValueCallback, uiResizeCallback),
           oscData(oscData_)
     {
+#ifdef DISTRHO_UI_QT4
         dialog.setLayout(&vbLayout);
         vbLayout.addWidget(ui.getNativeWidget());
         vbLayout.setContentsMargins(0, 0, 0, 0);
-
-        //ui.createWindow((PuglNativeWindow)dialog.winId());
+#endif
 
         dialog.setFixedSize(ui.getWidth(), ui.getHeight());
         dialog.setWindowTitle(title);
@@ -102,7 +113,6 @@ public:
         }
 
         dialog.close();
-        //ui.destroyWindow();
     }
 
     // ---------------------------------------------
@@ -160,10 +170,12 @@ public:
     // ---------------------------------------------
 
 protected:
+#if DISTRHO_PLUGIN_WANT_STATE
     void changeState(const char* key, const char* value)
     {
         osc_send_configure(oscData, key, value);
     }
+#endif
 
     void setParameterValue(uint32_t index, float value)
     {
@@ -188,12 +200,15 @@ protected:
     }
 
 private:
-    UIInternal ui;
-
     // Qt4 stuff
-    QDialog dialog;
-    QVBoxLayout vbLayout;
     int uiTimer;
+    QDialog dialog;
+#ifdef DISTRHO_UI_QT4
+    QVBoxLayout vbLayout;
+#endif
+
+    // plugin UI
+    UIInternal ui;
 
     const OscData* const oscData;
 
@@ -202,10 +217,16 @@ private:
 
     static void changeStateCallback(void* ptr, const char* key, const char* value)
     {
+#if DISTRHO_PLUGIN_WANT_STATE
         UIDssi* const _this_ = (UIDssi*)ptr;
         assert(_this_);
 
         _this_->changeState(key, value);
+#else
+        Q_UNUSED(ptr);
+        Q_UNUSED(key);
+        Q_UNUSED(value);
+#endif
     }
 
     static void setParameterValueCallback(void* ptr, uint32_t index, float value)
@@ -348,13 +369,13 @@ int main(int argc, char* argv[])
     char* const oscHost = lo_url_get_hostname(oscUrl);
     char* const oscPort = lo_url_get_port(oscUrl);
     char* const oscPath = lo_url_get_path(oscUrl);
+    size_t  oscPathSize = strlen(oscPath);
     lo_address  oscAddr = lo_address_new(oscHost, oscPort);
-    size_t oscPathSize  = strlen(oscPath);
     lo_server oscServer = lo_server_new(nullptr, osc_error_handler);
 
     OscData oscData = { oscAddr, oscPath, oscServer };
 
-    QApplication app(argc, argv);
+    QApplication app(argc, argv, true);
     UIDssi* const ui = new UIDssi(&oscData, uiTitle);
 
 #if DISTRHO_PLUGIN_WANT_STATE
@@ -406,7 +427,6 @@ int main(int argc, char* argv[])
 
     osc_send_update(&oscData, pluginPath);
 
-    ui->dssiui_show();
     int ret = app.exec();
 
 #if DISTRHO_PLUGIN_WANT_STATE

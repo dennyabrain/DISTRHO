@@ -22,7 +22,7 @@
 // -------------------------------------------------
 
 DistrhoUINotes::DistrhoUINotes()
-    : DISTRHO::Qt4UI(1),
+    : DISTRHO::Qt4UI(1), // 1 parameter
       textEdit(this),
       button(this),
       progressBar(this),
@@ -207,8 +207,6 @@ void DistrhoUINotes::textChanged()
 }
 
 // -------------------------------------------------
-
-#include "DistrhoUIMain.cpp"
 
 START_NAMESPACE_DISTRHO
 

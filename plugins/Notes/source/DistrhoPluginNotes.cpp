@@ -22,7 +22,7 @@
 // -------------------------------------------------
 
 DistrhoPluginNotes::DistrhoPluginNotes()
-    : DISTRHO::Plugin(1, 0)
+    : DISTRHO::Plugin(1, 0) // 1 parameter, 0 programs
 {
     curPage = 0;
 }
@@ -40,8 +40,8 @@ void DistrhoPluginNotes::d_initParameter(uint32_t index, DISTRHO::Parameter& par
         return;
 
     parameter.hints      = DISTRHO::PARAMETER_IS_AUTOMABLE | DISTRHO::PARAMETER_IS_INTEGER;
-    parameter.name       = strdup("Page");
-    parameter.symbol     = strdup("page");
+    parameter.name       = "Page";
+    parameter.symbol     = "page";
     parameter.ranges.def = 1;
     parameter.ranges.min = 1;
     parameter.ranges.max = 100;
@@ -100,8 +100,6 @@ void DistrhoPluginNotes::d_stateChanged(const char*, const char*)
 }
 
 // -------------------------------------------------
-
-#include "DistrhoPluginMain.cpp"
 
 START_NAMESPACE_DISTRHO
 

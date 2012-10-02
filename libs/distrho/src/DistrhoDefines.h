@@ -12,12 +12,11 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * A copy of the license is included with this software, or can be
- * found online at www.gnu.org/licenses.
+ * For a full copy of the license see the GPL.txt file
  */
 
-#ifndef __DISTRHO_INCLUDES_H__
-#define __DISTRHO_INCLUDES_H__
+#ifndef __DISTRHO_DEFINES_H__
+#define __DISTRHO_DEFINES_H__
 
 #include "DistrhoPluginInfo.h"
 
@@ -75,6 +74,10 @@
 # define USE_NAMESPACE_DISTRHO
 #endif
 
+#ifndef DISTRHO_UI_QT4
+# define DISTRHO_UI_OPENGL
+#endif
+
 #define DISTRHO_UI_URI DISTRHO_PLUGIN_URI "#UI"
 
-#endif // __DISTRHO_INCLUDES_H__
+#endif // __DISTRHO_DEFINES_H__

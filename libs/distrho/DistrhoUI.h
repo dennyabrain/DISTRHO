@@ -9,19 +9,16 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * A copy of the license is included with this software, or can be
- * found online at www.gnu.org/licenses.
+ * For a full copy of the license see the GPL.txt file
  */
 
 #ifndef __DISTRHO_UI_H__
 #define __DISTRHO_UI_H__
 
-#include "src/DistrhoDefines.h"
-
-#include <cstdint>
+#include "DistrhoUtils.h"
 
 START_NAMESPACE_DISTRHO
 
@@ -46,7 +43,7 @@ public:
 
     // Host UI State
     void d_uiResize(unsigned int width, unsigned int height);
-    // TODO - d_touch/edit/automate
+    // TODO - d_uiTouch/Edit/Automate
 
     // ---------------------------------------------
 
@@ -73,6 +70,9 @@ protected:
 private:
     UIPrivateData* data;
     friend class UIInternal;
+#ifdef DISTRHO_UI_OPENGL
+    friend class OpenGLUI;
+#endif
 };
 
 UI* createUI();

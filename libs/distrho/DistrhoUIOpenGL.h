@@ -9,22 +9,20 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * A copy of the license is included with this software, or can be
- * found online at www.gnu.org/licenses.
+ * For a full copy of the license see the GPL.txt file
  */
 
-#ifndef __DISTRHO_OPENGL_UI_H__
-#define __DISTRHO_OPENGL_UI_H__
+#ifndef __DISTRHO_UI_OPENGL_H__
+#define __DISTRHO_UI_OPENGL_H__
 
 #include "src/DistrhoDefines.h"
 
 #ifdef DISTRHO_UI_OPENGL
 
 #include "DistrhoUI.h"
-#include "DistrhoUtils.h"
 
 #if DISTRHO_OS_MAC
 # include <OpenGL/glu.h>
@@ -87,10 +85,19 @@ public:
 
     // ---------------------------------------------
 
+    // Host DSP State
+    double d_sampleRate() const;
+    void   d_setParameterValue(uint32_t index, float value);
+#if DISTRHO_PLUGIN_WANT_STATE
+    void   d_changeState(const char* key, const char* value);
+#endif
+
     // Host UI State
-    int  d_getModifiers();
-    void d_ignoreKeyRepeat(bool ignore);
-    void d_postRedisplay();
+    int  d_uiGetModifiers();
+    void d_uiIgnoreKeyRepeat(bool ignore);
+    void d_uiRepaint();
+    void d_uiResize(unsigned int width, unsigned int height);
+    // TODO - d_uiTouch/edit/automate
 
     // ---------------------------------------------
 
@@ -110,6 +117,7 @@ protected:
 #endif
 
     // UI Callbacks
+    virtual void d_uiIdle();
     virtual void d_onInit() = 0;
     virtual void d_onDisplay() = 0;
     virtual void d_onKeyboard(bool press, uint32_t key) = 0;
@@ -119,6 +127,9 @@ protected:
     virtual void d_onScroll(float dx, float dy) = 0;
     virtual void d_onSpecial(bool press, Key key) = 0;
     virtual void d_onClose() = 0;
+
+private:
+    friend class UIInternal;
 };
 
 // -------------------------------------------------
@@ -127,4 +138,4 @@ END_NAMESPACE_DISTRHO
 
 #endif // DISTRHO_UI_OPENGL
 
-#endif // __DISTRHO_OPENGL_UI_H__
+#endif // __DISTRHO_UI_OPENGL_H__

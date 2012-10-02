@@ -9,26 +9,28 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * A copy of the license is included with this software, or can be
- * found online at www.gnu.org/licenses.
+ * For a full copy of the license see the GPL.txt file
  */
 
-#include <map>
-#include <vector>
+#ifdef DISTRHO_PLUGIN_TARGET_LV2
 
 #include "DistrhoPluginInternal.h"
 
 #include "lv2-sdk/lv2.h"
 #include "lv2-sdk/atom.h"
 #include "lv2-sdk/atom-util.h"
-//#include "lv2-sdk/midi.h"
+#include "lv2-sdk/midi.h"
 #include "lv2-sdk/patch.h"
 #include "lv2-sdk/programs.h"
 #include "lv2-sdk/state.h"
 #include "lv2-sdk/urid.h"
+
+#include <cassert>
+#include <map>
+#include <vector>
 
 #ifndef DISTRHO_PLUGIN_URI
 # error DISTRHO_PLUGIN_URI undefined!
@@ -59,7 +61,6 @@ public:
         plugin.setBufferSize(lastBufferSize);
         plugin.setSampleRate(lastSampleRate);
 
-        // LV2 ports
         for (uint32_t i=0; i < DISTRHO_PLUGIN_NUM_INPUTS; i++)
             portAudioIns.push_back(nullptr);
 
@@ -73,7 +74,11 @@ public:
         }
 
         portLatency    = nullptr;
+#if DISTRHO_PLUGIN_HAS_UI
         portSampleRate = nullptr;
+#endif
+
+        // xxx
 #if DISTRHO_LV2_USE_EVENTS
         portEventsIn   = nullptr;
 #endif
@@ -113,6 +118,8 @@ public:
         portAudioOuts.clear();
         portControls.clear();
         lastControlValues.clear();
+
+        // xxx
 #if DISTRHO_PLUGIN_WANT_STATE
         // TODO - free values
         stateMap.clear();
@@ -130,9 +137,9 @@ public:
         plugin.deactivate();
     }
 
-    void lv2_connect_port(unsigned long port, void* dataLocation)
+    void lv2_connect_port(uint32_t port, void* dataLocation)
     {
-        unsigned long i, index = 0;
+        uint32_t i, index = 0;
 
         for (i=0; i < DISTRHO_PLUGIN_NUM_INPUTS; i++)
         {
@@ -161,6 +168,7 @@ public:
             }
         }
 
+        // xxx
 #if DISTRHO_LV2_USE_EVENTS
         if (port == index++)
         {
@@ -175,11 +183,13 @@ public:
             return;
         }
 
+#if DISTRHO_PLUGIN_HAS_UI
         if (port == index++)
         {
             portSampleRate = (floatptr)dataLocation;
             return;
         }
+#endif
     }
 
     void lv2_run(uint32_t bufferSize)
@@ -211,8 +221,9 @@ public:
             }
         }
 
-        // Get Events
+        // Get Events, xxx
         uint32_t midiEventCount = 0;
+
 #if DISTRHO_LV2_USE_EVENTS
         LV2_ATOM_SEQUENCE_FOREACH(portEventsIn, iter)
         {
@@ -278,24 +289,32 @@ public:
 
     void lv2_select_program(uint32_t bank, uint32_t program)
     {
-        const uint32_t index = bank * 128 + program;
+        const uint32_t realProgram = bank * 128 + program;
 
-        if (index >= plugin.programCount())
+        if (realProgram >= plugin.programCount())
             return;
 
-        plugin.setProgram(index);
+        plugin.setProgram(realProgram);
     }
 #endif
 
 #if DISTRHO_PLUGIN_WANT_STATE
+    // xxx - probably needs multiple STATE-URIs, so we're screwed
     LV2_State_Status lv2_save(LV2_State_Store_Function store, LV2_State_Handle handle, uint32_t /*flags*/, const LV2_Feature* const* /*features*/)
     {
-        for (charMap::iterator i = stateMap.begin(); i != stateMap.end(); i++)
+        for (auto i = stateMap.begin(); i != stateMap.end(); i++)
         {
-            const char* key   = i->first;
-            const char* value = i->second;
+            //const char* key   = i->first;
+            //const char* value = i->second;
 
-            store(handle, uridMap->map(uridMap->handle, DISTRHO_LV2_STATE_URI), value, strlen(key), uridMap->map(uridMap->handle, LV2_ATOM__String), LV2_STATE_IS_POD|LV2_STATE_IS_PORTABLE);
+            //size_t keyValueLen = strlen(key) + strlen(value) + 4;
+            //char keyValue[keyValueLen+1] = { 0 };
+
+            //strcpy(keyValue, key);
+            //strcat(keyValue, " \u00b7 ");
+            //strcat(keyValue, value);
+
+            //store(handle, uridMap->map(uridMap->handle, DISTRHO_LV2_STATE_URI), keyValue, keyValueLen, uridMap->map(uridMap->handle, LV2_ATOM__String), LV2_STATE_IS_POD|LV2_STATE_IS_PORTABLE);
         }
 
         return LV2_STATE_SUCCESS;
@@ -303,8 +322,8 @@ public:
 
     LV2_State_Status lv2_restore(LV2_State_Retrieve_Function retrieve, LV2_State_Handle handle, uint32_t flags, const LV2_Feature* const* /*features*/)
     {
-        size_t   size;
-        uint32_t type;
+        size_t   size = 0;
+        uint32_t type = 0;
         const void* data = retrieve(handle, uridMap->map(uridMap->handle, DISTRHO_LV2_STATE_URI), &size, &type, &flags);
 
         if (! data)
@@ -313,14 +332,15 @@ public:
         if (type != uridMap->map(uridMap->handle, LV2_ATOM__String))
             return LV2_STATE_ERR_BAD_TYPE;
 
-        const char* keyValue = (const char*)data;
-        const char* value    = strstr(keyValue, " \u00b7 ") + 4;
-        const size_t keyLen  = strlen(keyValue) - strlen(value) - 4;
+        // xxx - looks ok, but needs testing
+        //const char* keyValue = (const char*)data;
+        //const char* value    = strstr(keyValue, " \u00b7 ") + 4;
+        //const size_t keyLen  = strlen(keyValue) - strlen(value) - 4;
 
-        char key[keyLen];
-        strncpy(key, keyValue, keyLen);
+        //char key[keyLen+1] = { 0 };
+        //strncpy(key, keyValue, keyLen);
 
-        setStateChange(key, value);
+        //setStateChange(key, value);
 
         return LV2_STATE_SUCCESS;
     }
@@ -334,7 +354,11 @@ private:
     floatptrVector portAudioOuts;
     floatptrVector portControls;
     floatptr       portLatency;
+#if DISTRHO_PLUGIN_HAS_UI
     floatptr       portSampleRate;
+#endif
+
+    // xxx
 #if DISTRHO_LV2_USE_EVENTS
     LV2_Atom_Sequence* portEventsIn;
 
@@ -359,6 +383,7 @@ private:
     MidiEvent midiEvents[0];
 #endif
 
+    // xxx
 #if DISTRHO_PLUGIN_WANT_STATE
     charMap stateMap;
 
@@ -396,15 +421,20 @@ private:
         if (portLatency)
             *portLatency = plugin.latency();
 
+#if DISTRHO_PLUGIN_HAS_UI
         if (portSampleRate)
             *portSampleRate = lastSampleRate;
+#endif
     }
 };
 
 // -------------------------------------------------
 
-static LV2_Handle lv2_instantiate(const LV2_Descriptor*, double sampleRate, const char*, const LV2_Feature* const* features)
+static LV2_Handle lv2_instantiate(const LV2_Descriptor*, double sampleRate, const char* uri, const LV2_Feature* const* features)
 {
+    if (strcmp(uri, DISTRHO_PLUGIN_URI) != 0)
+        return nullptr;
+
     return new PluginLv2(sampleRate, features);
 }
 
@@ -532,3 +562,5 @@ const LV2_Descriptor* lv2_descriptor(uint32_t index)
 }
 
 // -------------------------------------------------
+
+#endif // DISTRHO_PLUGIN_TARGET_LV2

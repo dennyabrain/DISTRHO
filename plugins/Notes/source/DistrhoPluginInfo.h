@@ -27,7 +27,7 @@
 #define DISTRHO_PLUGIN_WANT_PROGRAMS 0
 #define DISTRHO_PLUGIN_WANT_STATE    1
 
-#define DISTRHO_PLUGIN_URI "http://distrho.sourceforge.net/plugins/Notes"
+#define DISTRHO_PLUGIN_URI "http://distrho.sf.net/plugins/Notes"
 
 #define DISTRHO_UI_QT4
 

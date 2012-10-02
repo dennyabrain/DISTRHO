@@ -9,50 +9,45 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * A copy of the license is included with this software, or can be
- * found online at www.gnu.org/licenses.
+ * For a full copy of the license see the GPL.txt file
  */
 
 #include "DistrhoPluginInternal.h"
 
-#include <cassert>
-
 START_NAMESPACE_DISTRHO
 
-static TimePos fallbackTimePos;
+// -------------------------------------------------
+
+const d_string        PluginInternal::fallbackString;
+const ParameterRanges PluginInternal::fallbackRanges;
 
 // -------------------------------------------------
 
 Plugin::Plugin(uint32_t parameterCount, uint32_t programCount)
 {
     data = new PluginPrivateData;
-    assert(data);
-
-    if (! data)
-        return;
-
-    data->parameterCount = parameterCount;
 
     if (parameterCount > 0)
+    {
+        data->parameterCount = parameterCount;
         data->parameters = new Parameter [parameterCount];
-
-#if DISTRHO_PLUGIN_WANT_PROGRAMS
-    data->programCount = programCount;
+    }
 
     if (programCount > 0)
-        data->programNames = new const char* [programCount];
-#else
-    (void)programCount;
+    {
+#if DISTRHO_PLUGIN_WANT_PROGRAMS
+        data->programCount = programCount;
+        data->programNames = new d_string [programCount];
 #endif
+    }
 }
 
 Plugin::~Plugin()
 {
-    if (data)
-        delete data;
+    delete data;
 }
 
 // -------------------------------------------------
@@ -60,23 +55,28 @@ Plugin::~Plugin()
 
 uint32_t Plugin::d_bufferSize() const
 {
-    return data ? data->bufferSize : 512;
+    return data->bufferSize;
 }
 
 double Plugin::d_sampleRate() const
 {
-    return data ? data->sampleRate : 44100.0;
+    return data->sampleRate;
 }
 
 const TimePos* Plugin::d_timePos() const
 {
-    return data ? &data->timePos : &fallbackTimePos;
+    return &data->timePos;
 }
 
 void Plugin::d_setLatency(uint32_t samples)
 {
-    if (data)
-        data->latency = samples;
+    data->latency = samples;
+}
+
+// -------------------------------------------------
+
+void Plugin::d_bufferSizeChanged(uint32_t)
+{
 }
 
 // -------------------------------------------------

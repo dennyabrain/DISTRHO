@@ -9,11 +9,10 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * A copy of the license is included with this software, or can be
- * found online at www.gnu.org/licenses.
+ * For a full copy of the license see the GPL.txt file
  */
 
 #include "DistrhoDefines.h"
@@ -74,9 +73,9 @@ protected:
                     height = minHeight;
 
                 ui->setFixedSize(width, height);
-                ui->d_uiResize(width, height);
+                //ui->d_uiResize(width, height);
 
-                grip->move(width - grip->width(), height - grip->height());
+                //grip->move(width - grip->width(), height - grip->height());
             }
             return true;
         }
@@ -159,10 +158,10 @@ void Qt4UI::d_uiIdle()
 
 void Qt4UI::resizeEvent(QResizeEvent* event)
 {
-    const QSize size(event->size());
-
     if (! (data && data->grip))
         return;
+
+    const QSize size(event->size());
 
     if (data->lastWidth != size.width() || data->lastHeight != size.height())
     {

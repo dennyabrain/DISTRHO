@@ -19,7 +19,6 @@
 #define __DISTRHO_PLUGIN_NOTES_H__
 
 #include "DistrhoPlugin.h"
-#include "DistrhoUtils.h"
 
 class DistrhoPluginNotes : public DISTRHO::Plugin
 {

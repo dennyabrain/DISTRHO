@@ -9,11 +9,10 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * A copy of the license is included with this software, or can be
- * found online at www.gnu.org/licenses.
+ * For a full copy of the license see the GPL.txt file
  */
 
 #include "DistrhoDefines.h"
@@ -23,56 +22,6 @@
 #include "DistrhoUIInternal.h"
 
 START_NAMESPACE_DISTRHO
-
-// ---------------------------------------------
-
-static void onCloseCallback(PuglView* view)
-{
-    UIInternal* const _this_ = (UIInternal*)puglGetHandle(view);
-    _this_->onClose();
-}
-
-static void onDisplayCallback(PuglView* view)
-{
-    UIInternal* const _this_ = (UIInternal*)puglGetHandle(view);
-    _this_->onDisplay();
-}
-
-static void onKeyboardCallback(PuglView* view, bool press, uint32_t key)
-{
-    UIInternal* const _this_ = (UIInternal*)puglGetHandle(view);
-    _this_->onKeyboard(press, key);
-}
-
-static void onMotionCallback(PuglView* view, int x, int y)
-{
-    UIInternal* const _this_ = (UIInternal*)puglGetHandle(view);
-    _this_->onMotion(x, y);
-}
-
-static void onMouseCallback(PuglView* view, int button, bool press, int x, int y)
-{
-    UIInternal* const _this_ = (UIInternal*)puglGetHandle(view);
-    _this_->onMouse(button, press, x, y);
-}
-
-static void onReshapeCallback(PuglView* view, int width, int height)
-{
-    UIInternal* const _this_ = (UIInternal*)puglGetHandle(view);
-    _this_->onReshape(width, height);
-}
-
-static void onScrollCallback(PuglView* view, float dx, float dy)
-{
-    UIInternal* const _this_ = (UIInternal*)puglGetHandle(view);
-    _this_->onScroll(dx, dy);
-}
-
-static void onSpecialCallback(PuglView* view, bool press, PuglKey key)
-{
-    UIInternal* const _this_ = (UIInternal*)puglGetHandle(view);
-    _this_->onSpecial(press, (Key)key);
-}
 
 // -------------------------------------------------
 
@@ -86,30 +35,46 @@ OpenGLUI::~OpenGLUI()
 }
 
 // -------------------------------------------------
+// Host UI State
 
-int OpenGLUI::d_getModifiers()
+int OpenGLUI::d_uiGetModifiers()
 {
-    if (data && data->view)
-        return puglGetModifiers(data->view);
+    if (data && data->widget)
+        return puglGetModifiers(data->widget);
     return 0;
 }
 
-void OpenGLUI::d_ignoreKeyRepeat(bool ignore)
+void OpenGLUI::d_uiIgnoreKeyRepeat(bool ignore)
 {
-    if (data && data->view)
-        puglIgnoreKeyRepeat(data->view, ignore);
+    if (data && data->widget)
+        puglIgnoreKeyRepeat(data->widget, ignore);
 }
 
-void OpenGLUI::d_postRedisplay()
+void OpenGLUI::d_uiRepaint()
 {
-    if (data && data->view)
-        puglPostRedisplay(data->view);
+    if (data && data->widget)
+        puglPostRedisplay(data->widget);
+}
+
+// -------------------------------------------------
+// UI Callbacks
+
+void OpenGLUI::d_uiIdle()
+{
+    if (data && data->widget)
+        puglProcessEvents(data->widget);
 }
 
 // -------------------------------------------------
 
 END_NAMESPACE_DISTRHO
 
-#include "pugl/pugl_x11.c"
+#if DISTRHO_OS_WINDOWS
+# include "pugl/pugl_win.cpp"
+#elif DISTRHO_OS_MAC
+# include "pugl/pugl_osx.m"
+#else
+# include "pugl/pugl_x11.c"
+#endif
 
 #endif // DISTRHO_UI_OPENGL

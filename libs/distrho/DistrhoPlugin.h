@@ -9,20 +9,16 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * A copy of the license is included with this software, or can be
- * found online at www.gnu.org/licenses.
+ * For a full copy of the license see the GPL.txt file
  */
 
 #ifndef __DISTRHO_PLUGIN_H__
 #define __DISTRHO_PLUGIN_H__
 
-#include "src/DistrhoDefines.h"
-
-#include <cstdint>
-#include <cstring>
+#include "DistrhoUtils.h"
 
 START_NAMESPACE_DISTRHO
 
@@ -50,18 +46,28 @@ struct ParameterRanges {
           step(0.001f),
           stepSmall(0.00001f),
           stepLarge(0.01f) {}
+
+    ParameterRanges(float def, float min, float max)
+        : step(0.001f),
+          stepSmall(0.00001f),
+          stepLarge(0.01f)
+    {
+        this->def = def;
+        this->min = min;
+        this->max = max;
+    }
 };
 
 // Parameter
 struct Parameter {
-    uint32_t    hints;
-    const char* name;
-    const char* symbol;
-    const char* unit;
+    uint32_t hints;
+    d_string name;
+    d_string symbol;
+    d_string unit;
     ParameterRanges ranges;
 
     Parameter()
-        : hints(0),
+        : hints(0x0),
           name(nullptr),
           symbol(nullptr),
           unit(nullptr) {}
@@ -121,7 +127,7 @@ protected:
     // Init
     virtual void d_initParameter(uint32_t index, Parameter& parameter) = 0;
 #if DISTRHO_PLUGIN_WANT_PROGRAMS
-    virtual void d_initProgramName(uint32_t index, const char*& programName) = 0;
+    virtual void d_initProgramName(uint32_t index, d_string& programName) = 0;
 #endif
 
     // Internal data
@@ -137,7 +143,7 @@ protected:
     virtual void d_run(const float** inputs, float** outputs, uint32_t frames, uint32_t midiEventCount, const MidiEvent* midiEvents) = 0;
 
     // Callbacks
-    virtual void d_bufferSizeChanged(uint32_t /* newBufferSize */) {}
+    virtual void d_bufferSizeChanged(uint32_t newBufferSize);
 #if DISTRHO_PLUGIN_WANT_STATE
     virtual void d_stateChanged(const char* key, const char* value) = 0;
 #endif

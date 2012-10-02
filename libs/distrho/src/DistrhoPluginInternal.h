@@ -9,11 +9,10 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * A copy of the license is included with this software, or can be
- * found online at www.gnu.org/licenses.
+ * For a full copy of the license see the GPL.txt file
  */
 
 #ifndef __DISTRHO_PLUGIN_INTERNAL_H__
@@ -22,7 +21,6 @@
 #include "DistrhoPlugin.h"
 
 #include <cassert>
-#include <cstdlib>
 
 START_NAMESPACE_DISTRHO
 
@@ -30,69 +28,41 @@ START_NAMESPACE_DISTRHO
 
 #define MAX_MIDI_EVENTS 512
 
-static ParameterRanges fallbackRanges;
-
 struct PluginPrivateData {
+    uint32_t bufferSize;
+    double   sampleRate;
+
     uint32_t   parameterCount;
-    uint32_t   bufferSize;
-    double     sampleRate;
-    TimePos    timePos;
-    uint32_t   latency;
     Parameter* parameters;
 
 #if DISTRHO_PLUGIN_WANT_PROGRAMS
-    uint32_t     programCount;
-    const char** programNames;
+    uint32_t  programCount;
+    d_string* programNames;
 #endif
 
+    TimePos  timePos;
+    uint32_t latency;
+
     PluginPrivateData()
-        : parameterCount(0),
-          bufferSize(512),
-          sampleRate(44100),
-          latency(0),
-#if DISTRHO_PLUGIN_WANT_PROGRAMS
+        : bufferSize(512),
+          sampleRate(44100.0),
+          parameterCount(0),
           parameters(nullptr),
+#if DISTRHO_PLUGIN_WANT_PROGRAMS
           programCount(0),
-          programNames(nullptr) {}
-#else
-          parameters(nullptr) {}
+          programNames(nullptr),
 #endif
+          timePos(),
+          latency(0) {}
 
     ~PluginPrivateData()
     {
         if (parameterCount > 0 && parameters)
-        {
-            for (uint32_t i = 0; i < parameterCount; i++)
-            {
-                Parameter* const parameter = &parameters[i];
-
-                if (! parameter)
-                    continue;
-
-                if (parameter->name)
-                    free((void*)parameter->name);
-                if (parameter->symbol)
-                    free((void*)parameter->symbol);
-                if (parameter->unit)
-                    free((void*)parameter->unit);
-            }
-
             delete[] parameters;
-        }
 
 #if DISTRHO_PLUGIN_WANT_PROGRAMS
         if (programCount > 0 && programNames)
-        {
-            for (uint32_t i = 0; i < programCount; i++)
-            {
-                const char* const programName = programNames[i];
-
-                if (programName)
-                    free((void*)programName);
-            }
-
             delete[] programNames;
-        }
 #endif
     }
 };
@@ -112,10 +82,6 @@ public:
             return;
 
         data = plugin->data;
-        assert(data);
-
-        if (! data)
-            return;
 
         for (uint32_t i=0; i < data->parameterCount; i++)
             plugin->d_initParameter(i, data->parameters[i]);
@@ -130,31 +96,37 @@ public:
 
     const char* name()
     {
+        assert(plugin);
         return plugin ? plugin->d_name() : "";
     }
 
     const char* label()
     {
+        assert(plugin);
         return plugin ? plugin->d_label() : "";
     }
 
     const char* maker()
     {
+        assert(plugin);
         return plugin ? plugin->d_maker() : "";
     }
 
     const char* license()
     {
+        assert(plugin);
         return plugin ? plugin->d_license() : "";
     }
 
     uint32_t version()
     {
+        assert(plugin);
         return plugin ? plugin->d_version() : 1000;
     }
 
     long uniqueId()
     {
+        assert(plugin);
         return plugin ? plugin->d_uniqueId() : 0;
     }
 
@@ -162,18 +134,20 @@ public:
 
     uint32_t latency() const
     {
+        assert(data);
         return data ? data->latency : 0;
     }
 
     uint32_t parameterCount() const
     {
+        assert(data);
         return data ? data->parameterCount : 0;
     }
 
     uint32_t parameterHints(uint32_t index) const
     {
         assert(data && index < data->parameterCount);
-        return (data && index < data->parameterCount) ? data->parameters[index].hints : 0;
+        return (data && index < data->parameterCount) ? data->parameters[index].hints : 0x0;
     }
 
     bool parameterIsOutput(uint32_t index) const
@@ -182,16 +156,16 @@ public:
         return bool(hints & PARAMETER_IS_OUTPUT);
     }
 
-    const char* parameterName(uint32_t index) const
+    const d_string& parameterName(uint32_t index) const
     {
         assert(data && index < data->parameterCount);
-        return (data && index < data->parameterCount) ? data->parameters[index].name : "";
+        return (data && index < data->parameterCount) ? data->parameters[index].name : fallbackString;
     }
 
-    const char* parameterSymbol(uint32_t index) const
+    const d_string& parameterSymbol(uint32_t index) const
     {
         assert(data && index < data->parameterCount);
-        return (data && index < data->parameterCount) ? data->parameters[index].symbol : nullptr;
+        return (data && index < data->parameterCount) ? data->parameters[index].symbol : fallbackString;
     }
 
     const ParameterRanges* parameterRanges(uint32_t index) const
@@ -209,6 +183,7 @@ public:
     void setParameterValue(uint32_t index, float value)
     {
         assert(plugin && index < data->parameterCount);
+
         if (plugin && index < data->parameterCount)
             plugin->d_setParameterValue(index, value);
     }
@@ -216,18 +191,20 @@ public:
 #if DISTRHO_PLUGIN_WANT_PROGRAMS
     uint32_t programCount() const
     {
+        assert(data);
         return data ? data->programCount : 0;
     }
 
-    const char* programName(uint32_t index) const
+    const d_string& programName(uint32_t index) const
     {
-        assert(index < data->programCount);
-        return (index < data->programCount) ? data->programNames[index] : nullptr;
+        assert(data && index < data->programCount);
+        return (data && index < data->programCount) ? data->programNames[index].asChar() : fallbackString.asChar();
     }
 
     void setProgram(uint32_t index)
     {
         assert(plugin && index < data->programCount);
+
         if (plugin && index < data->programCount)
             plugin->d_setProgram(index);
     }
@@ -237,19 +214,23 @@ public:
 
     void activate()
     {
+        assert(plugin);
+
         if (plugin)
             plugin->d_activate();
     }
 
     void deactivate()
     {
+        assert(plugin);
+
         if (plugin)
             plugin->d_deactivate();
     }
 
     void run(const float** inputs, float** outputs, uint32_t frames, uint32_t midiEventCount, const MidiEvent* midiEvents)
     {
-        assert(frames >= 2);
+        assert(plugin && frames >= 2);
 
         if (plugin)
             plugin->d_run(inputs, outputs, frames, midiEventCount, midiEvents);
@@ -257,7 +238,7 @@ public:
 
     void setBufferSize(uint32_t bufferSize, bool callback = false)
     {
-        assert(bufferSize >= 2);
+        assert(data && plugin && bufferSize >= 2);
 
         if (data)
             data->bufferSize = bufferSize;
@@ -272,7 +253,7 @@ public:
 
     void setSampleRate(double sampleRate)
     {
-        assert(sampleRate > 0.0);
+        assert(data && sampleRate > 0.0);
 
         if (data)
             data->sampleRate = sampleRate;
@@ -283,8 +264,7 @@ public:
 #if DISTRHO_PLUGIN_WANT_STATE
     void changeState(const char* key, const char* value)
     {
-        assert(key);
-        assert(value);
+        assert(plugin && key && value);
 
         if (plugin)
             plugin->d_stateChanged(key, value);
@@ -294,6 +274,10 @@ public:
 protected:
     Plugin* const plugin;
     PluginPrivateData* data;
+
+private:
+    static const d_string        fallbackString;
+    static const ParameterRanges fallbackRanges;
 };
 
 // -------------------------------------------------
