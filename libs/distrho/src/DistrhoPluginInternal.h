@@ -198,7 +198,7 @@ public:
     const d_string& programName(uint32_t index) const
     {
         assert(data && index < data->programCount);
-        return (data && index < data->programCount) ? data->programNames[index].asChar() : fallbackString.asChar();
+        return (data && index < data->programCount) ? data->programNames[index] : fallbackString;
     }
 
     void setProgram(uint32_t index)

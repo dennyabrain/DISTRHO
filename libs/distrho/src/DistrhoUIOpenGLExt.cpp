@@ -203,7 +203,7 @@ const Size& Rectangle::getSize() const
 
 bool Rectangle::contains(int x, int y) const
 {
-    return (_pos._x >= x && _pos._y >= y && _pos._x+_size._width <= x && _pos._y+_size._height <= y);
+    return (x >= _pos._x && y >= _pos._y && x <= _pos._x+_size._width && y <= _pos._y+_size._height);
 }
 
 bool Rectangle::contains(const Point& pos) const
@@ -276,7 +276,16 @@ Rectangle& Rectangle::operator-= (const Rectangle& rect)
 
 // -------------------------------------------------
 
-struct ImageSlider {
+struct ImageKnob {
+    uint32_t        paramIndex;
+    ParameterRanges range;
+    Point pos;
+    Size  size;
+    Rectangle area;
+    const char* imageData;
+};
+
+struct ImageVerticalSlider {
     uint32_t        paramIndex;
     ParameterRanges range;
     Point startPos, endPos;
@@ -289,11 +298,20 @@ struct OpenGLExtUIPrivateData {
     uint32_t parameterCount;
     float*   paramValues;
 
+    int32_t curMouseParam;
+    int initialPosX;
+    int initialPosY;
+
     const char* bgImage;
-    std::vector<ImageSlider> imageSliders;
+    std::vector<ImageKnob> imageKnobs;
+    std::vector<ImageVerticalSlider> imageSliders;
+
 
     OpenGLExtUIPrivateData(uint32_t parameterCount)
         : paramValues(nullptr),
+          curMouseParam(-1),
+          initialPosX(0),
+          initialPosY(0),
           bgImage(nullptr)
     {
         this->parameterCount = parameterCount;
@@ -304,6 +322,7 @@ struct OpenGLExtUIPrivateData {
 
     ~OpenGLExtUIPrivateData()
     {
+        imageKnobs.clear();
         imageSliders.clear();
 
         if (paramValues)
@@ -335,26 +354,47 @@ void OpenGLExtUI::d_uiIdle()
 // -------------------------------------------------
 // Extended Calls
 
+void OpenGLExtUI::setParameterValue(uint32_t index, float value)
+{
+    d_parameterChanged(index, value);
+}
+
 void OpenGLExtUI::setBackgroundImage(const char* imageData)
 {
     assert(imageData);
     data->bgImage = imageData;
 }
 
-//void OpenGLExtUI::addImageKnob(uint32_t paramIndex, const ParameterRanges& paramRanges, const Point& pos, const char* imageData)
-//{
-//}
-
-void OpenGLExtUI::addImageSlider(uint32_t paramIndex, const ParameterRanges& paramRanges, const Point& startPos, const Point& endPos, const Size& size, const char* imageData)
+void OpenGLExtUI::addImageKnob(uint32_t paramIndex, const ParameterRanges& paramRanges, const Point& pos, const Size& size, const char* imageData)
 {
     assert(paramIndex < data->parameterCount);
+    assert(imageData);
 
-    if (paramIndex >= data->parameterCount)
+    if (paramIndex >= data->parameterCount || ! imageData)
         return;
 
-    Rectangle area(startPos.getX(), startPos.getY(), endPos.getX()+size.getWidth(), endPos.getY()/*+size.getHeight()*/);
+    int imageSize = size.getWidth() < size.getHeight() ? size.getWidth() : size.getHeight();
 
-    ImageSlider imageSlider = { paramIndex, paramRanges, startPos, endPos, size, area, imageData };
+    Rectangle area(pos, size);
+    area.setY(pos.getY() - imageSize);
+
+    ImageKnob imageKnob = { paramIndex, paramRanges, pos, size, area, imageData };
+    data->imageKnobs.push_back(imageKnob);
+
+    data->paramValues[paramIndex] = paramRanges.def;
+}
+
+void OpenGLExtUI::addImageVerticalSlider(uint32_t paramIndex, const ParameterRanges& paramRanges, const Point& startPos, const Point& endPos, const Size& size, const char* imageData)
+{
+    assert(paramIndex < data->parameterCount);
+    assert(imageData);
+
+    if (paramIndex >= data->parameterCount || ! imageData)
+        return;
+
+    Rectangle area(startPos.getX(), startPos.getY() - size.getHeight()/2, size.getWidth(), endPos.getY() - startPos.getY());
+
+    ImageVerticalSlider imageSlider = { paramIndex, paramRanges, startPos, endPos, size, area, imageData };
     data->imageSliders.push_back(imageSlider);
 
     data->paramValues[paramIndex] = paramRanges.def;
@@ -365,13 +405,15 @@ void OpenGLExtUI::addImageSlider(uint32_t paramIndex, const ParameterRanges& par
 
 void OpenGLExtUI::d_parameterChanged(uint32_t index, float value)
 {
-    if (index < data->parameterCount)
-    {
-        if (data->paramValues[index] != value)
-            d_uiRepaint();
+    if (index >= data->parameterCount)
+        return;
 
-        data->paramValues[index] = value;
-    }
+    if (data->paramValues[index] == value)
+        return;
+
+    data->paramValues[index] = value;
+
+    d_uiRepaint();
 }
 
 void OpenGLExtUI::d_onInit()
@@ -399,12 +441,48 @@ void OpenGLExtUI::d_onDisplay()
         glDrawPixels(d_width(), d_height(), GL_BGR, GL_UNSIGNED_BYTE, data->bgImage);
     }
 
+    // image knobs
+    if (data->imageKnobs.size() > 0)
+    {
+        for (auto it = data->imageKnobs.begin(); it != data->imageKnobs.end(); it++)
+        {
+            const ImageKnob& imageKnob(*it);
+
+            assert(imageKnob.paramIndex < data->parameterCount);
+
+            if (imageKnob.paramIndex >= data->parameterCount)
+                continue;
+
+            float vper = (data->paramValues[imageKnob.paramIndex] - imageKnob.range.min) / (imageKnob.range.max - imageKnob.range.min);
+
+            int layers, imageSize;
+
+            if (imageKnob.size.getWidth() > imageKnob.size.getHeight())
+            {
+                layers    = imageKnob.size.getWidth() / imageKnob.size.getHeight();
+                imageSize = imageKnob.size.getHeight();
+            }
+            else
+            {
+                layers    = imageKnob.size.getHeight() / imageKnob.size.getWidth();
+                imageSize = imageKnob.size.getWidth();
+            }
+
+            int layerSize = imageSize * imageSize * 4;
+            int imageDataSize   = layerSize * layers;
+            int imageDataOffset = imageDataSize - layerSize - layerSize * rint(vper*(layers-1));
+
+            glRasterPos2i(imageKnob.pos.getX(), imageKnob.pos.getY());
+            glDrawPixels(imageSize, imageSize, GL_BGRA, GL_UNSIGNED_BYTE, imageKnob.imageData + imageDataOffset);
+        }
+    }
+
     // image sliders
     if (data->imageSliders.size() > 0)
     {
         for (auto it = data->imageSliders.begin(); it != data->imageSliders.end(); it++)
         {
-            const ImageSlider& imageSlider(*it);
+            const ImageVerticalSlider& imageSlider(*it);
 
             assert(imageSlider.paramIndex < data->parameterCount);
 
@@ -412,22 +490,13 @@ void OpenGLExtUI::d_onDisplay()
                 continue;
 
             float vper = (data->paramValues[imageSlider.paramIndex] - imageSlider.range.min) / (imageSlider.range.max - imageSlider.range.min);
-            int x = imageSlider.startPos.getX() + float(imageSlider.endPos.getX()-imageSlider.startPos.getX())*vper;
-            int y = imageSlider.startPos.getY() + float(imageSlider.endPos.getY()-imageSlider.startPos.getY())*vper;
+            int x = imageSlider.startPos.getX() + rint(float(imageSlider.endPos.getX() - imageSlider.startPos.getX()) * vper);
+            int y = imageSlider.startPos.getY() + rint(float(imageSlider.endPos.getY() - imageSlider.startPos.getY()) * vper);
 
             glRasterPos2i(x, y);
             glDrawPixels(imageSlider.size.getWidth(), imageSlider.size.getHeight(), GL_BGRA, GL_UNSIGNED_BYTE, imageSlider.imageData);
         }
     }
-
-#if 0
-    // knobs
-    glRasterPos2i(66, 330);
-    glDrawPixels(DistrhoArtwork::knobWidth, DistrhoArtwork::knobHeight, GL_BGRA, GL_UNSIGNED_BYTE, DistrhoArtwork::knobData);
-
-    glRasterPos2i(160, 330);
-    glDrawPixels(DistrhoArtwork::knobWidth, DistrhoArtwork::knobHeight, GL_BGRA, GL_UNSIGNED_BYTE, DistrhoArtwork::knobData);
-#endif
 }
 
 void OpenGLExtUI::d_onKeyboard(bool press, uint32_t key)
@@ -438,20 +507,140 @@ void OpenGLExtUI::d_onKeyboard(bool press, uint32_t key)
 
 void OpenGLExtUI::d_onMotion(int x, int y)
 {
-    (void)x;
-    (void)y;
-}
+    if (data->curMouseParam <= -1)
+        return;
 
-void OpenGLExtUI::d_onMouse(int button, bool press, int x, int y)
-{
-    printf("Mouse %i %i %i %i\n", button, press, x, y);
+    // image knobs
+    if (data->imageKnobs.size() > 0)
+    {
+        for (auto it = data->imageKnobs.begin(); it != data->imageKnobs.end(); it++)
+        {
+            const ImageKnob& imageKnob(*it);
+
+            if (int32_t(imageKnob.paramIndex) != data->curMouseParam)
+                continue;
+
+            //int movX = x - data->initialPosX;
+            int movY = data->initialPosY - y;
+
+            //if (movX != 0)
+            //{
+            //    float oldValue = data->paramValues[imageKnob.paramIndex];
+            //    float newValue = oldValue + imageKnob.range.step * movX;
+            //    imageKnob.range.fixRange(newValue);
+
+            //    if (oldValue != newValue)
+            //    {
+            //        d_parameterChanged(imageKnob.paramIndex, newValue);
+            //        d_setParameterValue(imageKnob.paramIndex, newValue);
+            //    }
+            //}
+
+            if (movY != 0)
+            {
+                float oldValue = data->paramValues[imageKnob.paramIndex];
+                float newValue = oldValue + imageKnob.range.step * movY;
+                imageKnob.range.fixRange(newValue);
+
+                if (oldValue != newValue)
+                {
+                    d_parameterChanged(imageKnob.paramIndex, newValue);
+                    d_setParameterValue(imageKnob.paramIndex, newValue);
+                }
+            }
+
+            data->initialPosX = x;
+            data->initialPosY = y;
+
+            return;
+        }
+    }
 
     // image sliders
     if (data->imageSliders.size() > 0)
     {
         for (auto it = data->imageSliders.begin(); it != data->imageSliders.end(); it++)
         {
-            const ImageSlider& imageSlider(*it);
+            const ImageVerticalSlider& imageSlider(*it);
+
+            if (int32_t(imageSlider.paramIndex) != data->curMouseParam)
+                continue;
+
+            if (imageSlider.area.contains(x, y))
+            {
+                data->curMouseParam = imageSlider.paramIndex;
+
+                float vper  = float(y - imageSlider.area.getY()) / imageSlider.area.getHeight();
+                float value = imageSlider.range.min + vper * (imageSlider.range.max - imageSlider.range.min);
+                imageSlider.range.fixRange(value);
+
+                d_parameterChanged(imageSlider.paramIndex, value);
+                d_setParameterValue(imageSlider.paramIndex, value);
+            }
+            else if (y < imageSlider.area.getY())
+            {
+                if (data->paramValues[imageSlider.paramIndex] != imageSlider.range.min)
+                {
+                    d_parameterChanged(imageSlider.paramIndex, imageSlider.range.min);
+                    d_setParameterValue(imageSlider.paramIndex, imageSlider.range.min);
+                }
+            }
+            else
+            {
+                if (data->paramValues[imageSlider.paramIndex] != imageSlider.range.max)
+                {
+                    d_parameterChanged(imageSlider.paramIndex, imageSlider.range.max);
+                    d_setParameterValue(imageSlider.paramIndex, imageSlider.range.max);
+                }
+            }
+
+            return;
+        }
+    }
+}
+
+void OpenGLExtUI::d_onMouse(int button, bool press, int x, int y)
+{
+    if (button != 1)
+        return;
+
+    if (data->curMouseParam >= 0 && ! press)
+    {
+        data->curMouseParam = -1;
+        return;
+    }
+
+    if (! press)
+        return;
+
+    // image knobs
+    if (data->imageKnobs.size() > 0)
+    {
+        for (auto it = data->imageKnobs.begin(); it != data->imageKnobs.end(); it++)
+        {
+            const ImageKnob& imageKnob(*it);
+
+            assert(imageKnob.paramIndex < data->parameterCount);
+
+            if (imageKnob.paramIndex >= data->parameterCount)
+                continue;
+
+            if (imageKnob.area.contains(x, y))
+            {
+                data->curMouseParam = imageKnob.paramIndex;
+                data->initialPosX   = x;
+                data->initialPosY   = y;
+                return;
+            }
+        }
+    }
+
+    // image sliders
+    if (data->imageSliders.size() > 0)
+    {
+        for (auto it = data->imageSliders.begin(); it != data->imageSliders.end(); it++)
+        {
+            const ImageVerticalSlider& imageSlider(*it);
 
             assert(imageSlider.paramIndex < data->parameterCount);
 
@@ -460,15 +649,21 @@ void OpenGLExtUI::d_onMouse(int button, bool press, int x, int y)
 
             if (imageSlider.area.contains(x, y))
             {
-                printf("Mouse %i %i %i %i------ YES FOR %i\n", button, press, x, y, imageSlider.paramIndex);
+                data->curMouseParam = imageSlider.paramIndex;
+                data->initialPosX   = x;
+                data->initialPosY   = y;
+
+                float vper  = float(y - imageSlider.area.getY()) / imageSlider.area.getHeight();
+                float value = imageSlider.range.min + vper * (imageSlider.range.max - imageSlider.range.min);
+                imageSlider.range.fixRange(value);
+
+                d_parameterChanged(imageSlider.paramIndex, value);
+                d_setParameterValue(imageSlider.paramIndex, value);
+
+                return;
             }
         }
     }
-
-    (void)button;
-    (void)press;
-    (void)x;
-    (void)y;
 }
 
 void OpenGLExtUI::d_onReshape(int width, int height)

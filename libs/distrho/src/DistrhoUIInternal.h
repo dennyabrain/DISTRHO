@@ -61,7 +61,7 @@ struct UIPrivateData {
 
     UIPrivateData()
         : parameterCount(0),
-          sampleRate(44100.0),
+          sampleRate(0.0),
           ptr(nullptr),
           widget(nullptr),
           changeStateCallbackFunc(nullptr),
@@ -175,6 +175,12 @@ public:
             ui->d_stateChanged(key, value);
     }
 #endif
+
+    void setSampleRate(double sampleRate)
+    {
+        if (data)
+            data->sampleRate = sampleRate;
+    }
 
     // ---------------------------------------------
 

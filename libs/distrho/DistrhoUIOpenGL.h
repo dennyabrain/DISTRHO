@@ -85,18 +85,10 @@ public:
 
     // ---------------------------------------------
 
-    // Host DSP State
-    double d_sampleRate() const;
-    void   d_setParameterValue(uint32_t index, float value);
-#if DISTRHO_PLUGIN_WANT_STATE
-    void   d_changeState(const char* key, const char* value);
-#endif
-
     // Host UI State
     int  d_uiGetModifiers();
     void d_uiIgnoreKeyRepeat(bool ignore);
     void d_uiRepaint();
-    void d_uiResize(unsigned int width, unsigned int height);
     // TODO - d_uiTouch/edit/automate
 
     // ---------------------------------------------

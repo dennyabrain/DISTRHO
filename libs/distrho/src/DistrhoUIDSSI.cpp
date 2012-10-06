@@ -101,6 +101,8 @@ public:
         dialog.setFixedSize(ui.getWidth(), ui.getHeight());
         dialog.setWindowTitle(title);
 
+        // TODO - block until first sample-rate is received
+        // this should be 0, only start when sample-rate is known
         uiTimer = startTimer(30);
     }
 
@@ -126,6 +128,9 @@ public:
 
     void dssiui_control(unsigned long index, float value)
     {
+        // TODO - detect sample-rate parameter
+        //ui.setSampleRate(value);
+
         if (long(index - DISTRHO_PLUGIN_NUM_INPUTS - DISTRHO_PLUGIN_NUM_OUTPUTS) < 0)
             return;
 
@@ -207,7 +212,7 @@ private:
     QVBoxLayout vbLayout;
 #endif
 
-    // plugin UI
+    // Plugin UI
     UIInternal ui;
 
     const OscData* const oscData;
@@ -426,6 +431,10 @@ int main(int argc, char* argv[])
     free(serverPath);
 
     osc_send_update(&oscData, pluginPath);
+
+    ui->dssiui_show();
+
+    // TODO - block until first sample-rate is received
 
     int ret = app.exec();
 

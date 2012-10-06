@@ -140,9 +140,10 @@ protected:
     virtual void d_uiIdle();
 
     // Extended Calls
+    void setParameterValue(uint32_t index, float value);
     void setBackgroundImage(const char* imageData);
-    //void addImageKnob(uint32_t paramIndex, const ParameterRanges& paramRanges, const Point& pos, const char* imageData);
-    void addImageSlider(uint32_t paramIndex, const ParameterRanges& paramRanges, const Point& startPos, const Point& endPos, const Size& size, const char* imageData);
+    void addImageKnob(uint32_t paramIndex, const ParameterRanges& paramRanges, const Point& pos, const Size& size, const char* imageData);
+    void addImageVerticalSlider(uint32_t paramIndex, const ParameterRanges& paramRanges, const Point& startPos, const Point& endPos, const Size& size, const char* imageData);
 
 private:
     OpenGLExtUIPrivateData* data;

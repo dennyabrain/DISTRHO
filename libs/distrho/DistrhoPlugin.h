@@ -56,6 +56,14 @@ struct ParameterRanges {
         this->min = min;
         this->max = max;
     }
+
+    void fixRange(float& value) const
+    {
+        if (value < min)
+            value = min;
+        else if (value > max)
+            value = max;
+    }
 };
 
 // Parameter
