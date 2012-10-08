@@ -22,6 +22,7 @@
 #include "DistrhoUIInternal.h"
 
 #include <cassert>
+#include <cmath>
 #include <vector>
 
 START_NAMESPACE_DISTRHO

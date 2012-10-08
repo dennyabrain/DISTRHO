@@ -44,15 +44,14 @@ struct PluginPrivateData {
     uint32_t latency;
 
     PluginPrivateData()
-        : bufferSize(512),
-          sampleRate(44100.0),
+        : bufferSize(0),
+          sampleRate(0.0),
           parameterCount(0),
           parameters(nullptr),
 #if DISTRHO_PLUGIN_WANT_PROGRAMS
           programCount(0),
           programNames(nullptr),
 #endif
-          timePos(),
           latency(0) {}
 
     ~PluginPrivateData()
@@ -168,6 +167,12 @@ public:
         return (data && index < data->parameterCount) ? data->parameters[index].symbol : fallbackString;
     }
 
+    const d_string& parameterUnit(uint32_t index) const
+    {
+        assert(data && index < data->parameterCount);
+        return (data && index < data->parameterCount) ? data->parameters[index].unit : fallbackString;
+    }
+
     const ParameterRanges* parameterRanges(uint32_t index) const
     {
         assert(data && index < data->parameterCount);
@@ -239,6 +244,9 @@ public:
     void setBufferSize(uint32_t bufferSize, bool callback = false)
     {
         assert(data && plugin && bufferSize >= 2);
+
+        if (callback && data->bufferSize == bufferSize)
+            callback = false;
 
         if (data)
             data->bufferSize = bufferSize;

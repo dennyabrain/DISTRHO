@@ -241,7 +241,14 @@ private:
 static inline
 d_string operator+(const char* strBufBefore, const d_string& strAfter)
 {
-    return d_string(strBufBefore) + strAfter;
+    const char* strBufAfter = (const char*)strAfter;
+    size_t newBufSize = strlen(strBufBefore) + strlen(strBufAfter) + 1;
+    char   newBuf[newBufSize];
+
+    strcpy(newBuf, strBufBefore);
+    strcat(newBuf, strBufAfter);
+
+    return d_string(newBuf);
 }
 
 // -------------------------------------------------

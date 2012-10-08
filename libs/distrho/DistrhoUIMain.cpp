@@ -22,7 +22,6 @@
 #elif defined(DISTRHO_PLUGIN_TARGET_LV2)
 //# include "src/DistrhoUILV2.cpp"
 #elif defined(DISTRHO_PLUGIN_TARGET_VST)
-# include "src/DistrhoUIVST.cpp"
 #endif
 
 #ifdef DISTRHO_UI_QT4
