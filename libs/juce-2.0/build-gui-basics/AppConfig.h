@@ -42,11 +42,7 @@
 /** Config: JUCE_USE_XRENDER
     Enables XRender to allow semi-transparent windowing on Linux.
 */
-#if LINUX
- #define JUCE_USE_XRENDER 1
-#else
- #define JUCE_USE_XRENDER 0
-#endif
+#define JUCE_USE_XRENDER 0
 
 /** Config: JUCE_USE_XCURSOR
     Uses XCursor to allow ARGB cursor on Linux. This is best left turned on unless you have
