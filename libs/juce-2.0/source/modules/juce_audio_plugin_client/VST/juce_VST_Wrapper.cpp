@@ -831,6 +831,8 @@ public:
 
     void audioProcessorChanged (AudioProcessor*)
     {
+        setInitialDelay (filter->getLatencySamples());
+        ioChanged();
         updateDisplay();
     }
 
