@@ -28,6 +28,9 @@ START_NAMESPACE_DISTRHO
 
 #define MAX_MIDI_EVENTS 512
 
+static uint32_t d_lastBufferSize = 0;
+static double   d_lastSampleRate = 0.0;
+
 struct PluginPrivateData {
     uint32_t bufferSize;
     double   sampleRate;
@@ -38,6 +41,11 @@ struct PluginPrivateData {
 #if DISTRHO_PLUGIN_WANT_PROGRAMS
     uint32_t  programCount;
     d_string* programNames;
+#endif
+
+#if DISTRHO_PLUGIN_WANT_STATE
+    uint32_t  stateCount;
+    d_string* stateKeys;
 #endif
 
     TimePos  timePos;
@@ -52,6 +60,10 @@ struct PluginPrivateData {
           programCount(0),
           programNames(nullptr),
 #endif
+#if DISTRHO_PLUGIN_WANT_STATE
+          stateCount(0),
+          stateKeys(nullptr),
+#endif
           latency(0) {}
 
     ~PluginPrivateData()
@@ -62,6 +74,11 @@ struct PluginPrivateData {
 #if DISTRHO_PLUGIN_WANT_PROGRAMS
         if (programCount > 0 && programNames)
             delete[] programNames;
+#endif
+
+#if DISTRHO_PLUGIN_WANT_STATE
+        if (stateCount > 0 && stateKeys)
+            delete[] stateKeys;
 #endif
     }
 };
@@ -88,6 +105,11 @@ public:
 #if DISTRHO_PLUGIN_WANT_PROGRAMS
         for (uint32_t i=0; i < data->programCount; i++)
             plugin->d_initProgramName(i, data->programNames[i]);
+#endif
+
+#if DISTRHO_PLUGIN_WANT_STATE
+        for (uint32_t i=0; i < data->stateCount; i++)
+            plugin->d_initStateKey(i, data->stateKeys[i]);
 #endif
     }
 
@@ -215,6 +237,28 @@ public:
     }
 #endif
 
+#if DISTRHO_PLUGIN_WANT_STATE
+    uint32_t stateCount() const
+    {
+        assert(data);
+        return data ? data->stateCount : 0;
+    }
+
+    const d_string& stateKey(uint32_t index) const
+    {
+        assert(data && index < data->stateCount);
+        return (data && index < data->stateCount) ? data->stateKeys[index] : fallbackString;
+    }
+
+    void setState(const char* key, const char* value)
+    {
+        assert(plugin && key && value);
+
+        if (plugin && key && value)
+            plugin->d_setState(key, value);
+    }
+#endif
+
     // ---------------------------------------------
 
     void activate()
@@ -259,25 +303,7 @@ public:
         }
     }
 
-    void setSampleRate(double sampleRate)
-    {
-        assert(data && sampleRate > 0.0);
-
-        if (data)
-            data->sampleRate = sampleRate;
-    }
-
     // ---------------------------------------------
-
-#if DISTRHO_PLUGIN_WANT_STATE
-    void changeState(const char* key, const char* value)
-    {
-        assert(plugin && key && value);
-
-        if (plugin)
-            plugin->d_stateChanged(key, value);
-    }
-#endif
 
 protected:
     Plugin* const plugin;

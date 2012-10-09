@@ -57,6 +57,16 @@ struct ParameterRanges {
         this->max = max;
     }
 
+    ParameterRanges(float def, float min, float max, float step, float stepSmall, float stepLarge)
+    {
+        this->def = def;
+        this->min = min;
+        this->max = max;
+        this->step = step;
+        this->stepSmall = stepSmall;
+        this->stepLarge = stepLarge;
+    }
+
     void fixRange(float& value) const
     {
         if (value < min)
@@ -87,7 +97,7 @@ struct MidiEvent {
     uint8_t  buffer[3];
 
     MidiEvent()
-#if 0
+#if 0 // FIXME - code below is valid C++11
         : frame(0),
           buffer{0} {}
 #else
@@ -110,7 +120,7 @@ struct PluginPrivateData;
 class Plugin
 {
 public:
-    Plugin(uint32_t parameterCount, uint32_t programCount);
+    Plugin(uint32_t parameterCount, uint32_t programCount, uint32_t stateCount);
     virtual ~Plugin();
 
     // ---------------------------------------------
@@ -137,12 +147,18 @@ protected:
 #if DISTRHO_PLUGIN_WANT_PROGRAMS
     virtual void d_initProgramName(uint32_t index, d_string& programName) = 0;
 #endif
+#if DISTRHO_PLUGIN_WANT_STATE
+    virtual void d_initStateKey(uint32_t index, d_string& stateKeyName) = 0;
+#endif
 
     // Internal data
     virtual float d_parameterValue(uint32_t index) = 0;
     virtual void  d_setParameterValue(uint32_t index, float value) = 0;
 #if DISTRHO_PLUGIN_WANT_PROGRAMS
     virtual void  d_setProgram(uint32_t index) = 0;
+#endif
+#if DISTRHO_PLUGIN_WANT_STATE
+    virtual void d_setState(const char* key, const char* value) = 0;
 #endif
 
     // Process
@@ -152,9 +168,6 @@ protected:
 
     // Callbacks
     virtual void d_bufferSizeChanged(uint32_t newBufferSize);
-#if DISTRHO_PLUGIN_WANT_STATE
-    virtual void d_stateChanged(const char* key, const char* value) = 0;
-#endif
 
     // ---------------------------------------------
 

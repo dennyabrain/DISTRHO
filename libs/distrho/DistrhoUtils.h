@@ -153,7 +153,7 @@ public:
         return strlen(buffer);
     }
 
-    bool isEmpty()
+    bool isEmpty() const
     {
         return (*buffer == 0);
     }

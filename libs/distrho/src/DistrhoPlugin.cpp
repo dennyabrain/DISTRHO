@@ -26,9 +26,12 @@ const ParameterRanges PluginInternal::fallbackRanges;
 
 // -------------------------------------------------
 
-Plugin::Plugin(uint32_t parameterCount, uint32_t programCount)
+Plugin::Plugin(uint32_t parameterCount, uint32_t programCount, uint32_t stateCount)
 {
     data = new PluginPrivateData;
+
+    data->bufferSize = d_lastBufferSize;
+    data->sampleRate = d_lastSampleRate;
 
     if (parameterCount > 0)
     {
@@ -41,6 +44,14 @@ Plugin::Plugin(uint32_t parameterCount, uint32_t programCount)
 #if DISTRHO_PLUGIN_WANT_PROGRAMS
         data->programCount = programCount;
         data->programNames = new d_string [programCount];
+#endif
+    }
+
+    if (stateCount > 0)
+    {
+#if DISTRHO_PLUGIN_WANT_STATE
+        data->stateCount = stateCount;
+        data->stateKeys  = new d_string [stateCount];
 #endif
     }
 }
@@ -74,6 +85,7 @@ void Plugin::d_setLatency(uint32_t samples)
 }
 
 // -------------------------------------------------
+// Callbacks
 
 void Plugin::d_bufferSizeChanged(uint32_t)
 {

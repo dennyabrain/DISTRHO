@@ -23,7 +23,6 @@
 
 #ifdef DISTRHO_PLUGIN_TARGET_DSSI
 # include "dssi/dssi.h"
-# define DISTRHO_DSSI_USE_PROGRAMS (DISTRHO_PLUGIN_WANT_PROGRAMS && ! DISTRHO_PLUGIN_WANT_STATE)
 #else
 # include "ladspa/ladspa.h"
 # if DISTRHO_PLUGIN_IS_SYNTH
@@ -45,13 +44,10 @@ START_NAMESPACE_DISTRHO
 class PluginLadspaDssi
 {
 public:
-    PluginLadspaDssi(double sampleRate)
-        : lastBufferSize(512),
-          lastSampleRate(sampleRate)
+    PluginLadspaDssi()
+        : lastBufferSize(d_lastBufferSize),
+          lastSampleRate(d_lastSampleRate)
     {
-        plugin.setBufferSize(lastBufferSize);
-        plugin.setSampleRate(lastSampleRate);
-
         for (uint32_t i=0; i < DISTRHO_PLUGIN_NUM_INPUTS; i++)
             portAudioIns.push_back(nullptr);
 
@@ -64,8 +60,11 @@ public:
             lastControlValues.push_back(plugin.parameterValue(i));
         }
 
-        portLatency    = nullptr;
+        portLatency = nullptr;
+
+#if defined(DISTRHO_PLUGIN_TARGET_DSSI) && DISTRHO_PLUGIN_HAS_UI
         portSampleRate = nullptr;
+#endif
     }
 
     ~PluginLadspaDssi()
@@ -124,11 +123,13 @@ public:
             return;
         }
 
+#if defined(DISTRHO_PLUGIN_TARGET_DSSI) && DISTRHO_PLUGIN_HAS_UI
         if (port == index++)
         {
             portSampleRate = dataLocation;
             return;
         }
+#endif
     }
 
 #ifdef DISTRHO_PLUGIN_TARGET_DSSI
@@ -138,12 +139,12 @@ public:
         if (strncmp(key, DSSI_RESERVED_CONFIGURE_PREFIX, strlen(DSSI_RESERVED_CONFIGURE_PREFIX) == 0))
             return nullptr;
 
-        plugin.changeState(key, value);
+        plugin.setState(key, value);
         return nullptr;
     }
 # endif
 
-# if DISTRHO_DSSI_USE_PROGRAMS
+# if DISTRHO_PLUGIN_WANT_PROGRAMS
     const DSSI_Program_Descriptor* dssi_get_program(unsigned long index)
     {
         if (index >= plugin.programCount())
@@ -164,6 +165,13 @@ public:
             return;
 
         plugin.setProgram(realProgram);
+
+        // Update parameters
+        for (uint32_t i=0; i < plugin.parameterCount(); i++)
+        {
+            if (! plugin.parameterIsOutput(i))
+                lastControlValues[i] = *portControls[i] = plugin.parameterValue(i);
+        }
     }
 # endif
 
@@ -184,7 +192,8 @@ public:
         if (bufferSize != lastBufferSize)
         {
             lastBufferSize = bufferSize;
-            plugin.setBufferSize(lastBufferSize, true);
+            d_lastBufferSize = bufferSize;
+            plugin.setBufferSize(bufferSize, true);
         }
 
         // Check for updated parameters
@@ -192,9 +201,6 @@ public:
 
         for (uint32_t i=0; i < plugin.parameterCount(); i++)
         {
-            if (! portControls[i])
-                continue;
-
             curValue = *portControls[i];
 
             if (lastControlValues[i] != curValue && ! plugin.parameterIsOutput(i))
@@ -260,7 +266,9 @@ private:
     LADSPA_DataPtrVector portAudioOuts;
     LADSPA_DataPtrVector portControls;
     LADSPA_DataPtr       portLatency;
+#if defined(DISTRHO_PLUGIN_TARGET_DSSI) && DISTRHO_PLUGIN_HAS_UI
     LADSPA_DataPtr       portSampleRate;
+#endif
 
     // Temporary data
     unsigned long     lastBufferSize;
@@ -284,8 +292,10 @@ private:
         if (portLatency)
             *portLatency = plugin.latency();
 
+#if defined(DISTRHO_PLUGIN_TARGET_DSSI) && DISTRHO_PLUGIN_HAS_UI
         if (portSampleRate)
             *portSampleRate = lastSampleRate;
+#endif
     }
 };
 
@@ -293,7 +303,10 @@ private:
 
 static LADSPA_Handle ladspa_instantiate(const LADSPA_Descriptor*, unsigned long sampleRate)
 {
-    return new PluginLadspaDssi(sampleRate);
+    if (d_lastBufferSize == 0)
+        d_lastBufferSize = 512;
+    d_lastSampleRate = sampleRate;
+    return new PluginLadspaDssi();
 }
 
 static void ladspa_connect_port(LADSPA_Handle instance, unsigned long port, LADSPA_Data* dataLocation)
@@ -347,7 +360,7 @@ static char* dssi_configure(LADSPA_Handle instance, const char* key, const char*
 }
 #endif
 
-# if DISTRHO_DSSI_USE_PROGRAMS
+# if DISTRHO_PLUGIN_WANT_PROGRAMS
 static const DSSI_Program_Descriptor* dssi_get_program(LADSPA_Handle instance, unsigned long index)
 {
     PluginLadspaDssi* plugin = (PluginLadspaDssi*)instance;
@@ -409,7 +422,7 @@ static DSSI_Descriptor descriptor = {
 # else
     /* configure                    */ nullptr,
 # endif
-# if DISTRHO_DSSI_USE_PROGRAMS
+# if DISTRHO_PLUGIN_WANT_PROGRAMS
     dssi_get_program,
     dssi_select_program,
 # else
@@ -440,8 +453,11 @@ public:
 
         // Get port count, init
         unsigned long i, port = 0;
-        unsigned long portCount = DISTRHO_PLUGIN_NUM_INPUTS + DISTRHO_PLUGIN_NUM_OUTPUTS + plugin.parameterCount() + 2;
-        const char** portNames  = new const char* [portCount];
+        unsigned long portCount = DISTRHO_PLUGIN_NUM_INPUTS + DISTRHO_PLUGIN_NUM_OUTPUTS + plugin.parameterCount() + 1; // + latency
+#if defined(DISTRHO_PLUGIN_TARGET_DSSI) && DISTRHO_PLUGIN_HAS_UI
+        portCount += 1; // sample-rate
+#endif
+        const char**  portNames = new const char* [portCount];
         LADSPA_PortDescriptor* portDescriptors = new LADSPA_PortDescriptor [portCount];
         LADSPA_PortRangeHint*  portRangeHints  = new LADSPA_PortRangeHint  [portCount];
 
@@ -535,6 +551,7 @@ public:
         portRangeHints[port].UpperBound     = 1.0f;
         port++;
 
+#if defined(DISTRHO_PLUGIN_TARGET_DSSI) && DISTRHO_PLUGIN_HAS_UI
         // Set sample-rate port
         portNames[port]       = strdup("_sample-rate");
         portDescriptors[port] = LADSPA_PORT_CONTROL | LADSPA_PORT_OUTPUT;
@@ -542,6 +559,7 @@ public:
         portRangeHints[port].LowerBound     = 0.0f;
         portRangeHints[port].UpperBound     = 256000.0f;
         port++;
+#endif
 
         // Set data
         ldescriptor.UniqueID  = plugin.uniqueId();

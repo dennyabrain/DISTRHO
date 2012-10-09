@@ -28,15 +28,12 @@
 #include "lv2-sdk/state.h"
 #include "lv2-sdk/urid.h"
 
-#include <cassert>
 #include <map>
 #include <vector>
 
 #ifndef DISTRHO_PLUGIN_URI
 # error DISTRHO_PLUGIN_URI undefined!
 #endif
-
-#define DISTRHO_LV2_STATE_URI "urn:distrho:lv2State"
 
 #define DISTRHO_LV2_USE_EVENTS         (DISTRHO_PLUGIN_IS_SYNTH || DISTRHO_PLUGIN_WANT_STATE)
 #define DISTRHO_LV2_USE_EXTENSION_DATA (DISTRHO_PLUGIN_WANT_PROGRAMS || DISTRHO_PLUGIN_WANT_STATE)
@@ -54,13 +51,10 @@ START_NAMESPACE_DISTRHO
 class PluginLv2
 {
 public:
-    PluginLv2(double sampleRate, const LV2_Feature* const* features)
-        : lastBufferSize(512),
-          lastSampleRate(sampleRate)
+    PluginLv2(const LV2_Feature* const* features)
+        : lastBufferSize(d_lastBufferSize),
+          lastSampleRate(d_lastSampleRate)
     {
-        plugin.setBufferSize(lastBufferSize);
-        plugin.setSampleRate(lastSampleRate);
-
         for (uint32_t i=0; i < DISTRHO_PLUGIN_NUM_INPUTS; i++)
             portAudioIns.push_back(nullptr);
 
@@ -83,6 +77,7 @@ public:
         portEventsIn   = nullptr;
 #endif
 
+        // xxx
 #if DISTRHO_LV2_USE_EVENTS
         // URIDs
         uridMap        = nullptr;
@@ -201,7 +196,8 @@ public:
         if (bufferSize != lastBufferSize)
         {
             lastBufferSize = bufferSize;
-            plugin.setBufferSize(lastBufferSize, true);
+            d_lastBufferSize = bufferSize;
+            plugin.setBufferSize(bufferSize, true);
         }
 
         // Check for updated parameters
@@ -209,9 +205,6 @@ public:
 
         for (uint32_t i=0; i < plugin.parameterCount(); i++)
         {
-            if (! portControls[i])
-                continue;
-
             curValue = *portControls[i];
 
             if (lastControlValues[i] != curValue && ! plugin.parameterIsOutput(i))
@@ -295,11 +288,18 @@ public:
             return;
 
         plugin.setProgram(realProgram);
+
+        // Update parameters
+        for (uint32_t i=0; i < plugin.parameterCount(); i++)
+        {
+            if (! plugin.parameterIsOutput(i))
+                lastControlValues[i] = *portControls[i] = plugin.parameterValue(i);
+        }
     }
 #endif
 
 #if DISTRHO_PLUGIN_WANT_STATE
-    // xxx - probably needs multiple STATE-URIs, so we're screwed
+    // xxx
     LV2_State_Status lv2_save(LV2_State_Store_Function store, LV2_State_Handle handle, uint32_t /*flags*/, const LV2_Feature* const* /*features*/)
     {
         for (auto i = stateMap.begin(); i != stateMap.end(); i++)
@@ -430,12 +430,15 @@ private:
 
 // -------------------------------------------------
 
-static LV2_Handle lv2_instantiate(const LV2_Descriptor*, double sampleRate, const char* uri, const LV2_Feature* const* features)
+static LV2_Handle lv2_instantiate(const LV2_Descriptor*, double sampleRate, const char*, const LV2_Feature* const* features)
 {
-    if (strcmp(uri, DISTRHO_PLUGIN_URI) != 0)
-        return nullptr;
+    // TODO - search features for initial bufferSize
 
-    return new PluginLv2(sampleRate, features);
+    if (d_lastBufferSize == 0)
+        d_lastBufferSize = 512;
+    d_lastSampleRate = sampleRate;
+
+    return new PluginLv2(features);
 }
 
 static void lv2_connect_port(LV2_Handle instance, uint32_t port, void* dataLocation)

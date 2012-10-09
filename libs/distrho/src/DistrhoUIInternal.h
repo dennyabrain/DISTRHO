@@ -39,8 +39,9 @@ typedef PuglView* NativeWidget;
 typedef QWidget*  NativeWidget;
 #endif
 
-typedef void (*changeStateFunc)(void* ptr, const char* key, const char* value);
-typedef void (*setParameterValueFunc)(void* ptr, uint32_t index, float value);
+typedef void (*setParameterFunc)(void* ptr, uint32_t index, float value);
+typedef void (*setStateFunc)(void* ptr, const char* key, const char* value);
+typedef void (*uiNoteFunc)(void* ptr, bool onOff, uint8_t channel, uint8_t note, uint8_t velo);
 typedef void (*uiResizeFunc)(void* ptr, unsigned int width, unsigned int height);
 
 // -------------------------------------------------
@@ -55,33 +56,41 @@ struct UIPrivateData {
     NativeWidget widget;
 
     // Callbacks
-    changeStateFunc       changeStateCallbackFunc;
-    setParameterValueFunc setParameterValueCallbackFunc;
-    uiResizeFunc          uiResizeCallbackFunc;
+    setParameterFunc setParameterCallbackFunc;
+    setStateFunc     setStateCallbackFunc;
+    uiNoteFunc       uiNoteCallbackFunc;
+    uiResizeFunc     uiResizeCallbackFunc;
 
     UIPrivateData()
         : parameterCount(0),
           sampleRate(0.0),
           ptr(nullptr),
           widget(nullptr),
-          changeStateCallbackFunc(nullptr),
-          setParameterValueCallbackFunc(nullptr),
+          setParameterCallbackFunc(nullptr),
+          setStateCallbackFunc(nullptr),
+          uiNoteCallbackFunc(nullptr),
           uiResizeCallbackFunc(nullptr) {}
 
     ~UIPrivateData()
     {
     }
 
-    void changeStateCallback(const char* key, const char* value)
+    void setParameterCallback(uint32_t index, float value)
     {
-        if (changeStateCallbackFunc)
-            changeStateCallbackFunc(ptr, key, value);
+        if (setParameterCallbackFunc)
+            setParameterCallbackFunc(ptr, index, value);
     }
 
-    void setParameterValueCallback(uint32_t index, float value)
+    void setStateCallback(const char* key, const char* value)
     {
-        if (setParameterValueCallbackFunc)
-            setParameterValueCallbackFunc(ptr, index, value);
+        if (setStateCallbackFunc)
+            setStateCallbackFunc(ptr, key, value);
+    }
+
+    void uiNoteCallback(bool onOff, uint8_t channel, uint8_t note, uint8_t velocity)
+    {
+        if (uiNoteCallbackFunc)
+            uiNoteCallbackFunc(ptr, onOff, channel, note, velocity);
     }
 
     void uiResizeCallback(unsigned int width, unsigned int height)
@@ -96,7 +105,7 @@ struct UIPrivateData {
 class UIInternal
 {
 public:
-    UIInternal(void* ptr, intptr_t winId, changeStateFunc changeStateCall, setParameterValueFunc setParameterValueCall, uiResizeFunc uiResizeCall)
+    UIInternal(void* ptr, intptr_t winId, setParameterFunc setParameterCall, setStateFunc setStateCall, uiNoteFunc uiNoteCall, uiResizeFunc uiResizeCall)
         : ui(createUI()),
           data(nullptr)
     {
@@ -112,9 +121,10 @@ public:
             return;
 
         data->ptr = ptr;
-        data->changeStateCallbackFunc       = changeStateCall;
-        data->setParameterValueCallbackFunc = setParameterValueCall;
-        data->uiResizeCallbackFunc          = uiResizeCall;
+        data->setParameterCallbackFunc = setParameterCall;
+        data->setStateCallbackFunc     = setStateCall;
+        data->uiNoteCallbackFunc       = uiNoteCall;
+        data->uiResizeCallbackFunc     = uiResizeCall;
 
 #ifdef DISTRHO_UI_OPENGL
         gl_initiated = false;

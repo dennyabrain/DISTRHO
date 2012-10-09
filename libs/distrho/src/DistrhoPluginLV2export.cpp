@@ -27,6 +27,7 @@
 #include "lv2-sdk/state.h"
 #include "lv2-sdk/urid.h"
 #include "lv2-sdk/ui.h"
+#include "lv2-sdk/units.h"
 
 #include <fstream>
 #include <iostream>
@@ -110,6 +111,7 @@ void lv2_generate_ttl_func()
 #if DISTRHO_PLUGIN_HAS_UI
         pluginString += "@prefix ui:   <" LV2_UI_PREFIX "> .\n";
 #endif
+        pluginString += "@prefix unit: <" LV2_UNITS_PREFIX "> .\n";
         pluginString += "\n";
 
         pluginString += "<" DISTRHO_PLUGIN_URI ">\n";
@@ -118,9 +120,12 @@ void lv2_generate_ttl_func()
 #else
         pluginString += "    a lv2:Plugin ;\n";
 #endif
+#if DISTRHO_PLUGIN_IS_SYNTH
         pluginString += "    lv2:optionalFeature <" LV2_CORE__hardRTCapable "> ;\n";
-#if DISTRHO_LV2_USE_EVENTS
         pluginString += "    lv2:requiredFeature <" LV2_URID__map "> ;\n";
+#elif DISTRHO_LV2_USE_EVENTS
+        pluginString += "    lv2:optionalFeature <" LV2_CORE__hardRTCapable "> ,\n";
+        pluginString += "                        <" LV2_URID__map "> ;\n";
 #endif
 #if (DISTRHO_PLUGIN_WANT_STATE && DISTRHO_PLUGIN_WANT_PROGRAMS)
         pluginString += "    lv2:extensionData <" LV2_STATE__interface "> ,\n";
@@ -210,6 +215,32 @@ void lv2_generate_ttl_func()
                     pluginString += "        lv2:maximum " + d_string(ranges->max) + " ;\n";
                 }
 
+                // unit
+                {
+                    const d_string& unit = plugin.parameterUnit(i);
+
+                    if (! unit.isEmpty())
+                    {
+                        if (unit == "db" || unit == "dB")
+                            pluginString += "        unit:unit unit:db ;\n";
+                        else if (unit == "hz" || unit == "Hz")
+                            pluginString += "        unit:unit unit:hz ;\n";
+                        else if (unit == "khz" || unit == "kHz")
+                            pluginString += "        unit:unit unit:khz ;\n";
+                        else if (unit == "mhz" || unit == "mHz")
+                            pluginString += "        unit:unit unit:mhz ;\n";
+                        else
+                        {
+                            pluginString += "        unit:unit [\n";
+                            pluginString += "            a unit:Unit ;\n";
+                            pluginString += "            unit:name   \"" + unit + "\" ;\n";
+                            pluginString += "            unit:symbol \"" + unit + "\" ;\n";
+                            pluginString += "            unit:render \"%f f\" ;\n";
+                            pluginString += "        ] ;\n";
+                        }
+                    }
+                }
+
                 // hints
                 {
                     uint32_t hints = plugin.parameterHints(i);
@@ -226,8 +257,9 @@ void lv2_generate_ttl_func()
                     pluginString += "    ] ,\n";
             }
 
-#if DISTRHO_LV2_USE_EVENTS
             pluginString += "    lv2:port [\n";
+
+#if DISTRHO_LV2_USE_EVENTS
             pluginString += "        a lv2:InputPort, atom:AtomPort ;\n";
             pluginString += "        lv2:index " + d_string(portIndex++) + " ;\n";
             pluginString += "        lv2:name \"Events Input\" ;\n";
@@ -242,7 +274,6 @@ void lv2_generate_ttl_func()
             pluginString += "    ] ,\n";
 #endif
 
-            pluginString += "    [\n";
             pluginString += "        a lv2:OutputPort, lv2:ControlPort ;\n";
             pluginString += "        lv2:index " + d_string(portIndex++) + " ;\n";
             pluginString += "        lv2:name \"Latency\" ;\n";
@@ -269,6 +300,13 @@ void lv2_generate_ttl_func()
         pluginFile.close();
         std::cout << " done!" << std::endl;
     }
+}
+
+// unused stuff
+void d_unusedStuff()
+{
+    (void)d_lastBufferSize;
+    (void)d_lastSampleRate;
 }
 
 END_NAMESPACE_DISTRHO

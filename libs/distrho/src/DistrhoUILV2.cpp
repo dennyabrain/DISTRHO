@@ -45,29 +45,21 @@
 
 START_NAMESPACE_DISTRHO
 
-class UILv2 : public QObject
+class UILv2
 {
 public:
-    UILv2(LV2UI_Write_Function writeFunction, LV2UI_Controller controller, LV2UI_Widget* widget, const LV2_Feature* const* features)
-        : ui(this, changeStateCallback, setParameterValueCallback, uiResizeCallback),
+    UILv2(intptr_t parent, LV2UI_Controller controller, LV2UI_Write_Function writeFunction, LV2UI_Widget* widget, const LV2_Feature* const* features)
+        : ui(this, parent, setParameterCallback, setStateCallback, uiNoteCallback, uiResizeCallback),
           lv2Controller(controller),
           lv2WriteFunction(writeFunction),
           lv2UiResize(nullptr),
 #if DISTRHO_PLUGIN_WANT_STATE
           uridIdPatchMessage(0),
 #endif
-#ifdef DISTRHO_UI_QT4
-          uiTimer(0)
-#else
           threadExitNow(false),
           threadRunning(false),
           thread(uiThreadCallback, this)
-#endif
     {
-#ifndef DISTRHO_UI_QT4
-        PuglNativeWindow parent = 0;
-#endif
-
         // Get Features
         for (uint32_t i = 0; features[i]; i++)
         {
@@ -78,10 +70,6 @@ public:
                 uridIdPatchMessage = uridMap->map(uridMap->handle, LV2_PATCH__Message);
 #endif
             }
-#ifndef DISTRHO_UI_QT4
-            else if (strcmp(features[i]->URI, LV2_UI__parent) == 0)
-                parent = (PuglNativeWindow)features[i]->data;
-#endif
 
             else if (strcmp(features[i]->URI, LV2_UI__resize) == 0)
                 lv2UiResize = (LV2UI_Resize*)features[i]->data;
@@ -101,23 +89,15 @@ public:
             lv2UiResize->ui_resize(lv2UiResize->handle, ui.getWidth(), ui.getHeight());
 
 #ifdef DISTRHO_UI_QT4
-        *widget = ui.getNativeWidget();
+        *widget = ui.data->widget();
 #else
-        //*widget = (void*)ui.getNativeWindow();
+        *widget = (void*)ui.gl_getNativeWindow();
 #endif
-
-        uiTimer = startTimer(30);
     }
 
     ~UILv2()
     {
-#ifdef DISTRHO_UI_QT4
-        if (uiTimer)
-            killTimer(uiTimer);
-#else
         uiThreadClose();
-#endif
-        //ui.destroyWindow();
     }
 
     // ---------------------------------------------
@@ -134,11 +114,7 @@ public:
             float value = *(float*)buffer;
             ui.parameterChanged(portIndex - DISTRHO_PLUGIN_NUM_INPUTS - DISTRHO_PLUGIN_NUM_OUTPUTS, value);
         }
-        else if (format == 1) // TODO
-        {
-             // TODO
-            ui.stateChanged(key, value);
-        }
+        // TODO - atom events
     }
 
 #if DISTRHO_PLUGIN_WANT_PROGRAMS
@@ -158,7 +134,7 @@ protected:
         (void)key;
         (void)value;
 
-        if (lv2WriteFunction && uridMap)
+        //if (lv2WriteFunction && uridMap)
         {
 
         }
@@ -176,15 +152,6 @@ protected:
             lv2UiResize->ui_resize(lv2UiResize->handle, width, height);
     }
 
-#ifdef DISTRHO_UI_QT4
-    void timerEvent(QTimerEvent* event)
-    {
-        if (event->timerId() == uiTimer)
-            ui.idle();
-
-        QObject::timerEvent(event);
-    }
-#else
     void uiThreadRun()
     {
         threadRunning = true;
@@ -206,7 +173,6 @@ protected:
         while (threadRunning)
             d_msleep(1000 / 25); // 25 FPS
     }
-#endif
 
 private:
     UIInternal  ui;
@@ -221,49 +187,68 @@ private:
 #endif
 
     // UI Thread
-#ifdef DISTRHO_UI_QT4
-    int uiTimer;
-#else
     bool threadExitNow;
     bool threadRunning;
     std::thread thread;
-#endif
 
     // ---------------------------------------------
     // Callbacks
 
-    static void changeStateCallback(void* ptr, const char* key, const char* value)
+    static void setParameterCallback(void* ptr, uint32_t index, float value)
     {
-        UILv2* const _this_ = (UILv2*)ptr;
-        assert(_this_);
-
-        _this_->changeState(key, value);
-    }
-
-    static void setParameterValueCallback(void* ptr, uint32_t index, float value)
-    {
-        UILv2* const _this_ = (UILv2*)ptr;
+        UILv2* _this_ = (UILv2*)ptr;
         assert(_this_);
 
         _this_->setParameterValue(index, value);
     }
 
+    static void setStateCallback(void* ptr, const char* key, const char* value)
+    {
+#if DISTRHO_PLUGIN_WANT_STATE
+        UILv2* _this_ = (UILv2*)ptr;
+        assert(_this_);
+
+        _this_->setState(key, value);
+#else
+        // unused
+        (void)ptr;
+        (void)key;
+        (void)value;
+#endif
+    }
+
+    static void uiNoteCallback(void* ptr, bool onOff, uint8_t channel, uint8_t note, uint8_t velocity)
+    {
+#if DISTRHO_PLUGIN_IS_SYNTH
+        UILv2* _this_ = (UILv2*)ptr;
+        assert(_this_);
+
+        _this_->uiNote(onOff, channel, note, velocity);
+#else
+        // unused
+        (void)ptr;
+        (void)onOff;
+        (void)channel;
+        (void)note;
+        (void)velocity;
+#endif
+    }
+
     static void uiResizeCallback(void* ptr, unsigned int width, unsigned int height)
     {
-        UILv2* const _this_ = (UILv2*)ptr;
+        UILv2* _this_ = (UILv2*)ptr;
         assert(_this_);
 
         _this_->uiResize(width, height);
     }
 
-#ifndef DISTRHO_UI_QT4
-    static void uiThreadCallback(UILv2* _this_)
+    static void uiThreadCallback(void* ptr)
     {
+        UILv2* _this_ = (UILv2*)ptr;
         assert(_this_);
 
         _this_->uiThreadRun();
     }
-#endif
 };
 
 // -------------------------------------------------
@@ -273,7 +258,21 @@ static LV2UI_Handle lv2ui_instantiate(const LV2UI_Descriptor*, const char* uri, 
     if (strcmp(uri, DISTRHO_PLUGIN_URI) != 0)
         return nullptr;
 
-    return new UILv2(writeFunction, controller, widget, features);
+    // Get parent
+    intptr_t parent = 0;
+
+#ifdef DISTRHO_UI_OPENGL
+    for (uint32_t i = 0; features[i]; i++)
+    {
+        if (strcmp(features[i]->URI, LV2_UI__parent) == 0)
+        {
+            parent = (intptr_t)features[i]->data;
+            break;
+        }
+    }
+#endif
+
+    return new UILv2(parent, controller, writeFunction, widget, features);
 }
 
 static void lv2ui_cleanup(LV2UI_Handle instance)

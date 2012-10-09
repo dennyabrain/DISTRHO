@@ -15,8 +15,6 @@
  * For a full copy of the license see the GPL.txt file
  */
 
-#include <cassert>
-
 #include "DistrhoUIInternal.h"
 
 START_NAMESPACE_DISTRHO
@@ -26,10 +24,6 @@ START_NAMESPACE_DISTRHO
 UI::UI(uint32_t parameterCount)
 {
     data = new UIPrivateData;
-    assert(data);
-
-    if (! data)
-        return;
 
     data->parameterCount = parameterCount;
 
@@ -40,8 +34,7 @@ UI::UI(uint32_t parameterCount)
 
 UI::~UI()
 {
-    if (data)
-        delete data;
+    delete data;
 }
 
 // -------------------------------------------------
@@ -49,32 +42,34 @@ UI::~UI()
 
 double UI::d_sampleRate() const
 {
-    if (data)
-        return data->sampleRate;
-    return 44100;
+    return data->sampleRate;
 }
 
 void UI::d_setParameterValue(uint32_t index, float value)
 {
-    if (data)
-        data->setParameterValueCallback(DISTRHO_PLUGIN_NUM_INPUTS + DISTRHO_PLUGIN_NUM_OUTPUTS + index, value);
+    data->setParameterCallback(DISTRHO_PLUGIN_NUM_INPUTS + DISTRHO_PLUGIN_NUM_OUTPUTS + index, value);
 }
 
 #if DISTRHO_PLUGIN_WANT_STATE
-void UI::d_changeState(const char* key, const char* value)
+void UI::d_setState(const char* key, const char* value)
 {
-    if (data)
-        data->changeStateCallback(key, value);
+    data->setStateCallback(key, value);
 }
 #endif
 
 // -------------------------------------------------
 // Host UI State
 
+#if DISTRHO_PLUGIN_IS_SYNTH
+void UI::d_uiNote(bool onOff, uint8_t channel, uint8_t note, uint8_t velocity)
+{
+    data->uiNoteCallback(onOff, channel, note, velocity);
+}
+#endif
+
 void UI::d_uiResize(unsigned int width, unsigned int height)
 {
-    if (data)
-        data->uiResizeCallback(width, height);
+    data->uiResizeCallback(width, height);
 }
 
 // -------------------------------------------------

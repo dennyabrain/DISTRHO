@@ -89,7 +89,7 @@ public:
 #ifdef DISTRHO_UI_QT4
           vbLayout(&dialog),
 #endif
-          ui(this, dialog.winId(), changeStateCallback, setParameterValueCallback, uiResizeCallback),
+          ui(this, dialog.winId(), setParameterCallback, setStateCallback, uiNoteCallback, uiResizeCallback),
           oscData(oscData_)
     {
 #ifdef DISTRHO_UI_QT4
@@ -175,17 +175,24 @@ public:
     // ---------------------------------------------
 
 protected:
+    void setParameterValue(uint32_t index, float value)
+    {
+        osc_send_control(oscData, index, value);
+    }
+
 #if DISTRHO_PLUGIN_WANT_STATE
-    void changeState(const char* key, const char* value)
+    void setState(const char* key, const char* value)
     {
         osc_send_configure(oscData, key, value);
     }
 #endif
 
-    void setParameterValue(uint32_t index, float value)
+#if DISTRHO_PLUGIN_IS_SYNTH
+    void uiNote(bool onOff, uint8_t channel, uint8_t note, uint8_t velocity)
     {
-        osc_send_control(oscData, index, value);
+        // TODO
     }
+#endif
 
     void uiResize(unsigned int width, unsigned int height)
     {
@@ -220,13 +227,21 @@ private:
     // ---------------------------------------------
     // Callbacks
 
-    static void changeStateCallback(void* ptr, const char* key, const char* value)
+    static void setParameterCallback(void* ptr, uint32_t index, float value)
     {
-#if DISTRHO_PLUGIN_WANT_STATE
-        UIDssi* const _this_ = (UIDssi*)ptr;
+        UIDssi* _this_ = (UIDssi*)ptr;
         assert(_this_);
 
-        _this_->changeState(key, value);
+        _this_->setParameterValue(index, value);
+    }
+
+    static void setStateCallback(void* ptr, const char* key, const char* value)
+    {
+#if DISTRHO_PLUGIN_WANT_STATE
+        UIDssi* _this_ = (UIDssi*)ptr;
+        assert(_this_);
+
+        _this_->setState(key, value);
 #else
         Q_UNUSED(ptr);
         Q_UNUSED(key);
@@ -234,17 +249,25 @@ private:
 #endif
     }
 
-    static void setParameterValueCallback(void* ptr, uint32_t index, float value)
+    static void uiNoteCallback(void* ptr, bool onOff, uint8_t channel, uint8_t note, uint8_t velocity)
     {
-        UIDssi* const _this_ = (UIDssi*)ptr;
+#if DISTRHO_PLUGIN_IS_SYNTH
+        UIDssi* _this_ = (UIDssi*)ptr;
         assert(_this_);
 
-        _this_->setParameterValue(index, value);
+        _this_->uiNote(onOff, channel, note, velocity);
+#else
+        Q_UNUSED(ptr);
+        Q_UNUSED(onOff);
+        Q_UNUSED(channel);
+        Q_UNUSED(note);
+        Q_UNUSED(velocity);
+#endif
     }
 
     static void uiResizeCallback(void* ptr, unsigned int width, unsigned int height)
     {
-        UIDssi* const _this_ = (UIDssi*)ptr;
+        UIDssi* _this_ = (UIDssi*)ptr;
         assert(_this_);
 
         _this_->uiResize(width, height);
@@ -302,14 +325,14 @@ int osc_program_handler(const char* const, const char* const, lo_arg** const arg
 #endif
 
 #if DISTRHO_PLUGIN_IS_SYNTH
-int osc_midi_handler(const char* const path, const char* const types, lo_arg** const argv, const int argc, const lo_message msg, void* const data)
+int osc_midi_handler(const char* const, const char* const, lo_arg** const argv, const int, const lo_message, void* const data)
 {
     UIDssi* const ui = (UIDssi*)data;
 
-    const uint8_t* data = argv[0]->m;
-    qDebug("osc_midi_handler(%p)", data);
+    const uint8_t* mdata = argv[0]->m;
+    qDebug("osc_midi_handler(%p)", mdata);
 
-    ui->dssiui_midi(data);
+    ui->dssiui_midi((unsigned char*)mdata);
 
     return 0;
 }
