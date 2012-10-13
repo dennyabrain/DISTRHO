@@ -24,6 +24,32 @@
 START_NAMESPACE_DISTRHO
 
 // -------------------------------------------------
+// QEmbedWidget
+
+QEmbedWidget::QEmbedWidget()
+{
+}
+
+QEmbedWidget::~QEmbedWidget()
+{
+}
+
+void QEmbedWidget::embedInto(WId id)
+{
+#ifdef Q_WS_X11
+    QX11EmbedWidget::embedInto(id);
+#endif
+}
+
+WId QEmbedWidget::containerWinId() const
+{
+#ifdef Q_WS_X11
+    return QX11EmbedWidget::containerWinId();
+#endif
+}
+
+// -------------------------------------------------
+// Qt4UI
 
 Qt4UI::Qt4UI()
     : UI(),

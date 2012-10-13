@@ -25,6 +25,7 @@
 # include "pugl/pugl.h"
 #else
 # include "DistrhoUIQt4.h"
+# include <QtGui/QApplication>
 # include <QtGui/QMouseEvent>
 # include <QtGui/QSizeGrip>
 # include <QtGui/QVBoxLayout>
@@ -43,22 +44,6 @@ START_NAMESPACE_DISTRHO
 typedef PuglView* NativeWidget;
 #else
 typedef QWidget*  NativeWidget;
-# ifdef Q_WS_X11
-class QEmbedWidget : public QX11EmbedWidget
-#else
-class QEmbedWidget : public QWidget
-#endif
-{
-public:
-    QEmbedWidget() {}
-    ~QEmbedWidget() {}
-
-# ifndef Q_WS_X11
-    // TODO for Windows and Mac OS support
-    void embedInto(WId id);
-    WId containerWinId() const;
-# endif
-};
 #endif
 
 typedef void (*setParamFunc)    (void* ptr, uint32_t index, float value);
@@ -70,6 +55,24 @@ typedef void (*uiResizeFunc)    (void* ptr, unsigned int width, unsigned int hei
 static double d_lastUiSampleRate = 0.0;
 
 void setLastUiSampleRate(double sampleRate);
+
+// -------------------------------------------------
+
+#ifdef DISTRHO_UI_QT4
+# ifdef Q_WS_X11
+class QEmbedWidget : public QX11EmbedWidget
+#else
+class QEmbedWidget : public QWidget
+#endif
+{
+public:
+    QEmbedWidget();
+    ~QEmbedWidget();
+
+    void embedInto(WId id);
+    WId containerWinId() const;
+};
+#endif
 
 // -------------------------------------------------
 
@@ -160,7 +163,7 @@ public:
         gl_initiated = false;
 #endif
 
-        if (! ui)
+        if (winId == 0 || ! ui)
             return;
 
         data = ui->data;
@@ -304,11 +307,20 @@ public:
     void destroyWindow()
     {
 #ifdef DISTRHO_UI_QT4
-        if (qt_grip)
-            delete qt_grip;
-
         if (qt_widget)
+        {
+            // remove main widget, to prevent it from being auto-deleted
+            qt_widget->layout()->removeWidget(data->widget);
+            data->widget->close();
+            data->widget->setParent(nullptr);
+
+            qt_widget->close();
+
+            if (qt_grip)
+                delete qt_grip;
+
             delete qt_widget;
+        }
 #else
         ((OpenGLUI*)ui)->d_onClose();
 
@@ -523,11 +535,7 @@ private:
 #ifdef DISTRHO_UI_QT4
     bool qt_mouseDown;
     QSizeGrip* qt_grip;
-# ifdef Q_WS_X11
     QEmbedWidget* qt_widget;
-# else
-    QWidget* qt_widget;
-# endif
 #else
     bool gl_initiated;
 #endif

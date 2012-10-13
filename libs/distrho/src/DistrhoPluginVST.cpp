@@ -59,6 +59,10 @@ public:
             parameterValues = nullptr;
         }
 
+#if DISTRHO_PLUGIN_WANT_PROGRAMS
+    nextProgram = -1;
+#endif
+
 #if DISTRHO_PLUGIN_IS_SYNTH
         midiEventCount = 0;
 #endif
@@ -77,7 +81,15 @@ public:
 
     void idle()
     {
-        for (uint32_t i=0, paramCount = m_plugin->parameterCount(); i < paramCount; i++)
+#if DISTRHO_PLUGIN_WANT_PROGRAMS
+        if (nextProgram != -1)
+        {
+            ui.programChanged(nextProgram);
+            nextProgram = -1;
+        }
+#endif
+
+        for (uint32_t i=0, count = m_plugin->parameterCount(); i < count; i++)
         {
             if (parameterChecks[i])
             {
@@ -110,6 +122,17 @@ public:
         parameterValues[index] = perValue;
     }
 
+#if DISTRHO_PLUGIN_WANT_PROGRAMS
+    void setProgramFromPlugin(uint32_t index)
+    {
+        nextProgram = index;
+
+        // set previous parameters invalid
+        for (uint32_t i=0, count = m_plugin->parameterCount(); i < count; i++)
+            parameterChecks[i] = false;
+    }
+#endif
+
     // ---------------------------------------------
 
 protected:
@@ -131,7 +154,7 @@ protected:
 #if DISTRHO_PLUGIN_WANT_STATE
     void setState(const char* key, const char* value)
     {
-        // TODO
+        m_plugin->setState(key, value);
     }
 #endif
 
@@ -168,6 +191,9 @@ private:
     bool*  parameterChecks;
     float* parameterValues;
 
+#if DISTRHO_PLUGIN_WANT_PROGRAMS
+    int32_t nextProgram;
+#endif
 #if DISTRHO_PLUGIN_IS_SYNTH
     uint32_t midiEventCount;
     MidiEvent midiEvents[MAX_MIDI_EVENTS];
@@ -243,10 +269,15 @@ public:
     {
 #if DISTRHO_PLUGIN_HAS_UI
         vstui = nullptr;
+        rect.top  = 0;
+        rect.left = 0;
+        rect.bottom = 0;
+        rect.right  = 0;
 #endif
 
-        curProgram = 0;
-
+#if DISTRHO_PLUGIN_WANT_PROGRAMS
+        curProgram = -1;
+#endif
 #if DISTRHO_PLUGIN_IS_SYNTH
         midiEventCount = 0;
 #endif
@@ -262,11 +293,16 @@ public:
 
         switch (opcode)
         {
+#if DISTRHO_PLUGIN_WANT_PROGRAMS
         case effSetProgram:
-            if (value < plugin.programCount())
+            if (value >= 0 && value < plugin.programCount())
             {
                 curProgram = value;
                 plugin.setProgram(curProgram);
+
+                if (vstui)
+                    vstui->setProgramFromPlugin(curProgram);
+
                 ret = 1;
             }
             break;
@@ -279,12 +315,13 @@ public:
             break;
 
         case effGetProgramName:
-            if (ptr && curProgram < (int32_t)plugin.programCount())
+            if (ptr && curProgram >= 0 && curProgram < (int32_t)plugin.programCount())
             {
                 strncpy((char*)ptr, plugin.programName(curProgram), kVstMaxProgNameLen);
                 ret = 1;
             }
             break;
+#endif
 
         case effGetParamDisplay:
             if (ptr && index < (int32_t)plugin.parameterCount())
@@ -311,17 +348,38 @@ public:
 
 #if DISTRHO_PLUGIN_HAS_UI
         case effEditGetRect:
-            if (vstui)
+            if (rect.bottom == 0 && ! vstui)
             {
-                static ERect rect = { 0, 0, (int16_t)vstui->getHeight(), (int16_t)vstui->getWidth() };
-                *(ERect**)ptr = &rect;
-                ret = 1;
+                // This is stupid, but some hosts want to know the UI size before creating it,
+                // so we have to create a temporary UI here
+                setLastUiSampleRate(d_lastSampleRate);
+
+                UIInternal tempUI(nullptr, 0, nullptr, nullptr, nullptr, nullptr, nullptr);
+                rect.bottom = tempUI.getHeight();
+                rect.right  = tempUI.getWidth();
             }
+            else
+            {
+                rect.bottom = vstui->getHeight();
+                rect.right  = vstui->getWidth();
+            }
+
+            *(ERect**)ptr = &rect;
+            ret = 1;
+
             break;
 
         case effEditOpen:
-            setLastUiSampleRate(d_lastSampleRate);
-            vstui = new UIVst(m_audioMaster, m_effect, &plugin, (intptr_t)ptr);
+            if (! vstui)
+            {
+                setLastUiSampleRate(d_lastSampleRate);
+                vstui = new UIVst(m_audioMaster, m_effect, &plugin, (intptr_t)ptr);
+            }
+
+#if DISTRHO_PLUGIN_WANT_PROGRAMS
+            if (curProgram >= 0)
+                vstui->setProgramFromPlugin(curProgram);
+#endif
 
             for (uint32_t i=0, count = plugin.parameterCount(); i < count; i++)
                 vstui->setParameterValueFromPlugin(i, plugin.parameterValue(i));
@@ -349,6 +407,7 @@ public:
             // TODO
             break;
 
+#if DISTRHO_PLUGIN_IS_SYNTH
         case effProcessEvents:
             if (ptr)
             {
@@ -356,6 +415,7 @@ public:
                 // TODO
             }
             break;
+#endif
 
         case effCanBeAutomated:
             if (index < (int32_t)plugin.parameterCount())
@@ -420,16 +480,18 @@ private:
     audioMasterCallback const m_audioMaster;
     AEffect* const m_effect;
 
-    int32_t curProgram;
-
     // Plugin
     PluginInternal plugin;
 
 #if DISTRHO_PLUGIN_HAS_UI
     // UI
     UIVst* vstui;
+    ERect rect;
 #endif
 
+#if DISTRHO_PLUGIN_WANT_PROGRAMS
+    int32_t curProgram;
+#endif
 #if DISTRHO_PLUGIN_IS_SYNTH
     uint32_t midiEventCount;
     MidiEvent midiEvents[MAX_MIDI_EVENTS];
@@ -501,6 +563,7 @@ static intptr_t vst_dispatcherCallback(AEffect* effect, int32_t opcode, int32_t 
         }
         return 0;
 
+#if DISTRHO_PLUGIN_WANT_PROGRAMS
     case effGetProgramNameIndexed:
         if (ptr && index < (int32_t)plugin.programCount())
         {
@@ -508,6 +571,7 @@ static intptr_t vst_dispatcherCallback(AEffect* effect, int32_t opcode, int32_t 
             return 1;
         }
         return 0;
+#endif
 
     case effGetPlugCategory:
 #if DISTRHO_PLUGIN_IS_SYNTH
@@ -620,7 +684,9 @@ const AEffect* VSTPluginMain(audioMasterCallback audioMaster)
 
     // plugin fields
     effect->numParams   = plugin->parameterCount();
+#if DISTRHO_PLUGIN_WANT_PROGRAMS
     effect->numPrograms = plugin->programCount();
+#endif
     effect->numInputs   = DISTRHO_PLUGIN_NUM_INPUTS;
     effect->numOutputs  = DISTRHO_PLUGIN_NUM_OUTPUTS;
 
@@ -634,9 +700,14 @@ const AEffect* VSTPluginMain(audioMasterCallback audioMaster)
 
     // plugin flags
     effect->flags |= effFlagsCanReplacing;
+
 #if DISTRHO_PLUGIN_HAS_UI
-    effect->flags |= effFlagsHasEditor;
+# ifdef DISTRHO_UI_QT4
+    if (QApplication::instance())
+# endif
+        effect->flags |= effFlagsHasEditor;
 #endif
+
 #if DISTRHO_PLUGIN_WANT_STATE
     effect->flags |= effFlagsProgramChunks;
 #endif
