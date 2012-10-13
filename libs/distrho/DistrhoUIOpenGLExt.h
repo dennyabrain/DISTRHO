@@ -240,7 +240,7 @@ struct OpenGLExtUIPrivateData;
 class OpenGLExtUI : public OpenGLUI
 {
 public:
-    OpenGLExtUI(uint32_t parameterCount);
+    OpenGLExtUI();
     virtual ~OpenGLExtUI();
 
     // ---------------------------------------------

@@ -856,8 +856,8 @@ struct OpenGLExtUIPrivateData {
 
 // -------------------------------------------------
 
-OpenGLExtUI::OpenGLExtUI(uint32_t parameterCount)
-    : OpenGLUI(parameterCount)
+OpenGLExtUI::OpenGLExtUI()
+    : OpenGLUI()
 {
     data = new OpenGLExtUIPrivateData;
 }
@@ -1240,7 +1240,7 @@ void OpenGLExtUI::d_onMouse(int button, bool press, int x, int y)
     {
         if (data->lastObjType == OBJECT_KNOB)
             imageKnobDragFinished((ImageKnob*)data->lastObj);
-        else if (data->lastObjType == OBJECT_KNOB)
+        else if (data->lastObjType == OBJECT_SLIDER)
             imageSliderDragFinished((ImageSlider*)data->lastObj);
     }
 
@@ -1385,7 +1385,7 @@ void OpenGLExtUI::d_onClose()
     {
         if (data->lastObjType == OBJECT_KNOB)
             imageKnobDragFinished((ImageKnob*)data->lastObj);
-        else if (data->lastObjType == OBJECT_KNOB)
+        else if (data->lastObjType == OBJECT_SLIDER)
             imageSliderDragFinished((ImageSlider*)data->lastObj);
     }
 

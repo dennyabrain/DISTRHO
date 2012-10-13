@@ -80,7 +80,7 @@ enum Mod {
 class OpenGLUI : public UI
 {
 public:
-    OpenGLUI(uint32_t parameterCount);
+    OpenGLUI();
     virtual ~OpenGLUI();
 
     // ---------------------------------------------

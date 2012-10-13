@@ -21,6 +21,13 @@ START_NAMESPACE_DISTRHO
 
 // -------------------------------------------------
 
+void setLastUiSampleRate(double sampleRate)
+{
+    d_lastUiSampleRate = sampleRate;
+}
+
+// -------------------------------------------------
+
 UI::UI()
 {
     data = new UIPrivateData;

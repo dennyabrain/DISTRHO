@@ -351,7 +351,10 @@ int osc_control_handler(const char*, const char*, lo_arg** argv, int, lo_message
     index -= 1;
 
     if (index == -1)
-        d_lastUiSampleRate = value;
+    {
+        setLastUiSampleRate(value);
+        return 0;
+    }
 
     if (index < 0)
         return 0;
@@ -412,7 +415,7 @@ int osc_sample_rate_handler(const char*, const char*, lo_arg** argv, int, lo_mes
     const int32_t sampleRate = argv[0]->i;
     qDebug("osc_sample_rate_handler(%i)", sampleRate);
 
-    d_lastUiSampleRate = sampleRate;
+    setLastUiSampleRate(sampleRate);
 
     return 0;
 }

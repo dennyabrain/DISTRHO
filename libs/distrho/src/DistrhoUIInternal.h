@@ -69,6 +69,8 @@ typedef void (*uiResizeFunc)    (void* ptr, unsigned int width, unsigned int hei
 
 static double d_lastUiSampleRate = 0.0;
 
+void setLastUiSampleRate(double sampleRate);
+
 // -------------------------------------------------
 
 struct UIPrivateData {

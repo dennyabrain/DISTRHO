@@ -25,8 +25,8 @@ START_NAMESPACE_DISTRHO
 
 // -------------------------------------------------
 
-OpenGLUI::OpenGLUI(uint32_t parameterCount)
-    : UI(parameterCount)
+OpenGLUI::OpenGLUI()
+    : UI()
 {
 }
 
