@@ -48,12 +48,14 @@ struct PluginPrivateData {
     d_string* stateKeys;
 #endif
 
-    TimePos  timePos;
+#if DISTRHO_PLUGIN_WANT_LATENCY
     uint32_t latency;
+#endif
+    TimePos  timePos;
 
     PluginPrivateData()
-        : bufferSize(0),
-          sampleRate(0.0),
+        : bufferSize(d_lastBufferSize),
+          sampleRate(d_lastSampleRate),
           parameterCount(0),
           parameters(nullptr),
 #if DISTRHO_PLUGIN_WANT_PROGRAMS
@@ -64,7 +66,13 @@ struct PluginPrivateData {
           stateCount(0),
           stateKeys(nullptr),
 #endif
-          latency(0) {}
+#if DISTRHO_PLUGIN_WANT_LATENCY
+          latency(0),
+#endif
+          timePos()
+    {
+        assert(d_lastSampleRate != 0.0);
+    }
 
     ~PluginPrivateData()
     {
@@ -113,6 +121,12 @@ public:
 #endif
     }
 
+    ~PluginInternal()
+    {
+        if (plugin)
+            delete plugin;
+    }
+
     // ---------------------------------------------
 
     const char* name()
@@ -153,11 +167,13 @@ public:
 
     // ---------------------------------------------
 
+#if DISTRHO_PLUGIN_WANT_LATENCY
     uint32_t latency() const
     {
         assert(data);
         return data ? data->latency : 0;
     }
+#endif
 
     uint32_t parameterCount() const
     {

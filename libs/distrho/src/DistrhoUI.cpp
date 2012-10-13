@@ -21,11 +21,17 @@ START_NAMESPACE_DISTRHO
 
 // -------------------------------------------------
 
-UI::UI(uint32_t parameterCount)
+UI::UI()
 {
     data = new UIPrivateData;
 
-    data->parameterCount = parameterCount;
+#if (defined(DISTRHO_PLUGIN_TARGET_DSSI) || defined(DISTRHO_PLUGIN_TARGET_LV2))
+    data->parameterOffset = DISTRHO_PLUGIN_NUM_INPUTS + DISTRHO_PLUGIN_NUM_OUTPUTS;
+# if DISTRHO_PLUGIN_WANT_LATENCY
+    data->parameterOffset += 1;
+# endif
+    data->parameterOffset += 1; // sample-rate
+#endif
 
 #ifdef DISTRHO_UI_QT4
     data->widget = (Qt4UI*)this;
@@ -47,7 +53,7 @@ double UI::d_sampleRate() const
 
 void UI::d_setParameterValue(uint32_t index, float value)
 {
-    data->setParameterCallback(DISTRHO_PLUGIN_NUM_INPUTS + DISTRHO_PLUGIN_NUM_OUTPUTS + index, value);
+    data->setParamCallback(index + data->parameterOffset, value);
 }
 
 #if DISTRHO_PLUGIN_WANT_STATE
@@ -60,10 +66,15 @@ void UI::d_setState(const char* key, const char* value)
 // -------------------------------------------------
 // Host UI State
 
-#if DISTRHO_PLUGIN_IS_SYNTH
-void UI::d_uiNote(bool onOff, uint8_t channel, uint8_t note, uint8_t velocity)
+void UI::d_uiEditParameter(uint32_t index, bool started)
 {
-    data->uiNoteCallback(onOff, channel, note, velocity);
+    data->uiEditParamCallback(index, started);
+}
+
+#if DISTRHO_PLUGIN_IS_SYNTH
+void UI::d_uiSendNote(bool onOff, uint8_t channel, uint8_t note, uint8_t velocity)
+{
+    data->uiSendNoteCallback(onOff, channel, note, velocity);
 }
 #endif
 
@@ -71,6 +82,15 @@ void UI::d_uiResize(unsigned int width, unsigned int height)
 {
     data->uiResizeCallback(width, height);
 }
+
+// -------------------------------------------------
+// DSP Callbacks
+
+#if DISTRHO_PLUGIN_IS_SYNTH
+void UI::d_uiNoteReceived(bool, uint8_t, uint8_t, uint8_t)
+{
+}
+#endif
 
 // -------------------------------------------------
 

@@ -15,8 +15,6 @@
  * For a full copy of the license see the GPL.txt file
  */
 
-// TODO - don't use sample-rate port if not (UI or DSSI)
-
 #if defined(DISTRHO_PLUGIN_TARGET_LADSPA) || defined(DISTRHO_PLUGIN_TARGET_DSSI)
 
 #include "DistrhoPluginInternal.h"
@@ -28,12 +26,15 @@
 # if DISTRHO_PLUGIN_IS_SYNTH
 #  error Cannot build synth plugin with LADSPA
 # endif
+# if DISTRHO_PLUGIN_WANT_STATE
+#  warning LADSPA cannot handle states
+# endif
 #endif
 
-#include <cstdio>
 #include <vector>
 
 typedef LADSPA_Data*                LADSPA_DataPtr;
+typedef const LADSPA_Data*          LADSPA_DataConstPtr;
 typedef std::vector<LADSPA_Data>    LADSPA_DataVector;
 typedef std::vector<LADSPA_DataPtr> LADSPA_DataPtrVector;
 
@@ -49,10 +50,10 @@ public:
           lastSampleRate(d_lastSampleRate)
     {
         for (uint32_t i=0; i < DISTRHO_PLUGIN_NUM_INPUTS; i++)
-            portAudioIns.push_back(nullptr);
+            portAudioIns[i] = nullptr;
 
         for (uint32_t i=0; i < DISTRHO_PLUGIN_NUM_OUTPUTS; i++)
-            portAudioOuts.push_back(nullptr);
+            portAudioOuts[i] = nullptr;
 
         for (uint32_t i=0; i < plugin.parameterCount(); i++)
         {
@@ -60,7 +61,9 @@ public:
             lastControlValues.push_back(plugin.parameterValue(i));
         }
 
+#if DISTRHO_PLUGIN_WANT_LATENCY
         portLatency = nullptr;
+#endif
 
 #if defined(DISTRHO_PLUGIN_TARGET_DSSI) && DISTRHO_PLUGIN_HAS_UI
         portSampleRate = nullptr;
@@ -69,8 +72,6 @@ public:
 
     ~PluginLadspaDssi()
     {
-        portAudioIns.clear();
-        portAudioOuts.clear();
         portControls.clear();
         lastControlValues.clear();
     }
@@ -108,20 +109,13 @@ public:
             }
         }
 
-        for (i=0; i < plugin.parameterCount(); i++)
-        {
-            if (port == index++)
-            {
-                portControls[i] = dataLocation;
-                return;
-            }
-        }
-
+#if DISTRHO_PLUGIN_WANT_LATENCY
         if (port == index++)
         {
             portLatency = dataLocation;
             return;
         }
+#endif
 
 #if defined(DISTRHO_PLUGIN_TARGET_DSSI) && DISTRHO_PLUGIN_HAS_UI
         if (port == index++)
@@ -130,6 +124,15 @@ public:
             return;
         }
 #endif
+
+        for (i=0; i < plugin.parameterCount(); i++)
+        {
+            if (port == index++)
+            {
+                portControls[i] = dataLocation;
+                return;
+            }
+        }
     }
 
 #ifdef DISTRHO_PLUGIN_TARGET_DSSI
@@ -137,6 +140,8 @@ public:
     char* dssi_configure(const char* key, const char* value)
     {
         if (strncmp(key, DSSI_RESERVED_CONFIGURE_PREFIX, strlen(DSSI_RESERVED_CONFIGURE_PREFIX) == 0))
+            return nullptr;
+        if (strncmp(key, DSSI_GLOBAL_CONFIGURE_PREFIX, strlen(DSSI_GLOBAL_CONFIGURE_PREFIX) == 0))
             return nullptr;
 
         plugin.setState(key, value);
@@ -170,7 +175,12 @@ public:
         for (uint32_t i=0; i < plugin.parameterCount(); i++)
         {
             if (! plugin.parameterIsOutput(i))
-                lastControlValues[i] = *portControls[i] = plugin.parameterValue(i);
+            {
+                lastControlValues[i] = plugin.parameterValue(i);
+
+                if (portControls[i])
+                    *portControls[i] = lastControlValues[i];
+            }
         }
     }
 # endif
@@ -210,31 +220,63 @@ public:
             }
         }
 
+#ifdef DISTRHO_PLUGIN_TARGET_DSSI
+# if DISTRHO_PLUGIN_IS_SYNTH
         // Get MIDI Events
         uint32_t midiEventCount = 0;
 
-#ifdef DISTRHO_PLUGIN_TARGET_DSSI
-# if DISTRHO_PLUGIN_IS_SYNTH
-        for (uint32_t i=0, j; i < eventCount && midiEventCount < MAX_MIDI_EVENTS; i++)
+        for (uint32_t i=0, j=0; i < eventCount && midiEventCount < MAX_MIDI_EVENTS; i++)
         {
+            snd_seq_event_t* event = &events[i];
+            memset(&midiEvents[midiEventCount], 0, sizeof(MidiEvent));
+
             if (events[i].type == SND_SEQ_EVENT_NOTEON)
             {
                 j = midiEventCount++;
-                midiEvents[j].frame = events[i].time.tick;
-                midiEvents[j].buffer[0] = 0x90 + events[i].data.note.channel;
-                midiEvents[j].buffer[1] = events[i].data.note.note;
-                midiEvents[j].buffer[2] = events[i].data.note.velocity;
+                midiEvents[j].frame     = event->time.tick;
+                midiEvents[j].buffer[0] = 0x90 + event->data.note.channel;
+                midiEvents[j].buffer[1] = event->data.note.note;
+                midiEvents[j].buffer[2] = event->data.note.velocity;
             }
             else if (events[i].type == SND_SEQ_EVENT_NOTEOFF)
             {
                 j = midiEventCount++;
-                midiEvents[j].frame = events[i].time.tick;
-                midiEvents[j].buffer[0] = 0x80 + events[i].data.note.channel;
-                midiEvents[j].buffer[1] = events[i].data.note.note;
-                midiEvents[j].buffer[2] = 0;
-                midiEventCount++;
+                midiEvents[j].frame     = event->time.tick;
+                midiEvents[j].buffer[0] = 0x80 + event->data.note.channel;
+                midiEvents[j].buffer[1] = event->data.note.note;
             }
-            // TODO - sound/notes off, other types
+            else if (events[i].type == SND_SEQ_EVENT_KEYPRESS)
+            {
+                j = midiEventCount++;
+                midiEvents[j].frame     = event->time.tick;
+                midiEvents[j].buffer[0] = 0xA0 + event->data.note.channel;
+                midiEvents[j].buffer[1] = event->data.note.note;
+                midiEvents[j].buffer[2] = event->data.note.velocity;
+            }
+            else if (events[i].type == SND_SEQ_EVENT_CONTROLLER)
+            {
+                j = midiEventCount++;
+                midiEvents[j].frame     = event->time.tick;
+                midiEvents[j].buffer[0] = 0xB0 + event->data.control.channel;
+                midiEvents[j].buffer[1] = event->data.control.param;
+                midiEvents[j].buffer[2] = event->data.control.value;
+            }
+            else if (events[i].type == SND_SEQ_EVENT_CHANPRESS)
+            {
+                j = midiEventCount++;
+                midiEvents[j].frame     = event->time.tick;
+                midiEvents[j].buffer[0] = 0xD0 + event->data.control.channel;
+                midiEvents[j].buffer[1] = event->data.control.value;
+            }
+            else if (events[i].type == SND_SEQ_EVENT_PITCHBEND)
+            {
+                // TODO
+                //j = midiEventCount++;
+                //midiEvents[j].frame     = event->time.tick;
+                //midiEvents[j].buffer[0] = 0xE0 + event->data.control.channel;
+                //midiEvents[j].buffer[1] = 0;
+                //midiEvents[j].buffer[2] = 0;
+            }
         }
 # else
         // unused
@@ -244,16 +286,11 @@ public:
 #endif
 
         // Run plugin for this cycle
-        const float* inputs[DISTRHO_PLUGIN_NUM_INPUTS];
-        float*       outputs[DISTRHO_PLUGIN_NUM_OUTPUTS];
-
-        for (uint32_t i=0; i < DISTRHO_PLUGIN_NUM_INPUTS; i++)
-            inputs[i] = portAudioIns[i];
-
-        for (uint32_t i=0; i < DISTRHO_PLUGIN_NUM_OUTPUTS; i++)
-            outputs[i] = portAudioOuts[i];
-
-        plugin.run(inputs, outputs, bufferSize, midiEventCount, midiEvents);
+#if DISTRHO_PLUGIN_IS_SYNTH
+        plugin.run(portAudioIns, portAudioOuts, bufferSize, midiEventCount, midiEvents);
+#else
+        plugin.run(portAudioIns, portAudioOuts, bufferSize, 0, nullptr);
+#endif
 
         updateParameterOutputs();
     }
@@ -262,10 +299,12 @@ private:
     PluginInternal plugin;
 
     // LADSPA ports
-    LADSPA_DataPtrVector portAudioIns;
-    LADSPA_DataPtrVector portAudioOuts;
+    LADSPA_DataConstPtr  portAudioIns[DISTRHO_PLUGIN_NUM_INPUTS];
+    LADSPA_DataPtr       portAudioOuts[DISTRHO_PLUGIN_NUM_INPUTS];
     LADSPA_DataPtrVector portControls;
+#if DISTRHO_PLUGIN_WANT_LATENCY
     LADSPA_DataPtr       portLatency;
+#endif
 #if defined(DISTRHO_PLUGIN_TARGET_DSSI) && DISTRHO_PLUGIN_HAS_UI
     LADSPA_DataPtr       portSampleRate;
 #endif
@@ -277,8 +316,6 @@ private:
 
 #if DISTRHO_PLUGIN_IS_SYNTH
     MidiEvent midiEvents[MAX_MIDI_EVENTS];
-#else
-    MidiEvent midiEvents[0];
 #endif
 
     void updateParameterOutputs()
@@ -286,11 +323,18 @@ private:
         for (uint32_t i=0; i < plugin.parameterCount(); i++)
         {
             if (plugin.parameterIsOutput(i))
-                lastControlValues[i] = *portControls[i] = plugin.parameterValue(i);
+            {
+                lastControlValues[i] = plugin.parameterValue(i);
+
+                if (portControls[i])
+                    *portControls[i] = lastControlValues[i];
+            }
         }
 
+#if DISTRHO_PLUGIN_WANT_LATENCY
         if (portLatency)
             *portLatency = plugin.latency();
+#endif
 
 #if defined(DISTRHO_PLUGIN_TARGET_DSSI) && DISTRHO_PLUGIN_HAS_UI
         if (portSampleRate)
@@ -306,6 +350,7 @@ static LADSPA_Handle ladspa_instantiate(const LADSPA_Descriptor*, unsigned long 
     if (d_lastBufferSize == 0)
         d_lastBufferSize = 512;
     d_lastSampleRate = sampleRate;
+
     return new PluginLadspaDssi();
 }
 
@@ -358,7 +403,7 @@ static char* dssi_configure(LADSPA_Handle instance, const char* key, const char*
 
     return plugin->dssi_configure(key, value);
 }
-#endif
+# endif
 
 # if DISTRHO_PLUGIN_WANT_PROGRAMS
 static const DSSI_Program_Descriptor* dssi_get_program(LADSPA_Handle instance, unsigned long index)
@@ -449,23 +494,30 @@ public:
     DescriptorInitializer()
     {
         // Create dummy plugin to get data from
+        d_lastBufferSize = 512;
+        d_lastSampleRate = 44100.0;
         PluginInternal plugin;
+        d_lastBufferSize = 0;
+        d_lastSampleRate = 0.0;
 
         // Get port count, init
         unsigned long i, port = 0;
-        unsigned long portCount = DISTRHO_PLUGIN_NUM_INPUTS + DISTRHO_PLUGIN_NUM_OUTPUTS + plugin.parameterCount() + 1; // + latency
+        unsigned long portCount = DISTRHO_PLUGIN_NUM_INPUTS + DISTRHO_PLUGIN_NUM_OUTPUTS + plugin.parameterCount();
+#if DISTRHO_PLUGIN_WANT_LATENCY
+        portCount += 1;
+#endif
 #if defined(DISTRHO_PLUGIN_TARGET_DSSI) && DISTRHO_PLUGIN_HAS_UI
         portCount += 1; // sample-rate
 #endif
-        const char**  portNames = new const char* [portCount];
+        const char** portNames = new const char* [portCount];
         LADSPA_PortDescriptor* portDescriptors = new LADSPA_PortDescriptor [portCount];
         LADSPA_PortRangeHint*  portRangeHints  = new LADSPA_PortRangeHint  [portCount];
 
         // Set ports
         for (i=0; i < DISTRHO_PLUGIN_NUM_INPUTS; i++, port++)
         {
-            char portName[16] = { 0 };
-            sprintf(portName, "audio_in_%lu", i+1);
+            char portName[24] = { 0 };
+            sprintf(portName, "Audio Input %lu", i+1);
 
             portNames[port]       = strdup(portName);
             portDescriptors[port] = LADSPA_PORT_AUDIO | LADSPA_PORT_INPUT;
@@ -477,8 +529,8 @@ public:
 
         for (i=0; i < DISTRHO_PLUGIN_NUM_OUTPUTS; i++, port++)
         {
-            char portName[16] = { 0 };
-            sprintf(portName, "audio_out_%lu", i+1);
+            char portName[24] = { 0 };
+            sprintf(portName, "Audio Output %lu", i+1);
 
             portNames[port]       = strdup(portName);
             portDescriptors[port] = LADSPA_PORT_AUDIO | LADSPA_PORT_OUTPUT;
@@ -488,9 +540,29 @@ public:
             portRangeHints[port].UpperBound = 1.0f;
         }
 
+#if DISTRHO_PLUGIN_WANT_LATENCY
+        // Set latency port
+        portNames[port]       = strdup("_latency");
+        portDescriptors[port] = LADSPA_PORT_CONTROL | LADSPA_PORT_OUTPUT;
+        portRangeHints[port].HintDescriptor = LADSPA_HINT_SAMPLE_RATE;
+        portRangeHints[port].LowerBound     = 0.0f;
+        portRangeHints[port].UpperBound     = 1.0f;
+        port++;
+#endif
+
+#if defined(DISTRHO_PLUGIN_TARGET_DSSI) && DISTRHO_PLUGIN_HAS_UI
+        // Set sample-rate port
+        portNames[port]       = strdup("_sample-rate");
+        portDescriptors[port] = LADSPA_PORT_CONTROL | LADSPA_PORT_OUTPUT;
+        portRangeHints[port].HintDescriptor = LADSPA_HINT_BOUNDED_BELOW | LADSPA_HINT_BOUNDED_ABOVE;
+        portRangeHints[port].LowerBound     = 0.0f;
+        portRangeHints[port].UpperBound     = 512000.0f;
+        port++;
+#endif
+
         for (i=0; i < plugin.parameterCount(); i++, port++)
         {
-            portNames[port]       = plugin.parameterName(i);
+            portNames[port]       = strdup(plugin.parameterName(i));
             portDescriptors[port] = LADSPA_PORT_CONTROL;
 
             if (plugin.parameterIsOutput(i))
@@ -540,26 +612,10 @@ public:
                     portRangeHints[port].HintDescriptor |= LADSPA_HINT_TOGGLED;
                 if (hints & PARAMETER_IS_INTEGER)
                     portRangeHints[port].HintDescriptor |= LADSPA_HINT_INTEGER;
+                if (hints & PARAMETER_IS_LOGARITHMIC)
+                    portRangeHints[port].HintDescriptor |= LADSPA_HINT_LOGARITHMIC;
             }
         }
-
-        // Set latency port
-        portNames[port]       = strdup("_latency");
-        portDescriptors[port] = LADSPA_PORT_CONTROL | LADSPA_PORT_OUTPUT;
-        portRangeHints[port].HintDescriptor = LADSPA_HINT_SAMPLE_RATE;
-        portRangeHints[port].LowerBound     = 0.0f;
-        portRangeHints[port].UpperBound     = 1.0f;
-        port++;
-
-#if defined(DISTRHO_PLUGIN_TARGET_DSSI) && DISTRHO_PLUGIN_HAS_UI
-        // Set sample-rate port
-        portNames[port]       = strdup("_sample-rate");
-        portDescriptors[port] = LADSPA_PORT_CONTROL | LADSPA_PORT_OUTPUT;
-        portRangeHints[port].HintDescriptor = LADSPA_HINT_BOUNDED_BELOW | LADSPA_HINT_BOUNDED_ABOVE;
-        portRangeHints[port].LowerBound     = 0.0f;
-        portRangeHints[port].UpperBound     = 256000.0f;
-        port++;
-#endif
 
         // Set data
         ldescriptor.UniqueID  = plugin.uniqueId();
@@ -590,6 +646,9 @@ public:
         if (ldescriptor.PortDescriptors)
             delete[] ldescriptor.PortDescriptors;
 
+        if (ldescriptor.PortRangeHints)
+            delete[] ldescriptor.PortRangeHints;
+
         if (ldescriptor.PortNames)
         {
             for (unsigned long i=0; i < ldescriptor.PortCount; i++)
@@ -600,9 +659,6 @@ public:
 
             delete[] ldescriptor.PortNames;
         }
-
-        if (ldescriptor.PortRangeHints)
-            delete[] ldescriptor.PortRangeHints;
     }
 };
 
@@ -630,4 +686,4 @@ const DSSI_Descriptor* dssi_descriptor(unsigned long index)
 
 // -------------------------------------------------
 
-#endif // defined(DISTRHO_PLUGIN_TARGET_LADSPA) || defined(DISTRHO_PLUGIN_TARGET_DSSI)
+#endif // DISTRHO_PLUGIN_TARGET_LADSPA || DISTRHO_PLUGIN_TARGET_DSSI

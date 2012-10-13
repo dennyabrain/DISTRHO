@@ -30,9 +30,6 @@ Plugin::Plugin(uint32_t parameterCount, uint32_t programCount, uint32_t stateCou
 {
     data = new PluginPrivateData;
 
-    data->bufferSize = d_lastBufferSize;
-    data->sampleRate = d_lastSampleRate;
-
     if (parameterCount > 0)
     {
         data->parameterCount = parameterCount;
@@ -79,10 +76,12 @@ const TimePos* Plugin::d_timePos() const
     return &data->timePos;
 }
 
+#if DISTRHO_PLUGIN_WANT_LATENCY
 void Plugin::d_setLatency(uint32_t samples)
 {
     data->latency = samples;
 }
+#endif
 
 // -------------------------------------------------
 // Callbacks

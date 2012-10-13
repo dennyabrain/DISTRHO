@@ -21,9 +21,9 @@
 
 #include "DistrhoUIInternal.h"
 
+#include <QtCore/QSettings>
 #include <QtGui/QApplication>
-#include <QtGui/QDialog>
-#include <QtGui/QVBoxLayout>
+#include <QtGui/QMainWindow>
 
 #include <lo/lo.h>
 
@@ -35,6 +35,11 @@ struct OscData {
     lo_address  addr;
     const char* path;
     lo_server   server;
+};
+
+struct StringData {
+    d_string key;
+    d_string value;
 };
 
 #if DISTRHO_PLUGIN_WANT_STATE
@@ -81,40 +86,62 @@ void osc_send_exiting(const OscData* oscData)
     lo_send(oscData->addr, targetPath, "");
 }
 
-class UIDssi : public QObject
+// stuff that we might receive while waiting for sample-rate
+static bool globalShow = false;
+#if DISTRHO_PLUGIN_WANT_STATE
+static std::vector<StringData> globalConfigures;
+#endif
+#if DISTRHO_PLUGIN_WANT_PROGRAMS
+static int32_t globalProgram[2] = { -1, -1 };
+#endif
+static std::vector<float> globalControls;
+
+class UIDssi : public QMainWindow
 {
 public:
     UIDssi(const OscData* oscData_, const char* title)
-        : dialog(nullptr),
-#ifdef DISTRHO_UI_QT4
-          vbLayout(&dialog),
-#endif
-          ui(this, dialog.winId(), setParameterCallback, setStateCallback, uiNoteCallback, uiResizeCallback),
+        : QMainWindow(nullptr),
+          widget(this),
+          settings("DISTRHO", DISTRHO_PLUGIN_NAME),
+          ui(this, widget.winId(), setParameterCallback, setStateCallback, nullptr, uiSendNoteCallback, uiResizeCallback),
           oscData(oscData_)
     {
-#ifdef DISTRHO_UI_QT4
-        dialog.setLayout(&vbLayout);
-        vbLayout.addWidget(ui.getNativeWidget());
-        vbLayout.setContentsMargins(0, 0, 0, 0);
+        setCentralWidget(&widget);
+        setFixedSize(ui.getWidth(), ui.getHeight());
+        setWindowTitle(title);
+
+        uiTimer = startTimer(30);
+
+        // load settings
+        restoreGeometry(settings.value("Global/Geometry", QByteArray()).toByteArray());
+
+#if DISTRHO_PLUGIN_WANT_STATE
+        for (size_t i=0; i < globalConfigures.size(); i++)
+            dssiui_configure(globalConfigures.at(i).key, globalConfigures.at(i).value);
 #endif
 
-        dialog.setFixedSize(ui.getWidth(), ui.getHeight());
-        dialog.setWindowTitle(title);
+#if DISTRHO_PLUGIN_WANT_PROGRAMS
+        if (globalProgram[0] >= 0 && globalProgram[1] >= 0)
+            dssiui_program(globalProgram[0], globalProgram[1]);
+#endif
 
-        // TODO - block until first sample-rate is received
-        // this should be 0, only start when sample-rate is known
-        uiTimer = startTimer(30);
+        for (size_t i=0; i < globalControls.size(); i++)
+            dssiui_control(i, globalControls.at(i));
+
+        if (globalShow)
+            show();
     }
 
     ~UIDssi()
     {
+        // save settings
+        settings.setValue("Global/Geometry", saveGeometry());
+
         if (uiTimer)
         {
             killTimer(uiTimer);
             osc_send_exiting(oscData);
         }
-
-        dialog.close();
     }
 
     // ---------------------------------------------
@@ -128,13 +155,7 @@ public:
 
     void dssiui_control(unsigned long index, float value)
     {
-        // TODO - detect sample-rate parameter
-        //ui.setSampleRate(value);
-
-        if (long(index - DISTRHO_PLUGIN_NUM_INPUTS - DISTRHO_PLUGIN_NUM_OUTPUTS) < 0)
-            return;
-
-        ui.parameterChanged(index - DISTRHO_PLUGIN_NUM_INPUTS - DISTRHO_PLUGIN_NUM_OUTPUTS, value);
+        ui.parameterChanged(index, value);
     }
 
 #if DISTRHO_PLUGIN_WANT_PROGRAMS
@@ -146,21 +167,28 @@ public:
 #endif
 
 #if DISTRHO_PLUGIN_IS_SYNTH
-    void dssiui_midi(unsigned char data[4])
+    void dssiui_midi(uint8_t data[4])
     {
-        // TODO
+        uint8_t status  = data[1] & 0xF0;
+        uint8_t channel = data[1] & 0x0F;
+
+        // fix bad note-off
+        if (status == 0x90 && data[3] == 0)
+            status -= 0x10;
+
+        if (status == 0x80)
+        {
+            uint8_t note = data[2];
+            ui.noteReceived(false, channel, note, 0);
+        }
+        else if (status == 0x90)
+        {
+            uint8_t note = data[2];
+            uint8_t velo = data[3];
+            ui.noteReceived(true, channel, note, velo);
+        }
     }
 #endif
-
-    void dssiui_show()
-    {
-        dialog.show();
-    }
-
-    void dssiui_hide()
-    {
-        dialog.hide();
-    }
 
     void dssiui_quit()
     {
@@ -169,15 +197,16 @@ public:
             killTimer(uiTimer);
             uiTimer = 0;
         }
+        close();
         qApp->quit();
     }
 
     // ---------------------------------------------
 
 protected:
-    void setParameterValue(uint32_t index, float value)
+    void setParameterValue(uint32_t rindex, float value)
     {
-        osc_send_control(oscData, index, value);
+        osc_send_control(oscData, rindex, value);
     }
 
 #if DISTRHO_PLUGIN_WANT_STATE
@@ -188,15 +217,19 @@ protected:
 #endif
 
 #if DISTRHO_PLUGIN_IS_SYNTH
-    void uiNote(bool onOff, uint8_t channel, uint8_t note, uint8_t velocity)
+    void uiSendNote(bool onOff, uint8_t channel, uint8_t note, uint8_t velocity)
     {
-        // TODO
+        uint8_t mdata[4] = { 0, channel, note, velocity };
+        mdata[1] += onOff ? 0x90 : 0x80;
+
+        osc_send_midi(oscData, mdata);
     }
 #endif
 
     void uiResize(unsigned int width, unsigned int height)
     {
-        dialog.setFixedSize(width, height);
+        widget.setFixedSize(width, height);
+        setFixedSize(width, height);
     }
 
     void timerEvent(QTimerEvent* event)
@@ -214,10 +247,8 @@ protected:
 private:
     // Qt4 stuff
     int uiTimer;
-    QDialog dialog;
-#ifdef DISTRHO_UI_QT4
-    QVBoxLayout vbLayout;
-#endif
+    QWidget widget;
+    QSettings settings;
 
     // Plugin UI
     UIInternal ui;
@@ -227,12 +258,12 @@ private:
     // ---------------------------------------------
     // Callbacks
 
-    static void setParameterCallback(void* ptr, uint32_t index, float value)
+    static void setParameterCallback(void* ptr, uint32_t rindex, float value)
     {
         UIDssi* _this_ = (UIDssi*)ptr;
         assert(_this_);
 
-        _this_->setParameterValue(index, value);
+        _this_->setParameterValue(rindex, value);
     }
 
     static void setStateCallback(void* ptr, const char* key, const char* value)
@@ -249,13 +280,13 @@ private:
 #endif
     }
 
-    static void uiNoteCallback(void* ptr, bool onOff, uint8_t channel, uint8_t note, uint8_t velocity)
+    static void uiSendNoteCallback(void* ptr, bool onOff, uint8_t channel, uint8_t note, uint8_t velocity)
     {
 #if DISTRHO_PLUGIN_IS_SYNTH
         UIDssi* _this_ = (UIDssi*)ptr;
         assert(_this_);
 
-        _this_->uiNote(onOff, channel, note, velocity);
+        _this_->uiSendNote(onOff, channel, note, velocity);
 #else
         Q_UNUSED(ptr);
         Q_UNUSED(onOff);
@@ -276,103 +307,158 @@ private:
 
 // -------------------------------------------------
 
-void osc_error_handler(const int num, const char* const msg, const char* const path)
+static UIDssi* globalUI   = nullptr;
+
+void osc_error_handler(int num, const char* msg, const char* path)
 {
     qCritical("osc_error_handler(%i, \"%s\", \"%s\")", num, msg, path);
 }
 
 #if DISTRHO_PLUGIN_WANT_STATE
-int osc_configure_handler(const char* const, const char* const, lo_arg** const argv, const int, const lo_message, void* const data)
+int osc_configure_handler(const char*, const char*, lo_arg** argv, int, lo_message, void*)
 {
-    UIDssi* const ui = (UIDssi*)data;
-
     const char* const key   = &argv[0]->s;
     const char* const value = &argv[1]->s;
     qDebug("osc_configure_handler(\"%s\", \"%s\")", key, value);
 
-    ui->dssiui_configure(key, value);
+    if (globalUI)
+    {
+        globalUI->dssiui_configure(key, value);
+    }
+    else
+    {
+        StringData data = { key, value };
+        globalConfigures.push_back(data);
+    }
 
     return 0;
 }
 #endif
 
-int osc_control_handler(const char* const, const char* const, lo_arg** const argv, const int, const lo_message, void* const data)
+int osc_control_handler(const char*, const char*, lo_arg** argv, int, lo_message, void*)
 {
-    UIDssi* const ui = (UIDssi*)data;
+    const int32_t rindex = argv[0]->i;
+    const float   value  = argv[1]->f;
+    qDebug("osc_control_handler(%i, %f)", rindex, value);
 
-    const int32_t index = argv[0]->i;
-    const float   value = argv[1]->f;
-    qDebug("osc_control_handler(%i, %f)", index, value);
+    int32_t index = rindex - DISTRHO_PLUGIN_NUM_INPUTS - DISTRHO_PLUGIN_NUM_OUTPUTS;
 
-    ui->dssiui_control(index, value);
+    // latency
+#if DISTRHO_PLUGIN_WANT_LATENCY
+    index -= 1;
+#endif
+    // sample-rate
+    index -= 1;
+
+    if (index == -1)
+        d_lastUiSampleRate = value;
+
+    if (index < 0)
+        return 0;
+
+    if (globalUI)
+    {
+        globalUI->dssiui_control(index, value);
+    }
+    else
+    {
+        if (index >= (int32_t)globalControls.size())
+        {
+            for (int32_t i=globalControls.size(); i < index; i++)
+                globalControls.push_back(0.0f);
+        }
+
+        globalControls[index] = value;
+    }
 
     return 0;
 }
 
 #if DISTRHO_PLUGIN_WANT_PROGRAMS
-int osc_program_handler(const char* const, const char* const, lo_arg** const argv, const int, const lo_message, void* const data)
+int osc_program_handler(const char*, const char*, lo_arg** argv, int, lo_message, void*)
 {
-    UIDssi* const ui = (UIDssi*)data;
-
     const int32_t bank    = argv[0]->i;
     const int32_t program = argv[1]->f;
     qDebug("osc_program_handler(%i, %i)", bank, program);
 
-    ui->dssiui_program(bank, program);
+    if (globalUI)
+    {
+        globalUI->dssiui_program(bank, program);
+    }
+    else
+    {
+        globalProgram[0] = bank;
+        globalProgram[1] = program;
+    }
 
     return 0;
 }
 #endif
 
 #if DISTRHO_PLUGIN_IS_SYNTH
-int osc_midi_handler(const char* const, const char* const, lo_arg** const argv, const int, const lo_message, void* const data)
+int osc_midi_handler(const char*, const char*, lo_arg** argv, int, lo_message, void*)
 {
-    UIDssi* const ui = (UIDssi*)data;
+    qDebug("osc_midi_handler()");
 
-    const uint8_t* mdata = argv[0]->m;
-    qDebug("osc_midi_handler(%p)", mdata);
-
-    ui->dssiui_midi((unsigned char*)mdata);
+    if (globalUI)
+        globalUI->dssiui_midi(argv[0]->m);
 
     return 0;
 }
 #endif
 
-int osc_show_handler(const char* const, const char* const, lo_arg** const, const int, const lo_message, void* const data)
+int osc_sample_rate_handler(const char*, const char*, lo_arg** argv, int, lo_message, void*)
 {
-    UIDssi* const ui = (UIDssi*)data;
+    const int32_t sampleRate = argv[0]->i;
+    qDebug("osc_sample_rate_handler(%i)", sampleRate);
 
+    d_lastUiSampleRate = sampleRate;
+
+    return 0;
+}
+
+int osc_show_handler(const char*, const char*, lo_arg**, int, lo_message, void*)
+{
     qDebug("osc_show_handler()");
 
-    ui->dssiui_show();
+    if (globalUI)
+        globalUI->show();
+    else
+        globalShow = true;
 
     return 0;
 }
 
-int osc_hide_handler(const char* const, const char* const, lo_arg** const, const int, const lo_message, void* const data)
+int osc_hide_handler(const char*, const char*, lo_arg**, int, lo_message, void*)
 {
-    UIDssi* const ui = (UIDssi*)data;
-
     qDebug("osc_hide_handler()");
 
-    ui->dssiui_hide();
+    if (globalUI)
+        globalUI->hide();
+    else
+        globalShow = false;
 
     return 0;
 }
 
-int osc_quit_handler(const char* const, const char* const, lo_arg** const, const int, const lo_message, void* const data)
+int osc_quit_handler(const char*, const char*, lo_arg**, int, lo_message, void*)
 {
-    UIDssi* const ui = (UIDssi*)data;
-
     qDebug("osc_quit_handler()");
 
-    ui->dssiui_quit();
-    delete ui;
+    if (globalUI)
+    {
+        globalUI->dssiui_quit();
+    }
+    else
+    {
+        if (QApplication* app = qApp)
+            app->quit();
+    }
 
     return 0;
 }
 
-int osc_debug_handler(const char* const path, const char* const, lo_arg** const, const int, const lo_message, void* const)
+int osc_debug_handler(const char* path, const char*, lo_arg**, int, lo_message, void*)
 {
     qDebug("osc_debug_handler(\"%s\")", path);
 
@@ -391,6 +477,8 @@ int main(int argc, char* argv[])
         return 1;
     }
 
+    QApplication app(argc, argv, true);
+
     const char* oscUrl  = argv[1];
     const char* uiTitle = argv[4];
 
@@ -403,49 +491,51 @@ int main(int argc, char* argv[])
 
     OscData oscData = { oscAddr, oscPath, oscServer };
 
-    QApplication app(argc, argv, true);
-    UIDssi* const ui = new UIDssi(&oscData, uiTitle);
-
 #if DISTRHO_PLUGIN_WANT_STATE
     char oscPathConfigure[oscPathSize+11];
     strcpy(oscPathConfigure, oscPath);
     strcat(oscPathConfigure, "/configure");
-    lo_server_add_method(oscServer, oscPathConfigure, "ss", osc_configure_handler, ui);
+    lo_server_add_method(oscServer, oscPathConfigure, "ss", osc_configure_handler, nullptr);
 #endif
 
     char oscPathControl[oscPathSize+9];
     strcpy(oscPathControl, oscPath);
     strcat(oscPathControl, "/control");
-    lo_server_add_method(oscServer, oscPathControl, "if", osc_control_handler, ui);
+    lo_server_add_method(oscServer, oscPathControl, "if", osc_control_handler, nullptr);
 
 #if DISTRHO_PLUGIN_WANT_PROGRAMS
     char oscPathProgram[oscPathSize+9];
     strcpy(oscPathProgram, oscPath);
     strcat(oscPathProgram, "/program");
-    lo_server_add_method(oscServer, oscPathProgram, "ii", osc_program_handler, ui);
+    lo_server_add_method(oscServer, oscPathProgram, "ii", osc_program_handler, nullptr);
 #endif
 
 #if DISTRHO_PLUGIN_IS_SYNTH
     char oscPathMidi[oscPathSize+6];
     strcpy(oscPathMidi, oscPath);
     strcat(oscPathMidi, "/midi");
-    lo_server_add_method(oscServer, oscPathMidi, "m", osc_midi_handler, ui);
+    lo_server_add_method(oscServer, oscPathMidi, "m", osc_midi_handler, nullptr);
 #endif
+
+    char oscPathSampleRate[oscPathSize+13];
+    strcpy(oscPathSampleRate, oscPath);
+    strcat(oscPathSampleRate, "/sample-rate");
+    lo_server_add_method(oscServer, oscPathSampleRate, "i", osc_sample_rate_handler, nullptr);
 
     char oscPathShow[oscPathSize+6];
     strcpy(oscPathShow, oscPath);
     strcat(oscPathShow, "/show");
-    lo_server_add_method(oscServer, oscPathShow, "", osc_show_handler, ui);
+    lo_server_add_method(oscServer, oscPathShow, "", osc_show_handler, nullptr);
 
     char oscPathHide[oscPathSize+6];
     strcpy(oscPathHide, oscPath);
     strcat(oscPathHide, "/hide");
-    lo_server_add_method(oscServer, oscPathHide, "", osc_hide_handler, ui);
+    lo_server_add_method(oscServer, oscPathHide, "", osc_hide_handler, nullptr);
 
     char oscPathQuit[oscPathSize+6];
     strcpy(oscPathQuit, oscPath);
     strcat(oscPathQuit, "/quit");
-    lo_server_add_method(oscServer, oscPathQuit, "", osc_quit_handler, ui);
+    lo_server_add_method(oscServer, oscPathQuit, "", osc_quit_handler, nullptr);
 
     lo_server_add_method(oscServer, nullptr, nullptr, osc_debug_handler, nullptr);
 
@@ -453,13 +543,39 @@ int main(int argc, char* argv[])
     char* const pluginPath = strdup(QString("%1%2").arg(serverPath).arg(oscPathSize > 1 ? oscPath + 1 : oscPath).toUtf8().constData());
     free(serverPath);
 
+    // send update msg and wait for sample-rate
     osc_send_update(&oscData, pluginPath);
 
-    ui->dssiui_show();
+    // wait for sample-rate
+    for (int i=0; i < 1000; i++)
+    {
+        if (d_lastUiSampleRate != 0.0)
+            break;
 
-    // TODO - block until first sample-rate is received
+        lo_server_recv(oscServer);
+        d_msleep(50);
+    }
 
-    int ret = app.exec();
+    int ret;
+
+    if (d_lastUiSampleRate != 0.0)
+    {
+        globalUI = new UIDssi(&oscData, uiTitle);
+
+        ret = app.exec();
+
+        delete globalUI;
+        globalUI = nullptr;
+    }
+    else
+    {
+        ret = 1;
+    }
+
+#if DISTRHO_PLUGIN_WANT_STATE
+    globalConfigures.clear();
+#endif
+    globalControls.clear();
 
 #if DISTRHO_PLUGIN_WANT_STATE
     lo_server_del_method(oscServer, oscPathConfigure, "ss");
@@ -471,13 +587,11 @@ int main(int argc, char* argv[])
 #if DISTRHO_PLUGIN_IS_SYNTH
     lo_server_del_method(oscServer, oscPathMidi, "m");
 #endif
+    lo_server_del_method(oscServer, oscPathSampleRate, "i");
     lo_server_del_method(oscServer, oscPathShow, "");
     lo_server_del_method(oscServer, oscPathHide, "");
     lo_server_del_method(oscServer, oscPathQuit, "");
-
-    delete ui;
-
-    lo_server_free(oscServer);
+    lo_server_del_method(oscServer, nullptr, nullptr);
 
     free(oscHost);
     free(oscPort);
@@ -485,6 +599,7 @@ int main(int argc, char* argv[])
     free(pluginPath);
 
     lo_address_free(oscAddr);
+    lo_server_free(oscServer);
 
     return ret;
 }

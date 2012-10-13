@@ -20,6 +20,10 @@
 
 #include "DistrhoPluginInfo.h"
 
+#ifndef DISTRHO_PLUGIN_NAME
+# error DISTRHO_PLUGIN_NAME undefined!
+#endif
+
 #ifndef DISTRHO_PLUGIN_HAS_UI
 # error DISTRHO_PLUGIN_HAS_UI undefined!
 #endif
@@ -34,6 +38,10 @@
 
 #ifndef DISTRHO_PLUGIN_NUM_OUTPUTS
 # error DISTRHO_PLUGIN_NUM_OUTPUTS undefined!
+#endif
+
+#ifndef DISTRHO_PLUGIN_WANT_LATENCY
+# error DISTRHO_PLUGIN_WANT_LATENCY undefined!
 #endif
 
 #ifndef DISTRHO_PLUGIN_WANT_PROGRAMS

@@ -30,25 +30,17 @@ START_NAMESPACE_DISTRHO
 
 // -------------------------------------------------
 
-struct Qt4UIPrivateData;
-
 class Qt4UI : public UI,
               public QWidget
 {
 public:
-    Qt4UI(uint32_t parameterCount);
+    Qt4UI();
     virtual ~Qt4UI();
-
-    // ---------------------------------------------
-
-    // Host UI State
-    // TODO - d_uiTouch/edit/automate
 
     // ---------------------------------------------
 
 protected:
     // Information
-    virtual const char* d_title() = 0;
     virtual bool d_resizable() { return false; }
     virtual int  d_minimumWidth() { return 100; }
     virtual int  d_minimumHeight() { return 100; }
@@ -66,12 +58,11 @@ protected:
     virtual void d_uiIdle();
 
     // Implement resize internally
-    virtual void resizeEvent(QResizeEvent*);
     unsigned int d_width() { return width(); }
     unsigned int d_height() { return height(); }
 
 private:
-    Qt4UIPrivateData* data;
+    friend class UIInternal;
 };
 
 // -------------------------------------------------

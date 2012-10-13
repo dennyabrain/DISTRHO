@@ -119,7 +119,7 @@ public:
 
     d_string(int value)
     {
-        size_t strBufSize = abs(value/10) + 2;
+        size_t strBufSize = abs(value/10) + 3;
         char   strBuf[strBufSize];
         snprintf(strBuf, strBufSize, "%d", value);
 
@@ -148,7 +148,7 @@ public:
         free(buffer);
     }
 
-    size_t length()
+    size_t length() const
     {
         return strlen(buffer);
     }

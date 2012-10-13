@@ -22,7 +22,7 @@
 // -------------------------------------------------
 
 DistrhoPluginNotes::DistrhoPluginNotes()
-    : DISTRHO::Plugin(1, 0) // 1 parameter, 0 programs
+    : DISTRHO::Plugin(1, 0, 103) // 1 parameter, 0 programs, 103 states
 {
     curPage = 0;
 }
@@ -50,6 +50,25 @@ void DistrhoPluginNotes::d_initParameter(uint32_t index, DISTRHO::Parameter& par
     parameter.ranges.stepLarge = 10;
 }
 
+void DistrhoPluginNotes::d_initStateKey(uint32_t index, d_string& stateKey)
+{
+    switch (index)
+    {
+    case 0:
+        stateKey = "readOnly";
+        break;
+    case 1 ... 100:
+        stateKey = "pageText #" + d_string(index);
+        break;
+    case 101:
+        stateKey = "guiWidth";
+        break;
+    case 102:
+        stateKey = "guiHeight";
+        break;
+    }
+}
+
 // -------------------------------------------------
 // Internal data
 
@@ -67,6 +86,11 @@ void DistrhoPluginNotes::d_setParameterValue(uint32_t index, float value)
         return;
 
     curPage = rint(value);
+}
+
+void DistrhoPluginNotes::d_setState(const char*, const char*)
+{
+    // do nothing, used only for UI state
 }
 
 // -------------------------------------------------
@@ -89,14 +113,6 @@ void DistrhoPluginNotes::d_run(const float** inputs, float** outputs, uint32_t f
 
     memcpy(out1, in1, sizeof(float)*frames);
     memcpy(out2, in2, sizeof(float)*frames);
-}
-
-// -------------------------------------------------
-// Callbacks
-
-void DistrhoPluginNotes::d_stateChanged(const char*, const char*)
-{
-    // do nothing, used only for UI state
 }
 
 // -------------------------------------------------

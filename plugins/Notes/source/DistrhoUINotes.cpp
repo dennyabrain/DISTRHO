@@ -22,7 +22,7 @@
 // -------------------------------------------------
 
 DistrhoUINotes::DistrhoUINotes()
-    : DISTRHO::Qt4UI(1), // 1 parameter
+    : DISTRHO::Qt4UI(),
       textEdit(this),
       button(this),
       progressBar(this),
@@ -66,6 +66,18 @@ DistrhoUINotes::~DistrhoUINotes()
 {
 }
 
+void DistrhoUINotes::saveCurrentTextState()
+{
+    QString pageKey   = QString("pageText #%1").arg(curPage);
+    QString pageValue = textEdit.toPlainText();
+
+    if (pageValue != notes[curPage-1])
+    {
+        notes[curPage-1] = pageValue;
+        d_setState(pageKey.toUtf8().constData(), pageValue.toUtf8().constData());
+    }
+}
+
 // -------------------------------------------------
 // DSP Callbacks
 
@@ -78,6 +90,7 @@ void DistrhoUINotes::d_parameterChanged(uint32_t index, float value)
 
     if (nextCurPage != curPage && nextCurPage >= 1 && nextCurPage <= 100)
     {
+        saveCurrentTextState();
         curPage = nextCurPage;
 
         textEdit.setPlainText(notes[curPage-1]);
@@ -135,18 +148,14 @@ void DistrhoUINotes::d_uiIdle()
 {
     if (saveSizeNowChecker == 11)
     {
-        d_changeState("guiWidth", QString::number(width()).toUtf8().constData());
-        d_changeState("guiHeight", QString::number(height()).toUtf8().constData());
-
+        d_setState("guiWidth", QString::number(width()).toUtf8().constData());
+        d_setState("guiHeight", QString::number(height()).toUtf8().constData());
         saveSizeNowChecker = -1;
     }
 
     if (saveTextNowChecker == 11)
     {
-        QString pageKey   = QString("pageText #%1").arg(curPage);
-        QString pageValue = textEdit.toPlainText();
-        d_changeState(pageKey.toUtf8().constData(), pageValue.toUtf8().constData());
-
+        saveCurrentTextState();
         saveTextNowChecker = -1;
     }
 
@@ -162,7 +171,7 @@ void DistrhoUINotes::d_uiIdle()
 void DistrhoUINotes::resizeEvent(QResizeEvent* event)
 {
     saveSizeNowChecker = 0;
-    DISTRHO::Qt4UI::resizeEvent(event);
+    QWidget::resizeEvent(event);
 }
 
 // -------------------------------------------------
@@ -172,25 +181,20 @@ void DistrhoUINotes::buttonClicked(bool click)
     bool readOnly = !click;
     textEdit.setReadOnly(readOnly);
 
-    d_changeState("readOnly", readOnly ? "yes" : "no");
+    d_setState("readOnly", readOnly ? "yes" : "no");
 }
 
 void DistrhoUINotes::progressBarValueChanged(float value)
 {
     value = rint(value);
 
+    if (curPage == (int)value)
+        return;
+
     // maybe save current text before changing page
     if (saveTextNowChecker >= 0 && value >= 1.0f && value <= 100.0f)
     {
-        QString pageKey   = QString("pageText #%1").arg(curPage);
-        QString pageValue = textEdit.toPlainText();
-
-        if (pageValue != notes[curPage-1])
-        {
-            notes[curPage-1] = pageValue;
-            d_changeState(pageKey.toUtf8().constData(), pageValue.toUtf8().constData());
-        }
-
+        saveCurrentTextState();
         saveTextNowChecker = -1;
     }
 

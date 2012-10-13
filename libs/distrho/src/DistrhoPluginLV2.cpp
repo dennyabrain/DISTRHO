@@ -27,6 +27,7 @@
 #include "lv2-sdk/programs.h"
 #include "lv2-sdk/state.h"
 #include "lv2-sdk/urid.h"
+#include "lv2-sdk/worker.h"
 
 #include <map>
 #include <vector>
@@ -42,7 +43,7 @@ typedef float*                floatptr;
 typedef std::vector<float>    floatVector;
 typedef std::vector<floatptr> floatptrVector;
 
-typedef std::map<char*,char*> charMap;
+typedef std::map<d_string,d_string> stringMap;
 
 // -------------------------------------------------
 
@@ -72,37 +73,42 @@ public:
         portSampleRate = nullptr;
 #endif
 
-        // xxx
 #if DISTRHO_LV2_USE_EVENTS
         portEventsIn   = nullptr;
-#endif
 
-        // xxx
-#if DISTRHO_LV2_USE_EVENTS
         // URIDs
-        uridMap        = nullptr;
+        uridMap = nullptr;
+
+        uridIdAtomString   = 0;
 # if DISTRHO_PLUGIN_IS_SYNTH
         uridIdMidiEvent    = 0;
 # endif
 # if DISTRHO_PLUGIN_WANT_STATE
         uridIdPatchMessage = 0;
+        workerSchedule     = nullptr;
 # endif
 
         for (uint32_t i=0; features[i]; i++)
         {
-            if (strcmp(features[i]->URI, LV2_URID_MAP_URI) == 0)
+            if (strcmp(features[i]->URI, LV2_URID__map) == 0)
             {
                 uridMap = (LV2_URID_Map*)features[i]->data;
+
+                uridIdAtomString   = uridMap->map(uridMap->handle, LV2_ATOM__String);
 # if DISTRHO_PLUGIN_IS_SYNTH
                 uridIdMidiEvent    = uridMap->map(uridMap->handle, LV2_MIDI__MidiEvent);
 # endif
 # if DISTRHO_PLUGIN_WANT_STATE
                 uridIdPatchMessage = uridMap->map(uridMap->handle, LV2_PATCH__Message);
 # endif
-                break;
+            }
+            else if (strcmp(features[i]->URI, LV2_WORKER__schedule) == 0)
+            {
+                workerSchedule = (LV2_Worker_Schedule*)features[i]->data;
             }
         }
 #else
+        // unused
         (void)features;
 #endif
     }
@@ -114,9 +120,7 @@ public:
         portControls.clear();
         lastControlValues.clear();
 
-        // xxx
 #if DISTRHO_PLUGIN_WANT_STATE
-        // TODO - free values
         stateMap.clear();
 #endif
     }
@@ -163,7 +167,6 @@ public:
             }
         }
 
-        // xxx
 #if DISTRHO_LV2_USE_EVENTS
         if (port == index++)
         {
@@ -220,7 +223,7 @@ public:
 #if DISTRHO_LV2_USE_EVENTS
         LV2_ATOM_SEQUENCE_FOREACH(portEventsIn, iter)
         {
-            LV2_Atom_Event* const event = (LV2_Atom_Event* const)iter;
+            const LV2_Atom_Event* event = /*(const LV2_Atom_Event*)*/iter;
 
             if (! event)
                 continue;
@@ -234,9 +237,9 @@ public:
                 if (event->body.size > 3)
                     continue;
 
-                uint8_t* const data = (uint8_t* const)(event + 1);
+                const uint8_t* data = (const uint8_t*)(event + 1);
 
-                midiEvents[midiEventCount].frame     = event->time.frames;
+                midiEvents[midiEventCount].frame = event->time.frames;
                 memcpy(midiEvents[midiEventCount].buffer, data, event->body.size);
 
                 midiEventCount += 1;
@@ -247,6 +250,8 @@ public:
             if (event->body.type == uridIdPatchMessage)
             {
                 // TODO
+                //if (workerSchedule)
+                //    workerSchedule->schedule_work(workerSchedule->handle, event->body.size, )
             }
 # endif
         }
@@ -299,22 +304,16 @@ public:
 #endif
 
 #if DISTRHO_PLUGIN_WANT_STATE
-    // xxx
-    LV2_State_Status lv2_save(LV2_State_Store_Function store, LV2_State_Handle handle, uint32_t /*flags*/, const LV2_Feature* const* /*features*/)
+    LV2_State_Status lv2_save(LV2_State_Store_Function store, LV2_State_Handle handle, uint32_t flags, const LV2_Feature* const* /*features*/)
     {
+        flags = LV2_STATE_IS_POD | LV2_STATE_IS_PORTABLE;
+
         for (auto i = stateMap.begin(); i != stateMap.end(); i++)
         {
-            //const char* key   = i->first;
-            //const char* value = i->second;
+            const d_string& key   = i->first;
+            const d_string& value = i->second;
 
-            //size_t keyValueLen = strlen(key) + strlen(value) + 4;
-            //char keyValue[keyValueLen+1] = { 0 };
-
-            //strcpy(keyValue, key);
-            //strcat(keyValue, " \u00b7 ");
-            //strcat(keyValue, value);
-
-            //store(handle, uridMap->map(uridMap->handle, DISTRHO_LV2_STATE_URI), keyValue, keyValueLen, uridMap->map(uridMap->handle, LV2_ATOM__String), LV2_STATE_IS_POD|LV2_STATE_IS_PORTABLE);
+            store(handle, uridMap->map(uridMap->handle, (const char*)key), (const char*)value, value.length(), uridIdAtomString, flags);
         }
 
         return LV2_STATE_SUCCESS;
@@ -322,27 +321,37 @@ public:
 
     LV2_State_Status lv2_restore(LV2_State_Retrieve_Function retrieve, LV2_State_Handle handle, uint32_t flags, const LV2_Feature* const* /*features*/)
     {
-        size_t   size = 0;
-        uint32_t type = 0;
-        const void* data = retrieve(handle, uridMap->map(uridMap->handle, DISTRHO_LV2_STATE_URI), &size, &type, &flags);
+        size_t   size;
+        uint32_t type;
 
-        if (! data)
-            return LV2_STATE_ERR_NO_PROPERTY;
+        for (uint32_t i=0; i < plugin.stateCount(); i++)
+        {
+            const d_string& key = plugin.stateKey(i);
 
-        if (type != uridMap->map(uridMap->handle, LV2_ATOM__String))
-            return LV2_STATE_ERR_BAD_TYPE;
+            const void* data = retrieve(handle, uridMap->map(uridMap->handle, (const char*)key), &size, &type, &flags);
 
-        // xxx - looks ok, but needs testing
-        //const char* keyValue = (const char*)data;
-        //const char* value    = strstr(keyValue, " \u00b7 ") + 4;
-        //const size_t keyLen  = strlen(keyValue) - strlen(value) - 4;
+            if (size == 0 || ! data)
+                continue;
+            if (type != uridIdAtomString)
+                continue;
 
-        //char key[keyLen+1] = { 0 };
-        //strncpy(key, keyValue, keyLen);
-
-        //setStateChange(key, value);
+            const char* value = (const char*)data;
+            setState(key, value);
+        }
 
         return LV2_STATE_SUCCESS;
+    }
+
+    LV2_Worker_Status lv2_work(LV2_Worker_Respond_Function /*respond*/, LV2_Worker_Respond_Handle /*handle*/, uint32_t /*size*/, const void* /*data*/)
+    {
+        // TODO
+        return LV2_WORKER_SUCCESS;
+    }
+
+    LV2_Worker_Status lv2_work_response(uint32_t /*size*/, const void* /*body*/)
+    {
+        // TODO
+        return LV2_WORKER_SUCCESS;
     }
 #endif
 
@@ -364,11 +373,13 @@ private:
 
     // URIDs
     LV2_URID_Map* uridMap;
-# if DISTRHO_PLUGIN_WANT_STATE
-    LV2_URID      uridIdPatchMessage;
-# endif
+    LV2_URID      uridIdAtomString;
 # if DISTRHO_PLUGIN_IS_SYNTH
     LV2_URID      uridIdMidiEvent;
+# endif
+# if DISTRHO_PLUGIN_WANT_STATE
+    LV2_URID      uridIdPatchMessage;
+    LV2_Worker_Schedule* workerSchedule;
 # endif
 #endif
 
@@ -383,30 +394,27 @@ private:
     MidiEvent midiEvents[0];
 #endif
 
-    // xxx
 #if DISTRHO_PLUGIN_WANT_STATE
-    charMap stateMap;
+    stringMap stateMap;
 
-    void setStateChange(char* newKey, const char* newValue)
+    void setState(const char* newKey, const char* newValue)
     {
-        plugin.changeState(newKey, newValue);
+        plugin.setState(newKey, newValue);
 
         // check if key already exists
-        for (charMap::iterator i = stateMap.begin(); i != stateMap.end(); i++)
+        for (auto i = stateMap.begin(); i != stateMap.end(); i++)
         {
-            char* key   = i->first;
-            char* value = i->second;
+            const d_string& key = i->first;
 
-            if (strcmp(key, newKey) == 0)
+            if (key == newKey)
             {
-                free(value);
-                i->second = strdup(newValue);
+                i->second = newValue;
                 return;
             }
         }
 
         // add a new one then
-        stateMap[newKey] = strdup(newValue);
+        stateMap[newKey] = newValue;
     }
 #endif
 
@@ -516,6 +524,22 @@ static LV2_State_Status lv2_restore(LV2_Handle instance, LV2_State_Retrieve_Func
 
     return plugin->lv2_restore(retrieve, handle, flags, features);
 }
+
+LV2_Worker_Status lv2_work(LV2_Handle instance, LV2_Worker_Respond_Function respond, LV2_Worker_Respond_Handle handle, uint32_t size, const void* data)
+{
+    PluginLv2* plugin = (PluginLv2*)instance;
+    assert(plugin);
+
+    return plugin->lv2_work(respond, handle, size, data);
+}
+
+LV2_Worker_Status lv2_work_response(LV2_Handle instance, uint32_t size, const void* body)
+{
+    PluginLv2* plugin = (PluginLv2*)instance;
+    assert(plugin);
+
+    return plugin->lv2_work_response(size, body);
+}
 # endif
 
 static const void* lv2_extension_data(const char* uri)
@@ -530,6 +554,10 @@ static const void* lv2_extension_data(const char* uri)
     static const LV2_State_Interface state = { lv2_save, lv2_restore };
     if (strcmp(uri, LV2_STATE__interface) == 0)
         return &state;
+
+    static const LV2_Worker_Interface worker = { lv2_work, lv2_work_response, nullptr };
+    if (strcmp(uri, LV2_WORKER__interface) == 0)
+        return &worker;
 # endif
 
     return nullptr;

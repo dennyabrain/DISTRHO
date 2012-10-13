@@ -30,11 +30,6 @@ public:
 
 protected:
     // Information
-    const char* d_name()
-    {
-        return "Notes";
-    }
-
     const char* d_label()
     {
         return "Notes";
@@ -62,18 +57,17 @@ protected:
 
     // Init
     void d_initParameter(uint32_t index, DISTRHO::Parameter& parameter);
+    void d_initStateKey(uint32_t index, d_string& stateKeyName);
 
     // Internal data
     float d_parameterValue(uint32_t index);
     void  d_setParameterValue(uint32_t index, float value);
+    void  d_setState(const char* key, const char* value);
 
     // Process
     void d_activate();
     void d_deactivate();
     void d_run(const float** inputs, float** outputs, uint32_t frames, uint32_t midiEventCount, const DISTRHO::MidiEvent* midiEvents);
-
-    // Callbacks
-    void d_stateChanged(const char* key, const char* value);
 
 private:
     int curPage;

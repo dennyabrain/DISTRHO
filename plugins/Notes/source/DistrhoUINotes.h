@@ -40,11 +40,6 @@ public:
 protected:
 
     // Information
-    const char* d_title()
-    {
-        return "Notes";
-    }
-
     bool d_resizable()
     {
         return true;
@@ -52,13 +47,15 @@ protected:
 
     int d_minimumWidth()
     {
-        return 150;
+        return 180;
     }
 
     int d_minimumHeight()
     {
-        return 100;
+        return 150;
     }
+
+    void saveCurrentTextState();
 
     // DSP Callbacks
     void d_parameterChanged(uint32_t index, float value);

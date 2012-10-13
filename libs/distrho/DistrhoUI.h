@@ -29,7 +29,7 @@ struct UIPrivateData;
 class UI
 {
 public:
-    UI(uint32_t parameterCount);
+    UI();
     virtual ~UI();
 
     // ---------------------------------------------
@@ -42,17 +42,16 @@ public:
 #endif
 
     // Host UI State
+    void d_uiEditParameter(uint32_t index, bool started);
 #if DISTRHO_PLUGIN_IS_SYNTH
-    void d_uiNote(bool onOff, uint8_t channel, uint8_t note, uint8_t velocity);
+    void d_uiSendNote(bool onOff, uint8_t channel, uint8_t note, uint8_t velocity);
 #endif
     void d_uiResize(unsigned int width, unsigned int height);
-    // TODO - d_uiTouch/Edit/Automate
 
     // ---------------------------------------------
 
 protected:
     // Information
-    virtual const char*  d_title() = 0;
     virtual unsigned int d_width() = 0;
     virtual unsigned int d_height() = 0;
 
@@ -64,6 +63,9 @@ protected:
 #if DISTRHO_PLUGIN_WANT_STATE
     virtual void d_stateChanged(const char* key, const char* value) = 0;
 #endif
+#if DISTRHO_PLUGIN_IS_SYNTH
+    virtual void d_uiNoteReceived(bool onOff, uint8_t channel, uint8_t note, uint8_t velocity);
+#endif
 
     // UI Callbacks
     virtual void d_uiIdle() = 0;
@@ -73,8 +75,11 @@ protected:
 private:
     UIPrivateData* data;
     friend class UIInternal;
-#ifdef DISTRHO_UI_OPENGL
+#ifdef DISTRHO_UI_QT4
+    friend class Qt4UI;
+#else
     friend class OpenGLUI;
+    friend class OpenGLExtUI;
 #endif
 };
 

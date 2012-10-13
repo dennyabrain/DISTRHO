@@ -25,10 +25,11 @@ START_NAMESPACE_DISTRHO
 // -------------------------------------------------
 
 // Parameter Hints
-const uint32_t PARAMETER_IS_AUTOMABLE = 1 << 0;
-const uint32_t PARAMETER_IS_BOOLEAN   = 1 << 1;
-const uint32_t PARAMETER_IS_INTEGER   = 1 << 2;
-const uint32_t PARAMETER_IS_OUTPUT    = 1 << 3;
+const uint32_t PARAMETER_IS_AUTOMABLE   = 1 << 0;
+const uint32_t PARAMETER_IS_BOOLEAN     = 1 << 1;
+const uint32_t PARAMETER_IS_INTEGER     = 1 << 2;
+const uint32_t PARAMETER_IS_LOGARITHMIC = 1 << 3;
+const uint32_t PARAMETER_IS_OUTPUT      = 1 << 4;
 
 // Parameter Ranges
 struct ParameterRanges {
@@ -129,13 +130,15 @@ public:
     uint32_t       d_bufferSize() const;
     double         d_sampleRate() const;
     const TimePos* d_timePos() const;
+#if DISTRHO_PLUGIN_WANT_LATENCY
     void           d_setLatency(uint32_t samples);
+#endif
 
     // ---------------------------------------------
 
 protected:
     // Information
-    virtual const char* d_name()  = 0;
+    virtual const char* d_name() { return DISTRHO_PLUGIN_NAME; }
     virtual const char* d_label() = 0;
     virtual const char* d_maker() = 0;
     virtual const char* d_license() = 0;
@@ -148,7 +151,7 @@ protected:
     virtual void d_initProgramName(uint32_t index, d_string& programName) = 0;
 #endif
 #if DISTRHO_PLUGIN_WANT_STATE
-    virtual void d_initStateKey(uint32_t index, d_string& stateKeyName) = 0;
+    virtual void d_initStateKey(uint32_t index, d_string& stateKey) = 0;
 #endif
 
     // Internal data
@@ -158,7 +161,7 @@ protected:
     virtual void  d_setProgram(uint32_t index) = 0;
 #endif
 #if DISTRHO_PLUGIN_WANT_STATE
-    virtual void d_setState(const char* key, const char* value) = 0;
+    virtual void  d_setState(const char* key, const char* value) = 0;
 #endif
 
     // Process

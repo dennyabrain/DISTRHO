@@ -85,17 +85,15 @@ public:
 
     // ---------------------------------------------
 
-    // Host UI State
+    // Host UI State (OpenGL)
     int  d_uiGetModifiers();
     void d_uiIgnoreKeyRepeat(bool ignore);
     void d_uiRepaint();
-    // TODO - d_uiTouch/edit/automate
 
     // ---------------------------------------------
 
 protected:
     // Information
-    virtual const char*  d_title() = 0;
     virtual unsigned int d_width() = 0;
     virtual unsigned int d_height() = 0;
 

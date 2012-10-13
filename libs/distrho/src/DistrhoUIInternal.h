@@ -18,13 +18,19 @@
 #ifndef __DISTRHO_UI_INTERNAL_H__
 #define __DISTRHO_UI_INTERNAL_H__
 
-#include "DistrhoDefines.h"
+#include "DistrhoUI.h"
 
 #ifdef DISTRHO_UI_OPENGL
-# include "DistrhoUIOpenGLExt.h"
+# include "DistrhoUIOpenGL.h"
 # include "pugl/pugl.h"
 #else
 # include "DistrhoUIQt4.h"
+# include <QtGui/QMouseEvent>
+# include <QtGui/QSizeGrip>
+# include <QtGui/QVBoxLayout>
+# ifdef Q_WS_X11
+#  include <QtGui/QX11EmbedWidget>
+# endif
 #endif
 
 #include <cassert>
@@ -37,48 +43,72 @@ START_NAMESPACE_DISTRHO
 typedef PuglView* NativeWidget;
 #else
 typedef QWidget*  NativeWidget;
+# ifdef Q_WS_X11
+class QEmbedWidget : public QX11EmbedWidget
+#else
+class QEmbedWidget : public QWidget
+#endif
+{
+public:
+    QEmbedWidget() {}
+    ~QEmbedWidget() {}
+
+# ifndef Q_WS_X11
+    // TODO for Windows and Mac OS support
+    void embedInto(WId id);
+    WId containerWinId() const;
+# endif
+};
 #endif
 
-typedef void (*setParameterFunc)(void* ptr, uint32_t index, float value);
-typedef void (*setStateFunc)(void* ptr, const char* key, const char* value);
-typedef void (*uiNoteFunc)(void* ptr, bool onOff, uint8_t channel, uint8_t note, uint8_t velo);
-typedef void (*uiResizeFunc)(void* ptr, unsigned int width, unsigned int height);
+typedef void (*setParamFunc)    (void* ptr, uint32_t index, float value);
+typedef void (*setStateFunc)    (void* ptr, const char* key, const char* value);
+typedef void (*uiEditParamFunc) (void* ptr, uint32_t index, bool started);
+typedef void (*uiSendNoteFunc)  (void* ptr, bool onOff, uint8_t channel, uint8_t note, uint8_t velo);
+typedef void (*uiResizeFunc)    (void* ptr, unsigned int width, unsigned int height);
+
+static double d_lastUiSampleRate = 0.0;
 
 // -------------------------------------------------
 
 struct UIPrivateData {
     // DSP
-    uint32_t parameterCount;
     double   sampleRate;
+    uint32_t parameterOffset;
 
     // UI
     void*        ptr;
     NativeWidget widget;
 
     // Callbacks
-    setParameterFunc setParameterCallbackFunc;
-    setStateFunc     setStateCallbackFunc;
-    uiNoteFunc       uiNoteCallbackFunc;
-    uiResizeFunc     uiResizeCallbackFunc;
+    setParamFunc    setParamCallbackFunc;
+    setStateFunc    setStateCallbackFunc;
+    uiEditParamFunc uiEditParamCallbackFunc;
+    uiSendNoteFunc  uiSendNoteCallbackFunc;
+    uiResizeFunc    uiResizeCallbackFunc;
 
     UIPrivateData()
-        : parameterCount(0),
-          sampleRate(0.0),
+        : sampleRate(d_lastUiSampleRate),
+          parameterOffset(0),
           ptr(nullptr),
           widget(nullptr),
-          setParameterCallbackFunc(nullptr),
+          setParamCallbackFunc(nullptr),
           setStateCallbackFunc(nullptr),
-          uiNoteCallbackFunc(nullptr),
-          uiResizeCallbackFunc(nullptr) {}
+          uiEditParamCallbackFunc(nullptr),
+          uiSendNoteCallbackFunc(nullptr),
+          uiResizeCallbackFunc(nullptr)
+    {
+        assert(d_lastUiSampleRate != 0.0);
+    }
 
     ~UIPrivateData()
     {
     }
 
-    void setParameterCallback(uint32_t index, float value)
+    void setParamCallback(uint32_t rindex, float value)
     {
-        if (setParameterCallbackFunc)
-            setParameterCallbackFunc(ptr, index, value);
+        if (setParamCallbackFunc)
+            setParamCallbackFunc(ptr, rindex, value);
     }
 
     void setStateCallback(const char* key, const char* value)
@@ -87,10 +117,16 @@ struct UIPrivateData {
             setStateCallbackFunc(ptr, key, value);
     }
 
-    void uiNoteCallback(bool onOff, uint8_t channel, uint8_t note, uint8_t velocity)
+    void uiEditParamCallback(uint32_t index, bool started)
     {
-        if (uiNoteCallbackFunc)
-            uiNoteCallbackFunc(ptr, onOff, channel, note, velocity);
+        if (uiEditParamCallbackFunc)
+            uiEditParamCallbackFunc(ptr, index, started);
+    }
+
+    void uiSendNoteCallback(bool onOff, uint8_t channel, uint8_t note, uint8_t velocity)
+    {
+        if (uiSendNoteCallbackFunc)
+            uiSendNoteCallbackFunc(ptr, onOff, channel, note, velocity);
     }
 
     void uiResizeCallback(unsigned int width, unsigned int height)
@@ -102,41 +138,48 @@ struct UIPrivateData {
 
 // -------------------------------------------------
 
+#ifdef DISTRHO_UI_QT4
+class UIInternal : public QObject
+#else
 class UIInternal
+#endif
 {
 public:
-    UIInternal(void* ptr, intptr_t winId, setParameterFunc setParameterCall, setStateFunc setStateCall, uiNoteFunc uiNoteCall, uiResizeFunc uiResizeCall)
+    UIInternal(void* ptr, intptr_t winId, setParamFunc setParamCall, setStateFunc setStateCall, uiEditParamFunc uiEditParamCall, uiSendNoteFunc uiSendNoteCall, uiResizeFunc uiResizeCall)
         : ui(createUI()),
           data(nullptr)
     {
         assert(ui);
 
+#ifdef DISTRHO_UI_QT4
+        qt_grip   = nullptr;
+        qt_widget = nullptr;
+#else
+        gl_initiated = false;
+#endif
+
         if (! ui)
             return;
 
         data = ui->data;
-        assert(data);
-
-        if (! data)
-            return;
 
         data->ptr = ptr;
-        data->setParameterCallbackFunc = setParameterCall;
-        data->setStateCallbackFunc     = setStateCall;
-        data->uiNoteCallbackFunc       = uiNoteCall;
-        data->uiResizeCallbackFunc     = uiResizeCall;
+        data->setParamCallbackFunc    = setParamCall;
+        data->setStateCallbackFunc    = setStateCall;
+        data->uiEditParamCallbackFunc = uiEditParamCall;
+        data->uiSendNoteCallbackFunc  = uiSendNoteCall;
+        data->uiResizeCallbackFunc    = uiResizeCall;
 
-#ifdef DISTRHO_UI_OPENGL
-        gl_initiated = false;
-        gl_createWindow(winId);
-#else
-        data->widget = (Qt4UI*)ui;
-        Q_UNUSED(winId);
-#endif
+        createWindow(winId);
     }
 
     ~UIInternal()
     {
+        if (ui)
+        {
+            destroyWindow();
+            delete ui;
+        }
     }
 
     // ---------------------------------------------
@@ -157,9 +200,13 @@ public:
         return ui ? ui->d_height() : 0;
     }
 
-    NativeWidget getNativeWidget()
+    intptr_t getWindowId()
     {
-        return data ? data->widget : nullptr;
+#ifdef DISTRHO_UI_QT4
+        return qt_widget ? qt_widget->winId() : 0;
+#else
+        return (data && data->widget) ? puglGetNativeWindow(data->widget) : 0;
+#endif
     }
 
     // ---------------------------------------------
@@ -186,21 +233,54 @@ public:
     }
 #endif
 
-    void setSampleRate(double sampleRate)
+#if DISTRHO_PLUGIN_IS_SYNTH
+    void noteReceived(bool onOff, uint8_t channel, uint8_t note, uint8_t velocity)
     {
-        if (data)
-            data->sampleRate = sampleRate;
+        if (ui)
+            ui->d_uiNoteReceived(onOff, channel, note, velocity);
     }
+#endif
 
     // ---------------------------------------------
 
-#ifdef DISTRHO_UI_OPENGL
-    void gl_createWindow(PuglNativeWindow parent)
+    void createWindow(intptr_t parent)
     {
+#ifdef DISTRHO_UI_QT4
+        // create embedable widget
+        qt_widget = new QEmbedWidget;
+
+        // set layout
+        qt_widget->setLayout(new QVBoxLayout(qt_widget));
+        qt_widget->layout()->addWidget(data->widget);
+        qt_widget->layout()->setContentsMargins(0, 0, 0, 0);
+        qt_widget->setFixedSize(ui->d_width(), ui->d_height());
+
+        // listen for resize on the plugin widget
+        data->widget->installEventFilter(this);
+
+        // set resize grip
+        if (((Qt4UI*)ui)->d_resizable())
+        {
+            qt_grip = new QSizeGrip(qt_widget);
+            qt_grip->resize(qt_grip->sizeHint());
+            qt_grip->setCursor(Qt::SizeFDiagCursor);
+            qt_grip->move(ui->d_width() - qt_grip->width(), ui->d_height() - qt_grip->height());
+            qt_grip->show();
+            qt_grip->raise();
+            qt_grip->installEventFilter(this);
+        }
+
+        // reparent widget
+        qt_widget->embedInto(parent);
+
+        // show it
+        qt_widget->show();
+
+#else
         if ((data && data->widget) || ! ui)
             return;
 
-        data->widget = puglCreate(parent, ui->d_title(), ui->d_width(), ui->d_height(), false);
+        data->widget = puglCreate(parent, DISTRHO_PLUGIN_NAME, ui->d_width(), ui->d_height(), false);
 
         assert(data->widget);
 
@@ -216,33 +296,34 @@ public:
         puglSetSpecialFunc(data->widget, gl_onSpecialCallback);
         puglSetReshapeFunc(data->widget, gl_onReshapeCallback);
         puglSetCloseFunc(data->widget, gl_onCloseCallback);
+#endif
     }
 
-    void gl_destroyWindowGL()
+    void destroyWindow()
     {
-        OpenGLUI* const uiGL = (OpenGLUI*)ui;
-        assert(uiGL);
+#ifdef DISTRHO_UI_QT4
+        if (qt_grip)
+            delete qt_grip;
 
-        if (uiGL)
-            uiGL->d_onClose();
+        if (qt_widget)
+            delete qt_widget;
+#else
+        ((OpenGLUI*)ui)->d_onClose();
 
         if (data && data->widget)
         {
             puglDestroy(data->widget);
             data->widget = nullptr;
         }
-    }
-
-    PuglNativeWindow gl_getNativeWindow()
-    {
-        return (data && data->widget) ? puglGetNativeWindow(data->widget) : 0;
+#endif
     }
 
     // ---------------------------------------------
 
+#ifdef DISTRHO_UI_OPENGL
     void gl_onDisplay()
     {
-        OpenGLUI* const uiGL = (OpenGLUI*)ui;
+        OpenGLUI* uiGL = (OpenGLUI*)ui;
         assert(uiGL);
 
         if (uiGL)
@@ -251,7 +332,7 @@ public:
 
     void gl_onKeyboard(bool press, uint32_t key)
     {
-        OpenGLUI* const uiGL = (OpenGLUI*)ui;
+        OpenGLUI* uiGL = (OpenGLUI*)ui;
         assert(uiGL);
 
         if (uiGL)
@@ -260,7 +341,7 @@ public:
 
     void gl_onMotion(int x, int y)
     {
-        OpenGLUI* const uiGL = (OpenGLUI*)ui;
+        OpenGLUI* uiGL = (OpenGLUI*)ui;
         assert(uiGL);
 
         if (uiGL)
@@ -269,7 +350,7 @@ public:
 
     void gl_onMouse(int button, bool press, int x, int y)
     {
-        OpenGLUI* const uiGL = (OpenGLUI*)ui;
+        OpenGLUI* uiGL = (OpenGLUI*)ui;
         assert(uiGL);
 
         if (uiGL)
@@ -278,7 +359,7 @@ public:
 
     void gl_onReshape(int width, int height)
     {
-        OpenGLUI* const uiGL = (OpenGLUI*)ui;
+        OpenGLUI* uiGL = (OpenGLUI*)ui;
         assert(uiGL);
 
         if (uiGL)
@@ -295,7 +376,7 @@ public:
 
     void gl_onScroll(float dx, float dy)
     {
-        OpenGLUI* const uiGL = (OpenGLUI*)ui;
+        OpenGLUI* uiGL = (OpenGLUI*)ui;
         assert(uiGL);
 
         if (uiGL)
@@ -304,7 +385,7 @@ public:
 
     void gl_onSpecial(bool press, Key key)
     {
-        OpenGLUI* const uiGL = (OpenGLUI*)ui;
+        OpenGLUI* uiGL = (OpenGLUI*)ui;
         assert(uiGL);
 
         if (uiGL)
@@ -313,7 +394,7 @@ public:
 
     void gl_onClose()
     {
-        OpenGLUI* const uiGL = (OpenGLUI*)ui;
+        OpenGLUI* uiGL = (OpenGLUI*)ui;
         assert(uiGL);
 
         if (uiGL)
@@ -324,49 +405,49 @@ public:
 
     static void gl_onDisplayCallback(PuglView* view)
     {
-        UIInternal* const _this_ = (UIInternal*)puglGetHandle(view);
+        UIInternal* _this_ = (UIInternal*)puglGetHandle(view);
         _this_->gl_onDisplay();
     }
 
     static void gl_onKeyboardCallback(PuglView* view, bool press, uint32_t key)
     {
-        UIInternal* const _this_ = (UIInternal*)puglGetHandle(view);
+        UIInternal* _this_ = (UIInternal*)puglGetHandle(view);
         _this_->gl_onKeyboard(press, key);
     }
 
     static void gl_onMotionCallback(PuglView* view, int x, int y)
     {
-        UIInternal* const _this_ = (UIInternal*)puglGetHandle(view);
+        UIInternal* _this_ = (UIInternal*)puglGetHandle(view);
         _this_->gl_onMotion(x, y);
     }
 
     static void gl_onMouseCallback(PuglView* view, int button, bool press, int x, int y)
     {
-        UIInternal* const _this_ = (UIInternal*)puglGetHandle(view);
+        UIInternal* _this_ = (UIInternal*)puglGetHandle(view);
         _this_->gl_onMouse(button, press, x, y);
     }
 
     static void gl_onReshapeCallback(PuglView* view, int width, int height)
     {
-        UIInternal* const _this_ = (UIInternal*)puglGetHandle(view);
+        UIInternal* _this_ = (UIInternal*)puglGetHandle(view);
         _this_->gl_onReshape(width, height);
     }
 
     static void gl_onScrollCallback(PuglView* view, float dx, float dy)
     {
-        UIInternal* const _this_ = (UIInternal*)puglGetHandle(view);
+        UIInternal* _this_ = (UIInternal*)puglGetHandle(view);
         _this_->gl_onScroll(dx, dy);
     }
 
     static void gl_onSpecialCallback(PuglView* view, bool press, PuglKey key)
     {
-        UIInternal* const _this_ = (UIInternal*)puglGetHandle(view);
+        UIInternal* _this_ = (UIInternal*)puglGetHandle(view);
         _this_->gl_onSpecial(press, (Key)key);
     }
 
     static void gl_onCloseCallback(PuglView* view)
     {
-        UIInternal* const _this_ = (UIInternal*)puglGetHandle(view);
+        UIInternal* _this_ = (UIInternal*)puglGetHandle(view);
         _this_->gl_onClose();
     }
 #endif
@@ -377,8 +458,75 @@ protected:
     UI* const ui;
     UIPrivateData* data;
 
-#ifdef DISTRHO_UI_OPENGL
+#ifdef DISTRHO_UI_QT4
+    bool eventFilter(QObject* obj, QEvent* event)
+    {
+        if (obj == qt_grip)
+        {
+            if (event->type() == QEvent::MouseButtonPress)
+            {
+                QMouseEvent* mEvent = (QMouseEvent*)event;
+                if (mEvent->button() == Qt::LeftButton)
+                    qt_mouseDown = true;
+                return true;
+            }
+
+            if (event->type() == QEvent::MouseMove)
+            {
+                if (qt_mouseDown)
+                {
+                    Qt4UI* qt_ui = (Qt4UI*)ui;
+                    QMouseEvent* mEvent = (QMouseEvent*)event;
+                    int width  = ui->d_width()  + mEvent->x() - qt_grip->width();
+                    int height = ui->d_height() + mEvent->y() - qt_grip->height();
+
+                    if (width < qt_ui->d_minimumWidth())
+                        width = qt_ui->d_minimumWidth();
+                    if (height < qt_ui->d_minimumHeight())
+                        height = qt_ui->d_minimumHeight();
+
+                    data->widget->setFixedSize(width, height);
+                }
+
+                return true;
+            }
+
+            if (event->type() == QEvent::MouseButtonRelease)
+            {
+                QMouseEvent* mEvent = (QMouseEvent*)event;
+                if (mEvent->button() == Qt::LeftButton)
+                    qt_mouseDown = false;
+                return true;
+            }
+        }
+        else if (data && obj == data->widget)
+        {
+            if (event->type() == QEvent::Resize)
+            {
+                QResizeEvent* rEvent = (QResizeEvent*)event;
+                const QSize&  size   = rEvent->size();
+
+                qt_widget->setFixedSize(size.width(), size.height());
+                qt_grip->move(size.width() - qt_grip->width(), size.height() - qt_grip->height());
+
+                ui->d_uiResize(size.width(), size.height());
+            }
+        }
+
+        return QObject::eventFilter(obj, event);
+    }
+#endif
+
 private:
+#ifdef DISTRHO_UI_QT4
+    bool qt_mouseDown;
+    QSizeGrip* qt_grip;
+# ifdef Q_WS_X11
+    QEmbedWidget* qt_widget;
+# else
+    QWidget* qt_widget;
+# endif
+#else
     bool gl_initiated;
 #endif
 };
