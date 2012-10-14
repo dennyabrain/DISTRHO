@@ -87,6 +87,16 @@ Point& Point::operator-=(const Point& pos)
     return *this;
 }
 
+bool Point::operator==(const Point& pos) const
+{
+    return (_x == pos._x && _y == pos._y);
+}
+
+bool Point::operator!=(const Point& pos) const
+{
+    return !operator==(pos);
+}
+
 // -------------------------------------------------
 // Point
 
@@ -674,8 +684,8 @@ public:
 
 #if DISTRHO_OS_LINUX
         Display* display    = view->impl->display;
-        Window thisWindow   = (Window)view->impl->win;
-        Window parentWindow = (Window)parentView->impl->win;
+        Window thisWindow   = view->impl->win;
+        Window parentWindow = parentView->impl->win;
 
         int x = (parentSize.getWidth()-image.getWidth())/2;
         int y = (parentSize.getHeight()-image.getHeight())/2;
@@ -714,7 +724,7 @@ public:
         {
 #if DISTRHO_OS_LINUX
             Display* display = view->impl->display;
-            Window   window  = (Window)view->impl->win;
+            Window   window  = view->impl->win;
             XRaiseWindow(display, window);
             XSetInputFocus(display, window, RevertToPointerRoot, CurrentTime);
 #endif
@@ -831,10 +841,36 @@ enum ObjectType {
     OBJECT_SLIDER = 3
 };
 
+#if DISTRHO_OS_LINUX
+struct LinuxData {
+    Display* display;
+    Window   window;
+
+    char   colorData[8];
+    XColor colorBlack;
+    Pixmap pixmapBlack;
+    Cursor cursorBlack;
+
+    LinuxData()
+        : display(nullptr),
+          window(0),
+          colorData{0},
+          colorBlack{0, 0, 0, 0, 0, 0}
+    {
+    }
+
+    ~LinuxData()
+    {
+        XFreeCursor(display, cursorBlack);
+    }
+};
+#endif
+
 struct OpenGLExtUIPrivateData {
     int initialPosX;
     int initialPosY;
-    void* lastObj;
+    void*      lastObj;
+    Point      lastCursorPos;
     ObjectType lastObjType;
 
     Image background;
@@ -843,14 +879,45 @@ struct OpenGLExtUIPrivateData {
     std::vector<ImageSlider*> sliders;
     OpenGLDialog* dialog;
 
+#if DISTRHO_OS_LINUX
+    LinuxData linuxData;
+#endif
+
     OpenGLExtUIPrivateData()
         : initialPosX(0),
           initialPosY(0),
           lastObj(nullptr),
+          lastCursorPos(0, 0),
           lastObjType(OBJECT_NULL),
           background(nullptr, 0, 0),
           dialog(nullptr)
     {
+    }
+
+    void showCursor()
+    {
+#if DISTRHO_OS_LINUX
+        if (lastCursorPos != Point(-1, -2))
+            XWarpPointer(linuxData.display, None, DefaultRootWindow(linuxData.display), 0, 0, 0, 0, lastCursorPos.getX(), lastCursorPos.getY());
+
+        XUndefineCursor(linuxData.display, linuxData.window);
+#endif
+    }
+
+    void hideCursor()
+    {
+#if DISTRHO_OS_LINUX
+        Window root, child;
+        int rootX, rootY, winX, winY;
+        unsigned int mask;
+
+        if (XQueryPointer(linuxData.display, DefaultRootWindow(linuxData.display), &root, &child, &rootX, &rootY, &winX, &winY, &mask))
+            lastCursorPos = Point(rootX, rootY);
+        else
+            lastCursorPos = Point(-1, -2);
+
+        XDefineCursor(linuxData.display, linuxData.window, linuxData.cursorBlack);
+#endif
     }
 };
 
@@ -942,7 +1009,6 @@ void OpenGLExtUI::imageSliderDragFinished(ImageSlider*)
 {
 }
 
-
 void OpenGLExtUI::d_onInit()
 {
     glEnable(GL_BLEND);
@@ -955,6 +1021,14 @@ void OpenGLExtUI::d_onInit()
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
+
+#if DISTRHO_OS_LINUX
+    data->linuxData.display = OpenGLUI::data->widget->impl->display;
+    data->linuxData.window  = OpenGLUI::data->widget->impl->win;
+    data->linuxData.pixmapBlack = XCreateBitmapFromData(data->linuxData.display, data->linuxData.window, data->linuxData.colorData, 8, 8);
+    data->linuxData.cursorBlack = XCreatePixmapCursor(data->linuxData.display, data->linuxData.pixmapBlack, data->linuxData.pixmapBlack,
+                                                      &data->linuxData.colorBlack, &data->linuxData.colorBlack, 0, 0);
+#endif
 }
 
 void OpenGLExtUI::d_onDisplay()
@@ -1090,7 +1164,6 @@ void OpenGLExtUI::d_onMotion(int x, int y)
             if (knob->_orientation == ImageKnob::Horizontal)
             {
                 int movX = x - data->initialPosX;
-
 
                 if (movX != 0)
                 {
@@ -1239,7 +1312,10 @@ void OpenGLExtUI::d_onMouse(int button, bool press, int x, int y)
     if (data->lastObjType != OBJECT_NULL && data->lastObj)
     {
         if (data->lastObjType == OBJECT_KNOB)
+        {
+            data->showCursor();
             imageKnobDragFinished((ImageKnob*)data->lastObj);
+        }
         else if (data->lastObjType == OBJECT_SLIDER)
             imageSliderDragFinished((ImageSlider*)data->lastObj);
     }
@@ -1287,6 +1363,7 @@ void OpenGLExtUI::d_onMouse(int button, bool press, int x, int y)
                 data->initialPosY = y;
                 data->lastObj     = knob;
                 data->lastObjType = OBJECT_KNOB;
+                data->hideCursor();
                 imageKnobDragStarted(knob);
                 return;
             }
@@ -1384,7 +1461,10 @@ void OpenGLExtUI::d_onClose()
     if (data->lastObjType != OBJECT_NULL && data->lastObj)
     {
         if (data->lastObjType == OBJECT_KNOB)
+        {
+            data->showCursor();
             imageKnobDragFinished((ImageKnob*)data->lastObj);
+        }
         else if (data->lastObjType == OBJECT_SLIDER)
             imageSliderDragFinished((ImageSlider*)data->lastObj);
     }

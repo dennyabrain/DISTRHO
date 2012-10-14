@@ -43,6 +43,8 @@ public:
     Point& operator=(const Point& pos);
     Point& operator+=(const Point& pos);
     Point& operator-=(const Point& pos);
+    bool operator==(const Point& pos) const;
+    bool operator!=(const Point& pos) const;
 
 private:
     int _x, _y;
