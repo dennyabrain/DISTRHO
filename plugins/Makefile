@@ -3,36 +3,61 @@
 all: build
 
 
-build: libs standalone lv2 vst
+build: plugins
 
-plugins: standalone lv2 vst
+plugins: standalone ladspa dssi lv2 vst
 
-
-libs:
-	$(MAKE) -C ../libs/lv2-ttl-generator
 
 standalone:
+# 	$(MAKE) -C 3BandEQ/Standalone
+
+ladspa:
+	$(MAKE) -C 3BandEQ/LADSPA
+
+dssi:
+	$(MAKE) -C 3BandEQ/DSSI
 
 lv2:
+# 	$(MAKE) -C 3BandEQ/LV2
 
 vst:
+	$(MAKE) -C 3BandEQ/VST
 	$(MAKE) -C JackAss/VST
+
 
 clean:
 	# Standalone
+	$(MAKE) clean -C 3BandEQ/Standalone
+
+	# LADSPA
+	$(MAKE) clean -C 3BandEQ/LADSPA
+
+	# DSSI
+	$(MAKE) clean -C 3BandEQ/DSSI
 
 	# LV2
+	$(MAKE) clean -C 3BandEQ/LV2
 
 	# VST
+	$(MAKE) clean -C 3BandEQ/VST
 	$(MAKE) clean -C JackAss/VST
 
-	rm -rf */Standalone/intermediate
-	rm -rf */LV2/intermediate
-	rm -rf */VST/intermediate
 
 distclean: clean
-	rm -rf */LV2/*.lv2
+	# Standalone
+	$(MAKE) distclean -C 3BandEQ/Standalone
+
+	# LADSPA
+	$(MAKE) distclean -C 3BandEQ/LADSPA
+
+	# DSSI
+	$(MAKE) distclean -C 3BandEQ/DSSI
+
+	# LV2
+	$(MAKE) distclean -C 3BandEQ/LV2
+
+	# VST
+	$(MAKE) distclean -C 3BandEQ/VST
+
 	rm -f */*/Makefile
 	rm -f */*/*.make
-	rm -f */*/*.sln
-	rm -f */*/*.vcproj

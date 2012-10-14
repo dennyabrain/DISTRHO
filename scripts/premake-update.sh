@@ -90,32 +90,29 @@ for i in $FILES; do
 done
 
 # ------------------------------------------------------------------------------------------------------------
-# 
-# FILES=`find . -name qmake.pro`
-# 
-# for i in $FILES; do
-#   FOLDER=`echo $i | awk sub'("/qmake.pro","")'`
-# 
-#   echo cd $FOLDER
-#   cd $FOLDER
-# 
-#   echo qmake qmake.pro
-#   qmake qmake.pro
-# 
-#   echo sed \""s/ = lib/ = /\"" -i Makefile
-#   sed "s/ = lib/ = /" -i Makefile
-# 
-#   if [ -d ../libs ]; then
-#     echo cd ..
-#     cd ..
-#   elif [ -d ../../libs ]; then
-#     echo cd ../..
-#     cd ../..
-#   elif [ -d ../../../libs ]; then
-#     echo cd ../../..
-#     cd ../../..
-#   else
-#     echo cd ../../../..
-#     cd ../../../..
-#   fi
-# done
+
+FILES=`find . -name qmake.pro`
+
+for i in $FILES; do
+  FOLDER=`echo $i | awk sub'("/qmake.pro","")'`
+
+  echo cd $FOLDER
+  cd $FOLDER
+
+  echo qmake qmake.pro
+  qmake qmake.pro
+
+  if [ -d ../libs ]; then
+    echo cd ..
+    cd ..
+  elif [ -d ../../libs ]; then
+    echo cd ../..
+    cd ../..
+  elif [ -d ../../../libs ]; then
+    echo cd ../../..
+    cd ../../..
+  else
+    echo cd ../../../..
+    cd ../../../..
+  fi
+done
