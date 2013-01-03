@@ -214,7 +214,7 @@ public:
 
             if (OK (AudioObjectGetPropertyData (deviceID, &pa, 0, 0, &size, ranges)))
             {
-                bufferSizes.add ((int) ranges[0].mMinimum);
+                bufferSizes.add ((int) (ranges[0].mMinimum + 15) & ~15);
 
                 for (int i = 32; i < 2048; i += 32)
                 {
@@ -828,7 +828,7 @@ private:
         return false;
     }
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CoreAudioInternal);
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CoreAudioInternal)
 };
 
 
@@ -1043,7 +1043,7 @@ private:
         return noErr;
     }
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CoreAudioIODevice);
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CoreAudioIODevice)
 };
 
 //==============================================================================
@@ -1257,7 +1257,7 @@ private:
         return noErr;
     }
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CoreAudioIODeviceType);
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CoreAudioIODeviceType)
 };
 
 //==============================================================================

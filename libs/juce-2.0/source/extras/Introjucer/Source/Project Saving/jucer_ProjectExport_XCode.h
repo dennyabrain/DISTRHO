@@ -154,6 +154,7 @@ public:
     void create (const OwnedArray<LibraryModule>&) const
     {
         infoPlistFile = getTargetFolder().getChildFile ("Info.plist");
+        menuNibFile = getTargetFolder().getChildFile ("RecentFilesMenuTemplate.nib");
 
         createIconFile();
 
@@ -275,7 +276,7 @@ private:
     mutable OwnedArray<ValueTree> pbxBuildFiles, pbxFileReferences, pbxGroups, misc, projectConfigs, targetConfigs;
     mutable StringArray buildPhaseIDs, resourceIDs, sourceIDs, frameworkIDs;
     mutable StringArray frameworkFileIDs, rezFileIDs, resourceFileRefs;
-    mutable File infoPlistFile, iconFile;
+    mutable File infoPlistFile, menuNibFile, iconFile;
     const bool iOS;
 
     static String sanitisePath (const String& path)
@@ -299,6 +300,18 @@ private:
             RelativePath plistPath (infoPlistFile, getTargetFolder(), RelativePath::buildTargetFolder);
             addFileReference (plistPath.toUnixStyle());
             resourceFileRefs.add (createFileRefID (plistPath));
+        }
+
+        if (! iOS)
+        {
+            MemoryOutputStream nib;
+            nib.write (BinaryData::RecentFilesMenuTemplate_nib, BinaryData::RecentFilesMenuTemplate_nibSize);
+            overwriteFileIfDifferentOrThrow (menuNibFile, nib);
+
+            RelativePath menuNibPath (menuNibFile, getTargetFolder(), RelativePath::buildTargetFolder);
+            addFileReference (menuNibPath.toUnixStyle());
+            resourceIDs.add (addBuildFile (menuNibPath, false, false));
+            resourceFileRefs.add (createFileRefID (menuNibPath));
         }
 
         if (iconFile.exists())
@@ -607,6 +620,14 @@ private:
             getLinkerFlagsForStaticLibrary (extraLibs.getReference(i), flags, librarySearchPaths);
 
         flags.add (replacePreprocessorTokens (config, getExtraLinkerFlagsString()));
+
+        StringArray libraries;
+        libraries.addTokens (getExternalLibrariesString(), ";", "\"'");
+        libraries.removeEmptyStrings (true);
+
+        if (libraries.size() != 0)
+            flags.add (replacePreprocessorTokens (config, "-l" + libraries.joinIntoString (" -l")).trim());
+
         flags.removeEmptyStrings (true);
     }
 
@@ -787,9 +808,9 @@ private:
                 String def (defines.getAllKeys()[i]);
                 const String value (defines.getAllValues()[i]);
                 if (value.isNotEmpty())
-                    def << "=" << value;
+                    def << "=" << value.replace ("\"", "\\\"");
 
-                defsList.add (def.quoted());
+                defsList.add ("\"" + def + "\"");
             }
 
             s.add ("GCC_PREPROCESSOR_DEFINITIONS = (" + indentList (defsList, ",") + ")");
@@ -849,7 +870,7 @@ private:
                 if (val.isEmpty() || (val.containsAnyOf (" \t;<>()=,&+-_@~\r\n")
                                         && ! (val.trimStart().startsWithChar ('(')
                                                 || val.trimStart().startsWithChar ('{'))))
-                    val = val.quoted();
+                    val = "\"" + val + "\"";
 
                 output << propertyName.toString() << " = " << val << "; ";
             }

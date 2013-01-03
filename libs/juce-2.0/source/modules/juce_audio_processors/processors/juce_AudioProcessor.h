@@ -134,6 +134,17 @@ public:
     virtual void processBlock (AudioSampleBuffer& buffer,
                                MidiBuffer& midiMessages) = 0;
 
+    /** Renders the next block when the processor is being bypassed.
+        The default implementation of this method will pass-through any incoming audio, but
+        you may override this method e.g. to add latency compensation to the data to match
+        the processor's latency characteristics. This will avoid situations where bypassing
+        will shift the signal forward in time, possibly creating pre-echo effects and odd timings.
+        Another use for this method would be to cross-fade or morph between the wet (not bypassed)
+        and dry (bypassed) signals.
+    */
+    virtual void processBlockBypassed (AudioSampleBuffer& buffer,
+                                       MidiBuffer& midiMessages);
+
     //==============================================================================
     /** Returns the current AudioPlayHead object that should be used to find
         out the state and position of the playhead.
@@ -238,6 +249,9 @@ public:
         later if the value changes.
     */
     void setLatencySamples (int newLatency);
+
+    /** Returns true if a silent input always produces a silent output (i.e. it has no tail). */
+    virtual bool silenceInProducesSilenceOut() const = 0;
 
     /** Returns true if the processor wants midi messages. */
     virtual bool acceptsMidi() const = 0;
@@ -539,13 +553,6 @@ public:
     virtual void numChannelsChanged();
 
     //==============================================================================
-    /** LV2 specific calls, saving/restore as string. */
-
-    virtual String getStateInformationString () { return String::empty; }
-
-    virtual void setStateInformationString (const String& data) {}
-
-    //==============================================================================
     /** Adds a listener that will be called when an aspect of this processor changes. */
     void addListener (AudioProcessorListener* newListener);
 
@@ -568,6 +575,25 @@ public:
 
     /** Not for public use - this is called to initialise the processor before playing. */
     void setSpeakerArrangement (const String& inputs, const String& outputs);
+
+    /** Flags to indicate the type of plugin context in which a processor is being used. */
+    enum WrapperType
+    {
+        wrapperType_Undefined = 0,
+        wrapperType_VST,
+        wrapperType_AudioUnit,
+        wrapperType_RTAS,
+        wrapperType_AAX,
+        wrapperType_Standalone
+    };
+
+    /** When loaded by a plugin wrapper, this flag will be set to indicate the type
+        of plugin within which the processor is running.
+    */
+    WrapperType wrapperType;
+
+    /** @internal */
+    static void setTypeOfNextNewPlugin (WrapperType);
 
 protected:
     //==============================================================================
@@ -608,7 +634,9 @@ private:
     BigInteger changingParams;
    #endif
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioProcessor);
+    AudioProcessorListener* getListenerLocked (int) const noexcept;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioProcessor)
 };
 
 

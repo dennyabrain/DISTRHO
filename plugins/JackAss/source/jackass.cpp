@@ -35,6 +35,9 @@ static const int paramVolume  = 5;
 static const int paramBalance = 6;
 static const int paramPan     = 8;
 
+static const int paramCount   = sizeof(paramMap);
+static const int programCount = 128;
+
 // -------------------------------------------------
 // Midi data
 
@@ -552,9 +555,6 @@ public:
 
 private:
     JackAssInstance* instance;
-
-    static const int paramCount = sizeof(paramMap);
-    static const int programCount = 128;
 
     float paramBuffers[paramCount];
     char* programNames[programCount];

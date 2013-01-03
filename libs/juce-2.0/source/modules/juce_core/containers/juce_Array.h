@@ -571,7 +571,7 @@ public:
         const ScopedLockType lock2 (otherArray.getLock());
 
         data.swapWith (otherArray.data);
-        swapVariables (numUsed, otherArray.numUsed);
+        std::swap (numUsed, otherArray.numUsed);
     }
 
     /** Adds elements from another array to the end of this array.
@@ -770,10 +770,9 @@ public:
     void removeAllInstancesOf (ParameterType valueToRemove)
     {
         const ScopedLockType lock (getLock());
-        ElementType* const e = data.elements;
 
         for (int i = numUsed; --i >= 0;)
-            if (valueToRemove == e[i])
+            if (valueToRemove == data.elements[i])
                 remove (i);
     }
 
@@ -901,8 +900,8 @@ public:
         if (isPositiveAndBelow (index1, numUsed)
              && isPositiveAndBelow (index2, numUsed))
         {
-            swapVariables (data.elements [index1],
-                           data.elements [index2]);
+            std::swap (data.elements [index1],
+                       data.elements [index2]);
         }
     }
 

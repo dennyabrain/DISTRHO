@@ -187,7 +187,9 @@ bool ComponentPeer::handleKeyPress (const int keyCode, const juce_wchar textChar
             {
                 currentlyFocused->moveKeyboardFocusToSibling (isTab);
                 keyWasUsed = (currentlyFocused != Component::getCurrentlyFocusedComponent());
-                break;
+
+                if (keyWasUsed || deletionChecker == nullptr)
+                    break;
             }
         }
     }
@@ -429,7 +431,7 @@ namespace DragHelpers
         WeakReference<Component> target;
         const ComponentPeer::DragInfo info;
 
-        JUCE_DECLARE_NON_COPYABLE (AsyncDropMessage);
+        JUCE_DECLARE_NON_COPYABLE (AsyncDropMessage)
     };
 }
 

@@ -29,7 +29,6 @@
 #include "../jucer_Headers.h"
 #include "../Utility/jucer_JucerTreeViewBase.h"
 #include "jucer_Project.h"
-#include "../Project Saving/jucer_ResourceFile.h"
 
 
 //==============================================================================
@@ -92,6 +91,8 @@ public:
 
     static void getAllSelectedNodesInTree (Component* componentInTree, OwnedArray <Project::Item>& selectedNodes);
 
+    File getDraggableFile() const      { return getFile(); }
+
     //==============================================================================
     Project::Item item;
 
@@ -102,7 +103,8 @@ protected:
     void treeChildrenChanged (const ValueTree& parentTree);
     virtual ProjectTreeViewBase* createSubItem (const Project::Item& node) = 0;
 
-    Icon getIcon() const { return item.getIcon().withContrastingColourTo (getBackgroundColour()); }
+    Icon getIcon() const           { return item.getIcon().withContrastingColourTo (getBackgroundColour()); }
+    bool isIconCrossedOut() const  { return item.isIconCrossedOut(); }
 
     //==============================================================================
     void triggerAsyncRename (const Project::Item& itemToRename);

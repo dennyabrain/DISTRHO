@@ -501,7 +501,7 @@ private:
                 | (0xffff & jlimit (-32768, 32767, roundToInt (32767.0f * l)));
     }
 
-    JUCE_DECLARE_NON_COPYABLE (DSoundInternalOutChannel);
+    JUCE_DECLARE_NON_COPYABLE (DSoundInternalOutChannel)
 };
 
 //==============================================================================
@@ -707,7 +707,7 @@ private:
     IDirectSoundCapture* pDirectSoundCapture;
     IDirectSoundCaptureBuffer* pInputBuffer;
 
-    JUCE_DECLARE_NON_COPYABLE (DSoundInternalInChannel);
+    JUCE_DECLARE_NON_COPYABLE (DSoundInternalInChannel)
 };
 
 //==============================================================================
@@ -990,15 +990,11 @@ public:
 
             if (isStarted)
             {
-                JUCE_TRY
-                {
-                    callback->audioDeviceIOCallback (const_cast <const float**> (inputBuffers.getArrayOfChannels()),
-                                                     inputBuffers.getNumChannels(),
-                                                     outputBuffers.getArrayOfChannels(),
-                                                     outputBuffers.getNumChannels(),
-                                                     bufferSizeSamples);
-                }
-                JUCE_CATCH_EXCEPTION
+                callback->audioDeviceIOCallback (const_cast <const float**> (inputBuffers.getArrayOfChannels()),
+                                                 inputBuffers.getNumChannels(),
+                                                 outputBuffers.getArrayOfChannels(),
+                                                 outputBuffers.getNumChannels(),
+                                                 bufferSizeSamples);
             }
             else
             {
@@ -1008,7 +1004,7 @@ public:
         }
     }
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DSoundAudioIODevice);
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DSoundAudioIODevice)
 };
 
 //==============================================================================
@@ -1281,7 +1277,7 @@ private:
     }
 
     //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DSoundAudioIODeviceType);
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DSoundAudioIODeviceType)
 };
 
 //==============================================================================

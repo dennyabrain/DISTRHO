@@ -52,6 +52,7 @@ public:
 
     bool acceptsMidi() const;
     bool producesMidi() const;
+    bool silenceInProducesSilenceOut() const;
 
     //==============================================================================
     int getNumPrograms();
@@ -66,7 +67,7 @@ public:
 
 private:
     //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FILTERCLASSNAME);
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FILTERCLASSNAME)
 };
 
 #endif  // HEADERGUARD

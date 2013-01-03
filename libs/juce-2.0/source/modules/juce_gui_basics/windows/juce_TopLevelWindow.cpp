@@ -120,7 +120,7 @@ private:
                 && tlw->isShowing();
     }
 
-    JUCE_DECLARE_NON_COPYABLE (TopLevelWindowManager);
+    JUCE_DECLARE_NON_COPYABLE (TopLevelWindowManager)
 };
 
 juce_ImplementSingleton_SingleThreaded (TopLevelWindowManager)
@@ -128,9 +128,7 @@ juce_ImplementSingleton_SingleThreaded (TopLevelWindowManager)
 void juce_checkCurrentlyFocusedTopLevelWindow();
 void juce_checkCurrentlyFocusedTopLevelWindow()
 {
-    TopLevelWindowManager* const wm = TopLevelWindowManager::getInstanceWithoutCreating();
-
-    if (wm != nullptr)
+    if (TopLevelWindowManager* const wm = TopLevelWindowManager::getInstanceWithoutCreating())
         wm->checkFocusAsync();
 }
 

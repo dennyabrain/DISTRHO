@@ -94,7 +94,7 @@ private:
     HeapBlock<uint8> imageData;
     const int pixelStride, lineStride;
 
-    JUCE_LEAK_DETECTOR (SoftwarePixelData);
+    JUCE_LEAK_DETECTOR (SoftwarePixelData)
 };
 
 SoftwareImageType::SoftwareImageType() {}
@@ -130,9 +130,9 @@ ImagePixelData::Ptr NativeImageType::create (Image::PixelFormat format, int widt
 class SubsectionPixelData  : public ImagePixelData
 {
 public:
-    SubsectionPixelData (ImagePixelData* const image_, const Rectangle<int>& area_)
-        : ImagePixelData (image_->pixelFormat, area_.getWidth(), area_.getHeight()),
-          image (image_), area (area_)
+    SubsectionPixelData (ImagePixelData* const im, const Rectangle<int>& r)
+        : ImagePixelData (im->pixelFormat, r.getWidth(), r.getHeight()),
+          image (im), area (r)
     {
     }
 
@@ -158,7 +158,7 @@ public:
 
         {
             Graphics g (newImage);
-            g.drawImageAt (Image (this), -area.getX(), -area.getY());
+            g.drawImageAt (Image (this), 0, 0);
         }
 
         newImage.getPixelData()->incReferenceCount();
@@ -171,7 +171,7 @@ private:
     const ImagePixelData::Ptr image;
     const Rectangle<int> area;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SubsectionPixelData);
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SubsectionPixelData)
 };
 
 Image Image::getClippedImage (const Rectangle<int>& area) const
@@ -494,7 +494,7 @@ struct AlphaMultiplyOp
         pixel.multiplyAlpha (alpha);
     }
 
-    JUCE_DECLARE_NON_COPYABLE (AlphaMultiplyOp);
+    JUCE_DECLARE_NON_COPYABLE (AlphaMultiplyOp)
 };
 
 void Image::multiplyAllAlphas (const float amountToMultiplyBy)

@@ -74,13 +74,15 @@ public:
     void getCommandInfo (CommandID commandID, ApplicationCommandInfo& result);
     bool perform (const InvocationInfo& info);
 
+    bool shouldDropFilesWhenDraggedExternally (const DragAndDropTarget::SourceDetails& sourceDetails,
+                                               StringArray& files, bool& canMoveFiles);
 private:
     ScopedPointer <Project> currentProject;
 
     static const char* getProjectWindowPosName()   { return "projectWindowPos"; }
     void createProjectContentCompIfNeeded();
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainWindow);
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainWindow)
 };
 
 //==============================================================================
@@ -111,7 +113,7 @@ public:
     OwnedArray<MainWindow> windows;
 
 private:
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainWindowList);
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainWindowList)
 };
 
 

@@ -55,6 +55,7 @@ namespace Ids
     DECLARE_ID (time);
     DECLARE_ID (extraCompilerFlags);
     DECLARE_ID (extraLinkerFlags);
+    DECLARE_ID (externalLibraries);
     DECLARE_ID (extraDefs);
     DECLARE_ID (projectType);
     DECLARE_ID (libraryType);
@@ -81,6 +82,7 @@ namespace Ids
     DECLARE_ID (prebuildCommand);
     DECLARE_ID (postbuildCommand);
     DECLARE_ID (generateManifest);
+    DECLARE_ID (useRuntimeLibDLL);
     DECLARE_ID (wholeProgramOptimisation);
     DECLARE_ID (juceLinkage);
     DECLARE_ID (buildVST);

@@ -398,6 +398,11 @@ public:
     */
     virtual void createAudioDeviceTypes (OwnedArray <AudioIODeviceType>& types);
 
+    /** Adds a new device type to the list of types.
+        The manager will take ownership of the object that is passed-in.
+    */
+    void addAudioDeviceType (AudioIODeviceType* newDeviceType);
+
     //==============================================================================
     /** Plays a beep through the current audio device.
 
@@ -501,7 +506,7 @@ private:
     AudioIODeviceType* findType (const String& inputName, const String& outputName);
     AudioIODeviceType* findType (const String& typeName);
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioDeviceManager);
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioDeviceManager)
 };
 
 #endif   // __JUCE_AUDIODEVICEMANAGER_JUCEHEADER__

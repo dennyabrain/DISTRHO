@@ -70,9 +70,7 @@ public:
                         options.escapeKeyTriggersCloseButton, true)
     {
         setUsingNativeTitleBar (options.useNativeTitleBar);
-
-        if (! JUCEApplication::isStandaloneApp())
-            setAlwaysOnTop (true); // for a plugin, make it always-on-top because the host windows are often top-level
+        setAlwaysOnTop (juce_areThereAnyAlwaysOnTopWindows());
 
         if (options.content.willDeleteObject())
             setContentOwned (options.content.release(), true);
@@ -89,7 +87,7 @@ public:
     }
 
 private:
-    JUCE_DECLARE_NON_COPYABLE (DefaultDialogWindow);
+    JUCE_DECLARE_NON_COPYABLE (DefaultDialogWindow)
 };
 
 DialogWindow::LaunchOptions::LaunchOptions() noexcept
@@ -102,11 +100,16 @@ DialogWindow::LaunchOptions::LaunchOptions() noexcept
 {
 }
 
-DialogWindow* DialogWindow::LaunchOptions::launchAsync()
+DialogWindow* DialogWindow::LaunchOptions::create()
 {
     jassert (content != nullptr); // You need to provide some kind of content for the dialog!
 
-    DefaultDialogWindow* const d = new DefaultDialogWindow (*this);
+    return new DefaultDialogWindow (*this);
+}
+
+DialogWindow* DialogWindow::LaunchOptions::launchAsync()
+{
+    DialogWindow* const d = create();
     d->enterModalState (true, nullptr, true);
     return d;
 }
@@ -125,8 +128,7 @@ void DialogWindow::showDialog (const String& dialogTitle,
                                const Colour& backgroundColour,
                                const bool escapeKeyTriggersCloseButton,
                                const bool resizable,
-                               const bool useBottomRightCornerResizer,
-                               const bool useNativeTitleBar)
+                               const bool useBottomRightCornerResizer)
 {
     LaunchOptions o;
     o.dialogTitle = dialogTitle;
@@ -134,9 +136,9 @@ void DialogWindow::showDialog (const String& dialogTitle,
     o.componentToCentreAround = componentToCentreAround;
     o.dialogBackgroundColour = backgroundColour;
     o.escapeKeyTriggersCloseButton = escapeKeyTriggersCloseButton;
+    o.useNativeTitleBar = false;
     o.resizable = resizable;
     o.useBottomRightCornerResizer = useBottomRightCornerResizer;
-    o.useNativeTitleBar = useNativeTitleBar;
 
     o.launchAsync();
 }
@@ -148,8 +150,7 @@ int DialogWindow::showModalDialog (const String& dialogTitle,
                                    const Colour& backgroundColour,
                                    const bool escapeKeyTriggersCloseButton,
                                    const bool resizable,
-                                   const bool useBottomRightCornerResizer,
-                                   const bool useNativeTitleBar)
+                                   const bool useBottomRightCornerResizer)
 {
     LaunchOptions o;
     o.dialogTitle = dialogTitle;
@@ -157,9 +158,9 @@ int DialogWindow::showModalDialog (const String& dialogTitle,
     o.componentToCentreAround = componentToCentreAround;
     o.dialogBackgroundColour = backgroundColour;
     o.escapeKeyTriggersCloseButton = escapeKeyTriggersCloseButton;
+    o.useNativeTitleBar = false;
     o.resizable = resizable;
     o.useBottomRightCornerResizer = useBottomRightCornerResizer;
-    o.useNativeTitleBar = useNativeTitleBar;
 
     return o.runModal();
 }

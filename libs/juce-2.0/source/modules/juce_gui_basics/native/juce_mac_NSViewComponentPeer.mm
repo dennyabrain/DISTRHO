@@ -520,19 +520,23 @@ public:
 
     void redirectMouseMove (NSEvent* ev)
     {
-       #if defined (MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_6
-        if ([NSWindow windowNumberAtPoint: [[ev window] convertBaseToScreen: [ev locationInWindow]]
-              belowWindowWithWindowNumber: 0] != [window windowNumber])
+        currentModifiers = currentModifiers.withoutMouseButtons();
+
+       #if defined (MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6
+        if ([NSWindow respondsToSelector: @selector (windowNumberAtPoint:belowWindowWithWindowNumber:)]
+             && [NSWindow windowNumberAtPoint: [[ev window] convertBaseToScreen: [ev locationInWindow]]
+                  belowWindowWithWindowNumber: 0] != [window windowNumber])
         {
-            [[NSCursor arrowCursor] set];
+            // moved into another window which overlaps this one, so trigger an exit
+            handleMouseEvent (0, Point<int> (-1, -1), currentModifiers, getMouseTime (ev));
         }
         else
        #endif
         {
-            currentModifiers = currentModifiers.withoutMouseButtons();
             sendMouseEvent (ev);
-            showArrowCursorIfNeeded();
         }
+
+        showArrowCursorIfNeeded();
     }
 
     void redirectMouseEnter (NSEvent* ev)
@@ -728,16 +732,17 @@ public:
         if (! component.isOpaque())
             CGContextClearRect (cg, CGContextGetClipBoundingBox (cg));
 
+        float displayScale = 1.0f;
+
+       #if defined (MAC_OS_X_VERSION_10_7) && (MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_7)
+        NSScreen* screen = [[view window] screen];
+        if ([screen respondsToSelector: @selector (backingScaleFactor)])
+            displayScale = screen.backingScaleFactor;
+       #endif
+
        #if USE_COREGRAPHICS_RENDERING
         if (usingCoreGraphics)
         {
-            float displayScale = 1.0f;
-
-           #if defined (MAC_OS_X_VERSION_10_7) && (MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_7)
-            NSScreen* screen = [[view window] screen];
-            if ([screen respondsToSelector: @selector (backingScaleFactor)])
-                displayScale = screen.backingScaleFactor;
-           #endif
 
             CoreGraphicsContext context (cg, (float) [view frame].size.height, displayScale);
 
@@ -748,22 +753,31 @@ public:
         else
        #endif
         {
-            const int xOffset = -roundToInt (r.origin.x);
-            const int yOffset = -roundToInt ([view frame].size.height - (r.origin.y + r.size.height));
+            const Point<int> offset (-roundToInt (r.origin.x),
+                                     -roundToInt ([view frame].size.height - (r.origin.y + r.size.height)));
             const int clipW = (int) (r.size.width  + 0.5f);
             const int clipH = (int) (r.size.height + 0.5f);
 
             RectangleList clip;
-            getClipRects (clip, xOffset, yOffset, clipW, clipH);
+            getClipRects (clip, offset, clipW, clipH);
 
             if (! clip.isEmpty())
             {
                 Image temp (component.isOpaque() ? Image::RGB : Image::ARGB,
-                            clipW, clipH, ! component.isOpaque());
+                            roundToInt (clipW * displayScale),
+                            roundToInt (clipH * displayScale),
+                            ! component.isOpaque());
 
                 {
+                    const int intScale = roundToInt (displayScale);
+                    if (intScale != 1)
+                        clip.scaleAll (intScale);
+
                     ScopedPointer<LowLevelGraphicsContext> context (component.getLookAndFeel()
-                                                                        .createGraphicsContext (temp, Point<int> (xOffset, yOffset), clip));
+                                                                      .createGraphicsContext (temp, offset * intScale, clip));
+
+                    if (intScale != 1)
+                        context->addTransform (AffineTransform::scale (displayScale));
 
                     insideDrawRect = true;
                     handlePaint (*context);
@@ -874,10 +888,11 @@ public:
 
     static void showArrowCursorIfNeeded()
     {
-        MouseInputSource& mouse = Desktop::getInstance().getMainMouseSource();
+        Desktop& desktop = Desktop::getInstance();
+        MouseInputSource& mouse = desktop.getMainMouseSource();
 
         if (mouse.getComponentUnderMouse() == nullptr
-             && Desktop::getInstance().findComponentAt (mouse.getScreenPosition()) == nullptr)
+             && desktop.findComponentAt (mouse.getScreenPosition()) == nullptr)
         {
             [[NSCursor arrowCursor] set];
         }
@@ -997,7 +1012,7 @@ public:
         else
             dragInfo.files = getDroppedFiles (pasteboard, contentType);
 
-        if (dragInfo.files.size() > 0 || dragInfo.text.isNotEmpty())
+        if (! dragInfo.isEmpty())
         {
             switch (type)
             {
@@ -1153,7 +1168,7 @@ private:
         object_setInstanceVariable (viewOrWindow, "owner", newOwner);
     }
 
-    void getClipRects (RectangleList& clip, const int xOffset, const int yOffset, const int clipW, const int clipH)
+    void getClipRects (RectangleList& clip, const Point<int> offset, const int clipW, const int clipH)
     {
         const NSRect* rects = nullptr;
         NSInteger numRects = 0;
@@ -1163,8 +1178,8 @@ private:
         const CGFloat viewH = [view frame].size.height;
 
         for (int i = 0; i < numRects; ++i)
-            clip.addWithoutMerging (clipBounds.getIntersection (Rectangle<int> (roundToInt (rects[i].origin.x) + xOffset,
-                                                                                roundToInt (viewH - (rects[i].origin.y + rects[i].size.height)) + yOffset,
+            clip.addWithoutMerging (clipBounds.getIntersection (Rectangle<int> (roundToInt (rects[i].origin.x) + offset.x,
+                                                                                roundToInt (viewH - (rects[i].origin.y + rects[i].size.height)) + offset.y,
                                                                                 roundToInt (rects[i].size.width),
                                                                                 roundToInt (rects[i].size.height))));
     }
@@ -1270,7 +1285,7 @@ private:
         return true;
     }
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NSViewComponentPeer);
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NSViewComponentPeer)
 };
 
 int NSViewComponentPeer::insideToFrontCall = 0;
@@ -1620,7 +1635,7 @@ private:
             owner->sendDragCallback (1, sender);
     }
 
-    static BOOL prepareForDragOperation (id self, SEL, id <NSDraggingInfo>)
+    static BOOL prepareForDragOperation (id, SEL, id <NSDraggingInfo>)
     {
         return YES;
     }

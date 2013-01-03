@@ -206,7 +206,7 @@ private:
     InputStream* inputStream;
     ScopedPointer<InputStream> streamToDelete;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ZipInputStream);
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ZipInputStream)
 };
 
 
@@ -265,8 +265,10 @@ int ZipFile::getNumEntries() const noexcept
 
 const ZipFile::ZipEntry* ZipFile::getEntry (const int index) const noexcept
 {
-    ZipEntryHolder* const zei = entries [index];
-    return zei != nullptr ? &(zei->entry) : nullptr;
+    if (ZipEntryHolder* const zei = entries [index])
+        return &(zei->entry);
+
+    return nullptr;
 }
 
 int ZipFile::getIndexOfFileName (const String& fileName) const noexcept
@@ -285,10 +287,9 @@ const ZipFile::ZipEntry* ZipFile::getEntry (const String& fileName) const noexce
 
 InputStream* ZipFile::createStreamForEntry (const int index)
 {
-    ZipEntryHolder* const zei = entries[index];
     InputStream* stream = nullptr;
 
-    if (zei != nullptr)
+    if (ZipEntryHolder* const zei = entries[index])
     {
         stream = new ZipInputStream (*this, *zei);
 
@@ -529,7 +530,7 @@ private:
         target.writeShort (0); // extra field length
     }
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Item);
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Item)
 };
 
 //=============================================================================

@@ -133,6 +133,12 @@ public:
         */
         DialogWindow* launchAsync();
 
+        /** Creates a new DialogWindow instance with these settings.
+            This method simply creates the window, it doesn't run it modally. In most cases
+            you'll want to use launchAsync() or runModal() instead.
+        */
+        DialogWindow* create();
+
        #if JUCE_MODAL_LOOPS_PERMITTED || DOXYGEN
         /** Launches and runs the dialog modally, returning the status code that was
             used to terminate the modal loop.
@@ -190,8 +196,7 @@ public:
                             const Colour& backgroundColour,
                             bool escapeKeyTriggersCloseButton,
                             bool shouldBeResizable = false,
-                            bool useBottomRightCornerResizer = false,
-                            bool useNativeTitleBar = false);
+                            bool useBottomRightCornerResizer = false);
 
    #if JUCE_MODAL_LOOPS_PERMITTED || DOXYGEN
     /** Easy way of quickly showing a dialog box containing a given component.
@@ -239,8 +244,7 @@ public:
                                 const Colour& backgroundColour,
                                 bool escapeKeyTriggersCloseButton,
                                 bool shouldBeResizable = false,
-                                bool useBottomRightCornerResizer = false,
-                                bool useNativeTitleBar = false);
+                                bool useBottomRightCornerResizer = false);
    #endif
 
 
@@ -254,7 +258,7 @@ protected:
 private:
     bool escapeKeyTriggersCloseButton;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DialogWindow);
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DialogWindow)
 };
 
 #endif   // __JUCE_DIALOGWINDOW_JUCEHEADER__

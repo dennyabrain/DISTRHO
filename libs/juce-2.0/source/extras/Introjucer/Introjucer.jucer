@@ -15,7 +15,7 @@
   <EXPORTFORMATS>
     <XCODE_MAC targetFolder="Builds/MacOSX" vstFolder="~/SDKs/vstsdk2.4" rtasFolder="~/SDKs/PT_80_SDK"
                juceFolder="../.." documentExtensions=".jucer" objCExtraSuffix="zNNCr"
-               bigIcon="rVgowdy">
+               bigIcon="rVgowdy" extraCompilerFlags="-W -Wall -Wshadow -Wno-missing-field-initializers -Wno-strict-aliasing">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="Introjucer"
                        osxSDK="default" osxCompatibility="default" osxArchitecture="default"/>
@@ -240,6 +240,8 @@
             file="Source/BinaryData/jucer_NewCppFileTemplate.h"/>
       <FILE id="teqnin" name="jucer_NewInlineComponentTemplate.h" compile="0"
             resource="1" file="Source/BinaryData/jucer_NewInlineComponentTemplate.h"/>
+      <FILE id="TNXogM" name="RecentFilesMenuTemplate.nib" compile="0" resource="1"
+            file="Source/BinaryData/RecentFilesMenuTemplate.nib"/>
     </GROUP>
   </MAINGROUP>
   <JUCEOPTIONS JUCE_ASIO="disabled" JUCE_WASAPI="disabled" JUCE_DIRECTSOUND="disabled"

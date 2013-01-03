@@ -89,7 +89,7 @@ public:
 
 #else
  #if JUCE_WINDOWS
-  #if defined (WINAPI) || defined (_WINDOWS_) || defined(JUCE_MINGW)
+  #if defined (WINAPI) || defined (_WINDOWS_)
    #define JUCE_MAIN_FUNCTION       int __stdcall WinMain (HINSTANCE, HINSTANCE, const LPSTR, int)
   #elif defined (_UNICODE)
    #define JUCE_MAIN_FUNCTION       int __stdcall WinMain (void*, void*, const wchar_t*, int)
@@ -104,7 +104,7 @@ public:
 
  #define START_JUCE_APPLICATION(AppClass) \
     static juce::JUCEApplicationBase* juce_CreateApplication() { return new AppClass(); } \
-    JUCE_MAIN_FUNCTION \
+    extern "C" JUCE_MAIN_FUNCTION \
     { \
         juce::JUCEApplication::createInstance = &juce_CreateApplication; \
         return juce::JUCEApplication::main (JUCE_MAIN_FUNCTION_ARGS); \

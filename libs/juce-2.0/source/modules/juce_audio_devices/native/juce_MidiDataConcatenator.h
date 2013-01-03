@@ -48,8 +48,9 @@ public:
         pendingDataTime = 0;
     }
 
+    template <typename UserDataType, typename CallbackType>
     void pushMidiData (const void* inputData, int numBytes, double time,
-                       MidiInput* input, MidiInputCallback& callback)
+                       UserDataType* input, CallbackType& callback)
     {
         const uint8* d = static_cast <const uint8*> (inputData);
 
@@ -105,8 +106,9 @@ public:
     }
 
 private:
+    template <typename UserDataType, typename CallbackType>
     void processSysex (const uint8*& d, int& numBytes, double time,
-                       MidiInput* input, MidiInputCallback& callback)
+                       UserDataType* input, CallbackType& callback)
     {
         if (*d == 0xf0)
         {
@@ -168,7 +170,7 @@ private:
     int pendingBytes;
     uint8 runningStatus;
 
-    JUCE_DECLARE_NON_COPYABLE (MidiDataConcatenator);
+    JUCE_DECLARE_NON_COPYABLE (MidiDataConcatenator)
 };
 
 #endif   // __JUCE_MIDIDATACONCATENATOR_JUCEHEADER__

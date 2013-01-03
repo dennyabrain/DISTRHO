@@ -277,7 +277,7 @@ File Project::getLastDocumentOpened()                   { return lastDocumentOpe
 void Project::setLastDocumentOpened (const File& file)  { lastDocumentOpened = file; }
 
 //==============================================================================
-void Project::valueTreePropertyChanged (ValueTree& tree, const Identifier& property)
+void Project::valueTreePropertyChanged (ValueTree&, const Identifier& property)
 {
     if (property == Ids::projectType)
         setMissingDefaultValues();
@@ -331,16 +331,12 @@ String Project::getRelativePathForFile (const File& file) const
 //==============================================================================
 const ProjectType& Project::getProjectType() const
 {
-    const ProjectType* type = ProjectType::findType (getProjectTypeString());
-    jassert (type != nullptr);
+    if (const ProjectType* type = ProjectType::findType (getProjectTypeString()))
+        return *type;
 
-    if (type == nullptr)
-    {
-        type = ProjectType::findType (ProjectType::getGUIAppTypeName());
-        jassert (type != nullptr);
-    }
-
-    return *type;
+    const ProjectType* guiType = ProjectType::findType (ProjectType::getGUIAppTypeName());
+    jassert (guiType != nullptr);
+    return *guiType;
 }
 
 //==============================================================================
@@ -382,12 +378,18 @@ void Project::createPropertyEditors (PropertyListBuilder& props)
                "Extra comments: This field is not used for code or project generation, it's just a space where you can express your thoughts.");
 }
 
-String Project::getVersionAsHex() const
+static StringArray getConfigs (const Project& p)
 {
     StringArray configs;
-    configs.addTokens (getVersionString(), ",.", String::empty);
+    configs.addTokens (p.getVersionString(), ",.", String::empty);
     configs.trim();
     configs.removeEmptyStrings();
+    return configs;
+}
+
+String Project::getVersionAsHex() const
+{
+    const StringArray configs (getConfigs (*this));
 
     int value = (configs[0].getIntValue() << 16) + (configs[1].getIntValue() << 8) + configs[2].getIntValue();
 
@@ -789,12 +791,19 @@ Icon Project::Item::getIcon() const
 
         return Icon (icons.document, Colours::yellow);
     }
-    else if (isMainGroup())
-    {
+
+    if (isMainGroup())
         return Icon (icons.juceLogo, Colours::orange);
-    }
 
     return Icon (icons.folder, Colours::darkgrey);
+}
+
+bool Project::Item::isIconCrossedOut() const
+{
+    return isFile()
+            && ! (shouldBeCompiled()
+                   || shouldBeAddedToBinaryResources()
+                   || getFile().hasFileExtension (headerFileExtensions));
 }
 
 //==============================================================================

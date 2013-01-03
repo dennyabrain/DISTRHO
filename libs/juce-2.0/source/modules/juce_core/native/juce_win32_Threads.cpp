@@ -550,7 +550,7 @@ private:
     HANDLE readPipe, writePipe;
     PROCESS_INFORMATION processInfo;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ActiveProcess);
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ActiveProcess)
 };
 
 bool ChildProcess::start (const String& command)
@@ -561,6 +561,11 @@ bool ChildProcess::start (const String& command)
         activeProcess = nullptr;
 
     return activeProcess != nullptr;
+}
+
+bool ChildProcess::start (const StringArray& args)
+{
+    return start (args.joinIntoString (" "));
 }
 
 bool ChildProcess::isRunning() const

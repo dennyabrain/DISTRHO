@@ -153,6 +153,9 @@ protected:
         Value getWholeProgramOptValue()             { return getValue (Ids::wholeProgramOptimisation); }
         bool shouldDisableWholeProgramOpt() const   { return static_cast<int> (config [Ids::wholeProgramOptimisation]) > 0; }
 
+        Value getUsingRuntimeLibDLL()               { return getValue (Ids::useRuntimeLibDLL); }
+        bool isUsingRuntimeLibDLL() const           { return config [Ids::useRuntimeLibDLL]; }
+
         String getOutputFilename (const String& suffix, bool forceSuffix) const
         {
             const String target (File::createLegalFileName (getTargetBinaryNameString().trim()));
@@ -171,12 +174,22 @@ protected:
             props.add (new ChoicePropertyComponent (getWarningLevelValue(), "Warning Level",
                                                     StringArray (warningLevelNames), Array<var> (warningLevels)));
 
-            const char* const wpoNames[] = { "Enable link-time code generation when possible",
-                                             "Always disable link-time code generation", nullptr };
-            const var wpoValues[] = { var(), var (1) };
+            {
+                const char* const runtimeNames[] = { "(Default)", "Use static runtime", "Use DLL runtime", nullptr };
+                const var runtimeValues[] = { var(), var (false), var (true) };
 
-            props.add (new ChoicePropertyComponent (getWholeProgramOptValue(), "Whole Program Optimisation",
-                                                    StringArray (wpoNames), Array<var> (wpoValues, numElementsInArray (wpoValues))));
+                props.add (new ChoicePropertyComponent (getUsingRuntimeLibDLL(), "Runtime Library",
+                                                        StringArray (runtimeNames), Array<var> (runtimeValues, numElementsInArray (runtimeValues))));
+            }
+
+            {
+                const char* const wpoNames[] = { "Enable link-time code generation when possible",
+                                                 "Always disable link-time code generation", nullptr };
+                const var wpoValues[] = { var(), var (1) };
+
+                props.add (new ChoicePropertyComponent (getWholeProgramOptValue(), "Whole Program Optimisation",
+                                                        StringArray (wpoNames), Array<var> (wpoValues, numElementsInArray (wpoValues))));
+            }
 
             props.add (new TextPropertyComponent (getPrebuildCommand(),  "Pre-build Command",  2048, false));
             props.add (new TextPropertyComponent (getPostbuildCommand(), "Post-build Command", 2048, false));
@@ -485,7 +498,9 @@ protected:
 
         if (iconFile != File::nonexistent)
            mo << newLine
-              << "IDI_ICON1 ICON DISCARDABLE " << iconFile.getFileName().quoted();
+              << "IDI_ICON1 ICON DISCARDABLE " << iconFile.getFileName().quoted()
+              << newLine
+              << "IDI_ICON2 ICON DISCARDABLE " << iconFile.getFileName().quoted();
 
         overwriteFileIfDifferentOrThrow (rcFile, mo);
     }
@@ -739,8 +754,8 @@ protected:
 
             compiler->setAttribute ("AdditionalIncludeDirectories", replacePreprocessorTokens (config, getHeaderSearchPaths (config).joinIntoString (";")));
             compiler->setAttribute ("PreprocessorDefinitions", getPreprocessorDefs (config, ";"));
-            compiler->setAttribute ("RuntimeLibrary", msvcNeedsDLLRuntimeLib ? (isDebug ? 3 : 2) // MT DLL
-                                                                             : (isDebug ? 1 : 0)); // MT static
+            compiler->setAttribute ("RuntimeLibrary", config.isUsingRuntimeLibDLL() ? (isDebug ? 3 : 2) // MT DLL
+                                                                                    : (isDebug ? 1 : 0)); // MT static
             compiler->setAttribute ("RuntimeTypeInfo", "true");
             compiler->setAttribute ("UsePrecompiledHeader", "0");
             compiler->setAttribute ("PrecompiledHeaderFile", getIntDirFile (config.getOutputFilename (".pch", true)));
@@ -796,8 +811,11 @@ protected:
             if (config.config [Ids::msvcModuleDefinitionFile].toString().isNotEmpty())
                 linker->setAttribute ("ModuleDefinitionFile", config.config [Ids::msvcModuleDefinitionFile].toString());
 
-            String extraLinkerOptions (getExtraLinkerFlagsString());
+            String externalLibraries (getExternalLibrariesString());
+            if (externalLibraries.isNotEmpty())
+                linker->setAttribute ("AdditionalDependencies", replacePreprocessorTokens (config, externalLibraries).trim());
 
+            String extraLinkerOptions (getExtraLinkerFlagsString());
             if (extraLinkerOptions.isNotEmpty())
                 linker->setAttribute ("AdditionalOptions", replacePreprocessorTokens (config, extraLinkerOptions).trim());
         }
@@ -810,6 +828,10 @@ protected:
                 String extraLinkerOptions (getExtraLinkerFlagsString());
                 extraLinkerOptions << " /IMPLIB:" << getOutDirFile (config.getOutputFilename (".lib", true));
                 linker->setAttribute ("AdditionalOptions", replacePreprocessorTokens (config, extraLinkerOptions).trim());
+
+                String externalLibraries (getExternalLibrariesString());
+                if (externalLibraries.isNotEmpty())
+                    linker->setAttribute ("AdditionalDependencies", replacePreprocessorTokens (config, externalLibraries).trim());
 
                 linker->setAttribute ("OutputFile", getOutDirFile (config.getOutputFilename (msvcTargetSuffix, false)));
                 linker->setAttribute ("IgnoreDefaultLibraryNames", isDebug ? "libcmt.lib, msvcrt.lib" : "");
@@ -1141,8 +1163,8 @@ protected:
                 includePaths.add ("%(AdditionalIncludeDirectories)");
                 cl->createNewChildElement ("AdditionalIncludeDirectories")->addTextElement (includePaths.joinIntoString (";"));
                 cl->createNewChildElement ("PreprocessorDefinitions")->addTextElement (getPreprocessorDefs (config, ";") + ";%(PreprocessorDefinitions)");
-                cl->createNewChildElement ("RuntimeLibrary")->addTextElement (msvcNeedsDLLRuntimeLib ? (isDebug ? "MultiThreadedDebugDLL" : "MultiThreadedDLL")
-                                                                                                     : (isDebug ? "MultiThreadedDebug"    : "MultiThreaded"));
+                cl->createNewChildElement ("RuntimeLibrary")->addTextElement (config.isUsingRuntimeLibDLL() ? (isDebug ? "MultiThreadedDebugDLL" : "MultiThreadedDLL")
+                                                                                                            : (isDebug ? "MultiThreadedDebug"    : "MultiThreaded"));
                 cl->createNewChildElement ("RuntimeTypeInfo")->addTextElement ("true");
                 cl->createNewChildElement ("PrecompiledHeader");
                 cl->createNewChildElement ("AssemblerListingLocation")->addTextElement ("$(IntDir)\\");
@@ -1181,6 +1203,11 @@ protected:
                     link->createNewChildElement ("OptimizeReferences")->addTextElement ("true");
                     link->createNewChildElement ("EnableCOMDATFolding")->addTextElement ("true");
                 }
+
+                String externalLibraries (getExternalLibrariesString());
+                if (externalLibraries.isNotEmpty())
+                    link->createNewChildElement ("AdditionalDependencies")->addTextElement (replacePreprocessorTokens (config, externalLibraries).trim()
+                                                                                              + ";%(AdditionalDependencies)");
 
                 String extraLinkerOptions (getExtraLinkerFlagsString());
                 if (extraLinkerOptions.isNotEmpty())
