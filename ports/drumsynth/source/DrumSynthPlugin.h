@@ -202,6 +202,8 @@ public:
 
     bool hasEditor() const { return true; }
 
+    bool silenceInProducesSilenceOut() const { return false; }
+
     //==============================================================================
     const String getName() const          { return JucePlugin_Name; }
     bool acceptsMidi() const              { return JucePlugin_WantsMidiInput; }

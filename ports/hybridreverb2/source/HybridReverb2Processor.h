@@ -53,6 +53,8 @@ public:
 
     bool hasEditor() const { return true; }
 
+    bool silenceInProducesSilenceOut() const { return false; }
+
     //==============================================================================
     MasterAndCommander *getMaster() { return master; }
 

@@ -186,5 +186,5 @@ void DRowAudioEditorComponent::updateParametersFromFilter()
        change message again, and the values would drift out.
     */
 	for(int i = 0; i < noParams; i++)
-		sliders[i]->setValue (tempParamVals[i], false);
+		sliders[i]->setValue (tempParamVals[i], dontSendNotification);
 }

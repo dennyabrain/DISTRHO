@@ -317,7 +317,7 @@ TabMain::TabMain (MasterAndCommander *m)
     sliderENDms->setTextValueSuffix (T(" dB"));
     sliderENDms->setDoubleClickReturnValue (true, 0.0);
 
-    sliderPresetIncDec->setValue(1, false);
+    sliderPresetIncDec->setValue(1, dontSendNotification);
     //[/UserPreSize]
 
     setSize (828, 548);
@@ -427,7 +427,7 @@ void TabMain::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
         int new_preset = presetManager->getSimilarPreset(old_preset, 0, index);
         if (new_preset != old_preset)
         {
-            sliderPresetIncDec->setValue(new_preset, true);
+            sliderPresetIncDec->setValue(new_preset);
             labelPresetNum->setText(String(new_preset), false);
         }
         //[/UserComboBoxCode_comboBox]
@@ -440,7 +440,7 @@ void TabMain::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
         int new_preset = presetManager->getSimilarPreset(old_preset, 1, index);
         if (new_preset != old_preset)
         {
-            sliderPresetIncDec->setValue(new_preset, true);
+            sliderPresetIncDec->setValue(new_preset);
             labelPresetNum->setText(String(new_preset), false);
         }
         //[/UserComboBoxCode_comboBox2]
@@ -453,7 +453,7 @@ void TabMain::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
         int new_preset = presetManager->getSimilarPreset(old_preset, 2, index);
         if (new_preset != old_preset)
         {
-            sliderPresetIncDec->setValue(new_preset, true);
+            sliderPresetIncDec->setValue(new_preset);
             labelPresetNum->setText(String(new_preset), false);
         }
         //[/UserComboBoxCode_comboBox3]
@@ -466,7 +466,7 @@ void TabMain::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
         int new_preset = presetManager->getSimilarPreset(old_preset, 3, index);
         if (new_preset != old_preset)
         {
-            sliderPresetIncDec->setValue(new_preset, true);
+            sliderPresetIncDec->setValue(new_preset);
             labelPresetNum->setText(String(new_preset), false);
         }
         //[/UserComboBoxCode_comboBox4]
@@ -518,13 +518,13 @@ void TabMain::sliderValueChanged (Slider* sliderThatWasMoved)
         if (value == 0)
         {
             value = presetManager->getNumPresets();
-            sliderPresetIncDec->setValue(value, false);
+            sliderPresetIncDec->setValue(value, dontSendNotification);
             labelPresetNum->setText(String(value), false);
         }
         if (value > presetManager->getNumPresets())
         {
             value = 1;
-            sliderPresetIncDec->setValue(value, false);
+            sliderPresetIncDec->setValue(value, dontSendNotification);
             labelPresetNum->setText(String(value), false);
         }
         String str(value);
@@ -637,7 +637,7 @@ void TabMain::setEnvelope (ParamEnvelope *param)
 
 void TabMain::setNum(int num)
 {
-    sliderPresetIncDec->setValue(num, true);
+    sliderPresetIncDec->setValue(num);
     labelPresetNum->setText(String(num), false);
 }
 

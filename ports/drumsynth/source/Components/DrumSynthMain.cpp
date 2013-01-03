@@ -1426,29 +1426,29 @@ void DrumSynthMain::updateControls ()
     int currentDrumNumber = plugin->getCurrentDrum();
     if (currentDrumNumber >= 0 && currentDrumNumber < TOTAL_DRUM_NOTES)
     {
-        tuningSlider->setValue (plugin->getParameterMapped (PPAR(currentDrumNumber, PP_MAIN_TUNING)), false);
-        stretchSlider->setValue (plugin->getParameterMapped (PPAR(currentDrumNumber, PP_MAIN_STRETCH)), false);
-        gainSlider->setValue (plugin->getParameterMapped (PPAR(currentDrumNumber, PP_MAIN_GAIN)), false);
-        resonanceSlider->setValue (plugin->getParameterMapped (PPAR(currentDrumNumber, PP_MAIN_RESONANCE)), false);
-        toneLevelSlider->setValue (plugin->getParameterMapped (PPAR(currentDrumNumber, PP_TONE_LEVEL)), false);
-        toneFreq1Slider->setValue (plugin->getParameterMapped (PPAR(currentDrumNumber, PP_TONE_F1)), false);
-        toneFreq2Slider->setValue (plugin->getParameterMapped (PPAR(currentDrumNumber, PP_TONE_F2)), false);
-        toneDroopSlider->setValue (plugin->getParameterMapped (PPAR(currentDrumNumber, PP_TONE_DROOP)), false);
-        tonePhaseSlider->setValue (plugin->getParameterMapped (PPAR(currentDrumNumber, PP_TONE_PHASE)), false);
-        noiseLevelSlider->setValue (plugin->getParameterMapped (PPAR(currentDrumNumber, PP_NOIZ_LEVEL)), false);
-        overLevelSlider->setValue (plugin->getParameterMapped (PPAR(currentDrumNumber, PP_OTON_LEVEL)), false);
-        overFreq1Slider->setValue (plugin->getParameterMapped (PPAR(currentDrumNumber, PP_OTON_F1)), false);
-        overWave1Slider->setValue (plugin->getParameterMapped (PPAR(currentDrumNumber, PP_OTON_WAVE1)), false);
-        overFreq2Slider->setValue (plugin->getParameterMapped (PPAR(currentDrumNumber, PP_OTON_F2)), false);
-        overWave2Slider->setValue (plugin->getParameterMapped (PPAR(currentDrumNumber, PP_OTON_WAVE2)), false);
-        overParamSlider->setValue (plugin->getParameterMapped (PPAR(currentDrumNumber, PP_OTON_PARAM)), false);
-        band1LevelSlider->setValue (plugin->getParameterMapped (PPAR(currentDrumNumber, PP_NBA1_LEVEL)), false);
-        band1FreqSlider->setValue (plugin->getParameterMapped (PPAR(currentDrumNumber, PP_NBA1_F)), false);
-        band1DeltaSlider->setValue (plugin->getParameterMapped (PPAR(currentDrumNumber, PP_NBA1_DF)), false);
-        band2LevelSlider->setValue (plugin->getParameterMapped (PPAR(currentDrumNumber, PP_NBA2_LEVEL)), false);
-        band2FreqSlider->setValue (plugin->getParameterMapped (PPAR(currentDrumNumber, PP_NBA2_F)), false);
-        band2DeltaSlider->setValue (plugin->getParameterMapped (PPAR(currentDrumNumber, PP_NBA2_DF)), false);
-        noiseSlopeSlider->setValue (plugin->getParameterMapped (PPAR(currentDrumNumber, PP_NOIZ_SLOPE)), false);
+        tuningSlider->setValue (plugin->getParameterMapped (PPAR(currentDrumNumber, PP_MAIN_TUNING)), dontSendNotification);
+        stretchSlider->setValue (plugin->getParameterMapped (PPAR(currentDrumNumber, PP_MAIN_STRETCH)), dontSendNotification);
+        gainSlider->setValue (plugin->getParameterMapped (PPAR(currentDrumNumber, PP_MAIN_GAIN)), dontSendNotification);
+        resonanceSlider->setValue (plugin->getParameterMapped (PPAR(currentDrumNumber, PP_MAIN_RESONANCE)), dontSendNotification);
+        toneLevelSlider->setValue (plugin->getParameterMapped (PPAR(currentDrumNumber, PP_TONE_LEVEL)), dontSendNotification);
+        toneFreq1Slider->setValue (plugin->getParameterMapped (PPAR(currentDrumNumber, PP_TONE_F1)), dontSendNotification);
+        toneFreq2Slider->setValue (plugin->getParameterMapped (PPAR(currentDrumNumber, PP_TONE_F2)), dontSendNotification);
+        toneDroopSlider->setValue (plugin->getParameterMapped (PPAR(currentDrumNumber, PP_TONE_DROOP)), dontSendNotification);
+        tonePhaseSlider->setValue (plugin->getParameterMapped (PPAR(currentDrumNumber, PP_TONE_PHASE)), dontSendNotification);
+        noiseLevelSlider->setValue (plugin->getParameterMapped (PPAR(currentDrumNumber, PP_NOIZ_LEVEL)), dontSendNotification);
+        overLevelSlider->setValue (plugin->getParameterMapped (PPAR(currentDrumNumber, PP_OTON_LEVEL)), dontSendNotification);
+        overFreq1Slider->setValue (plugin->getParameterMapped (PPAR(currentDrumNumber, PP_OTON_F1)), dontSendNotification);
+        overWave1Slider->setValue (plugin->getParameterMapped (PPAR(currentDrumNumber, PP_OTON_WAVE1)), dontSendNotification);
+        overFreq2Slider->setValue (plugin->getParameterMapped (PPAR(currentDrumNumber, PP_OTON_F2)), dontSendNotification);
+        overWave2Slider->setValue (plugin->getParameterMapped (PPAR(currentDrumNumber, PP_OTON_WAVE2)), dontSendNotification);
+        overParamSlider->setValue (plugin->getParameterMapped (PPAR(currentDrumNumber, PP_OTON_PARAM)), dontSendNotification);
+        band1LevelSlider->setValue (plugin->getParameterMapped (PPAR(currentDrumNumber, PP_NBA1_LEVEL)), dontSendNotification);
+        band1FreqSlider->setValue (plugin->getParameterMapped (PPAR(currentDrumNumber, PP_NBA1_F)), dontSendNotification);
+        band1DeltaSlider->setValue (plugin->getParameterMapped (PPAR(currentDrumNumber, PP_NBA1_DF)), dontSendNotification);
+        band2LevelSlider->setValue (plugin->getParameterMapped (PPAR(currentDrumNumber, PP_NBA2_LEVEL)), dontSendNotification);
+        band2FreqSlider->setValue (plugin->getParameterMapped (PPAR(currentDrumNumber, PP_NBA2_F)), dontSendNotification);
+        band2DeltaSlider->setValue (plugin->getParameterMapped (PPAR(currentDrumNumber, PP_NBA2_DF)), dontSendNotification);
+        noiseSlopeSlider->setValue (plugin->getParameterMapped (PPAR(currentDrumNumber, PP_NOIZ_SLOPE)), dontSendNotification);
 
         filterButton->setActivated (filterButton->getActivateValue ()
                                     == plugin->getParameterMapped (PPAR(currentDrumNumber, PP_MAIN_FILTER)));
@@ -1488,7 +1488,7 @@ void DrumSynthMain::updateControls ()
         env = (DrumSynthEnvelope*) envelopeTabs->getTabContentComponent (5); env->updateParameters (true);
         env = (DrumSynthEnvelope*) envelopeTabs->getTabContentComponent (6); env->updateParameters (true);
 
-        currentDrum->setValue (currentDrumNumber, false);
+        currentDrum->setValue (currentDrumNumber, dontSendNotification);
         drumName->setText (plugin->getDrumName (currentDrumNumber), false);
         midiKeyboard->setCurrentNoteNumber (currentDrumNumber + START_DRUM_NOTES_OFFSET);
     }

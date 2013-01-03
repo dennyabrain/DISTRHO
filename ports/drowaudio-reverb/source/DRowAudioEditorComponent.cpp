@@ -60,7 +60,7 @@ DRowAudioEditorComponent::DRowAudioEditorComponent (DRowAudioFilter* const owner
 		sliders[i]->addListener (this);
 		sliders[i]->setRange (0.0, 1.0, 0.01);
 		sliders[i]->setTextBoxStyle(Slider::TextBoxRight, false, 50, 20);
-		sliders[i]->setValue (ownerFilter->getParameter (i), false);
+		sliders[i]->setValue (ownerFilter->getParameter (i), dontSendNotification);
 		
 		ownerFilter->getParameterPointer(i)->setupSlider(*sliders[i]);
 	}
@@ -247,5 +247,5 @@ void DRowAudioEditorComponent::updateParametersFromFilter()
 
     // Update our sliders
 	for(int i = 0; i < noParams; i++)
-		sliders[i]->setValue (tempParamVals[i], false);
+		sliders[i]->setValue (tempParamVals[i], dontSendNotification);
 }

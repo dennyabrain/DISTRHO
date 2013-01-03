@@ -89,7 +89,7 @@ bool TappedDelayLine::setTapDelaySamples(int tapIndex, int newDelaySamples)
 
 void TappedDelayLine::setTapSpacing(float newSpacingCoefficient)
 {
-	if ( !almostEqual(spacingCoefficient, newSpacingCoefficient) )
+	if ( !almostEqual<float>(spacingCoefficient, newSpacingCoefficient) )
 	{
 		spacingCoefficient = fabsf(newSpacingCoefficient);
 
@@ -116,7 +116,7 @@ void TappedDelayLine::setTapSpacingExplicitly(float newSpacingCoefficient)
 
 void TappedDelayLine::scaleFeedbacks(float newFeedbackCoefficient)
 {
-	if ( !almostEqual(feedbackCoefficient, newFeedbackCoefficient) )
+	if ( !almostEqual<float>(feedbackCoefficient, newFeedbackCoefficient) )
 	{
 		feedbackCoefficient = newFeedbackCoefficient;
 		
@@ -176,7 +176,7 @@ void TappedDelayLine::updateDelayTimes(double newSampleRate)
 	for (int i = 0; i < readTaps.size(); i++)
 	{
 		if ( (int)readTaps[i].sampleRateWhenCreated != 0
-			 && !almostEqual(newSampleRate, readTaps.getReference(i).sampleRateWhenCreated) )
+			 && !almostEqual<double>(newSampleRate, readTaps.getReference(i).sampleRateWhenCreated) )
 		{
 			double scale = (newSampleRate / readTaps.getReference(i).sampleRateWhenCreated);
 			readTaps.getReference(i).delaySamples *= scale;

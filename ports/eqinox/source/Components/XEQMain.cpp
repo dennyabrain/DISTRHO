@@ -576,32 +576,32 @@ void XEQMain::sliderValueChanged (Slider* sliderThatWasMoved)
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 void XEQMain::updateControls ()
 {
-    eq1Gain->setValue (plugin->getParameter (PAR_BAND1GAIN), false);
-    eq1Freq->setValue (plugin->getParameter (PAR_BAND1FREQ), false);
-    eq1Bw->setValue (plugin->getParameter (PAR_BAND1BW), false);
+    eq1Gain->setValue (plugin->getParameter (PAR_BAND1GAIN), dontSendNotification);
+    eq1Freq->setValue (plugin->getParameter (PAR_BAND1FREQ), dontSendNotification);
+    eq1Bw->setValue (plugin->getParameter (PAR_BAND1BW), dontSendNotification);
 
-    eq2Gain->setValue (plugin->getParameter (PAR_BAND2GAIN), false);
-    eq2Freq->setValue (plugin->getParameter (PAR_BAND2FREQ), false);
-    eq2Bw->setValue (plugin->getParameter (PAR_BAND2BW), false);
+    eq2Gain->setValue (plugin->getParameter (PAR_BAND2GAIN), dontSendNotification);
+    eq2Freq->setValue (plugin->getParameter (PAR_BAND2FREQ), dontSendNotification);
+    eq2Bw->setValue (plugin->getParameter (PAR_BAND2BW), dontSendNotification);
 
-    eq3Gain->setValue (plugin->getParameter (PAR_BAND3GAIN), false);
-    eq3Freq->setValue (plugin->getParameter (PAR_BAND3FREQ), false);
-    eq3Bw->setValue (plugin->getParameter (PAR_BAND3BW), false);
+    eq3Gain->setValue (plugin->getParameter (PAR_BAND3GAIN), dontSendNotification);
+    eq3Freq->setValue (plugin->getParameter (PAR_BAND3FREQ), dontSendNotification);
+    eq3Bw->setValue (plugin->getParameter (PAR_BAND3BW), dontSendNotification);
 
-    eq4Gain->setValue (plugin->getParameter (PAR_BAND4GAIN), false);
-    eq4Freq->setValue (plugin->getParameter (PAR_BAND4FREQ), false);
-    eq4Bw->setValue (plugin->getParameter (PAR_BAND4BW), false);
+    eq4Gain->setValue (plugin->getParameter (PAR_BAND4GAIN), dontSendNotification);
+    eq4Freq->setValue (plugin->getParameter (PAR_BAND4FREQ), dontSendNotification);
+    eq4Bw->setValue (plugin->getParameter (PAR_BAND4BW), dontSendNotification);
 
-    eq5Gain->setValue (plugin->getParameter (PAR_BAND5GAIN), false);
-    eq5Freq->setValue (plugin->getParameter (PAR_BAND5FREQ), false);
-    eq5Bw->setValue (plugin->getParameter (PAR_BAND5BW), false);
+    eq5Gain->setValue (plugin->getParameter (PAR_BAND5GAIN), dontSendNotification);
+    eq5Freq->setValue (plugin->getParameter (PAR_BAND5FREQ), dontSendNotification);
+    eq5Bw->setValue (plugin->getParameter (PAR_BAND5BW), dontSendNotification);
 
-    eq6Gain->setValue (plugin->getParameter (PAR_BAND6GAIN), false);
-    eq6Freq->setValue (plugin->getParameter (PAR_BAND6FREQ), false);
-    eq6Bw->setValue (plugin->getParameter (PAR_BAND6BW), false);
+    eq6Gain->setValue (plugin->getParameter (PAR_BAND6GAIN), dontSendNotification);
+    eq6Freq->setValue (plugin->getParameter (PAR_BAND6FREQ), dontSendNotification);
+    eq6Bw->setValue (plugin->getParameter (PAR_BAND6BW), dontSendNotification);
 
-    gainSlider->setValue (plugin->getParameter (PAR_GAIN), false);
-    drywetSlider->setValue (plugin->getParameter (PAR_DRYWET), false);
+    gainSlider->setValue (plugin->getParameter (PAR_GAIN), dontSendNotification);
+    drywetSlider->setValue (plugin->getParameter (PAR_DRYWET), dontSendNotification);
 
     updateScope ();
 }

@@ -315,20 +315,20 @@ void DRowAudioFilter::processBlock (AudioSampleBuffer& buffer,
 									
 			if (sampleL < 0.0f) {
 				sampleL *= -1.0f;
-				sampleL = linearInterpolate(distortionBuffer, distortionBufferSize, sampleL*distortionBufferMax);
+				sampleL = linearInterpolate<float>(distortionBuffer, distortionBufferSize, sampleL*distortionBufferMax);
 				sampleL *= -1.0f;
 			}
 			else {
-				sampleL = linearInterpolate(distortionBuffer, distortionBufferSize, sampleL*distortionBufferMax);
+				sampleL = linearInterpolate<float>(distortionBuffer, distortionBufferSize, sampleL*distortionBufferMax);
 			}
 			
 			if (sampleR < 0.0f) {
 				sampleR *= -1.0f;
-				sampleR = linearInterpolate(distortionBuffer, distortionBufferSize, sampleR*distortionBufferMax);
+				sampleR = linearInterpolate<float>(distortionBuffer, distortionBufferSize, sampleR*distortionBufferMax);
 				sampleR *= -1.0f;
 			}
 			else {
-				sampleR = linearInterpolate(distortionBuffer, distortionBufferSize, sampleR*distortionBufferMax);
+				sampleR = linearInterpolate<float>(distortionBuffer, distortionBufferSize, sampleR*distortionBufferMax);
 			}
 						
 			*channelL++ = sampleL;
@@ -358,11 +358,11 @@ void DRowAudioFilter::processBlock (AudioSampleBuffer& buffer,
 			
 			if (sampleL < 0.0f) {
 				sampleL *= -1.0f;
-				sampleL = linearInterpolate(distortionBuffer, distortionBufferSize, sampleL*distortionBufferMax);
+				sampleL = linearInterpolate<float>(distortionBuffer, distortionBufferSize, sampleL*distortionBufferMax);
 				sampleL *= -1.0f;
 			}
 			else {
-				sampleL = linearInterpolate(distortionBuffer, distortionBufferSize, sampleL*distortionBufferMax);
+				sampleL = linearInterpolate<float>(distortionBuffer, distortionBufferSize, sampleL*distortionBufferMax);
 			}
 			
 			*channelL++ = sampleL;

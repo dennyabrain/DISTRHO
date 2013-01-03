@@ -119,6 +119,8 @@ public:
     void getStateInformation (MemoryBlock& destData);
     void setStateInformation (const void* data, int sizeInBytes);
 
+    bool silenceInProducesSilenceOut() const { return false; }
+
     //==============================================================================
 	// Custom Methods
 	void setupParams();

@@ -192,11 +192,11 @@ void TheFunctionAudioProcessorEditor::timerCallback()
 {
     TheFunctionAudioProcessor* ourProcessor = getProcessor();
 
-    gainSlider.setValue (ourProcessor->gain, false);
-    gainLSlider.setValue (ourProcessor->gainL, false);
-	gainRSlider.setValue (ourProcessor->gainR, false);
-    panLSlider.setValue (ourProcessor->panL, false);
-    panRSlider.setValue (ourProcessor->panR, false);
+    gainSlider.setValue (ourProcessor->gain, dontSendNotification);
+    gainLSlider.setValue (ourProcessor->gainL, dontSendNotification);
+	gainRSlider.setValue (ourProcessor->gainR, dontSendNotification);
+    panLSlider.setValue (ourProcessor->panL, dontSendNotification);
+    panRSlider.setValue (ourProcessor->panR, dontSendNotification);
 
 
 	if (ourProcessor->phaseL < 0.5)

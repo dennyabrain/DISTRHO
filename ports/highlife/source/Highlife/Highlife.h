@@ -71,6 +71,8 @@ public:
 
         bool hasEditor() const { return true; }
 
+        bool silenceInProducesSilenceOut() const { return false; }
+
 public:
 
     void prepareToPlay (double sampleRate, int samplesPerBlock);

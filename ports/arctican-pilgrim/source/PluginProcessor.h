@@ -70,6 +70,8 @@ public:
     String getStateInformationString ();
     void setStateInformationString (const String& data);
 
+    bool silenceInProducesSilenceOut() const { return true; }
+
     //==============================================================================
     //	USER FUNCTIONS =============================================================
     //==============================================================================

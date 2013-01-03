@@ -125,7 +125,9 @@ public:
 	/** Sets up a given slider with the parmeters properties.
      */
 	void setupSlider (Slider& slider);
-	
+
+        double normaliseValue (double scaledValue);
+
 private:
     //==============================================================================
     Value valueObject;
@@ -134,8 +136,6 @@ private:
 	double smoothCoeff, smoothValue;
 	double skewFactor, step;
 	ParameterUnit unit;
-	
-    double normaliseValue (double scaledValue);
 
     //==============================================================================
 	JUCE_LEAK_DETECTOR (PluginParameter);

@@ -68,6 +68,8 @@ public:
     void getStateInformation (MemoryBlock& destData);
     void setStateInformation (const void* data, int sizeInBytes);
 
+    bool silenceInProducesSilenceOut() const { return true; }
+
     //==============================================================================
     /** Returns a PluginParameter so any UIs that have been created can reference
         the underlying Values.

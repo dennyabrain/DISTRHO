@@ -120,8 +120,8 @@ void ThePilgrimAudioProcessorEditor::buttonClicked(Button *buttonThatWasClicked)
 
 void ThePilgrimAudioProcessorEditor::timerCallback()
 {	
-    filterSlider.setValue (getProcessor()->filterParameter.getValue(), false);
-	mixSlider.setValue (getProcessor()->mixParameter.getValue(), false);
+    filterSlider.setValue (getProcessor()->filterParameter.getValue(), dontSendNotification);
+	mixSlider.setValue (getProcessor()->mixParameter.getValue(), dontSendNotification);
 	filterSlider.setCCNumber(getProcessor()->filterParameter.getControllerNumber());	
 	mixSlider.setCCNumber(getProcessor()->mixParameter.getControllerNumber());
 	learnButton.setIsLearning(getProcessor()->learnIsActive);
