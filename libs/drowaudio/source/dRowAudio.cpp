@@ -32,7 +32,7 @@
 // and your header search path must make it accessible to the module's files.
 #include "AppConfig.h"
 
-#include "modules/juce_core/native/juce_BasicNativeHeaders.h"
+//#include "../juce_core/native/juce_BasicNativeHeaders.h"
 
 #if JUCE_MAC || JUCE_IOS
     #import <Foundation/Foundation.h>
@@ -60,6 +60,8 @@ namespace drow {
 #include "audio/dRowAudio_FilteringAudioSource.cpp"
 #include "audio/dRowAudio_ReversibleAudioSource.cpp"
 #include "audio/dRowAudio_LoopingAudioSource.cpp"
+
+#include "audio/dRowAudio_PitchDetector.cpp"
 
 #include "audio/dRowAudio_AudioUtilityUnitTests.cpp"
 
@@ -118,6 +120,7 @@ namespace drow {
 #include "utility/dRowAudio_EncryptedString.cpp"
 #include "utility/dRowAudio_ITunesLibrary.cpp"
 #include "utility/dRowAudio_ITunesLibraryParser.cpp"
+#include "utility/dRowAudio_UnityBuilder.cpp"
 #include "parameters/dRowAudio_PluginParameter.cpp"
 
 }

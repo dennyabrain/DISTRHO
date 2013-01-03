@@ -2,7 +2,7 @@ diff --git a/modules/juce_audio_devices/audio_io/juce_AudioDeviceManager.cpp b/m
 index c67ba90..4cf937a 100644
 --- a/modules/juce_audio_devices/audio_io/juce_AudioDeviceManager.cpp
 +++ b/modules/juce_audio_devices/audio_io/juce_AudioDeviceManager.cpp
-@@ -151,8 +151,8 @@ void AudioDeviceManager::createAudioDeviceTypes (OwnedArray <AudioIODeviceType>&
+@@ -153,8 +153,8 @@ void AudioDeviceManager::createAudioDeviceTypes (OwnedArray <AudioIODeviceType>&
      addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_ASIO());
      addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_CoreAudio());
      addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_iOSAudio());

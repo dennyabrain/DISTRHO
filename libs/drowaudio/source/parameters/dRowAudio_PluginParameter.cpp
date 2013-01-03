@@ -20,20 +20,6 @@
 
 
 
-String getXmlName(const String& name)
-{
-    String xmlName = name.replace("&", ":-amp-:")
-                         .replace("<",":-lt-:")
-                         .replace(">",":-gt-:")
-                         .replace("'",":-apos-:")
-                         .replace("\"",":-quot-:")
-                         .replace(".",":-46-:")
-                         .replace("/", ":-47-:")
-                         .replace("\\", ":-92-:")
-                         .replace(" ", ":-nbsp-:");
-    return xmlName;
-}
-
 PluginParameter::PluginParameter()
 {
 	init("parameter",		// name
@@ -151,19 +137,19 @@ void PluginParameter::setStep (double newStep)
 
 void PluginParameter::writeXml (XmlElement& xmlState)
 {
-	xmlState.setAttribute (getXmlName(name), getValue());
+	xmlState.setAttribute (name,	getValue());
 }
 
 void PluginParameter::readXml (const XmlElement* xmlState)
 {
-	setValue (xmlState->getDoubleAttribute (getXmlName(name), getValue()));
+	setValue (xmlState->getDoubleAttribute (name, getValue()));
 }
 
 void PluginParameter::setupSlider (Slider &slider)
 {
     slider.setRange             (min, max, step);
     slider.setSkewFactor        (skewFactor);
-    slider.setValue             (getValue(), false);
+    slider.setValue             (getValue(), dontSendNotification);
     slider.setTextValueSuffix   (unitSuffix);
 }
 

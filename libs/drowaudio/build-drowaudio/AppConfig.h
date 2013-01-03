@@ -22,7 +22,7 @@
 //=============================================================================
 /** Config: DROWAUDIO_USE_FFTREAL
     Enables the FFTReal library. By default this is enabled except on the Mac
-    where the Accelerate framework is preferred. However, if you do explicity
+    where the Accelerate framework is preferred. However, if you do explicity 
     enable this setting fftreal can be used for testing purposes.
  */
 #if JUCE_MAC

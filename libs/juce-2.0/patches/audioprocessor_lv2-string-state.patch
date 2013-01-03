@@ -2,7 +2,7 @@ diff --git a/modules/juce_audio_processors/processors/juce_AudioProcessor.h b/mo
 index 6eb3479..2b1f7e2 100644
 --- a/modules/juce_audio_processors/processors/juce_AudioProcessor.h
 +++ b/modules/juce_audio_processors/processors/juce_AudioProcessor.h
-@@ -534,6 +534,13 @@ public:
+@@ -553,6 +553,13 @@ public:
      virtual void numChannelsChanged();
  
      //==============================================================================

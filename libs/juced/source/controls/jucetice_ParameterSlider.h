@@ -55,7 +55,7 @@ public:
     //==============================================================================
     void parameterChanged (AudioParameter* newParameter, const int index)
     {
-        setValue (newParameter->getValueMapped (), false);
+        setValue (newParameter->getValueMapped (), dontSendNotification);
     }
 
     void attachedToParameter (AudioParameter* newParameter, const int index)
