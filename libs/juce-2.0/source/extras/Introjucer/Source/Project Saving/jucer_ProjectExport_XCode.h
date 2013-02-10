@@ -704,17 +704,17 @@ private:
         if (xcodeOtherRezFlags.isNotEmpty())
             s.add ("OTHER_REZFLAGS = \"" + xcodeOtherRezFlags + "\"");
 
+        if (config.getTargetBinaryRelativePathString().isNotEmpty())
+        {
+            RelativePath binaryPath (config.getTargetBinaryRelativePathString(), RelativePath::projectFolder);
+            binaryPath = binaryPath.rebased (projectFolder, getTargetFolder(), RelativePath::buildTargetFolder);
+
+            s.add ("DSTROOT = " + sanitisePath (binaryPath.toUnixStyle()));
+            s.add ("SYMROOT = " + sanitisePath (binaryPath.toUnixStyle()));
+        }
+
         if (projectType.isLibrary())
         {
-            if (config.getTargetBinaryRelativePathString().isNotEmpty())
-            {
-                RelativePath binaryPath (config.getTargetBinaryRelativePathString(), RelativePath::projectFolder);
-                binaryPath = binaryPath.rebased (projectFolder, getTargetFolder(), RelativePath::buildTargetFolder);
-
-                s.add ("DSTROOT = " + sanitisePath (binaryPath.toUnixStyle()));
-                s.add ("SYMROOT = " + sanitisePath (binaryPath.toUnixStyle()));
-            }
-
             s.add ("CONFIGURATION_BUILD_DIR = \"$(BUILD_DIR)\"");
             s.add ("DEPLOYMENT_LOCATION = YES");
         }
@@ -1151,6 +1151,11 @@ private:
     ValueTree& addBuildPhase (const String& phaseType, const StringArray& fileIds) const
     {
         String phaseId (createID (phaseType + "resbuildphase"));
+
+        int n = 0;
+        while (buildPhaseIDs.contains (phaseId))
+            phaseId = createID (phaseType + "resbuildphase" + String (++n));
+
         buildPhaseIDs.add (phaseId);
 
         ValueTree* v = new ValueTree (phaseId);

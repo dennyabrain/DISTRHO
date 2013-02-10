@@ -148,6 +148,19 @@ private:
     SilentDummyModalComp dummyModalComponent;
 };
 
+static NSMutableArray* createAllowedTypesArray (const StringArray& filters)
+{
+    NSMutableArray* filterArray = [[[NSMutableArray alloc] init] autorelease];
+
+    for (int i = 0; i < filters.size(); ++i)
+        [filterArray addObject: juceStringToNS (filters[i].replace ("*.", ""))];
+
+    if (filters.size() == 0)
+        [filterArray addObject: juceStringToNS ("*")];
+
+    return filterArray;
+}
+
 //==============================================================================
 void FileChooser::showPlatformDialog (Array<File>& results,
                                       const String& title,
@@ -185,6 +198,7 @@ void FileChooser::showPlatformDialog (Array<File>& results,
                                         : [NSOpenPanel openPanel];
 
     [panel setTitle: juceStringToNS (title)];
+    [panel setAllowedFileTypes: createAllowedTypesArray (*filters)];
 
     if (! isSaveDialogue)
     {

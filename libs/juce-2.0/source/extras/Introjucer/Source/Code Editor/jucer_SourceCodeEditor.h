@@ -134,7 +134,8 @@ protected:
 
 //==============================================================================
 class SourceCodeEditor  : public DocumentEditorComponent,
-                          private ValueTree::Listener
+                          private ValueTree::Listener,
+                          private CodeDocument::Listener
 {
 public:
     SourceCodeEditor (OpenDocumentManager::Document* document);
@@ -158,9 +159,13 @@ private:
     void valueTreeParentChanged (ValueTree&);
     void valueTreeRedirected (ValueTree&);
 
-    void updateColourScheme();
+    void codeDocumentTextInserted (const String&, int);
+    void codeDocumentTextDeleted (int, int);
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SourceCodeEditor);
+    void updateColourScheme();
+    void checkSaveState();
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SourceCodeEditor)
 };
 
 
@@ -196,7 +201,7 @@ private:
     class FindPanel;
     ScopedPointer<FindPanel> findPanel;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GenericCodeEditorComponent);
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GenericCodeEditorComponent)
 };
 
 //==============================================================================
@@ -210,7 +215,7 @@ public:
     void insertTextAtCaret (const String& newText);
 
 private:
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CppCodeEditorComponent);
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CppCodeEditorComponent)
 };
 
 

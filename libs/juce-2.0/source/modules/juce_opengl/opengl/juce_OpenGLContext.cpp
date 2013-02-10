@@ -158,10 +158,10 @@ public:
         NativeContext::Locker locker (*nativeContext);
 
         JUCE_CHECK_OPENGL_ERROR
-        glViewport (0, 0, viewportArea.getWidth(), viewportArea.getHeight());
 
         if (context.renderer != nullptr)
         {
+            glViewport (0, 0, viewportArea.getWidth(), viewportArea.getHeight());
             context.renderer->renderOpenGL();
             clearGLError();
         }
@@ -323,6 +323,7 @@ public:
         if (context.renderer != nullptr)
             context.renderer->openGLContextClosing();
 
+        cachedImageFrameBuffer.release();
         nativeContext->shutdownOnRenderThread();
 
         associatedObjectNames.clear();
