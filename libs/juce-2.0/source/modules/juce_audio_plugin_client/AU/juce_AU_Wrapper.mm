@@ -441,7 +441,7 @@ public:
     //==============================================================================
     ComponentResult Version()                   { return JucePlugin_VersionCode; }
     bool SupportsTail()                         { return true; }
-    Float64 GetTailTime()                       { return (JucePlugin_TailLengthSeconds); }
+    Float64 GetTailTime()                       { return juceFilter->getTailLengthSeconds(); }
     Float64 GetSampleRate()                     { return GetOutput(0)->GetStreamFormat().mSampleRate; }
 
     Float64 GetLatency()
@@ -1439,11 +1439,17 @@ private:
         return ComponentEntryPoint<Class>::Dispatch (params, obj); \
     }
 
+#if JucePlugin_ProducesMidiOutput || JucePlugin_WantsMidiInput
+ #define FACTORY_BASE_CLASS AUMIDIEffectFactory
+#else
+ #define FACTORY_BASE_CLASS AUBaseFactory
+#endif
+
 #define JUCE_FACTORY_ENTRYX(Class, Name) \
     extern "C" __attribute__((visibility("default"))) void* Name ## Factory (const AudioComponentDescription* desc); \
     extern "C" __attribute__((visibility("default"))) void* Name ## Factory (const AudioComponentDescription* desc) \
     { \
-        return AUBaseFactory<Class>::Factory (desc); \
+        return FACTORY_BASE_CLASS<Class>::Factory (desc); \
     }
 
 #define JUCE_COMPONENT_ENTRY(Class, Name, Suffix)   JUCE_COMPONENT_ENTRYX(Class, Name, Suffix)
