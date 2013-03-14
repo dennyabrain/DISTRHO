@@ -70,7 +70,7 @@ void MemoryOutputStream::reset() noexcept
 
 void MemoryOutputStream::prepareToWrite (size_t numBytes)
 {
-    jassert (numBytes >= 0);
+    jassert ((ssize_t) numBytes >= 0);
     size_t storageNeeded = position + numBytes;
 
     if (storageNeeded >= data.getSize())
@@ -124,11 +124,9 @@ bool MemoryOutputStream::setPosition (int64 newPosition)
         position = jlimit ((size_t) 0, size, (size_t) newPosition);
         return true;
     }
-    else
-    {
-        // trying to make it bigger isn't a good thing to do..
-        return false;
-    }
+
+    // can't move beyond the end of the stream..
+    return false;
 }
 
 int MemoryOutputStream::writeFromInputStream (InputStream& source, int64 maxNumBytesToWrite)

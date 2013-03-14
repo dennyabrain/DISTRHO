@@ -59,7 +59,7 @@ JuceticeLookAndFeel::~JuceticeLookAndFeel()
 }
 
 //==============================================================================
-const Font JuceticeLookAndFeel::getPopupMenuFont()
+Font JuceticeLookAndFeel::getPopupMenuFont()
 {
     return Font (14.0f);
 }

@@ -54,7 +54,7 @@ public:
     virtual ~JuceticeLookAndFeel();
 
     //==============================================================================
-    const Font getPopupMenuFont();
+    Font getPopupMenuFont();
 
     //==============================================================================
     void drawToggleButton (Graphics& g,
