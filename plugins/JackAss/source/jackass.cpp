@@ -278,10 +278,12 @@ public:
         if (curProgram < 0 || curProgram > programCount)
             return;
 
+#if 0
         // bank select
         instance->putEvent(0xB0, 0x00, 0, 0);
         // program select
         instance->putEvent(0xC0, program, 0, 0);
+#endif
 
         AudioEffectX::setProgram(program);
     }
