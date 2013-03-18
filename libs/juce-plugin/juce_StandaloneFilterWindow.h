@@ -30,6 +30,7 @@
 
 #include "modules/juce_core/juce_core.h"
 #include "modules/juce_audio_basics/juce_audio_basics.h"
+#include "modules/juce_audio_plugin_client/utility/juce_IncludeModuleHeaders.h"
 #include "modules/juce_audio_processors/juce_audio_processors.h"
 #include "modules/juce_audio_devices/juce_audio_devices.h"
 #include "modules/juce_audio_utils/juce_audio_utils.h"
@@ -39,13 +40,6 @@
 #include "icon/DistrhoIcon.h"
 
 using namespace juce;
-
-//==============================================================================
-/** Somewhere in the codebase of your plugin, you need to implement this function
-    and make it create an instance of the filter subclass that you're building.
-*/
-extern AudioProcessor* JUCE_CALLTYPE createPluginFilter();
-
 
 //==============================================================================
 /**
@@ -75,7 +69,7 @@ public:
     {
         JUCE_TRY
         {
-            filter = createPluginFilter();
+            filter = createPluginFilterOfType(AudioProcessor::wrapperType_Standalone);
         }
         JUCE_CATCH_ALL
 
@@ -302,7 +296,7 @@ public:
     {
         deleteFilter();
 
-        filter = createPluginFilter();
+        filter = createPluginFilterOfType(AudioProcessor::wrapperType_Standalone);
 
         if (filter != nullptr)
         {
