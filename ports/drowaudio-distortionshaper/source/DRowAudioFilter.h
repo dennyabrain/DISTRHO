@@ -89,13 +89,14 @@ public:
     void getStateInformation (MemoryBlock& destData);
     void setStateInformation (const void* data, int sizeInBytes);
 
-    bool silenceInProducesSilenceOut() const { return true; }
+    bool silenceInProducesSilenceOut() const { return false; }
+    double getTailLengthSeconds() const { return 0.0; }
 
     //==============================================================================
 	// Custom Methods
 	void setupParams();
 	void updateParameters();
-	
+
 	// AU Compatibility Methods
 	double getScaledParameter(int index);
 	void setScaledParameter(int index, float newValue);
@@ -111,26 +112,26 @@ public:
 
     //==============================================================================
     juce_UseDebuggingNewOperator
-	
+
 	float* getDistortionBuffer()	{	return distortionBuffer;		}
 	int getDistortionBufferSize()	{	return distortionBufferSize;	}
-	
+
 private:
-	
+
 	PluginParameter params[noParams];
 
 	double currentSampleRate;
-	
+
 	static const int distortionBufferSize = 1024;
 	static const int distortionBufferMax = distortionBufferSize - 1;
 //	float *distortionBuffer;
 	HeapBlock <float> distortionBuffer;
-	
+
 	ScopedPointer <OnePoleFilter> inFilterL;
 	ScopedPointer <OnePoleFilter> inFilterR;
 	ScopedPointer <OnePoleFilter> outFilterL;
 	ScopedPointer <OnePoleFilter> outFilterR;
-	
+
 	void parameterChanged (int index, float newValue);
 	void refillBuffer();
 };

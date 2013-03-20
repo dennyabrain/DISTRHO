@@ -38,7 +38,7 @@
     This function must be implemented to create a new instance of your
     plugin object.
 */
-AudioProcessor* JUCE_CALLTYPE createPluginFilter()
+AudioProcessor* JUCE_CALLTYPE createPluginFilterOfType(AudioProcessor::WrapperType)
 {
     return new DRowAudioFilter();
 }
@@ -63,7 +63,7 @@ void DRowAudioFilter::setupParams()
 {
 /*	void init(const String& name_, ParameterUnit unit_, String description_,
 			  double value_, double min_ =0.0f, double max_ =1.0f, double default_ =0.0f);*/
-	
+
 	params[RATE].init(parameterNames[RATE], UnitHertz, "Changes the rate",
 					  0.5, 0.0, 20.0, 0.5);
 	params[RATE].setSkewFactor(0.5f);
@@ -114,7 +114,7 @@ void DRowAudioFilter::setParameter (int index, float newValue)
 			}
 		}
 	}
-	
+
 	updateFilters();
 }
 
@@ -129,7 +129,7 @@ void DRowAudioFilter::setScaledParameter (int index, float newValue)
 			}
 		}
 	}
-	
+
 	updateFilters();
 }
 
@@ -145,8 +145,8 @@ const String DRowAudioFilter::getParameterName (int index)
 {
 	for (int i = 0; i < noParams; i++)
 		if (index == i)
-			return String(parameterNames[i]);	
-	
+			return String(parameterNames[i]);
+
     return String::empty;
 }
 
@@ -154,7 +154,7 @@ const String DRowAudioFilter::getParameterText (int index)
 {
 	for (int i = 0; i < noParams; i++)
 		if (index == i)
-			return String(params[i].getValue(), 2);	
+			return String(params[i].getValue(), 2);
 
     return String::empty;
 }
@@ -163,8 +163,8 @@ PluginParameter* DRowAudioFilter::getParameterPointer(int index)
 {
 	for (int i = 0; i < noParams; i++)
 		if (index == i)
-			return &params[i];	
-	
+			return &params[i];
+
     return 0;
 }
 //=====================================================================
@@ -173,7 +173,7 @@ double DRowAudioFilter::getParameterMin(int index)
 {
 	for (int i = 0; i < noParams; i++)
 		if (index == i)
-			return params[i].getMin();	
+			return params[i].getMin();
     return 0.0f;
 }
 
@@ -181,7 +181,7 @@ double DRowAudioFilter::getParameterMax(int index)
 {
 	for (int i = 0; i < noParams; i++)
 		if (index == i)
-			return params[i].getMax();	
+			return params[i].getMax();
     return 0.0f;
 }
 
@@ -189,7 +189,7 @@ double DRowAudioFilter::getParameterDefault(int index)
 {
 	for (int i = 0; i < noParams; i++)
 		if (index == i)
-			return params[i].getDefault();	
+			return params[i].getDefault();
     return 0.0f;
 }
 
@@ -197,7 +197,7 @@ ParameterUnit DRowAudioFilter::getParameterUnit(int index)
 {
 	for (int i = 0; i < noParams; i++)
 		if (index == i)
-			return params[i].getUnit();	
+			return params[i].getUnit();
     return (ParameterUnit)0;
 }
 
@@ -205,14 +205,14 @@ double  DRowAudioFilter::getParameterStep(int index)
 {
 	for (int i = 0; i < noParams; i++)
 		if (index == i)
-			return params[i].getStep();	
+			return params[i].getStep();
     return 0.0f;
 }
 double  DRowAudioFilter::getParameterSkewFactor(int index)
 {
 	for (int i = 0; i < noParams; i++)
 		if (index == i)
-			return params[i].getSkewFactor();	
+			return params[i].getSkewFactor();
     return 0.0f;
 }
 
@@ -258,11 +258,11 @@ void DRowAudioFilter::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
 	currentSampleRate = sampleRate;
 	oneOverCurrentSampleRate = 1.0f/currentSampleRate;
-	
+
 	// set up wave buffer and fill with triangle data
 	iLookupTableSize = 8192;
 	iLookupTableSizeMask =  iLookupTableSize-1;
-	
+
 	pfLookupTable = new float[iLookupTableSize];
 	float fPhaseStep = (2 * double_Pi) / iLookupTableSize;
 	for(int i = 0; i < iLookupTableSize; i++){
@@ -273,21 +273,21 @@ void DRowAudioFilter::prepareToPlay (double sampleRate, int samplesPerBlock)
 	}
 	iLookupTablePos = 0;
 	iSamplesProcessed = 0;
-	
-	
+
+
 	// set up circular buffers
 	iBufferSize = (int)sampleRate;
 	pfCircularBufferL = new float[iBufferSize];
 	for (int i = 0; i < iBufferSize; i++)
 		pfCircularBufferL[i] = 0;
-	
+
 	if (getNumInputChannels() == 2) {
 		pfCircularBufferR = new float[iBufferSize];
 		for (int i = 0; i < iBufferSize; i++)
 			pfCircularBufferR[i] = 0;
 	}
 	iBufferWritePos = 0;
-		
+
 	updateFilters();
 }
 
@@ -303,7 +303,7 @@ void DRowAudioFilter::processBlock (AudioSampleBuffer& buffer,
 									MidiBuffer& midiMessages)
 {
 	smoothParameters();
-	
+
 	const int numInputChannels = getNumInputChannels();
 
 	// create parameters to use
@@ -320,9 +320,9 @@ void DRowAudioFilter::processBlock (AudioSampleBuffer& buffer,
 	float* pfSample[numInputChannels];
 	for (int channel = 0; channel < getNumInputChannels(); channel++)
 		pfSample[channel] = buffer.getSampleData(channel);
-		
+
 	if (numInputChannels == 2)
-	{		
+	{
 		//========================================================================
 		while (--numSamples >= 0)
 		{
@@ -330,15 +330,15 @@ void DRowAudioFilter::processBlock (AudioSampleBuffer& buffer,
 
 			iSamplesProcessed++;
 			float fOsc = (pfLookupTable[index] * fDepth) + fDepth;
-			
+
 			float fBufferReadPos1 = (iBufferWritePos - (fOsc * iBufferSize));
 			if (fBufferReadPos1 < 0)
 				fBufferReadPos1 += iBufferSize;
-			
+
 			// read values from buffers
 			int iPos1, iPos2;
 			float fDiff, fDelL, fDelR;
-			
+
 			iPos1 = (int)fBufferReadPos1;
 			iPos2 = iPos1 + 1;
 			if (iPos2 == iBufferSize)
@@ -346,69 +346,69 @@ void DRowAudioFilter::processBlock (AudioSampleBuffer& buffer,
 			fDiff = fBufferReadPos1 - iPos1;
 			fDelL = pfCircularBufferL[iPos2]*fDiff + pfCircularBufferL[iPos1]*(1-fDiff);
 			fDelR = pfCircularBufferR[iPos2]*fDiff + pfCircularBufferR[iPos1]*(1-fDiff);
-			
+
 			// store current samples in buffers
 			iBufferWritePos++;
 			if (iBufferWritePos >= iBufferSize)
-				iBufferWritePos = 0;			
+				iBufferWritePos = 0;
 			pfCircularBufferL[iBufferWritePos] = *pfSample[0] + (fFeedback * fDelL);
 			pfCircularBufferR[iBufferWritePos] = *pfSample[1] + (fFeedback * fDelR);
-			
+
 			// calculate output samples
 			float fOutL = 0.5f * (*pfSample[0] + fWetDryMix*fDelL);
 			float fOutR = 0.5f * (*pfSample[1] + fWetDryMix*fDelR);
 
 			*pfSample[0] = fOutL;
 			*pfSample[1] = fOutR;
-			
+
 			// incriment sample pointers
 			pfSample[0]++;
 			pfSample[1]++;
 		}
-		//========================================================================	
+		//========================================================================
 	}
 	else if (numInputChannels == 1)
-	{		
+	{
 		//========================================================================
 		while (--numSamples >= 0)
 		{
 			int index =  (int)(iSamplesProcessed * phaseStep) &	iLookupTableSizeMask;
-			
+
 			iSamplesProcessed++;
 			float fOsc = (pfLookupTable[index] * fDepth) + fDepth;
-			
+
 			float fBufferReadPos1 = (iBufferWritePos - (fOsc * iBufferSize));
 			if (fBufferReadPos1 < 0)
 				fBufferReadPos1 += iBufferSize;
-			
+
 			// read values from buffers
 			int iPos1, iPos2;
 			float fDiff, fDelL;
-			
+
 			iPos1 = (int)fBufferReadPos1;
 			iPos2 = iPos1 + 1;
 			if (iPos2 == iBufferSize)
 				iPos2 = 0;
 			fDiff = fBufferReadPos1 - iPos1;
 			fDelL = pfCircularBufferL[iPos2]*fDiff + pfCircularBufferL[iPos1]*(1-fDiff);
-			
+
 			// store current samples in buffers
 			iBufferWritePos++;
 			if (iBufferWritePos >= iBufferSize)
-				iBufferWritePos = 0;			
+				iBufferWritePos = 0;
 			pfCircularBufferL[iBufferWritePos] = *pfSample[0] + (fFeedback * fDelL);
-			
+
 			// calculate output samples
 			float fOutL = 0.5f * (*pfSample[0] + fWetDryMix*fDelL);
-			
+
 			*pfSample[0] = fOutL;
-			
+
 			// incriment sample pointers
 			pfSample[0]++;
 		}
-		//========================================================================	
+		//========================================================================
 	}
-		
+
     // in case we have more outputs than inputs, we'll clear any output
     // channels that didn't contain input data, (because these aren't
     // guaranteed to be empty - they may contain garbage).

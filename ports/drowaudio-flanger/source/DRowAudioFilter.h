@@ -92,14 +92,15 @@ public:
     void setStateInformation (const void* data, int sizeInBytes);
 
     bool silenceInProducesSilenceOut() const { return true; }
+    double getTailLengthSeconds() const { return 0.0; }
 
     //==============================================================================
-	
+
 	// Custom Methods
 	void setupParams();
 	void updateFilters();
 	void updateParameters();
-	
+
 	// AU Compatibility Methods
 	double getScaledParameter(int index);
 	void setScaledParameter(int index, float newValue);
@@ -111,22 +112,22 @@ public:
 	double getParameterStep(int index);
 	double getParameterSkewFactor(int index);
 	void smoothParameters();
-	PluginParameter* getParameterPointer(int index);	
-	
+	PluginParameter* getParameterPointer(int index);
+
     //==============================================================================
     juce_UseDebuggingNewOperator
-	
+
 private:
-	
+
 	// parameter variables
 	PluginParameter params[noParams];
-	
+
 	double currentSampleRate, oneOverCurrentSampleRate;
-		
+
 	float* pfCircularBufferL;
 	float* pfCircularBufferR;
 	int iBufferSize, iBufferWritePos;
-	
+
 	float* pfLookupTable;
 	int iLookupTableSize, iLookupTableSizeMask, iLookupTablePos;
 	uint32 iSamplesProcessed;

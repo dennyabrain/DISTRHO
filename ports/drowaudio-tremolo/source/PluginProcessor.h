@@ -69,17 +69,18 @@ public:
     void setStateInformation (const void* data, int sizeInBytes);
 
     bool silenceInProducesSilenceOut() const { return true; }
+    double getTailLengthSeconds() const { return 0.0; }
 
     //==============================================================================
     /** Returns a PluginParameter so any UIs that have been created can reference
         the underlying Values.
      */
     PluginParameter* getParameterObject (int index);
-    
+
     /** Quicker way of getting the Value object of a PluginParameter.
      */
     Value& getParameterValueObject (int index);
-    
+
     /** This will be called when one of our PluginParameter values changes.
         We go through them one by one to see which one has changed and respond to
         it accordingly.
@@ -95,13 +96,13 @@ private:
     Value dummyValue;
 
     Buffer tremoloBufferL, tremoloBufferR, dummyBuffer;
-    
+
     double currentSampleRate;
     float tremoloBufferPosition;
     float tremoloBufferIncriment;
 
     ParameterUpdater parameterUpdater;
-    
+
     //==============================================================================
     void parameterUpdated (int index);
 

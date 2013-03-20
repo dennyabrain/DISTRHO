@@ -38,7 +38,7 @@
     This function must be implemented to create a new instance of your
     plugin object.
 */
-AudioProcessor* JUCE_CALLTYPE createPluginFilter()
+AudioProcessor* JUCE_CALLTYPE createPluginFilterOfType(AudioProcessor::WrapperType)
 {
     return new DRowAudioFilter();
 }
@@ -47,15 +47,15 @@ AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 DRowAudioFilter::DRowAudioFilter()
 {
 	// set up the parameters with the required limits and units
-	
+
 	params[INGAIN].init(parameterNames[INGAIN], UnitDecibels, "Changes the distortion ammount",
 						0.0, 0.0, 24.0, 0.0);
 //	params[INGAIN].setSkewFactorFromMidPoint(0.0);
-	
+
 	params[OUTGAIN].init(parameterNames[OUTGAIN], UnitDecibels, "Changes the output level",
 						 0.0, -6.0, 6.0, 0.0);
 	params[OUTGAIN].setSkewFactorFromMidPoint(0.0);
-	
+
 	params[PREFILTER].init(parameterNames[PREFILTER], UnitHertz, "Changes the input filtering",
 					 500.0, 50.0, 5000.0, 500.0);
 	params[PREFILTER].setSkewFactor(0.5);
@@ -66,24 +66,24 @@ DRowAudioFilter::DRowAudioFilter()
 	params[POSTFILTER].setSkewFactor(0.5);
 	params[POSTFILTER].setStep(1.0);
 
-	
+
 	params[X1].init(parameterNames[X1], UnitGeneric, String::empty,
 					0.25, 0.0, 1.0, 0.25);
-	
+
 	params[Y1].init(parameterNames[Y1], UnitGeneric, String::empty,
 					0.25, 0.0, 1.0, 0.25);
-	
+
 	params[X2].init(parameterNames[X2], UnitGeneric, String::empty,
 					0.75, 0.0, 1.0, 0.75);
-	
+
 	params[Y2].init(parameterNames[Y2], UnitGeneric, String::empty,
 					0.75, 0.0, 1.0, 0.75);
-	
+
 	// initialiase and fill the buffer
 //	distortionBuffer = new float[distortionBufferSize];
 	distortionBuffer.calloc(distortionBufferSize);
 	refillBuffer();
-	
+
 	inFilterL = new OnePoleFilter;
 	inFilterR = new OnePoleFilter;
 	outFilterL = new OnePoleFilter;
@@ -160,8 +160,8 @@ const String DRowAudioFilter::getParameterName (int index)
 {
 	for (int i = 0; i < noParams; i++)
 		if (index == i)
-			return String(parameterNames[i]);	
-	
+			return String(parameterNames[i]);
+
     return String::empty;
 }
 
@@ -169,8 +169,8 @@ const String DRowAudioFilter::getParameterText (int index)
 {
 	for (int i = 0; i < noParams; i++)
 		if (index == i)
-			return String(params[i].getValue(), 2);	
-	
+			return String(params[i].getValue(), 2);
+
     return String::empty;
 }
 
@@ -178,8 +178,8 @@ PluginParameter* DRowAudioFilter::getParameterPointer(int index)
 {
 	for (int i = 0; i < noParams; i++)
 		if (index == i)
-			return &params[i];	
-	
+			return &params[i];
+
     return 0;
 }
 //=====================================================================
@@ -196,7 +196,7 @@ double DRowAudioFilter::getParameterMax(int index)
 {
 	for (int i = 0; i < noParams; i++)
 		if (index == i)
-			return params[i].getMax();	
+			return params[i].getMax();
     return 0.0f;
 }
 
@@ -204,7 +204,7 @@ double DRowAudioFilter::getParameterDefault(int index)
 {
 	for (int i = 0; i < noParams; i++)
 		if (index == i)
-			return params[i].getDefault();	
+			return params[i].getDefault();
     return 0.0f;
 }
 
@@ -212,7 +212,7 @@ ParameterUnit DRowAudioFilter::getParameterUnit(int index)
 {
 	for (int i = 0; i < noParams; i++)
 		if (index == i)
-			return params[i].getUnit();	
+			return params[i].getUnit();
     return (ParameterUnit)0;
 }
 
@@ -220,14 +220,14 @@ double  DRowAudioFilter::getParameterStep(int index)
 {
 	for (int i = 0; i < noParams; i++)
 		if (index == i)
-			return params[i].getStep();	
+			return params[i].getStep();
     return 0.0f;
 }
 double  DRowAudioFilter::getParameterSkewFactor(int index)
 {
 	for (int i = 0; i < noParams; i++)
 		if (index == i)
-			return params[i].getSkewFactor();	
+			return params[i].getSkewFactor();
     return 0.0f;
 }
 
@@ -272,7 +272,7 @@ bool DRowAudioFilter::producesMidi() const
 void DRowAudioFilter::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
 	currentSampleRate = sampleRate;
-	
+
 	parameterChanged(PREFILTER, 0.0f);
 	parameterChanged(POSTFILTER, 0.0f);
 }
@@ -286,8 +286,8 @@ void DRowAudioFilter::processBlock (AudioSampleBuffer& buffer,
 {
 	smoothParameters();
 	const int numInputChannels = getNumInputChannels();
-	int numSamples = buffer.getNumSamples();		
-	
+	int numSamples = buffer.getNumSamples();
+
 	// set up the parameters to be used
 	float inGain = decibelsToAbsolute(params[INGAIN].getSmoothedValue());
 	float outGain = decibelsToAbsolute(params[OUTGAIN].getSmoothedValue());
@@ -295,11 +295,11 @@ void DRowAudioFilter::processBlock (AudioSampleBuffer& buffer,
 	buffer.applyGain(0, buffer.getNumSamples(), inGain);
 
 	if (numInputChannels == 2)
-	{		
+	{
 		// get sample pointers
-		float* channelL = buffer.getSampleData(0); 
-		float* channelR = buffer.getSampleData(1); 
-		
+		float* channelL = buffer.getSampleData(0);
+		float* channelR = buffer.getSampleData(1);
+
 		// pre-filter
 		inFilterL->processSamples(buffer.getSampleData(0), numSamples);
 		inFilterR->processSamples(buffer.getSampleData(1), numSamples);
@@ -308,11 +308,11 @@ void DRowAudioFilter::processBlock (AudioSampleBuffer& buffer,
 		{
 			float sampleL = *channelL;
 			float sampleR = *channelR;
-			
+
 			// clip samples
 			sampleL = jlimit(-1.0f, 1.0f, sampleL);
 			sampleR = jlimit(-1.0f, 1.0f, sampleR);
-									
+
 			if (sampleL < 0.0f) {
 				sampleL *= -1.0f;
 				sampleL = linearInterpolate<float>(distortionBuffer, distortionBufferSize, sampleL*distortionBufferMax);
@@ -321,7 +321,7 @@ void DRowAudioFilter::processBlock (AudioSampleBuffer& buffer,
 			else {
 				sampleL = linearInterpolate<float>(distortionBuffer, distortionBufferSize, sampleL*distortionBufferMax);
 			}
-			
+
 			if (sampleR < 0.0f) {
 				sampleR *= -1.0f;
 				sampleR = linearInterpolate<float>(distortionBuffer, distortionBufferSize, sampleR*distortionBufferMax);
@@ -330,32 +330,32 @@ void DRowAudioFilter::processBlock (AudioSampleBuffer& buffer,
 			else {
 				sampleR = linearInterpolate<float>(distortionBuffer, distortionBufferSize, sampleR*distortionBufferMax);
 			}
-						
+
 			*channelL++ = sampleL;
 			*channelR++ = sampleR;
 		}
-		
+
 		// post-filter
 		outFilterL->processSamples(buffer.getSampleData(0), buffer.getNumSamples());
 		outFilterR->processSamples(buffer.getSampleData(1), buffer.getNumSamples());
-		
+
 		buffer.applyGain(0, buffer.getNumSamples(), outGain);
 	}
 	else if (numInputChannels == 1)
-	{		
+	{
 		// get sample pointers
-		float* channelL = buffer.getSampleData(0); 
-		
+		float* channelL = buffer.getSampleData(0);
+
 		// pre-filter
 		inFilterL->processSamples(buffer.getSampleData(0), numSamples);
-		
+
 		while (--numSamples >= 0)
 		{
 			float sampleL = *channelL;
-			
+
 			// clip samples
 			sampleL = jlimit(-1.0f, 1.0f, sampleL);
-			
+
 			if (sampleL < 0.0f) {
 				sampleL *= -1.0f;
 				sampleL = linearInterpolate<float>(distortionBuffer, distortionBufferSize, sampleL*distortionBufferMax);
@@ -364,18 +364,18 @@ void DRowAudioFilter::processBlock (AudioSampleBuffer& buffer,
 			else {
 				sampleL = linearInterpolate<float>(distortionBuffer, distortionBufferSize, sampleL*distortionBufferMax);
 			}
-			
+
 			*channelL++ = sampleL;
 		}
-		
+
 		// post-filter
 		outFilterL->processSamples(buffer.getSampleData(0), buffer.getNumSamples());
-		
+
 		buffer.applyGain(0, buffer.getNumSamples(), outGain);
 	}
 	//========================================================================
 
-	
+
     // in case we have more outputs than inputs, we'll clear any output
     // channels that didn't contain input data, (because these aren't
     // guaranteed to be empty - they may contain garbage).
@@ -402,13 +402,13 @@ void DRowAudioFilter::getStateInformation (MemoryBlock& destData)
 
     // create an outer XML element..
     XmlElement xmlState ("MYPLUGINSETTINGS");
-	
+
     // add some attributes to it..
     xmlState.setAttribute ("pluginVersion", 1);
 	for(int i = 0; i < noParams; i++) {
 		params[i].writeXml(xmlState);
 	}
-	
+
     // then use this helper function to stuff it into the binary blob and return it..
     copyXmlToBinary (xmlState, destData);
 }
@@ -417,7 +417,7 @@ void DRowAudioFilter::setStateInformation (const void* data, int sizeInBytes)
 {
     // use this helper function to get the XML from this binary blob..
     XmlElement* const xmlState = getXmlFromBinary (data, sizeInBytes);
-	
+
     if (xmlState != 0)
     {
         // check that it's the right type of xml..
@@ -427,10 +427,10 @@ void DRowAudioFilter::setStateInformation (const void* data, int sizeInBytes)
 			for(int i = 0; i < noParams; i++) {
 				params[i].readXml(xmlState);
 			}
-			
+
             sendChangeMessage ();
         }
-		
+
         delete xmlState;
     }
 }

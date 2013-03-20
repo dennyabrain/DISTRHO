@@ -19,11 +19,11 @@ standalone:
 	$(MAKE) -C arctican-pilgrim/Standalone
 # 	$(MAKE) -C argotlunar/Standalone
 # 	$(MAKE) -C bitmangler/Standalone
-# 	$(MAKE) -C drowaudio-distortion/Standalone
-# 	$(MAKE) -C drowaudio-distortionshaper/Standalone
-# 	$(MAKE) -C drowaudio-flanger/Standalone
-# 	$(MAKE) -C drowaudio-reverb/Standalone
-# 	$(MAKE) -C drowaudio-tremolo/Standalone
+	$(MAKE) -C drowaudio-distortion/Standalone
+	$(MAKE) -C drowaudio-distortionshaper/Standalone
+	$(MAKE) -C drowaudio-flanger/Standalone
+	$(MAKE) -C drowaudio-reverb/Standalone
+	$(MAKE) -C drowaudio-tremolo/Standalone
 # 	$(MAKE) -C drumsynth/Standalone
 # 	$(MAKE) -C eqinox/Standalone
 # 	$(MAKE) -C highlife/Standalone
@@ -76,11 +76,11 @@ vst:
 	$(MAKE) -C arctican-pilgrim/VST
 # 	$(MAKE) -C argotlunar/VST
 # 	$(MAKE) -C bitmangler/VST
-# 	$(MAKE) -C drowaudio-distortion/VST
-# 	$(MAKE) -C drowaudio-distortionshaper/VST
-# 	$(MAKE) -C drowaudio-flanger/VST
-# 	$(MAKE) -C drowaudio-reverb/VST
-# 	$(MAKE) -C drowaudio-tremolo/VST
+	$(MAKE) -C drowaudio-distortion/VST
+	$(MAKE) -C drowaudio-distortionshaper/VST
+	$(MAKE) -C drowaudio-flanger/VST
+	$(MAKE) -C drowaudio-reverb/VST
+	$(MAKE) -C drowaudio-tremolo/VST
 # 	$(MAKE) -C drumsynth/VST
 # 	$(MAKE) -C eqinox/VST
 # 	$(MAKE) -C highlife/VST
@@ -105,11 +105,11 @@ clean:
 	$(MAKE) clean -C arctican-pilgrim/Standalone
 # 	$(MAKE) clean -C argotlunar/Standalone
 # 	$(MAKE) clean -C bitmangler/Standalone
-# 	$(MAKE) clean -C drowaudio-distortion/Standalone
-# 	$(MAKE) clean -C drowaudio-distortionshaper/Standalone
-# 	$(MAKE) clean -C drowaudio-flanger/Standalone
-# 	$(MAKE) clean -C drowaudio-reverb/Standalone
-# 	$(MAKE) clean -C drowaudio-tremolo/Standalone
+	$(MAKE) clean -C drowaudio-distortion/Standalone
+	$(MAKE) clean -C drowaudio-distortionshaper/Standalone
+	$(MAKE) clean -C drowaudio-flanger/Standalone
+	$(MAKE) clean -C drowaudio-reverb/Standalone
+	$(MAKE) clean -C drowaudio-tremolo/Standalone
 # 	$(MAKE) clean -C drumsynth/Standalone
 # 	$(MAKE) clean -C eqinox/Standalone
 # 	$(MAKE) clean -C highlife/Standalone
@@ -134,11 +134,11 @@ clean:
 # 	$(MAKE) clean -C argotlunar/LV2
 # 	$(MAKE) clean -C bitmangler/LV2
 # 	$(MAKE) clean -C cmt-bitcrusher/LV2
-# 	$(MAKE) clean -C drowaudio-distortion/LV2
-# 	$(MAKE) clean -C drowaudio-distortionshaper/LV2
-# 	$(MAKE) clean -C drowaudio-flanger/LV2
-# 	$(MAKE) clean -C drowaudio-reverb/LV2
-# 	$(MAKE) clean -C drowaudio-tremolo/LV2
+	$(MAKE) clean -C drowaudio-distortion/LV2
+	$(MAKE) clean -C drowaudio-distortionshaper/LV2
+	$(MAKE) clean -C drowaudio-flanger/LV2
+	$(MAKE) clean -C drowaudio-reverb/LV2
+	$(MAKE) clean -C drowaudio-tremolo/LV2
 # 	$(MAKE) clean -C drumsynth/LV2
 # 	$(MAKE) clean -C eqinox/LV2
 # 	$(MAKE) clean -C highlife/LV2
@@ -163,11 +163,11 @@ clean:
 	$(MAKE) clean -C arctican-pilgrim/VST
 # 	$(MAKE) clean -C argotlunar/VST
 # 	$(MAKE) clean -C bitmangler/VST
-# 	$(MAKE) clean -C drowaudio-distortion/VST
-# 	$(MAKE) clean -C drowaudio-distortionshaper/VST
-# 	$(MAKE) clean -C drowaudio-flanger/VST
-# 	$(MAKE) clean -C drowaudio-reverb/VST
-# 	$(MAKE) clean -C drowaudio-tremolo/VST
+	$(MAKE) clean -C drowaudio-distortion/VST
+	$(MAKE) clean -C drowaudio-distortionshaper/VST
+	$(MAKE) clean -C drowaudio-flanger/VST
+	$(MAKE) clean -C drowaudio-reverb/VST
+	$(MAKE) clean -C drowaudio-tremolo/VST
 # 	$(MAKE) clean -C drumsynth/VST
 # 	$(MAKE) clean -C eqinox/VST
 # 	$(MAKE) clean -C highlife/VST

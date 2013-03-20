@@ -142,12 +142,6 @@
 */
 #define JucePlugin_SilenceInProducesSilenceOut      0
 
-/** If your plugin has a tail, you can set the length here and this information
-	will be passed on to the host.
-	(Not all formats/hosts might actually use this, though)
- */
-#define JucePlugin_TailLengthSeconds                0
-
 /** If set to 1, this hints that the host should ignore any keys that are pressed
     when the plugin has keyboard focus. If 0, then the host should still execute
     any shortcut keys that are pressed, even if the plugin does have focus.
@@ -242,7 +236,7 @@
  actually show it to the user in a list (why??)... Anyway, this macro lets you
  provide a sensible name for that class to make it clear what plugin it refers to.
  Obviously this has to be a valid obj-C class name.
- 
+
  Just to make things a little more complicated, this name must also be unique to this
  precise version of your software. Otherwise, if the host loads two plugins that use the
  same class name, the obj-C linker will almost certainly connect the wrong modules together

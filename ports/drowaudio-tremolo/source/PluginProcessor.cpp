@@ -34,7 +34,7 @@ TremoloAudioProcessor::TremoloAudioProcessor()
                      Parameters::defaults[i]);
         parameterUpdater.addParameter (i);
     }
-    
+
     parameterUpdater.dispatchParameters();
 }
 
@@ -59,7 +59,7 @@ float TremoloAudioProcessor::getParameter (int index)
 {
     if (index >= 0 && index < parameters.size())
         return (float) parameters[index]->getNormalisedValue();
-    
+
     return 0.0f;
 }
 
@@ -73,7 +73,7 @@ const String TremoloAudioProcessor::getParameterName (int index)
 {
     if (index >= 0 && index < parameters.size())
         return parameters[index]->getName();
-    
+
     return String::empty;
 }
 
@@ -81,7 +81,7 @@ const String TremoloAudioProcessor::getParameterText (int index)
 {
     if (index >= 0 && index < parameters.size())
         return String (parameters[index]->getValue(), 2);
-    
+
     return String::empty;
 }
 
@@ -166,19 +166,19 @@ void TremoloAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer&
 {
     // update any pending parameters
     parameterUpdater.dispatchParameters();
-    
+
     const int tremoloBufferSize = tremoloBufferL.getSize();
     const float* tremoloData[2] = {tremoloBufferL.getData(), tremoloBufferR.getData()};
-    
+
 	// find the number of samples in the buffer to process
 	int numSamples = buffer.getNumSamples();
     const int numChannels = buffer.getNumChannels();
-	
+
 	// initialise the pointer to samples
 	float* channelData[2];
     for (int c = numChannels; --c >= 0;)
 		channelData[c] = buffer.getSampleData (c);
-	
+
 	//===================================================================
 	// Main Sample Loop
 	//===================================================================
@@ -190,9 +190,9 @@ void TremoloAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer&
         // incriment buffer position
 		tremoloBufferPosition += tremoloBufferIncriment;
 		if (tremoloBufferPosition >= tremoloBufferSize)
-			tremoloBufferPosition -= tremoloBufferSize;	
+			tremoloBufferPosition -= tremoloBufferSize;
     }
-    
+
     // In case we have more outputs than inputs, we'll clear any output
     // channels that didn't contain input data, (because these aren't
     // guaranteed to be empty - they may contain garbage).
@@ -234,7 +234,7 @@ Value& TremoloAudioProcessor::getParameterValueObject (int index)
 {
     if (isPositiveAndBelow (index, parameters.size()))
         return parameters[index]->getValueObject();
-    
+
     return dummyValue;
 }
 
@@ -257,7 +257,7 @@ Buffer& TremoloAudioProcessor::getTremoloBuffer (int index)
         return tremoloBufferL;
     if (index == 1)
         return tremoloBufferR;
-    
+
     return dummyBuffer;
 }
 
@@ -275,7 +275,7 @@ void TremoloAudioProcessor::parameterUpdated (int parameter)
     {
         fillBuffer (tremoloBufferL.getData(), 0);
         fillBuffer (tremoloBufferR.getData(), degreesToRadians (parameters.getUnchecked (Parameters::phase)->getValue()));
-        
+
         // once we've refilled the buffer we need to let the UI know again
         sendChangeMessage();
     }
@@ -286,17 +286,17 @@ void TremoloAudioProcessor::fillBuffer (float* bufferToFill, float phaseAngleRad
 	// Scale parameters
 	const float depth = (float) parameters.getUnchecked (Parameters::depth)->getNormalisedValue() * 0.5f;
 	const float shape = (float) parameters.getUnchecked (Parameters::shape)->getValue();
-	
+
     const int tremoloBufferSize = tremoloBufferL.getSize();
     const float oneOverTremoloBufferSize = 1.0f / tremoloBufferSize;
-    
+
 	// create buffer with sine data
 	for (int i = 0; i < tremoloBufferSize; ++i)
 	{
 		// fill buffer with sine data
 		const float radians = i * 2.0f * (float_Pi * oneOverTremoloBufferSize);
 		float rawBufferData = sin (radians + phaseAngleRadians);
-		
+
 		if (rawBufferData >= 0)
         {
 			bufferToFill[i] = ((pow (rawBufferData, shape) * depth) + (1.0f - depth));
@@ -313,7 +313,7 @@ void TremoloAudioProcessor::fillBuffer (float* bufferToFill, float phaseAngleRad
 
 //==============================================================================
 // This creates new instances of the plugin..
-AudioProcessor* JUCE_CALLTYPE createPluginFilter()
+AudioProcessor* JUCE_CALLTYPE createPluginFilterOfType(AudioProcessor::WrapperType)
 {
     return new TremoloAudioProcessor();
 }

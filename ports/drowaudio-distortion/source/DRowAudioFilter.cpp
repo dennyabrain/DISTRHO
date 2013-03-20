@@ -38,7 +38,7 @@
     This function must be implemented to create a new instance of your
     plugin object.
 */
-AudioProcessor* JUCE_CALLTYPE createPluginFilter()
+AudioProcessor* JUCE_CALLTYPE createPluginFilterOfType(AudioProcessor::WrapperType)
 {
     return new DRowAudioFilter();
 }
@@ -117,7 +117,7 @@ void DRowAudioFilter::setParameter (int index, float newValue)
 			}
 		}
 	}
-	
+
 	updateFilters();
 }
 
@@ -132,7 +132,7 @@ void DRowAudioFilter::setScaledParameter (int index, float newValue)
 			}
 		}
 	}
-	
+
 	updateFilters();
 }
 
@@ -148,8 +148,8 @@ const String DRowAudioFilter::getParameterName (int index)
 {
 	for (int i = 0; i < noParams; i++)
 		if (index == i)
-			return String(parameterNames[i]);	
-	
+			return String(parameterNames[i]);
+
     return String::empty;
 }
 
@@ -157,7 +157,7 @@ const String DRowAudioFilter::getParameterText (int index)
 {
 	for (int i = 0; i < noParams; i++)
 		if (index == i)
-			return String(params[i].getValue(), 2);	
+			return String(params[i].getValue(), 2);
 
     return String::empty;
 }
@@ -166,8 +166,8 @@ const String DRowAudioFilter::getParameterSuffix (int index)
 {
 	for (int i = 0; i < noParams; i++)
 		if (index == i)
-			return String(params[i].getUnitSuffix());	
-	
+			return String(params[i].getUnitSuffix());
+
     return String::empty;
 }
 
@@ -175,8 +175,8 @@ PluginParameter* DRowAudioFilter::getParameterPointer(int index)
 {
 	for (int i = 0; i < noParams; i++)
 		if (index == i)
-			return &params[i];	
-	
+			return &params[i];
+
    return 0;
 }
 
@@ -271,7 +271,7 @@ void DRowAudioFilter::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
 	currentSampleRate = sampleRate;
 	oneOverCurrentSampleRate = 1.0f/currentSampleRate;
-	
+
 	// update the filters
 	fPreCf = params[PRE].getSmoothedValue();
 	fPostCf = params[POST].getSmoothedValue();
@@ -286,7 +286,7 @@ void DRowAudioFilter::processBlock (AudioSampleBuffer& buffer,
                                    MidiBuffer& midiMessages)
 {
 	smoothParameters();
-	
+
 	const int numInputChannels = getNumInputChannels();
 
 
@@ -303,21 +303,21 @@ void DRowAudioFilter::processBlock (AudioSampleBuffer& buffer,
 	float* pfSample[numInputChannels];
 	for (int channel = 0; channel < numInputChannels; channel++)
 		pfSample[channel] = buffer.getSampleData(channel);
-		
-		
+
+
 	if (numInputChannels == 2)
 	{
 		// input filter the samples
 		inFilterL.processSamples(pfSample[0], numSamples);
 		inFilterR.processSamples(pfSample[1], numSamples);
-		
+
 		//========================================================================
 		while (--samplesLeft >= 0)
 		{
 			// distort
 			*pfSample[0] *= fInGain;
 			*pfSample[1] *= fInGain;
-		
+
 			// shape (using the limit of tanh is 1 so no cliping required)
 			*pfSample[0] = tanh(*pfSample[0] * fColour);
 			*pfSample[1] = tanh(*pfSample[1] * fColour);
@@ -325,13 +325,13 @@ void DRowAudioFilter::processBlock (AudioSampleBuffer& buffer,
 			// apply output gain
 			*pfSample[0] *= fOutGain;
 			*pfSample[1] *= fOutGain;
-		
+
 			// incriment sample pointers
 			pfSample[0]++;
 			pfSample[1]++;
 		}
 		//========================================================================
-		
+
 		// output filter the samples
 		outFilterL.processSamples(buffer.getSampleData(0), numSamples);
 		outFilterR.processSamples(buffer.getSampleData(1), numSamples);
@@ -340,29 +340,29 @@ void DRowAudioFilter::processBlock (AudioSampleBuffer& buffer,
 	{
 		// input filter the samples
 		inFilterL.processSamples(pfSample[0], numSamples);
-		
+
 		//========================================================================
 		while (--samplesLeft >= 0)
 		{
 			// distort
 			*pfSample[0] *= fInGain;
-			
+
 			// shape (using the limit of tanh is 1 so no cliping required)
 			*pfSample[0] = tanh(*pfSample[0] * fColour);
-			
+
 			// apply output gain
 			*pfSample[0] *= fOutGain;
-			
+
 			// incriment sample pointers
 			pfSample[0]++;
 		}
 		//========================================================================
-		
+
 		// output filter the samples
 		outFilterL.processSamples(buffer.getSampleData(0), numSamples);
 	}
-	
-		
+
+
     // clear any output channels that didn't contain input data
     for (int i = getNumInputChannels(); i < getNumOutputChannels(); ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
