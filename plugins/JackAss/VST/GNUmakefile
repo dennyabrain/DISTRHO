@@ -3,8 +3,11 @@
 CXX     ?= g++
 WINECXX ?= wineg++
 
-BASE_FLAGS    = -shared -O2 -ffast-math -fomit-frame-pointer -fvisibility=hidden -fPIC -mtune=generic -msse -mfpmath=sse -std=c++0x -Wall -I../../../sdks/vstsdk2.4 $(CXXFLAGS)
+ifeq ($(CONFIG),Debug)
 BASE_FLAGS    = -shared -O0 -g -fPIC -std=c++0x -Wall -I../../../sdks/vstsdk2.4 $(CXXFLAGS)
+else
+BASE_FLAGS    = -shared -O2 -ffast-math -fomit-frame-pointer -fvisibility=hidden -fPIC -mtune=generic -msse -mfpmath=sse -std=c++0x -Wall -I../../../sdks/vstsdk2.4 $(CXXFLAGS)
+endif
 
 UNIX_FLAGS    = $(BASE_FLAGS) `pkg-config --cflags --libs jack` $(LDFLAGS)
 
