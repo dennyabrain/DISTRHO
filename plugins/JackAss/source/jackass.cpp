@@ -208,7 +208,8 @@ public:
         std::sprintf(strBuf, "midi-out_%02lu", instances.size()+1);
         jack_port_t* const jport = jack_port_register(gJackClient, strBuf, JACK_DEFAULT_MIDI_TYPE, JackPortIsOutput, 0);
 
-        instances.push_back(new JackAssInstance(jport));
+        fInstance = new JackAssInstance(jport);
+        instances.push_back(fInstance);
     }
 
     ~JackAss()
@@ -250,7 +251,7 @@ public:
         for (VstInt32 i=0; i < sampleFrames; i++)
             out1[i] = out2[i] = 0.0f;
 
-        if (gNeedMidiResend)
+        if (gNeedMidiResend && fInstance != nullptr)
         {
             for (int i=0; i < kParamCount; i++)
                 fInstance->putEvent(0xB0, kParamMap[i], int(fParamBuffers[i]*127), 0);
@@ -261,6 +262,9 @@ public:
 
     VstInt32 processEvents(VstEvents* const ev)
     {
+        if (fInstance == nullptr)
+            return 0;
+
         for (VstInt32 i=0; i < ev->numEvents; i++)
         {
             if (ev->events[i]->type == kVstMidiType)

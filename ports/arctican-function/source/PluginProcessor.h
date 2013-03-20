@@ -35,6 +35,8 @@ public:
     AudioProcessorEditor* createEditor();
     bool hasEditor() const;
 
+    double getTailLengthSeconds() const { return 0.0; }
+
     //==============================================================================
     const String getName() const;
 

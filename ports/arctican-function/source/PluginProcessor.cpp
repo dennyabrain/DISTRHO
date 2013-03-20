@@ -254,12 +254,12 @@ void TheFunctionAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuf
 
 		float numberOfSamples = buffer.getNumSamples();
 
-        float* channelDataL = buffer.getSampleData (0); 
-		float* channelDataR = buffer.getSampleData (1); 
+        float* channelDataL = buffer.getSampleData (0);
+		float* channelDataR = buffer.getSampleData (1);
 
 		AudioSampleBuffer inputData = buffer; // Temp buffer for manipulation
-        float* inputDataL = inputData.getSampleData (0); 
-		float* inputDataR = inputData.getSampleData (1); 
+        float* inputDataL = inputData.getSampleData (0);
+		float* inputDataR = inputData.getSampleData (1);
 
 		float LinLout; // Left IN Left OUT - Gain
 		float LinRout; // Left IN Right OUT - Gain
@@ -321,7 +321,7 @@ void TheFunctionAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuf
 
 			RMSLevelL += abs(channelDataL[i]);
 			RMSLevelR += abs(channelDataR[i]);
-			
+
 		}
 	//******************
 
@@ -415,7 +415,7 @@ void TheFunctionAudioProcessor::setStateInformation (const void* data, int sizeI
 
 //==============================================================================
 // This creates new instances of the plugin..
-AudioProcessor* JUCE_CALLTYPE createPluginFilter()
+AudioProcessor* JUCE_CALLTYPE createPluginFilterOfType(AudioProcessor::WrapperType)
 {
     return new TheFunctionAudioProcessor();
 }

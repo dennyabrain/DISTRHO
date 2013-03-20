@@ -37,6 +37,8 @@ public:
     AudioProcessorEditor* createEditor();
     bool hasEditor() const;
 
+    double getTailLengthSeconds() const { return 0.0; }
+
     //==============================================================================
     const String getName() const;
 
@@ -75,38 +77,38 @@ public:
     //==============================================================================
     //	USER FUNCTIONS =============================================================
     //==============================================================================
-	
+
 	void updateFilter();
 
 	PluginParameter filterParameter;
 	PluginParameter mixParameter;
-	
+
 	IIRFilter highFilterL;
 	IIRFilter highFilterR;
 	IIRFilter lowFilterL;
 	IIRFilter lowFilterR;
-	
+
 	double globalSampleRate;
-	
+
 	enum Parameters
     {
         filterFreqParam = 0,
 		mixParam,
-		
+
         totalNumParams
     };
-	
+
 	int contnumber;
 	int contvalue;
 	bool learnIsActive;
 	int currentLearnParam;
 	int lastMovedParam;
-	
-	
+
+
 private:
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ThePilgrimAudioProcessor);
-	
+
 };
 
 #endif  // __PLUGINPROCESSOR_H_34DAFF0F__

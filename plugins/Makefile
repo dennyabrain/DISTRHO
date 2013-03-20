@@ -33,7 +33,7 @@ lv2:
 # 	$(MAKE) -C PingPongPan/LV2
 
 vst:
-# 	mkdir -p ../bin/vst
+	mkdir -p ../bin/vst
 # 	$(MAKE) -C 3BandEQ/VST
 # 	$(MAKE) -C 3BandSplitter/VST
 # 	$(MAKE) -C PingPongPan/VST
