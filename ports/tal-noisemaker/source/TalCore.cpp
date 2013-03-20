@@ -38,7 +38,7 @@ more information.
 This function must be implemented to create a new instance of your
 plugin object.
 */
-AudioProcessor* JUCE_CALLTYPE createPluginFilter()
+AudioProcessor* JUCE_CALLTYPE createPluginFilterOfType(AudioProcessor::WrapperType)
 {
     return new TalCore();
 }
@@ -58,7 +58,7 @@ TalCore::TalCore()
 
     talPresets = new TalPreset*[this->numPrograms];
 
-    for (int i = 0; i < this->numPrograms; i++) talPresets[i] = new TalPreset(); 
+    for (int i = 0; i < this->numPrograms; i++) talPresets[i] = new TalPreset();
     curProgram = 0;
 
     // load factory presets
@@ -83,7 +83,7 @@ TalCore::TalCore()
 
 TalCore::~TalCore()
 {
-    for (int i = 0; i < this->numPrograms; i++) delete talPresets[i]; 
+    for (int i = 0; i < this->numPrograms; i++) delete talPresets[i];
     if (talPresets) delete[] talPresets;
     if (engine) delete engine;
 
@@ -105,7 +105,7 @@ float TalCore::getParameter (int index)
 {
     if (index < NUMPARAM)
         return talPresets[curProgram]->programData[index];
-    else 
+    else
         return 0;
 }
 
@@ -661,7 +661,7 @@ inline bool TalCore::getNextEvent(MidiBuffer::Iterator *midiIterator, const int 
         *midiMessage = *nextMidiMessage;
         hasMidiMessage = midiIterator->getNextEvent(*nextMidiMessage, midiEventPos);
         return true;
-    } 
+    }
     return false;
 }
 
@@ -670,9 +670,9 @@ void TalCore::handleController (const int controllerNumber,
 {
     if (talPresets[curProgram]->programData[MIDILEARN] > 0.0f)
     {
-        for (int i = 0; i < this->numPrograms; i++) 
+        for (int i = 0; i < this->numPrograms; i++)
         {
-            talPresets[i]->midiMap[controllerNumber] = lastMovedController; 
+            talPresets[i]->midiMap[controllerNumber] = lastMovedController;
         }
     }
     int midiControlNumber = talPresets[curProgram]->midiMap[controllerNumber];
@@ -806,10 +806,10 @@ void TalCore::getXmlPrograms(XmlElement *programList, int programNumber)
         program->setAttribute ("osc1volume", talPresets[programNumber]->programData[OSC1VOLUME]);
         program->setAttribute ("osc2volume", talPresets[programNumber]->programData[OSC2VOLUME]);
         program->setAttribute ("osc3volume", talPresets[programNumber]->programData[OSC3VOLUME]);
-    
+
         program->setAttribute ("osc1waveform", talPresets[programNumber]->programData[OSC1WAVEFORM]);
         program->setAttribute ("osc2waveform", talPresets[programNumber]->programData[OSC2WAVEFORM]);
-        
+
         program->setAttribute ("oscsync", talPresets[programNumber]->programData[OSCSYNC]);
 
         program->setAttribute ("oscmastertune", talPresets[programNumber]->programData[OSCMASTERTUNE]);
@@ -870,7 +870,7 @@ void TalCore::getXmlPrograms(XmlElement *programList, int programNumber)
         program->setAttribute ("detune", talPresets[programNumber]->programData[DETUNE]);
         program->setAttribute ("vintagenoise", talPresets[programNumber]->programData[VINTAGENOISE]);
         program->setAttribute ("ringmodulation", talPresets[programNumber]->programData[RINGMODULATION]);
-        
+
         program->setAttribute ("chorus1enable", talPresets[programNumber]->programData[CHORUS1ENABLE]);
         program->setAttribute ("chorus2enable", talPresets[programNumber]->programData[CHORUS2ENABLE]);
 
@@ -904,7 +904,7 @@ void TalCore::getXmlPrograms(XmlElement *programList, int programNumber)
 
         EnvelopePresetUtility utility;
         utility.addEnvelopeDataToXml(talPresets[programNumber]->getPoints(), program);
-        
+
         programList->addChildElement(program);
 }
 
@@ -921,10 +921,10 @@ void TalCore::setXmlPrograms(XmlElement* e, int programNumber, float version)
         talPresets[programNumber]->programData[OSC1VOLUME] = (float) e->getDoubleAttribute ("osc1volume", 0.8f);
         talPresets[programNumber]->programData[OSC2VOLUME] = (float) e->getDoubleAttribute ("osc2volume", 0.0f);
         talPresets[programNumber]->programData[OSC3VOLUME] = (float) e->getDoubleAttribute ("osc3volume", 0.8f);
-        
+
         talPresets[programNumber]->programData[OSC1WAVEFORM] = (float) e->getDoubleAttribute ("osc1waveform", 1.0f);
         talPresets[programNumber]->programData[OSC2WAVEFORM] = (float) e->getDoubleAttribute ("osc2waveform", 1.0f);
-        
+
         talPresets[programNumber]->programData[OSCSYNC] = (float) e->getDoubleAttribute ("oscsync", 0.0f);
 
         talPresets[programNumber]->programData[OSCMASTERTUNE] = (float) e->getDoubleAttribute ("oscmastertune", 0.5f);
@@ -997,7 +997,7 @@ void TalCore::setXmlPrograms(XmlElement* e, int programNumber, float version)
         talPresets[programNumber]->programData[REVERBLOWCUT] = (float) e->getDoubleAttribute ("reverblowcut", 0.1f);
 
         talPresets[programNumber]->programData[OSCBITCRUSHER] = (float) e->getDoubleAttribute ("oscbitcrusher", 1.0f);
-        
+
         talPresets[programNumber]->programData[DELAYWET] = (float) e->getDoubleAttribute ("delaywet", 0.0f);
         talPresets[programNumber]->programData[DELAYTIME] = (float) e->getDoubleAttribute ("delaytime", 0.5f);
         talPresets[programNumber]->programData[DELAYSYNC] = (float) e->getDoubleAttribute ("delaysync", 0.0f);
@@ -1011,7 +1011,7 @@ void TalCore::setXmlPrograms(XmlElement* e, int programNumber, float version)
         talPresets[programNumber]->programData[TAB2OPEN] = (float) e->getDoubleAttribute ("tab2open", 1.0f);
         talPresets[programNumber]->programData[TAB3OPEN] = (float) e->getDoubleAttribute ("tab3open", 0.0f);
         talPresets[programNumber]->programData[TAB4OPEN] = (float) e->getDoubleAttribute ("tab4open", 0.0f);
-        
+
         talPresets[programNumber]->programData[ENVELOPEEDITORDEST1] = (float) e->getDoubleAttribute ("envelopeeditordest1", 1.0f);
         talPresets[programNumber]->programData[ENVELOPEEDITORSPEED] = (float) e->getDoubleAttribute ("envelopeeditorspeed", 1.0f);
         talPresets[programNumber]->programData[ENVELOPEEDITORAMOUNT] = (float) e->getDoubleAttribute ("envelopeeditoramount", 0.0f);
@@ -1108,7 +1108,7 @@ void TalCore::restoreMidiMapping(XmlElement* xmlState)
     {
         forEachXmlChildElement (*midiMap, e)
         {
-            for (int j = 0; j < this->numPrograms; j++) 
+            for (int j = 0; j < this->numPrograms; j++)
             {
                 int controller = e->getIntAttribute("controllernumber", 0);
                 if (controller < 256 && controller > 0)
@@ -1167,7 +1167,7 @@ void TalCore::setCurrentProgram (int index)
         // Load envelope stuff
         this->engine->setPoints(talPresets[index]->getPoints());
 
-        for (int i = 0; i < NUMPARAM; i++) 
+        for (int i = 0; i < NUMPARAM; i++)
         {
             setParameter(i, talPresets[curProgram]->programData[i]);
         }

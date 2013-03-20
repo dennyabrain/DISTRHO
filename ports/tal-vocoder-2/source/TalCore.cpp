@@ -37,7 +37,7 @@
     This function must be implemented to create a new instance of your
     plugin object.
 */
-AudioProcessor* JUCE_CALLTYPE createPluginFilter()
+AudioProcessor* JUCE_CALLTYPE createPluginFilterOfType(AudioProcessor::WrapperType)
 {
     return new TalCore();
 }
@@ -59,7 +59,7 @@ TalCore::TalCore()
 	this->engine = new VocoderEngine(sampleRate);
 	this->talPresets = new TalPreset*[this->numberOfPrograms];
 
-	for (int i = 0; i < this->numberOfPrograms; i++) 
+	for (int i = 0; i < this->numberOfPrograms; i++)
     {
         talPresets[i] = new TalPreset();
     }
@@ -70,7 +70,7 @@ TalCore::TalCore()
 	ProgramChunk *chunk = new ProgramChunk();
 	XmlDocument myDocument (chunk->getXmlChunk());
 	XmlElement* mainElement = myDocument.getDocumentElement();
-	
+
 	MemoryBlock* destData = new MemoryBlock();
 	copyXmlToBinary(*mainElement, *destData);
 	setStateInformation(destData->getData(), destData->getSize());
@@ -110,7 +110,7 @@ float TalCore::getParameter (int index)
 {
 	if (index < NUMPARAM)
 		return talPresets[curProgram]->programData[index];
-	else 
+	else
 		return 0;
 }
 
@@ -362,7 +362,7 @@ void TalCore::processBlock (AudioSampleBuffer& buffer,
 	if (numberOfChannels == 1)
 	{
 		float *samples0 = buffer.getSampleData(0, 0);
-		float *samples1 = buffer.getSampleData(0, 0); 
+		float *samples1 = buffer.getSampleData(0, 0);
 
 		int samplePos = 0;
 		int numSamples = buffer.getNumSamples();
@@ -410,7 +410,7 @@ void TalCore::processMidiPerSample(MidiBuffer::Iterator *midiIterator, int sampl
         else if (midiMessage->isAllNotesOff())
         {
             engine->reset();
-        }       
+        }
     }
 }
 
@@ -421,7 +421,7 @@ inline bool TalCore::getNextEvent(MidiBuffer::Iterator *midiIterator, const int 
         *midiMessage = *nextMidiMessage;
         hasMidiMessage = midiIterator->getNextEvent(*nextMidiMessage, midiEventPos);
         return true;
-    } 
+    }
     return false;
 }
 
@@ -431,9 +431,9 @@ void TalCore::handleController (const int controllerNumber,
 	// no midi
 	//if (params[REALSTEREOMODE] > 0.0f)
 	//{
-	//	for (int i = 0; i < NUMPROGRAMS; i++) 
+	//	for (int i = 0; i < NUMPROGRAMS; i++)
 	//	{
-	//		talPresets[i].midiMap[controllerNumber] = lastMovedController; 
+	//		talPresets[i].midiMap[controllerNumber] = lastMovedController;
 	//	}
 	//}
 	//if (talPresets[curProgram].midiMap[controllerNumber] > 0)
@@ -478,7 +478,7 @@ void TalCore::getCurrentProgramStateInformation (MemoryBlock& destData)
 
     // programs
     XmlElement *programList = new XmlElement ("programs");
-    
+
     getXmlPrograms(programList, this->curProgram);
     tal.addChildElement(programList);
 
@@ -589,7 +589,7 @@ void TalCore::setXmlPrograms(XmlElement* e, int programNumber, float version)
     //File *file = new File("e:/wired.txt");
     if (e->hasTagName(T("program")) && programNumber < this->numberOfPrograms)
     {
-        ///file->appendText("start"); 
+        ///file->appendText("start");
 	    talPresets[programNumber]->name = e->getStringAttribute(T("programname"), T("Not Saved"));
         talPresets[programNumber]->programData[TAL_VOLUME] = (float)e->getDoubleAttribute(T("volume"), 0.5f);
         talPresets[programNumber]->programData[HARMONICS] = (float)e->getDoubleAttribute(T("harmonics"), 0.5f);
@@ -611,7 +611,7 @@ void TalCore::setXmlPrograms(XmlElement* e, int programNumber, float version)
         talPresets[programNumber]->programData[PULSEFINETUNE] = (float)e->getDoubleAttribute(T("pulsefinetune"), 0.5f);
         talPresets[programNumber]->programData[SAWFINETUNE] = (float)e->getDoubleAttribute(T("sawfinetune"), 0.5f);
         talPresets[programNumber]->programData[ESSERINTENSITY] = (float)e->getDoubleAttribute(T("esserintensity"), 0.5f);
-        
+
         talPresets[programNumber]->programData[VOCODERBAND00] = (float)e->getDoubleAttribute(T("vocoderband00"), 0.5f);
         talPresets[programNumber]->programData[VOCODERBAND01] = (float)e->getDoubleAttribute(T("vocoderband01"), 0.5f);
         talPresets[programNumber]->programData[VOCODERBAND02] = (float)e->getDoubleAttribute(T("vocoderband02"), 0.5f);
@@ -623,9 +623,9 @@ void TalCore::setXmlPrograms(XmlElement* e, int programNumber, float version)
         talPresets[programNumber]->programData[VOCODERBAND08] = (float)e->getDoubleAttribute(T("vocoderband08"), 0.5f);
         talPresets[programNumber]->programData[VOCODERBAND09] = (float)e->getDoubleAttribute(T("vocoderband09"), 0.5f);
         talPresets[programNumber]->programData[VOCODERBAND10] = (float)e->getDoubleAttribute(T("vocoderband10"), 0.5f);
-	   
+
         //file->appendText("end");
-        
+
     }
 }
 
@@ -653,7 +653,7 @@ void TalCore::restoreMidiMapping(XmlElement* xmlState)
     {
         forEachXmlChildElement (*midiMap, e)
         {
-            for (int j = 0; j < this->numberOfPrograms; j++) 
+            for (int j = 0; j < this->numberOfPrograms; j++)
             {
                 int controller = e->getIntAttribute(T("controllernumber"), 0);
                 if (controller < 255 && controller > 0)
@@ -702,15 +702,15 @@ int TalCore::getCurrentProgram ()
 void TalCore::setCurrentProgram (int index)
 {
     //const ScopedLock sl (myCriticalSectionBuffer);
-    
+
 	if (index < this->numberOfPrograms)
 	{
 		curProgram = index;
-		for (int i = 0; i < NUMPARAM; i++) 
+		for (int i = 0; i < NUMPARAM; i++)
 		{
 			setParameter(i, talPresets[index]->programData[i]);
 		}
-		
+
         this->sendChangeMessage();
 	}
 }

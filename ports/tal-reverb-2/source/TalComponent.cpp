@@ -69,7 +69,7 @@ FilmStripKnob* TalComponent::addNormalKnob(int x, int y, TalCore* const ownerFil
 									 knobImage.getHeight() / knobImage.getWidth(),
 									 false));
     filmStripKnob->setBounds(x, y, knobImage.getWidth() + 16, knobImage.getWidth() + 20);
-	filmStripKnob->setValue(ownerFilter->getParameter(parameter), false);
+	filmStripKnob->setValue(ownerFilter->getParameter(parameter), dontSendNotification);
 	filmStripKnob->addListener (this);
 	return filmStripKnob;
 }
@@ -128,7 +128,7 @@ void TalComponent::sliderValueChanged (Slider* caller)
 void TalComponent::buttonClicked (Button* caller)
 {
     TalCore* const filter = getFilter();
-	if (caller == realStereoModeButton) 
+	if (caller == realStereoModeButton)
 	{
 		float realStereoMode = 0.0f;
 		if (caller->getToggleState() == true) realStereoMode = 1.0f;
@@ -168,36 +168,36 @@ void TalComponent::updateParametersFromFilter()
     // ..release the lock ASAP
     filter->getCallbackLock().exit();
 
-	decayTimeKnob->setValue(roomSize, false); 
-	
-	preDelayKnob->setValue(preDelay, false);
+	decayTimeKnob->setValue(roomSize, dontSendNotification);
+
+	preDelayKnob->setValue(preDelay, dontSendNotification);
 	preDelayKnob->setTextValue(juce::String((int)(audioUtils.getLogScaledValue(preDelay) * 1000)) + T("ms"));
 
-	lowShelfFrequencyKnob->setValue(lowShelfFrequency, false);
+	lowShelfFrequencyKnob->setValue(lowShelfFrequency, dontSendNotification);
 	lowShelfFrequencyKnob->setTextValue(juce::String((int)audioUtils.getLogScaledFrequency(lowShelfFrequency)) + T("Hz"));
 
-	highShelfFrequencyKnob->setValue(highShelfFrequency, false);
+	highShelfFrequencyKnob->setValue(highShelfFrequency, dontSendNotification);
 	highShelfFrequencyKnob->setTextValue(juce::String((int)audioUtils.getLogScaledFrequency(highShelfFrequency)) + T("Hz"));
 
-	peakFrequencyKnob->setValue(peakFrequency, false);
+	peakFrequencyKnob->setValue(peakFrequency, dontSendNotification);
 	peakFrequencyKnob->setTextValue(juce::String((int)audioUtils.getLogScaledFrequency(peakFrequency)) + T("Hz"));
 
-	lowShelfGainKnob->setValue(lowShelfGain, false);
+	lowShelfGainKnob->setValue(lowShelfGain, dontSendNotification);
 	lowShelfGainKnob->setTextValue(juce::String(audioUtils.getLogScaledValueInDecibelFilter(lowShelfGain, 1), 1) + T("dB"));
 
-	highShelfGainKnob->setValue(highShelfGain, false);
+	highShelfGainKnob->setValue(highShelfGain, dontSendNotification);
 	highShelfGainKnob->setTextValue(juce::String(audioUtils.getLogScaledValueInDecibelFilter(highShelfGain, 1), 1) + T("dB"));
 
-	peakGainKnob->setValue(peakGain, false);
+	peakGainKnob->setValue(peakGain, dontSendNotification);
 	peakGainKnob->setTextValue(juce::String(audioUtils.getLogScaledValueInDecibelFilter(peakGain, 1), 1) + T("dB"));
 
-	stereoWithKnob->setValue(stereo, false);
+	stereoWithKnob->setValue(stereo, dontSendNotification);
 
-	drySlider->setValue(dry, false);  
-	drySlider->setTextValue(juce::String(audioUtils.getLogScaledValueInDecibel(dry, 2), 1) + T("dB"));	
+	drySlider->setValue(dry, dontSendNotification);
+	drySlider->setTextValue(juce::String(audioUtils.getLogScaledValueInDecibel(dry, 2), 1) + T("dB"));
 	
-	wetSlider->setValue(wet, false);
-	wetSlider->setTextValue(juce::String(audioUtils.getLogScaledValueInDecibel(wet, 2), 1) + T("dB"));	
+	wetSlider->setValue(wet, dontSendNotification);
+	wetSlider->setTextValue(juce::String(audioUtils.getLogScaledValueInDecibel(wet, 2), 1) + T("dB"));
 
 	if (realStereoMode > 0.0f)
 	{

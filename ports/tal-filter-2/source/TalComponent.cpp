@@ -75,7 +75,7 @@ ComboBox* TalComponent::addComboBox(int x, int y, int width, TalCore* const owne
 	addAndMakeVisible(comboBox = new ComboBox(T("ComboBox")));
 	comboBox->setBounds(x, y, width, 20);
 	comboBox->setColour(ComboBox::backgroundColourId, Colour((juce::uint8)40, (juce::uint8)40, (juce::uint8)40, 120.0f));
-	comboBox->setColour(ComboBox::textColourId, Colour::greyLevel(1.0f));	
+	comboBox->setColour(ComboBox::textColourId, Colour::greyLevel(1.0f));
 	comboBox->setColour(ComboBox::buttonColourId, Colour((juce::uint8)8, (juce::uint8)11, (juce::uint8)58, 0.0f));
 	comboBox->setColour(ComboBox::arrowColourId, Colour((juce::uint8)8, (juce::uint8)11, (juce::uint8)58, 0.0f));
     comboBox->setSelectedId((int)ownerFilter->getParameter(parameter), true);
@@ -91,7 +91,7 @@ FilmStripKnob* TalComponent::addNormalKnob(int x, int y, TalCore* const ownerFil
 									 false,
                                      parameter));
     filmStripKnob->setBounds(x, y, knobImage.getWidth(), knobImage.getHeight() / numOfFrames);
-	filmStripKnob->setValue(ownerFilter->getParameter(parameter), false);
+	filmStripKnob->setValue(ownerFilter->getParameter(parameter), dontSendNotification);
 	filmStripKnob->addListener (this);
 	return filmStripKnob;
 }
@@ -169,10 +169,10 @@ void TalComponent::updateParametersFromFilter()
     speedFactorComboBox->setSelectedId((int)speedFactor, true);
     filtertypeComboBox->setSelectedId((int)filterType, true);
 
-    resonanceKnob->setValue(resonance, false);
-    volumeInKnob->setValue(volumeIn, false);
-    volumeOutKnob->setValue(volumeOut, false);
-    depthKnob->setValue(depth, false);
+    resonanceKnob->setValue(resonance, dontSendNotification);
+    volumeInKnob->setValue(volumeIn, dontSendNotification);
+    volumeOutKnob->setValue(volumeOut, dontSendNotification);
+    depthKnob->setValue(depth, dontSendNotification);
 }
 
 //==============================================================================

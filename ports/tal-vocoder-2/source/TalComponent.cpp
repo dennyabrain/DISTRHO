@@ -17,7 +17,7 @@ TalComponent::TalComponent (TalCore* const ownerFilter) : AudioProcessorEditor (
     Font fontDigital(typeface);
     fontDigital.setSizeAndStyle(13.0f, 0, 0.7f, 0.0f);
 
-    // components 
+    // components
     this->oscSyncButton = this->addNormalButton(this, 211, 50, ownerFilter, toggleButtonImage, false, OSCSYNC);
     this->polyModeButton = this->addNormalButton(this, 211, 89, ownerFilter, toggleButtonImage, false, POLYMODE);
 
@@ -28,7 +28,7 @@ TalComponent::TalComponent (TalCore* const ownerFilter) : AudioProcessorEditor (
     this->volumeKnob = this->addNormalKnob(this, 551, 183, ownerFilter, knobImage, 61, TAL_VOLUME);
     this->harmonicsKnob = this->addNormalKnob(this, 509, 183, ownerFilter, knobImage, 61, HARMONICS);
     this->envelopeReleaseKnob = this->addNormalKnob(this, 462, 183, ownerFilter, knobImage, 61, ENVELOPERELEASE);
-    
+
     this->portamentoKnob = this->addNormalKnob(this, 173, 183, ownerFilter, knobImage, 61, PORTAMENTO);
     this->tuneKnob = this->addNormalKnob(this, 210, 183, ownerFilter, knobImage, 61, TAL_TUNE);
 
@@ -109,7 +109,7 @@ FilmStripKnob* TalComponent::addNormalKnob(Component *component, int x, int y, T
 									 false,
                                      parameter));
     filmStripKnob->setBounds(x, y, knobImage.getWidth(), knobImage.getHeight() / numOfFrames);
-	filmStripKnob->setValue(ownerFilter->getParameter(parameter), false);
+	filmStripKnob->setValue(ownerFilter->getParameter(parameter), dontSendNotification);
 	filmStripKnob->addListener(this);
 	return filmStripKnob;
 }
@@ -129,7 +129,7 @@ ImageSlider* TalComponent::addSlider(Component *component, int x, int y, TalCore
 	ImageSlider *imageSlider;
 	component->addAndMakeVisible(imageSlider = new ImageSlider(sliderImage, height, parameter));
 	imageSlider->setBounds(x, y, sliderImage.getWidth(), height + sliderImage.getHeight());
-	imageSlider->setValue(ownerFilter->getParameter(parameter), false);
+	imageSlider->setValue(ownerFilter->getParameter(parameter), dontSendNotification);
 	imageSlider->addListener(this);
 	return imageSlider;
 }
@@ -140,7 +140,7 @@ TalComboBox* TalComponent::addTalComboBox(Component *component, int x, int y, in
 	component->addAndMakeVisible(comboBox = new TalComboBox(parameter));
 	comboBox->setBounds(x, y, width, 20);
 	comboBox->setColour(TalComboBox::backgroundColourId, Colour((juce::uint8)8, (juce::uint8)11, (juce::uint8)58, 0.0f));
-	comboBox->setColour(TalComboBox::textColourId, Colour::greyLevel(1.0f));	
+	comboBox->setColour(TalComboBox::textColourId, Colour::greyLevel(1.0f));
 	comboBox->setColour(TalComboBox::buttonColourId, Colour((juce::uint8)8, (juce::uint8)11, (juce::uint8)58, 0.0f));
 	comboBox->setColour(TalComboBox::arrowColourId, Colour((juce::uint8)8, (juce::uint8)11, (juce::uint8)58, 0.0f));
     comboBox->setSelectedId((int)ownerFilter->getParameter(parameter), true);
@@ -271,35 +271,35 @@ void TalComponent::updateParametersFromFilter()
     // ..release the lock ASAP
     filter->getCallbackLock().exit();
 
-	this->volumeKnob->setValue(volume, false);
-	this->harmonicsKnob->setValue(harmonics, false);
-	this->oscTransposeKnob->setValue(oscTranspose, false);
-	this->portamentoKnob->setValue(portamento, false);
-	this->tuneKnob->setValue(tune, false);
-	this->envelopeReleaseKnob->setValue(envelopeRelease, false);
+	this->volumeKnob->setValue(volume, dontSendNotification);
+	this->harmonicsKnob->setValue(harmonics, dontSendNotification);
+	this->oscTransposeKnob->setValue(oscTranspose, dontSendNotification);
+	this->portamentoKnob->setValue(portamento, dontSendNotification);
+	this->tuneKnob->setValue(tune, dontSendNotification);
+	this->envelopeReleaseKnob->setValue(envelopeRelease, dontSendNotification);
 
-	this->noiseVolumeSlider->setValue(noiseVolume, false);
-	this->pulseVolumeSlider->setValue(pulseVolume, false);
-	this->sawVolumeSlider->setValue(sawVolume, false);
-	this->subOscVolumeSlider->setValue(subOscVolume, false);
+	this->noiseVolumeSlider->setValue(noiseVolume, dontSendNotification);
+	this->pulseVolumeSlider->setValue(pulseVolume, dontSendNotification);
+	this->sawVolumeSlider->setValue(sawVolume, dontSendNotification);
+	this->subOscVolumeSlider->setValue(subOscVolume, dontSendNotification);
 
-    this->esserIntensityKnob->setValue(esserIntensity, false);
-	this->pulseTuneKnob->setValue(pulseTune, false);
-	this->sawTuneKnob->setValue(sawTune, false);
-	this->pulseFineTuneKnob->setValue(pulseFineTune, false);
-	this->sawFineTuneKnob->setValue(sawFineTune, false);
+    this->esserIntensityKnob->setValue(esserIntensity, dontSendNotification);
+	this->pulseTuneKnob->setValue(pulseTune, dontSendNotification);
+	this->sawTuneKnob->setValue(sawTune, dontSendNotification);
+	this->pulseFineTuneKnob->setValue(pulseFineTune, dontSendNotification);
+	this->sawFineTuneKnob->setValue(sawFineTune, dontSendNotification);
 
-    this->band00Slider->setValue(band00, false);
-    this->band01Slider->setValue(band01, false);
-    this->band02Slider->setValue(band02, false);
-    this->band03Slider->setValue(band03, false);
-    this->band04Slider->setValue(band04, false);
-    this->band05Slider->setValue(band05, false);
-    this->band06Slider->setValue(band06, false);
-    this->band07Slider->setValue(band07, false);
-    this->band08Slider->setValue(band08, false);
-    this->band09Slider->setValue(band09, false);
-    this->band10Slider->setValue(band10, false);
+    this->band00Slider->setValue(band00, dontSendNotification);
+    this->band01Slider->setValue(band01, dontSendNotification);
+    this->band02Slider->setValue(band02, dontSendNotification);
+    this->band03Slider->setValue(band03, dontSendNotification);
+    this->band04Slider->setValue(band04, dontSendNotification);
+    this->band05Slider->setValue(band05, dontSendNotification);
+    this->band06Slider->setValue(band06, dontSendNotification);
+    this->band07Slider->setValue(band07, dontSendNotification);
+    this->band08Slider->setValue(band08, dontSendNotification);
+    this->band09Slider->setValue(band09, dontSendNotification);
+    this->band10Slider->setValue(band10, dontSendNotification);
 
     this->inputModeButton->setToggleState(inputMode > 0.0f, false);
     this->chorusButton->setToggleState(chorus > 0.0f, false);

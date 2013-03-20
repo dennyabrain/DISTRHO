@@ -55,7 +55,7 @@ public:
     void prepareToPlay (double sampleRate, int samplesPerBlock);
     void releaseResources();
 
-	void processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages); 
+	void processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages);
 
     //==============================================================================
     bool hasEditor() const                  { return true; }
@@ -80,6 +80,9 @@ public:
     bool acceptsMidi() const;
     bool producesMidi() const;
 
+    bool silenceInProducesSilenceOut() const { return false; }
+    double getTailLengthSeconds() const { return 0.0; }
+
     bool doesClip();
 
     // vst preset handling
@@ -97,7 +100,7 @@ public:
 
     void setStateInformationFromXml(XmlElement* xmlState);
     XmlElement* getCurrentProgramStateInformationAsXml();
-    
+
     void getXmlPrograms(XmlElement *programList, int programNumber);
     void setXmlPrograms(XmlElement *programList, int programNumber, float version);
     void restoreMidiMapping(XmlElement* e);

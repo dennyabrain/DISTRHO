@@ -65,7 +65,7 @@ TalComponent::TalComponent (TalCore* const ownerFilter)
 	filterTypeComboBox->setColour(ComboBox::arrowColourId, Colour::greyLevel(0.9f));
 	filterTypeComboBox->addItem(T("Low Pass"),1);
 	filterTypeComboBox->addItem(T("High Pass"),2);
-	filterTypeComboBox->addItem(T("Band Pass"),3); 
+	filterTypeComboBox->addItem(T("Band Pass"),3);
 	filterTypeComboBox->addItem(T("Reserved"),4);
 	filterTypeComboBox->addItem(T("Reserved"),5);
 	filterTypeComboBox->addItem(T("Reserved"),6);
@@ -78,7 +78,7 @@ TalComponent::TalComponent (TalCore* const ownerFilter)
 	lfoWaveformComboBox->setColour(ComboBox::arrowColourId, Colour::greyLevel(0.9f));
 	lfoWaveformComboBox->addItem(T("sin"),1);
 	lfoWaveformComboBox->addItem(T("tri"),2);
-	lfoWaveformComboBox->addItem(T("saw"),3); 
+	lfoWaveformComboBox->addItem(T("saw"),3);
 	lfoWaveformComboBox->addItem(T("sq"),4);
 	lfoWaveformComboBox->addItem(T("s&h"),5);
 	lfoWaveformComboBox->addItem(T("noise"),6);
@@ -90,7 +90,7 @@ TalComponent::TalComponent (TalCore* const ownerFilter)
 	lfoSyncComboBox->setColour(ComboBox::arrowColourId, Colour::greyLevel(0.9f));
 	lfoSyncComboBox->addItem(T("rate"),1);
 	lfoSyncComboBox->addItem(T("1/16"),2);
-	lfoSyncComboBox->addItem(T("1/8"),3); 
+	lfoSyncComboBox->addItem(T("1/8"),3);
 	lfoSyncComboBox->addItem(T("1/4"),4);
 	lfoSyncComboBox->addItem(T("1/2"),5);
 	lfoSyncComboBox->addItem(T("1/1"),6);
@@ -109,7 +109,7 @@ TalComponent::TalComponent (TalCore* const ownerFilter)
 	lfoSyncComboBox->addItem(T("2/1T"),19);
 
 	// Version info
-	versionLabel = new Label("Version Info", "V 1.56"); 
+	versionLabel = new Label("Version Info", "V 1.56");
 	versionLabel->setBounds(16, 440, 100, 20);
 	versionLabel->setColour(Label::textColourId, Colour((juce::uint8)100, (juce::uint8)100, (juce::uint8)100, 0.8f));
 	addAndMakeVisible(versionLabel);
@@ -220,13 +220,13 @@ void TalComponent::comboBoxChanged (ComboBox* caller)
 void TalComponent::buttonClicked (Button* caller)
 {
     TalCore* const filter = getFilter();
-	if (caller == midiLearnButton) 
+	if (caller == midiLearnButton)
 	{
 		float midiLearn = 0.0f;
 		if (caller->getToggleState() == true) midiLearn = 1.0f;
 		filter->setParameterNotifyingHost(MIDILEARN, midiLearn);
 	}
-	if (caller == midiTriggerButton) 
+	if (caller == midiTriggerButton)
 	{
 		float midiTrigger = 0.0f;
 		if (caller->getToggleState() == true) midiTrigger = 1.0f;
@@ -266,23 +266,23 @@ void TalComponent::updateParametersFromFilter()
     // ..release the lock ASAP
     filter->getCallbackLock().exit();
 
-	cutoffKnob->setValue(cutoff, false); 
-	resonanceKnob->setValue(resonance, false); 
-	lfoRateKnob->setValue(lfoRate, false); 
-	lfoIntensityKnob->setValue(lfoIntensity, false);
-	volumeKnob->setValue(volume, false);
-	inputDriveKnob->setValue(inputDrive, false);
+	cutoffKnob->setValue(cutoff, dontSendNotification);
+	resonanceKnob->setValue(resonance, dontSendNotification);
+	lfoRateKnob->setValue(lfoRate, dontSendNotification);
+	lfoIntensityKnob->setValue(lfoIntensity, dontSendNotification);
+	volumeKnob->setValue(volume, dontSendNotification);
+	inputDriveKnob->setValue(inputDrive, dontSendNotification);
 
-	envelopeIntesityKnob->setValue(envelopeIntesity, false);
-	envelopeSpeedKnob->setValue(envelopeSpeed, false);
-	lfoWidthKnob->setValue(lfoWidth, false);
+	envelopeIntesityKnob->setValue(envelopeIntesity, dontSendNotification);
+	envelopeSpeedKnob->setValue(envelopeSpeed, dontSendNotification);
+	lfoWidthKnob->setValue(lfoWidth, dontSendNotification);
 
-	filterTypeComboBox->setSelectedId(filtertype, true); 
-	lfoWaveformComboBox->setSelectedId(lfoWaveform, true); 
-	lfoSyncComboBox->setSelectedId(lfoSync, true); 
+	filterTypeComboBox->setSelectedId(filtertype, true);
+	lfoWaveformComboBox->setSelectedId(lfoWaveform, true);
+	lfoSyncComboBox->setSelectedId(lfoSync, true);
 
-	midiLearnButton->setValue(midiLearn, false);
-	midiTriggerButton->setValue(midiTrigger, false);
+	midiLearnButton->setValue(midiLearn, dontSendNotification);
+	midiTriggerButton->setValue(midiTrigger, dontSendNotification);
 }
 
 //==============================================================================

@@ -29,14 +29,14 @@ standalone:
 # 	$(MAKE) -C highlife/Standalone
 # 	$(MAKE) -C hybridreverb2/Standalone
 # 	$(MAKE) -C juce-demo-plugin/Standalone
-# 	$(MAKE) -C tal-dub-3/Standalone
-# 	$(MAKE) -C tal-filter/Standalone
-# 	$(MAKE) -C tal-filter-2/Standalone
-# 	$(MAKE) -C tal-noisemaker/Standalone
-# 	$(MAKE) -C tal-reverb/Standalone
-# 	$(MAKE) -C tal-reverb-2/Standalone
-# 	$(MAKE) -C tal-reverb-3/Standalone
-# 	$(MAKE) -C tal-vocoder-2/Standalone
+	$(MAKE) -C tal-dub-3/Standalone
+	$(MAKE) -C tal-filter/Standalone
+	$(MAKE) -C tal-filter-2/Standalone
+	$(MAKE) -C tal-noisemaker/Standalone
+	$(MAKE) -C tal-reverb/Standalone
+	$(MAKE) -C tal-reverb-2/Standalone
+	$(MAKE) -C tal-reverb-3/Standalone
+	$(MAKE) -C tal-vocoder-2/Standalone
 # 	$(MAKE) -C vex/Standalone
 # 	$(MAKE) -C wolpertinger/Standalone
 
@@ -88,14 +88,14 @@ vst:
 # 	$(MAKE) -C juce-demo-plugin/VST
 # 	$(MAKE) -C juce_pitcher/VST
 # 	$(MAKE) -C sDelay/VST
-# 	$(MAKE) -C tal-dub-3/VST
-# 	$(MAKE) -C tal-filter/VST
-# 	$(MAKE) -C tal-filter-2/VST
-# 	$(MAKE) -C tal-noisemaker/VST
-# 	$(MAKE) -C tal-reverb/VST
-# 	$(MAKE) -C tal-reverb-2/VST
-# 	$(MAKE) -C tal-reverb-3/VST
-# 	$(MAKE) -C tal-vocoder-2/VST
+	$(MAKE) -C tal-dub-3/VST
+	$(MAKE) -C tal-filter/VST
+	$(MAKE) -C tal-filter-2/VST
+	$(MAKE) -C tal-noisemaker/VST
+	$(MAKE) -C tal-reverb/VST
+	$(MAKE) -C tal-reverb-2/VST
+	$(MAKE) -C tal-reverb-3/VST
+	$(MAKE) -C tal-vocoder-2/VST
 # 	$(MAKE) -C vex/VST
 # 	$(MAKE) -C wolpertinger/VST
 
@@ -117,14 +117,14 @@ clean:
 # 	$(MAKE) clean -C juce-demo-plugin/Standalone
 # 	$(MAKE) clean -C juce_pitcher/Standalone
 # 	$(MAKE) clean -C sDelay/Standalone
-# 	$(MAKE) clean -C tal-dub-3/Standalone
-# 	$(MAKE) clean -C tal-filter/Standalone
-# 	$(MAKE) clean -C tal-filter-2/Standalone
-# 	$(MAKE) clean -C tal-noisemaker/Standalone
-# 	$(MAKE) clean -C tal-reverb/Standalone
-# 	$(MAKE) clean -C tal-reverb-2/Standalone
-# 	$(MAKE) clean -C tal-reverb-3/Standalone
-# 	$(MAKE) clean -C tal-vocoder-2/Standalone
+	$(MAKE) clean -C tal-dub-3/Standalone
+	$(MAKE) clean -C tal-filter/Standalone
+	$(MAKE) clean -C tal-filter-2/Standalone
+	$(MAKE) clean -C tal-noisemaker/Standalone
+	$(MAKE) clean -C tal-reverb/Standalone
+	$(MAKE) clean -C tal-reverb-2/Standalone
+	$(MAKE) clean -C tal-reverb-3/Standalone
+	$(MAKE) clean -C tal-vocoder-2/Standalone
 # 	$(MAKE) clean -C vex/Standalone
 # 	$(MAKE) clean -C wolpertinger/Standalone
 
@@ -147,14 +147,14 @@ clean:
 # 	$(MAKE) clean -C juce_pitcher/LV2
 # 	$(MAKE) clean -C k-meter/LV2
 # 	$(MAKE) clean -C sDelay/LV2
-# 	$(MAKE) clean -C tal-dub-3/LV2
-# 	$(MAKE) clean -C tal-filter/LV2
-# 	$(MAKE) clean -C tal-filter-2/LV2
-# 	$(MAKE) clean -C tal-noisemaker/LV2
-# 	$(MAKE) clean -C tal-reverb/LV2
-# 	$(MAKE) clean -C tal-reverb-2/LV2
-# 	$(MAKE) clean -C tal-reverb-3/LV2
-# 	$(MAKE) clean -C tal-vocoder-2/LV2
+	$(MAKE) clean -C tal-dub-3/LV2
+	$(MAKE) clean -C tal-filter/LV2
+	$(MAKE) clean -C tal-filter-2/LV2
+	$(MAKE) clean -C tal-noisemaker/LV2
+	$(MAKE) clean -C tal-reverb/LV2
+	$(MAKE) clean -C tal-reverb-2/LV2
+	$(MAKE) clean -C tal-reverb-3/LV2
+	$(MAKE) clean -C tal-vocoder-2/LV2
 # 	$(MAKE) clean -C vex/LV2
 # 	$(MAKE) clean -C wolpertinger/LV2
 
@@ -175,14 +175,14 @@ clean:
 # 	$(MAKE) clean -C juce-demo-plugin/VST
 # 	$(MAKE) clean -C juce_pitcher/VST
 # 	$(MAKE) clean -C sDelay/VST
-# 	$(MAKE) clean -C tal-dub-3/VST
-# 	$(MAKE) clean -C tal-filter/VST
-# 	$(MAKE) clean -C tal-filter-2/VST
-# 	$(MAKE) clean -C tal-noisemaker/VST
-# 	$(MAKE) clean -C tal-reverb/VST
-# 	$(MAKE) clean -C tal-reverb-2/VST
-# 	$(MAKE) clean -C tal-reverb-3/VST
-# 	$(MAKE) clean -C tal-vocoder-2/VST
+	$(MAKE) clean -C tal-dub-3/VST
+	$(MAKE) clean -C tal-filter/VST
+	$(MAKE) clean -C tal-filter-2/VST
+	$(MAKE) clean -C tal-noisemaker/VST
+	$(MAKE) clean -C tal-reverb/VST
+	$(MAKE) clean -C tal-reverb-2/VST
+	$(MAKE) clean -C tal-reverb-3/VST
+	$(MAKE) clean -C tal-vocoder-2/VST
 # 	$(MAKE) clean -C vex/VST
 # 	$(MAKE) clean -C wolpertinger/VST
 

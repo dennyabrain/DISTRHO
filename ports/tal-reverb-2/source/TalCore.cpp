@@ -37,7 +37,7 @@
     This function must be implemented to create a new instance of your
     plugin object.
 */
-AudioProcessor* JUCE_CALLTYPE createPluginFilter()
+AudioProcessor* JUCE_CALLTYPE createPluginFilterOfType(AudioProcessor::WrapperType)
 {
     return new TalCore();
 }
@@ -54,14 +54,14 @@ TalCore::TalCore()
 	params = engine->param;
 	talPresets = new TalPreset*[NUMPROGRAMS];
 
-	for (int i = 0; i < NUMPROGRAMS; i++) talPresets[i] = new TalPreset(); 
+	for (int i = 0; i < NUMPROGRAMS; i++) talPresets[i] = new TalPreset();
 	curProgram = 0;
 
 	// load factory presets
 	ProgramChunk *chunk = new ProgramChunk();
 	XmlDocument myDocument (chunk->getXmlChunk());
 	XmlElement* mainElement = myDocument.getDocumentElement();
-	
+
 	MemoryBlock* destData = new MemoryBlock();
 	copyXmlToBinary(*mainElement, *destData);
 	setStateInformation(destData->getData(), destData->getSize());
@@ -91,7 +91,7 @@ float TalCore::getParameter (int index)
 {
 	if (index < NUMPARAM)
 		return talPresets[curProgram]->programData[index];
-	else 
+	else
 		return 0;
 }
 
@@ -264,7 +264,7 @@ void TalCore::processBlock (AudioSampleBuffer& buffer,
 	if (numberOfChannels == 1)
 	{
 		float *samples0 = buffer.getSampleData(0, 0);
-		float *samples1 = buffer.getSampleData(0, 0); 
+		float *samples1 = buffer.getSampleData(0, 0);
 
 		int samplePos = 0;
 		int numSamples = buffer.getNumSamples();
@@ -290,7 +290,7 @@ void TalCore::processMidiPerSample(MidiBuffer::Iterator *midiIterator, MidiMessa
 {
 	// There can be more than one event at the same position
 	while (hasMoreMidiMessages && midiEventPos == samplePos)
-	{ 
+	{
 		if (controllerMidiMessage.isController())
 		{
 			handleController (controllerMidiMessage.getControllerNumber(),
@@ -306,9 +306,9 @@ void TalCore::handleController (const int controllerNumber,
 	// no midi
 	//if (params[REALSTEREOMODE] > 0.0f)
 	//{
-	//	for (int i = 0; i < NUMPROGRAMS; i++) 
+	//	for (int i = 0; i < NUMPROGRAMS; i++)
 	//	{
-	//		talPresets[i].midiMap[controllerNumber] = lastMovedController; 
+	//		talPresets[i].midiMap[controllerNumber] = lastMovedController;
 	//	}
 	//}
 	//if (talPresets[curProgram].midiMap[controllerNumber] > 0)
@@ -427,7 +427,7 @@ void TalCore::setStateInformation (const void* data, int sizeInBytes)
 		{
 			forEachXmlChildElement (*midiMap, e)
 			{
-				for (int j = 0; j < NUMPROGRAMS; j++) 
+				for (int j = 0; j < NUMPROGRAMS; j++)
 				{
 					int controller = e->getIntAttribute(T("controllernumber"), 0);
 					if (controller < 255 && controller > 0)
@@ -485,7 +485,7 @@ void TalCore::setStateInformationString (const String& data)
             {
                     forEachXmlChildElement (*midiMap, e)
                     {
-                            for (int j = 0; j < NUMPROGRAMS; j++) 
+                            for (int j = 0; j < NUMPROGRAMS; j++)
                             {
                                     int controller = e->getIntAttribute(T("controllernumber"), 0);
                                     if (controller < 255 && controller > 0)
@@ -565,7 +565,7 @@ void TalCore::setCurrentProgram (int index)
 	if (index < NUMPROGRAMS)
 	{
 		curProgram = index;
-		for (int i = 0; i < NUMPARAM; i++) 
+		for (int i = 0; i < NUMPARAM; i++)
 		{
 			setParameter(i, talPresets[index]->programData[i]);
 		}

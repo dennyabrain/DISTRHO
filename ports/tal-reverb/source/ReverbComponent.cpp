@@ -61,14 +61,14 @@ ReverbComponent::ReverbComponent (TalCore* const ownerFilter)
     setSize (800, 285);
 
 	// Init values
-	roomSizeKnob->setValue(ownerFilter->getParameter(ROOMSIZE)); 
-	preDelayKnob->setValue(ownerFilter->getParameter(PREDELAY)); 
-	dampKnob->setValue(ownerFilter->getParameter(DAMP)); 
-	lowPassKnob->setValue(ownerFilter->getParameter(HIGHCUT)); 
-	highPassKnob->setValue(ownerFilter->getParameter(LOWCUT)); 
-	stereoWithKnob->setValue(ownerFilter->getParameter(STEREO)); 
-	drySlider->setValue(ownerFilter->getParameter(DRY));  
-	wetSlider->setValue(ownerFilter->getParameter(WET));
+	roomSizeKnob->setValue(ownerFilter->getParameter(ROOMSIZE), dontSendNotification);
+	preDelayKnob->setValue(ownerFilter->getParameter(PREDELAY), dontSendNotification);
+	dampKnob->setValue(ownerFilter->getParameter(DAMP), dontSendNotification);
+	lowPassKnob->setValue(ownerFilter->getParameter(HIGHCUT), dontSendNotification);
+	highPassKnob->setValue(ownerFilter->getParameter(LOWCUT), dontSendNotification);
+	stereoWithKnob->setValue(ownerFilter->getParameter(STEREO));
+	drySlider->setValue(ownerFilter->getParameter(DRY), dontSendNotification);
+	wetSlider->setValue(ownerFilter->getParameter(WET), dontSendNotification);
 
 	// Register change listener after initialisation
 	roomSizeKnob->addListener (this);
@@ -141,7 +141,7 @@ void ReverbComponent::sliderValueChanged (Slider* caller)
 void ReverbComponent::buttonClicked (Button* caller)
 {
     TalCore* const filter = getFilter();
-	if (caller == midiLearnButton) 
+	if (caller == midiLearnButton)
 	{
 		float midiLearn = 0.0f;
 		if (caller->getToggleState() == true) midiLearn = 1.0f;
@@ -175,14 +175,14 @@ void ReverbComponent::updateParametersFromFilter()
     // ..release the lock ASAP
     filter->getCallbackLock().exit();
 
-	roomSizeKnob->setValue(roomSize); 
-	preDelayKnob->setValue(preDelay); 
-	dampKnob->setValue(damp); 
-	lowPassKnob->setValue(highCut); 
-	highPassKnob->setValue(lowCut); 
-	stereoWithKnob->setValue(stereo); 
-	drySlider->setValue(dry);  
-	wetSlider->setValue(wet);
+	roomSizeKnob->setValue(roomSize, dontSendNotification);
+	preDelayKnob->setValue(preDelay, dontSendNotification);
+	dampKnob->setValue(damp, dontSendNotification);
+	lowPassKnob->setValue(highCut, dontSendNotification);
+	highPassKnob->setValue(lowCut, dontSendNotification);
+	stereoWithKnob->setValue(stereo, dontSendNotification);
+	drySlider->setValue(dry, dontSendNotification);
+	wetSlider->setValue(wet, dontSendNotification);
 
 	if (midiLearn > 0.0f)
 	{

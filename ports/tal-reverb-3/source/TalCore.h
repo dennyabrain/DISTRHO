@@ -82,6 +82,9 @@ public:
     bool acceptsMidi() const;
     bool producesMidi() const;
 
+    bool silenceInProducesSilenceOut() const { return false; }
+    double getTailLengthSeconds() const { return 0.0; }
+
     //==============================================================================
     int getNumPrograms();
     int getCurrentProgram();
@@ -99,7 +102,7 @@ public:
 	void handleController (const int controllerNumber,
                            const int controllerValue);
 
-	void processMidiPerSample (MidiBuffer::Iterator *midiIterator, 
+	void processMidiPerSample (MidiBuffer::Iterator *midiIterator,
 							   MidiMessage controllerMidiMessage, int samplePos);
 
     float* getCurrentVolume();

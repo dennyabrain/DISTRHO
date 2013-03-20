@@ -15,12 +15,12 @@ TalComponent::TalComponent (TalCore* const ownerFilter)
     Font fontDigital(typeface);
     fontDigital.setSizeAndStyle(13.0f, 0, 0.7f, 0.0f);
 
-    this->lowShelfGainSlider = addSlider(this, 21, 39, ownerFilter, knowWhiteImage, 186, LOWSHELFGAIN); 
-    this->highShelfGainSlider = addSlider(this, 84, 39, ownerFilter, knowWhiteImage, 186, HIGHSHELFGAIN); 
+    this->lowShelfGainSlider = addSlider(this, 21, 39, ownerFilter, knowWhiteImage, 186, LOWSHELFGAIN);
+    this->highShelfGainSlider = addSlider(this, 84, 39, ownerFilter, knowWhiteImage, 186, HIGHSHELFGAIN);
 
-    this->decayTimeSlider = addSlider(this, 145, 39, ownerFilter, knowWhiteImage, 186, DECAYTIME); 
-    this->stereoWidthSlider = addSlider(this, 208, 39, ownerFilter, knowWhiteImage, 186, STEREO); 
-    this->preDelaySlider = addSlider(this, 271, 39, ownerFilter, knowWhiteImage, 186, PREDELAY); 
+    this->decayTimeSlider = addSlider(this, 145, 39, ownerFilter, knowWhiteImage, 186, DECAYTIME);
+    this->stereoWidthSlider = addSlider(this, 208, 39, ownerFilter, knowWhiteImage, 186, STEREO);
+    this->preDelaySlider = addSlider(this, 271, 39, ownerFilter, knowWhiteImage, 186, PREDELAY);
 
     this->drySlider = addSlider(this, 358, 39, ownerFilter, knowRedImage, 186, DRY);
     this->wetSlider = addSlider(this, 421, 39, ownerFilter, knowRedImage, 186, WET);
@@ -85,7 +85,7 @@ ImageSlider* TalComponent::addSlider(Component *component, int x, int y, TalCore
 	ImageSlider *imageSlider;
 	component->addAndMakeVisible(imageSlider = new ImageSlider(sliderImage, height, parameter));
 	imageSlider->setBounds(x, y, /*sliderImage->getWidth()*/ 70, height + sliderImage.getHeight());
-	imageSlider->setValue(ownerFilter->getParameter(parameter), false);
+	imageSlider->setValue(ownerFilter->getParameter(parameter), dontSendNotification);
 	imageSlider->addListener (this);
 	return imageSlider;
 }
@@ -194,14 +194,14 @@ void TalComponent::updateParametersFromFilter()
     // ..release the lock ASAP
     filter->getCallbackLock().exit();
 
-	this->decayTimeSlider->setValue(roomSize, false);
-	this->preDelaySlider->setValue(preDelay, false);
-	this->lowShelfGainSlider->setValue(lowShelfGain, false);
-	this->highShelfGainSlider->setValue(highShelfGain, false);
-	this->stereoWidthSlider->setValue(stereo, false);
+	this->decayTimeSlider->setValue(roomSize, dontSendNotification);
+	this->preDelaySlider->setValue(preDelay, dontSendNotification);
+	this->lowShelfGainSlider->setValue(lowShelfGain, dontSendNotification);
+	this->highShelfGainSlider->setValue(highShelfGain, dontSendNotification);
+	this->stereoWidthSlider->setValue(stereo, dontSendNotification);
 
-	this->drySlider->setValue(dry, false);
-	this->wetSlider->setValue(wet, false);
+	this->drySlider->setValue(dry, dontSendNotification);
+	this->wetSlider->setValue(wet, dontSendNotification);
 
     this->realStereoModeButton->setToggleState(realStereoMode > 0.0f, true);
     this->powerButton->setToggleState(power > 0.0f, true);

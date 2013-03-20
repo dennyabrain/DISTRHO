@@ -39,7 +39,7 @@
     This function must be implemented to create a new instance of your
     plugin object.
 */
-AudioProcessor* JUCE_CALLTYPE createPluginFilter()
+AudioProcessor* JUCE_CALLTYPE createPluginFilterOfType(AudioProcessor::WrapperType)
 {
     return new TalCore();
 }
@@ -64,7 +64,7 @@ TalCore::TalCore()
 
     // load factory presets
     talPresets = new TalPreset*[NUMPROGRAMS];
-    for (int i = 0; i < NUMPROGRAMS; i++) talPresets[i] = new TalPreset(); 
+    for (int i = 0; i < NUMPROGRAMS; i++) talPresets[i] = new TalPreset();
     curProgram = 0;
 
     ProgramChunk *chunk = new ProgramChunk();
@@ -94,7 +94,7 @@ float TalCore::getParameter (int index)
 {
 	if (index < NUMPARAM)
 		return talPresets[curProgram]->programData[index];
-	else 
+	else
 		return 0;
 }
 
@@ -190,7 +190,7 @@ bool TalCore::acceptsMidi() const
 bool TalCore::producesMidi() const
 {
     return false;
-} 
+}
 
 void TalCore::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
@@ -250,7 +250,7 @@ void TalCore::processBlock (AudioSampleBuffer& buffer,
 	if (numberOfChannels == 1)
 	{
 		float *samples0 = buffer.getSampleData(0, 0);
-		float *samples1 = buffer.getSampleData(0, 0); 
+		float *samples1 = buffer.getSampleData(0, 0);
 
 		int samplePos = 0;
 		int numSamples = buffer.getNumSamples();
@@ -308,7 +308,7 @@ void TalCore::getStateInformation (MemoryBlock& destData)
     //String myXmlDoc = tal.createDocument ("presets.txt");
     //file->replaceWithText(myXmlDoc);
     //#endif
-} 
+}
 
 void TalCore::setStateInformation (const void* data, int sizeInBytes)
 {
@@ -419,7 +419,7 @@ void TalCore::setCurrentProgram (int index)
 
         this->engine->setPoints(talPresets[index]->getPoints());
 
-		for (int i = 0; i < NUMPARAM; i++) 
+		for (int i = 0; i < NUMPARAM; i++)
 		{
 			this->setParameter(i, talPresets[index]->programData[i]);
         }

@@ -31,7 +31,7 @@ TalComponent::TalComponent (TalCore* const ownerFilter)
 	lfo1RateKnob = addNormalKnob(this->synth1AccordeonTab, 26, 51, ownerFilter, knobImage, numberOfImages, LFO1RATE);
 	lfo1AmountKnob = addNormalKnob(this->synth1AccordeonTab, 26, 113, ownerFilter, knobImage, numberOfImages, LFO1AMOUNT);
 	lfo1PhaseKnob = addNormalKnob(this->synth1AccordeonTab, 26, 176, ownerFilter, knobImage, numberOfImages, LFO1PHASE);
-	
+
     lfo1DestinationTalComboBox = addTalComboBox(this->synth1AccordeonTab, 92, 121, 60, ownerFilter, LFO1DESTINATION);
 	lfo1DestinationTalComboBox->addItem("Off",1);
 	lfo1DestinationTalComboBox->addItem("Filter",2);
@@ -48,11 +48,11 @@ TalComponent::TalComponent (TalCore* const ownerFilter)
 	osc1PwKnob = addNormalKnob(this->synth1AccordeonTab, 238, 113, ownerFilter, knobImage, numberOfImages, OSC1PW);
 	osc1PhaseKnob = addNormalKnob(this->synth1AccordeonTab, 188, 113, ownerFilter, knobImage, numberOfImages, OSC1PHASE);
 	osc1FineTuneKnob = addNormalKnob(this->synth1AccordeonTab, 238, 51, ownerFilter, knobImage, numberOfImages, OSC1FINETUNE);
-	
+
     osc1WaveformTalComboBox = addTalComboBox(this->synth1AccordeonTab, 193, 187, 80, ownerFilter, OSC1WAVEFORM);
 	osc1WaveformTalComboBox->addItem("Saw",1);
 	osc1WaveformTalComboBox->addItem("Pulse",2);
-	osc1WaveformTalComboBox->addItem("Noise",3); 
+	osc1WaveformTalComboBox->addItem("Noise",3);
 
     // osc 2
 	osc2VolumeKnob = addNormalKnob(this->synth1AccordeonTab, 488, 51, ownerFilter, knobImage, numberOfImages, OSC2VOLUME);
@@ -60,13 +60,13 @@ TalComponent::TalComponent (TalCore* const ownerFilter)
 	osc2FineTuneKnob = addNormalKnob(this->synth1AccordeonTab, 363, 51, ownerFilter, knobImage, numberOfImages, OSC2FINETUNE);
 	osc2FmKnob = addNormalKnob(this->synth1AccordeonTab, 363, 113, ownerFilter, knobImage, numberOfImages, OSC2FM);
 	osc2PhaseKnob = addNormalKnob(this->synth1AccordeonTab, 313, 113, ownerFilter, knobImage, numberOfImages, OSC2PHASE);
-	
+
     osc2WaveformTalComboBox = addTalComboBox(this->synth1AccordeonTab, 319, 187, 80, ownerFilter, OSC2WAVEFORM);
 	osc2WaveformTalComboBox->addItem("Saw",1);
 	osc2WaveformTalComboBox->addItem("Pulse",2);
-	osc2WaveformTalComboBox->addItem("Triangle",3); 
+	osc2WaveformTalComboBox->addItem("Triangle",3);
 	osc2WaveformTalComboBox->addItem("Sine",4);
-	osc2WaveformTalComboBox->addItem("Noise",5); 
+	osc2WaveformTalComboBox->addItem("Noise",5);
 
     // master
 	osc3VolumeKnob = addNormalKnob(this->synth1AccordeonTab, 538, 51, ownerFilter, knobImage, numberOfImages, OSC3VOLUME);
@@ -74,28 +74,28 @@ TalComponent::TalComponent (TalCore* const ownerFilter)
     ringmodulationKnob =  addNormalKnob(this->synth1AccordeonTab, 438, 113, ownerFilter, knobImage, numberOfImages, RINGMODULATION);
 	oscMasterTuneKnob = addNormalKnob(this->synth1AccordeonTab, 440, 176, ownerFilter, knobImage, numberOfImages, OSCMASTERTUNE);
 	oscSyncButton = addNormalButton(this->synth1AccordeonTab, 490, 125, ownerFilter, buttonImage, false, OSCSYNC);
-	transposeKnob = addNormalKnob(this->synth1AccordeonTab, 538, 176, ownerFilter, knobImage, numberOfImages, TRANSPOSE);	
+	transposeKnob = addNormalKnob(this->synth1AccordeonTab, 538, 176, ownerFilter, knobImage, numberOfImages, TRANSPOSE);
 	volumeKnob = addNormalKnob(this->synth1AccordeonTab, 613, 51, ownerFilter, knobImage, numberOfImages, VOLUME);
 
     voicesTalComboBox = addTalComboBox(this->synth1AccordeonTab, 595, 130, 60, ownerFilter, VOICES);
 	voicesTalComboBox->addItem("mono",1);
 	voicesTalComboBox->addItem("2",2);
-	voicesTalComboBox->addItem("3",3); 
+	voicesTalComboBox->addItem("3",3);
 	voicesTalComboBox->addItem("4",4);
 	voicesTalComboBox->addItem("5",5);
 	voicesTalComboBox->addItem("6",6);
-	
+
     portamentoModeTalComboBox = addTalComboBox(this->synth1AccordeonTab, 595, 107, 60, ownerFilter, PORTAMENTOMODE);
 	portamentoModeTalComboBox->addItem("Off",1);
 	portamentoModeTalComboBox->addItem("Auto",2);
-	portamentoModeTalComboBox->addItem("On",3); 
+	portamentoModeTalComboBox->addItem("On",3);
 
     this->accordeonTabContainer->add(this->synth1AccordeonTab);
 
     // Synth 2 Tab
     // ------------------------------------------
     this->synth2AccordeonTab = new AccordeonTab(internalCachedBackgroundImage, 275, 275);
-    
+
     // lfo 2
 	lfo2RateKnob = addNormalKnob(this->synth2AccordeonTab, 26, 51, ownerFilter, knobImage, numberOfImages, LFO2RATE);
 	lfo2AmountKnob = addNormalKnob(this->synth2AccordeonTab, 26, 113, ownerFilter, knobImage, numberOfImages, LFO2AMOUNT);
@@ -106,7 +106,7 @@ TalComponent::TalComponent (TalCore* const ownerFilter)
 
 	lfo2DestinationTalComboBox = addTalComboBox(this->synth2AccordeonTab, 92, 121, 60, ownerFilter, LFO2DESTINATION);
 	lfo2DestinationTalComboBox->addItem("Off",1);
-	lfo2DestinationTalComboBox->addItem("Filter",2);     
+	lfo2DestinationTalComboBox->addItem("Filter",2);
 	lfo2DestinationTalComboBox->addItem("Osc1",3);
 	lfo2DestinationTalComboBox->addItem("Osc2",4);
 	lfo2DestinationTalComboBox->addItem("Osc1 & 2",8);
@@ -119,11 +119,11 @@ TalComponent::TalComponent (TalCore* const ownerFilter)
 	resonanceKnob = addNormalKnob(this->synth2AccordeonTab, 238, 51, ownerFilter, knobImage, numberOfImages, RESONANCE);
 	keyfollowKnob = addNormalKnob(this->synth2AccordeonTab, 313, 51, ownerFilter, knobImage, numberOfImages, KEYFOLLOW);
 	filterContourKnob = addNormalKnob(this->synth2AccordeonTab, 363, 51, ownerFilter, knobImage, numberOfImages, FILTERCONTOUR);
-	
-    filterAttackKnob = addSlider(this->synth2AccordeonTab, 198, 130, ownerFilter, sliderImage, 64, FILTERATTACK); 
-	filterDecayKnob = addSlider(this->synth2AccordeonTab, 198 + 50, 130, ownerFilter, sliderImage, 64, FILTERDECAY); 
-	filterSustainKnob = addSlider(this->synth2AccordeonTab, 198 + 100, 130, ownerFilter, sliderImage, 64, FILTERSUSTAIN); 
-	filterReleaseKnob = addSlider(this->synth2AccordeonTab, 198 + 150, 130, ownerFilter, sliderImage, 64, FILTERRELEASE);  
+
+    filterAttackKnob = addSlider(this->synth2AccordeonTab, 198, 130, ownerFilter, sliderImage, 64, FILTERATTACK);
+	filterDecayKnob = addSlider(this->synth2AccordeonTab, 198 + 50, 130, ownerFilter, sliderImage, 64, FILTERDECAY);
+	filterSustainKnob = addSlider(this->synth2AccordeonTab, 198 + 100, 130, ownerFilter, sliderImage, 64, FILTERSUSTAIN);
+	filterReleaseKnob = addSlider(this->synth2AccordeonTab, 198 + 150, 130, ownerFilter, sliderImage, 64, FILTERRELEASE);
 
     filtertypeTalComboBox = addTalComboBox(this->synth2AccordeonTab, 292, 15, 80, ownerFilter, FILTERTYPE);
 	filtertypeTalComboBox->addItem("LP 24dB",1);
@@ -138,11 +138,11 @@ TalComponent::TalComponent (TalCore* const ownerFilter)
 	filtertypeTalComboBox->addItem("BP SV 24dB",10);
 
     // adsr
-    ampAttackKnob = addSlider(this->synth2AccordeonTab, 448, 130, ownerFilter, sliderImage, 64, AMPATTACK); 
-	ampDecayKnob = addSlider(this->synth2AccordeonTab, 448 + 50, 130, ownerFilter, sliderImage, 64, AMPDECAY); 
-	ampSustainKnob = addSlider(this->synth2AccordeonTab, 448 + 100, 130, ownerFilter, sliderImage, 64, AMPSUSTAIN); 
+    ampAttackKnob = addSlider(this->synth2AccordeonTab, 448, 130, ownerFilter, sliderImage, 64, AMPATTACK);
+	ampDecayKnob = addSlider(this->synth2AccordeonTab, 448 + 50, 130, ownerFilter, sliderImage, 64, AMPDECAY);
+	ampSustainKnob = addSlider(this->synth2AccordeonTab, 448 + 100, 130, ownerFilter, sliderImage, 64, AMPSUSTAIN);
 	ampReleaseKnob = addSlider(this->synth2AccordeonTab, 448 + 150, 130, ownerFilter, sliderImage, 64, AMPRELEASE);
-	
+
     freeAdAttackKnob = addNormalKnob(this->synth2AccordeonTab, 440, 51, ownerFilter, knobImage, numberOfImages, FREEADATTACK);
 	freeAdDecayKnob = addNormalKnob(this->synth2AccordeonTab, 488, 51, ownerFilter, knobImage, numberOfImages, FREEADDECAY);
 	freeAdAmountKnob = addNormalKnob(this->synth2AccordeonTab, 538, 51, ownerFilter, knobImage, numberOfImages, FREEADAMOUNT);
@@ -167,7 +167,7 @@ TalComponent::TalComponent (TalCore* const ownerFilter)
     this->envelopeEditorView->setSplineColor(Colour((const uint8)160, (const uint8)160, (const uint8)160, (const uint8)255));
 	this->envelopeEditorAccordeonTab->addAndMakeVisible(envelopeEditorView);
     this->envelopeEditorView->setBounds(30, this->envelopeEditorAccordeonTab->getTabHeight() + 23, width, height);
-    
+
     envelopeEditorDest1TalComboBox = addTalComboBox(this->envelopeEditorAccordeonTab, 583, 21, 70, ownerFilter, ENVELOPEEDITORDEST1);
 	envelopeEditorDest1TalComboBox->addItem("Off",1);
 	envelopeEditorDest1TalComboBox->addItem("Filter",2);
@@ -191,17 +191,17 @@ TalComponent::TalComponent (TalCore* const ownerFilter)
 
     this->envelopeEditorAmountKnob = addNormalKnob(this->envelopeEditorAccordeonTab, 600, 143, ownerFilter, darkKnobImage, numberOfImages, ENVELOPEEDITORAMOUNT);
     this->envelopeResetButton = addNormalButton(this->envelopeEditorAccordeonTab, 602, 203, ownerFilter, buttonImage, true, ENVELOPERESET);
-    
+
     this->accordeonTabContainer->add(this->envelopeEditorAccordeonTab);
 
     // Control
     // ------------------------------------------
     this->controlAccordeonTab = new AccordeonTab(internalCachedBackgroundImage, 825, 275);
-    
+
     // velocity control
-    velocityVolumeKnob = addSlider(this->controlAccordeonTab, 38, 22, ownerFilter, sliderImage, 50, VELOCITYVOLUME); 
-    velocityContourKnob = addSlider(this->controlAccordeonTab, 91, 22, ownerFilter, sliderImage, 50, VELOCITYCONTOUR); 
-    velocityCutoffKnob = addSlider(this->controlAccordeonTab, 146, 22, ownerFilter, sliderImage, 50, VELOCITYCUTOFF); 
+    velocityVolumeKnob = addSlider(this->controlAccordeonTab, 38, 22, ownerFilter, sliderImage, 50, VELOCITYVOLUME);
+    velocityContourKnob = addSlider(this->controlAccordeonTab, 91, 22, ownerFilter, sliderImage, 50, VELOCITYCONTOUR);
+    velocityCutoffKnob = addSlider(this->controlAccordeonTab, 146, 22, ownerFilter, sliderImage, 50, VELOCITYCUTOFF);
     pitchwheelCutoffKnob = addSlider(this->controlAccordeonTab, 226, 22, ownerFilter, sliderImage, 50, PITCHWHEELCUTOFF);
     pitchwheelPitchKnob = addSlider(this->controlAccordeonTab, 281, 22, ownerFilter, sliderImage, 50, PITCHWHEELPITCH);
     highpassKnob = addSlider(this->controlAccordeonTab, 359, 22, ownerFilter, sliderImage, 50, HIGHPASS);
@@ -215,7 +215,7 @@ TalComponent::TalComponent (TalCore* const ownerFilter)
     reverbPreDelayKnob = addNormalKnob(this->controlAccordeonTab, 288, 122, ownerFilter, darkKnobImage, numberOfImages, REVERBPREDELAY);
 	reverbHighCutKnob = addNormalKnob(this->controlAccordeonTab, 338, 122, ownerFilter, darkKnobImage, numberOfImages, REVERBHIGHCUT);
 	reverbLowCutKnob = addNormalKnob(this->controlAccordeonTab, 388, 122, ownerFilter, darkKnobImage, numberOfImages, REVERBLOWCUT);
-	
+
     // delay
     delayWetKnob = addNormalKnob(this->controlAccordeonTab, 188, 179, ownerFilter, darkKnobImage, numberOfImages, DELAYWET);
     delayTimeKnob = addNormalKnob(this->controlAccordeonTab, 238, 179, ownerFilter, darkKnobImage, numberOfImages, DELAYTIME);
@@ -258,10 +258,10 @@ TalComponent::TalComponent (TalCore* const ownerFilter)
     this->logoPanel->addAndMakeVisible(infoText);
 
     midiLearnButton = addNormalButton(this->logoPanel, 442, 5, ownerFilter, buttonImage, false, MIDILEARN);
-   
+
     loadButton = addNormalButton(this->logoPanel, 544, -13, ownerFilter, loadButtonImage, true, PRESETLOAD);
     saveButton = addNormalButton(this->logoPanel, 544, 8, ownerFilter, saveButtonImage, true, PRESETSAVE);
-	
+
     panicButton = addNormalButton(this->logoPanel, 620, 5, ownerFilter, buttonImage, true, PANIC);
     this->accordeonTabContainer->add(this->logoPanel);
 
@@ -296,7 +296,7 @@ FilmStripKnob* TalComponent::addNormalKnob(Component *component, int x, int y, T
 									 false,
                                      parameter));
     filmStripKnob->setBounds(x, y + this->synth1AccordeonTab->getTabHeight(), knobImage.getWidth(), knobImage.getHeight() / numOfFrames);
-	filmStripKnob->setValue(ownerFilter->getParameter(parameter), false);
+	filmStripKnob->setValue(ownerFilter->getParameter(parameter), dontSendNotification);
 	filmStripKnob->addListener (this);
 	return filmStripKnob;
 }
@@ -316,7 +316,7 @@ ImageSlider* TalComponent::addSlider(Component *component, int x, int y, TalCore
 	ImageSlider *imageSlider;
 	component->addAndMakeVisible(imageSlider = new ImageSlider(sliderImage, height, parameter));
 	imageSlider->setBounds(x, y + this->synth1AccordeonTab->getTabHeight(), /*sliderImage->getWidth()*/ 40, height + sliderImage.getHeight());
-	imageSlider->setValue(ownerFilter->getParameter(parameter), false);
+	imageSlider->setValue(ownerFilter->getParameter(parameter), dontSendNotification);
 	imageSlider->addListener (this);
 	return imageSlider;
 }
@@ -327,7 +327,7 @@ TalComboBox* TalComponent::addTalComboBox(Component *component, int x, int y, in
 	component->addAndMakeVisible(comboBox = new TalComboBox(parameter));
 	comboBox->setBounds(x, y + this->synth1AccordeonTab->getTabHeight(), width, 20);
 	comboBox->setColour(TalComboBox::backgroundColourId, Colour((juce::uint8)8, (juce::uint8)11, (juce::uint8)58, 0.0f));
-	comboBox->setColour(TalComboBox::textColourId, Colour::greyLevel(1.0f));	
+	comboBox->setColour(TalComboBox::textColourId, Colour::greyLevel(1.0f));
 	comboBox->setColour(TalComboBox::buttonColourId, Colour((juce::uint8)8, (juce::uint8)11, (juce::uint8)58, 0.0f));
 	comboBox->setColour(TalComboBox::arrowColourId, Colour((juce::uint8)8, (juce::uint8)11, (juce::uint8)58, 0.0f));
     comboBox->setSelectedId((int)ownerFilter->getParameter(parameter), true);
@@ -350,7 +350,7 @@ void TalComponent::resized()
     {
         setSize(this->accordeonTabContainer->getWidth(), 2 * this->synth2AccordeonTab->getTabHeight() + this->logoPanel->getHeight() + this->synth2AccordeonTab->getMaxHeight() + this->synth1AccordeonTab->getMaxHeight());
     }
-    
+
     repaint();
 }
 
@@ -535,7 +535,7 @@ void TalComponent::handleClickedTabs (Button* caller)
 {
     TalCore* const filter = getProcessor();
 
-    if (caller == synth1AccordeonTab 
+    if (caller == synth1AccordeonTab
         || caller == synth2AccordeonTab
         || caller == envelopeEditorAccordeonTab
         || caller == controlAccordeonTab)
@@ -634,7 +634,7 @@ void TalComponent::updateParametersFromFilter()
 	float voices = filter->getParameter(VOICES);
 	float portamento = filter->getParameter(PORTAMENTO);
 	float portamentoMode = filter->getParameter(PORTAMENTOMODE);
-	
+
 	float lfo1Waveform = filter->getParameter(LFO1WAVEFORM);
 	float lfo2Waveform = filter->getParameter(LFO2WAVEFORM);
 
@@ -675,7 +675,7 @@ void TalComponent::updateParametersFromFilter()
     float detune = filter->getParameter(DETUNE);
     float vintageNoise = filter->getParameter(VINTAGENOISE);
     float ringmodulation = filter->getParameter(RINGMODULATION);
-    
+
     float chorus1 = filter->getParameter(CHORUS1ENABLE);
     float chorus2 = filter->getParameter(CHORUS2ENABLE);
 
@@ -714,79 +714,79 @@ void TalComponent::updateParametersFromFilter()
     // ..release the lock ASAP
     filter->getCallbackLock().exit();
 
-	volumeKnob->setValue(volume, false);
-	cutoffKnob->setValue(cutoff, false);
-	resonanceKnob->setValue(resonance, false);
-	filterContourKnob->setValue(filterContour, false);
-	keyfollowKnob->setValue(keyfollow, false); 
-	filterAttackKnob->setValue(filterAttack, false);
-	filterDecayKnob->setValue(filterDecay, false);
-	filterSustainKnob->setValue(filterSustain, false); 
-	filterReleaseKnob->setValue(filterRelease, false);
+	volumeKnob->setValue(volume, dontSendNotification);
+	cutoffKnob->setValue(cutoff, dontSendNotification);
+	resonanceKnob->setValue(resonance, dontSendNotification);
+	filterContourKnob->setValue(filterContour, dontSendNotification);
+	keyfollowKnob->setValue(keyfollow, dontSendNotification);
+	filterAttackKnob->setValue(filterAttack, dontSendNotification);
+	filterDecayKnob->setValue(filterDecay, dontSendNotification);
+	filterSustainKnob->setValue(filterSustain, dontSendNotification);
+	filterReleaseKnob->setValue(filterRelease, dontSendNotification);
 
-	ampAttackKnob->setValue(ampAttack, false);
-	ampDecayKnob->setValue(ampDecay, false); 
-	ampSustainKnob->setValue(ampSustain, false); 
-	ampReleaseKnob->setValue(ampRelease, false);
+	ampAttackKnob->setValue(ampAttack, dontSendNotification);
+	ampDecayKnob->setValue(ampDecay, dontSendNotification);
+	ampSustainKnob->setValue(ampSustain, dontSendNotification);
+	ampReleaseKnob->setValue(ampRelease, dontSendNotification);
 
-	osc1VolumeKnob->setValue(osc1Volume, false); 
-	osc2VolumeKnob->setValue(osc2Volume, false); 
-	osc3VolumeKnob->setValue(osc3Volume, false);
-	portamentoKnob->setValue(portamento, false); 
-    ringmodulationKnob->setValue(ringmodulation, false);
+	osc1VolumeKnob->setValue(osc1Volume, dontSendNotification);
+	osc2VolumeKnob->setValue(osc2Volume, dontSendNotification);
+	osc3VolumeKnob->setValue(osc3Volume, dontSendNotification);
+	portamentoKnob->setValue(portamento, dontSendNotification);
+    ringmodulationKnob->setValue(ringmodulation, dontSendNotification);
 
-	oscMasterTuneKnob->setValue(oscMasterTune, false);
-	osc1TuneKnob->setValue(osc1Tune, false);
-	osc2TuneKnob->setValue(osc2Tune, false);
-	osc1FineTuneKnob->setValue(osc1FineTune, false);
-	osc2FineTuneKnob->setValue(osc2FineTune, false); 
+	oscMasterTuneKnob->setValue(oscMasterTune, dontSendNotification);
+	osc1TuneKnob->setValue(osc1Tune, dontSendNotification);
+	osc2TuneKnob->setValue(osc2Tune, dontSendNotification);
+	osc1FineTuneKnob->setValue(osc1FineTune, dontSendNotification);
+	osc2FineTuneKnob->setValue(osc2FineTune, dontSendNotification);
 
-	lfo1WaveformKnob->setValue(lfo1Waveform, false);
-	lfo2WaveformKnob->setValue(lfo2Waveform, false);
+	lfo1WaveformKnob->setValue(lfo1Waveform, dontSendNotification);
+	lfo2WaveformKnob->setValue(lfo2Waveform, dontSendNotification);
 
-	lfo1RateKnob->setValue(lfo1Rate, false);
-	lfo2RateKnob->setValue(lfo2Rate, false);
-	lfo1AmountKnob->setValue(lfo1Amount, false);
-	lfo2AmountKnob->setValue(lfo2Amount, false);
+	lfo1RateKnob->setValue(lfo1Rate, dontSendNotification);
+	lfo2RateKnob->setValue(lfo2Rate, dontSendNotification);
+	lfo1AmountKnob->setValue(lfo1Amount, dontSendNotification);
+	lfo2AmountKnob->setValue(lfo2Amount, dontSendNotification);
 
-	lfo1PhaseKnob->setValue(lfo1Phase, false);
-	lfo2PhaseKnob->setValue(lfo2Phase, false);
+	lfo1PhaseKnob->setValue(lfo1Phase, dontSendNotification);
+	lfo2PhaseKnob->setValue(lfo2Phase, dontSendNotification);
 
-	osc1PwKnob->setValue(osc1Pw, false);
-	osc2FmKnob->setValue(osc2Fm, false);
-	osc1PhaseKnob->setValue(osc1Phase, false);
-	osc2PhaseKnob->setValue(osc2Phase, false);
-	transposeKnob->setValue(transpose, false);
+	osc1PwKnob->setValue(osc1Pw, dontSendNotification);
+	osc2FmKnob->setValue(osc2Fm, dontSendNotification);
+	osc1PhaseKnob->setValue(osc1Phase, dontSendNotification);
+	osc2PhaseKnob->setValue(osc2Phase, dontSendNotification);
+	transposeKnob->setValue(transpose, dontSendNotification);
 
-	freeAdAttackKnob->setValue(freeAdAttack, false);
-	freeAdDecayKnob->setValue(freeAdDecay, false);
-	freeAdAmountKnob->setValue(freeAdAmount, false);
+	freeAdAttackKnob->setValue(freeAdAttack, dontSendNotification);
+	freeAdDecayKnob->setValue(freeAdDecay, dontSendNotification);
+	freeAdAmountKnob->setValue(freeAdAmount, dontSendNotification);
 
-    velocityVolumeKnob->setValue(velocityVolume, false);
-    velocityContourKnob->setValue(velocityContour, false);
-    velocityCutoffKnob->setValue(velocityCutoff, false);
-    pitchwheelCutoffKnob->setValue(pitchwheelCutoff, false);
-    pitchwheelPitchKnob->setValue(pitchwheelPitch, false);
-    highpassKnob->setValue(highpass, false);
-    detuneKnob->setValue(detune, false);
-    vintageNoiseKnob->setValue(vintageNoise, false);
+    velocityVolumeKnob->setValue(velocityVolume, dontSendNotification);
+    velocityContourKnob->setValue(velocityContour, dontSendNotification);
+    velocityCutoffKnob->setValue(velocityCutoff, dontSendNotification);
+    pitchwheelCutoffKnob->setValue(pitchwheelCutoff, dontSendNotification);
+    pitchwheelPitchKnob->setValue(pitchwheelPitch, dontSendNotification);
+    highpassKnob->setValue(highpass, dontSendNotification);
+    detuneKnob->setValue(detune, dontSendNotification);
+    vintageNoiseKnob->setValue(vintageNoise, dontSendNotification);
 
-    reverbWetKnob->setValue(reverbWet, false);
-    reverbDecayKnob->setValue(reverbDecay, false);
-    reverbPreDelayKnob->setValue(reverbPreDelay, false);
-    reverbHighCutKnob->setValue(reverbHighCut, false);
-    reverbLowCutKnob->setValue(reverbLowCut, false);
+    reverbWetKnob->setValue(reverbWet, dontSendNotification);
+    reverbDecayKnob->setValue(reverbDecay, dontSendNotification);
+    reverbPreDelayKnob->setValue(reverbPreDelay, dontSendNotification);
+    reverbHighCutKnob->setValue(reverbHighCut, dontSendNotification);
+    reverbLowCutKnob->setValue(reverbLowCut, dontSendNotification);
 
-    oscBitcrusherKnob->setValue(oscBitcrusher, false);
-    envelopeEditorAmountKnob->setValue(envelopeEditorAmount, false);
+    oscBitcrusherKnob->setValue(oscBitcrusher, dontSendNotification);
+    envelopeEditorAmountKnob->setValue(envelopeEditorAmount, dontSendNotification);
 
-    filterDriveKnob->setValue(filterDrive, false);
+    filterDriveKnob->setValue(filterDrive, dontSendNotification);
 
-    delayWetKnob->setValue(delayWet, false);
-    delayTimeKnob->setValue(delayTime, false);
-    delayHighShelfKnob->setValue(delayHighShelf, false);
-    delayLowShelfKnob->setValue(delayLowShelf, false);
-    delayFeedbackKnob->setValue(delayFeedback, false);
+    delayWetKnob->setValue(delayWet, dontSendNotification);
+    delayTimeKnob->setValue(delayTime, dontSendNotification);
+    delayHighShelfKnob->setValue(delayHighShelf, dontSendNotification);
+    delayLowShelfKnob->setValue(delayLowShelf, dontSendNotification);
+    delayFeedbackKnob->setValue(delayFeedback, dontSendNotification);
 
 	// Buttons
 	oscSyncButton->setToggleState(oscSync, false);
@@ -805,14 +805,14 @@ void TalComponent::updateParametersFromFilter()
     envelopeFixTempoButton->setToggleState(envelopeFixTempo > 0, false);
 
 	// TalComboBox
-	voicesTalComboBox->setNormalizedSelectedId(voices, true); 
-	portamentoModeTalComboBox->setNormalizedSelectedId(portamentoMode, true); 
-	lfo1DestinationTalComboBox->setNormalizedSelectedId(lfo1Destination, true); 
-	lfo2DestinationTalComboBox->setNormalizedSelectedId(lfo2Destination, true); 
-	freeAdDestinationTalComboBox->setNormalizedSelectedId(freeAdDestination, true); 
+	voicesTalComboBox->setNormalizedSelectedId(voices, true);
+	portamentoModeTalComboBox->setNormalizedSelectedId(portamentoMode, true);
+	lfo1DestinationTalComboBox->setNormalizedSelectedId(lfo1Destination, true);
+	lfo2DestinationTalComboBox->setNormalizedSelectedId(lfo2Destination, true);
+	freeAdDestinationTalComboBox->setNormalizedSelectedId(freeAdDestination, true);
 	filtertypeTalComboBox->setNormalizedSelectedId(filtertype, true);
 
-	osc1WaveformTalComboBox->setNormalizedSelectedId(osc1Waveform, true); 
+	osc1WaveformTalComboBox->setNormalizedSelectedId(osc1Waveform, true);
 	osc2WaveformTalComboBox->setNormalizedSelectedId(osc2Waveform, true);
 
     envelopeEditorSpeedTalComboBox->setNormalizedSelectedId(envelopeEditorSpeed, true);

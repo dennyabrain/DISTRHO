@@ -35,7 +35,7 @@ TalComponent::TalComponent (TalCore* const ownerFilter)
 	delaySyncComboBox->setColour(ComboBox::textColourId, Colour::greyLevel(0.8f));
 	delaySyncComboBox->addItem("FREE",1);
 	delaySyncComboBox->addItem("1/16",2);
-	delaySyncComboBox->addItem("1/8",3); 
+	delaySyncComboBox->addItem("1/8",3);
 	delaySyncComboBox->addItem("1/4",4);
 	delaySyncComboBox->addItem("1/2",5);
 	delaySyncComboBox->addItem("1/1",6);
@@ -63,7 +63,7 @@ TalComponent::TalComponent (TalCore* const ownerFilter)
 
 	midiLearnButton = addToggleButton(610, 147, ownerFilter, bmp00132_png, bmp00132_pngSize, bmp00133_png, bmp00133_pngSize, -1);
 	// liveModeButton = addToggleButton(500, 147, ownerFilter, bmp00138_png, bmp00138_pngSize, bmp00139_png, bmp00139_pngSize, -1);
-	
+
 	tabButton = addTabButton(720, 147, ownerFilter, bmp00136_png, bmp00136_pngSize, bmp00137_png, bmp00137_pngSize, -1);
 
 	delayTwiceLButton = addToggleButton(209, 58, ownerFilter, bmp00134_png, bmp00134_pngSize, bmp00135_png, bmp00135_pngSize, DELAYTWICE_L);
@@ -97,13 +97,13 @@ FilmStripKnob* TalComponent::addNormalKnob(int x, int y, TalCore* const ownerFil
 									 knobImage.getHeight() / knobImage.getWidth(),
 									 false, parameter));
     filmStripKnob->setBounds(x, y, knobImage.getWidth(), knobImage.getWidth());
-	filmStripKnob->setValue(ownerFilter->getParameter(parameter), false);
+	filmStripKnob->setValue(ownerFilter->getParameter(parameter), dontSendNotification);
 	filmStripKnob->addListener (this);
 	return filmStripKnob;
 }
 
 
-ImageToggleButton* TalComponent::addToggleButton(int x, int y, TalCore* const ownerFilter, 
+ImageToggleButton* TalComponent::addToggleButton(int x, int y, TalCore* const ownerFilter,
 	const char *imageDataOff, int imageDataOffSize, const char *imamgeDataOn, int imageDataOnSize, int parameter)
 {
 	Image toggleImgOff = ImageCache::getFromMemory(imageDataOff, imageDataOffSize);
@@ -118,7 +118,7 @@ ImageToggleButton* TalComponent::addToggleButton(int x, int y, TalCore* const ow
 	return toggleButton;
 }
 
-ImageTabButton* TalComponent::addTabButton(int x, int y, TalCore* const ownerFilter, 
+ImageTabButton* TalComponent::addTabButton(int x, int y, TalCore* const ownerFilter,
 	const char *imageDataOff, int imageDataOffSize, const char *imamgeDataOn, int imageDataOnSize, int parameter)
 {
 	Image tabImgOff = ImageCache::getFromMemory(imageDataOff, imageDataOffSize);
@@ -170,7 +170,7 @@ void TalComponent::setTooltip(Slider* slider)
 	if (slider == feedbackKnob)
 	{
 		// Set delayTime tooltip
-		String text = String::formatted(T("%4.4f"), 
+		String text = String::formatted(T("%4.4f"),
 			audioUtils.calculateFeedback((float)slider->getValue()));
 		slider->setTooltip(text);
 	}
@@ -200,13 +200,13 @@ void TalComponent::comboBoxChanged (ComboBox* caller)
 void TalComponent::buttonClicked (Button* caller)
 {
     TalCore* const filter = getFilter();
-	if (caller == midiLearnButton) 
+	if (caller == midiLearnButton)
 	{
 		float midiLearn = 0.0f;
 		if (caller->getToggleState()) midiLearn = 1.0f;
 		filter->setParameterNotifyingHost(MIDILEARN, midiLearn);
 	}
-	//if (caller == liveModeButton) 
+	//if (caller == liveModeButton)
 	//{
 	//	float liveMode = 0.0f;
 	//	if (caller->getToggleState()) liveMode = 1.0f;
@@ -242,11 +242,11 @@ void TalComponent::buttonClicked (Button* caller)
 	{
 		// set new rate
 		juce::int64 deltaTimeInMs = tabButton->setClick();
-		if (deltaTimeInMs > (juce::int64)0 && 
+		if (deltaTimeInMs > (juce::int64)0 &&
 			deltaTimeInMs < (juce::int64)4000)
 		{
 			float delayTime = (float)deltaTimeInMs / 4000.0f;
-			delayTimeKnob->setValue(delayTime, true); 
+			delayTimeKnob->setValue(delayTime);
 		}
 	}
 }
@@ -282,18 +282,18 @@ void TalComponent::updateParametersFromFilter()
     // ..release the lock ASAP
     filter->getCallbackLock().exit();
 
-	inputDriveKnob->setValue(inputDrive, false); 
-	delayTimeKnob->setValue(delayTime, false); 
-	feedbackKnob->setValue(feedback, false); 
-	highCutKnob->setValue(highCut, false); 
-	cutoffKnob->setValue(cutoff, false); 
-	wetKnob->setValue(wet, false);
-	dryKnob->setValue(dry, false);
+	inputDriveKnob->setValue(inputDrive, dontSendNotification);
+	delayTimeKnob->setValue(delayTime, dontSendNotification);
+	feedbackKnob->setValue(feedback, dontSendNotification);
+	highCutKnob->setValue(highCut, dontSendNotification);
+	cutoffKnob->setValue(cutoff, dontSendNotification);
+	wetKnob->setValue(wet, dontSendNotification);
+	dryKnob->setValue(dry, dontSendNotification);
 
-	midiLearnButton->setValue(midiLearn, false);
-	// liveModeButton->setValue(liveMode, false);
-	delayTwiceLButton->setValue(delayTimeTwiceL, false);
-	delayTwiceRButton->setValue(delayTimeTwiceR, false);
+	midiLearnButton->setValue(midiLearn, dontSendNotification);
+	// liveModeButton->setValue(liveMode, dontSendNotification);
+	delayTwiceLButton->setValue(delayTimeTwiceL, dontSendNotification);
+	delayTwiceRButton->setValue(delayTimeTwiceR, dontSendNotification);
 
 	delaySyncComboBox->setSelectedId((int)delaySync, true);
 

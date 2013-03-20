@@ -84,6 +84,9 @@ public:
     bool acceptsMidi() const;
     bool producesMidi() const;
 
+    bool silenceInProducesSilenceOut() const { return false; }
+    double getTailLengthSeconds() const { return 0.0; }
+
     //==============================================================================
     int getNumPrograms();
     int getCurrentProgram();
@@ -99,7 +102,7 @@ public:
 
     void setStateInformationFromXml(XmlElement* xmlState);
     XmlElement* getCurrentProgramStateInformationAsXml();
-    
+
     void getXmlPrograms(XmlElement *programList, int programNumber);
     void setXmlPrograms(XmlElement *programList, int programNumber, float version);
     void restoreMidiMapping(XmlElement* e);
