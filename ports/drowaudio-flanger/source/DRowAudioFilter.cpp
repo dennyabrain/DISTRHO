@@ -45,8 +45,11 @@ AudioProcessor* JUCE_CALLTYPE createPluginFilterOfType(AudioProcessor::WrapperTy
 
 //==============================================================================
 DRowAudioFilter::DRowAudioFilter()
+    : pfLookupTable(nullptr),
+      pfCircularBufferL(nullptr),
+      pfCircularBufferR(nullptr)
 {
-	setupParams();
+    setupParams();
 }
 
 DRowAudioFilter::~DRowAudioFilter()
@@ -293,9 +296,11 @@ void DRowAudioFilter::prepareToPlay (double sampleRate, int samplesPerBlock)
 
 void DRowAudioFilter::releaseResources()
 {
-	delete[] pfLookupTable;
-	delete[] pfCircularBufferL;
-	if (getNumInputChannels() == 2)
+        if (pfLookupTable != nullptr)
+            delete[] pfLookupTable;
+        if (pfCircularBufferL != nullptr)
+            delete[] pfCircularBufferL;
+	if (getNumInputChannels() == 2 && pfCircularBufferR != nullptr)
 		delete[] pfCircularBufferR;
 }
 
