@@ -1,7 +1,7 @@
 /*
   ==============================================================================
 
-   Build options for juce-audio-devices static library
+   Build options for juce-audio-devices_full static library
 
   ==============================================================================
 */
@@ -14,8 +14,8 @@
 #include "../build-audio-formats/AppConfig.h"
 
 #if LINUX
-#include "../build-gui-basics/AppConfig.h"
-#include "../source/modules/juce_gui_basics/juce_gui_basics.h"
+ #include "../build-gui-basics/AppConfig.h"
+ #include "../source/modules/juce_gui_basics/juce_gui_basics.h"
 
 static inline
 const char* jucelinux__getAppName()
@@ -23,7 +23,7 @@ const char* jucelinux__getAppName()
     using namespace juce;
     JUCEApplication* app = JUCEApplication::getInstance();
 
-    if (app)
+    if (app != nullptr)
         return app->getApplicationName().toUTF8();
 
     return "JuceApp";

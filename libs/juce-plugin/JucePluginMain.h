@@ -23,4 +23,6 @@
 #include "modules/juce_graphics/juce_graphics.h"
 #include "modules/juce_gui_basics/juce_gui_basics.h"
 
+#include "modules/juce_audio_plugin_client/utility/juce_CheckSettingMacros.h"
+
 #endif // __DISTRHO_PLUGIN_MAIN_H__
