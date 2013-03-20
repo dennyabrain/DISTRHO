@@ -1,7 +1,7 @@
 /*
   ==============================================================================
 
-   Build options for juced static library
+   Build options for drowaudio static library
 
   ==============================================================================
 */
@@ -10,7 +10,13 @@
 #define __DISTRHO_DROWAUDIO_APPCONFIG_H__
 
 #include "../build-audio-basics/AppConfig.h"
-#include "../build-audio-devices/AppConfig.h"
+
+#if JucePlugin_Build_Standalone
+ #include "../build-audio-devices_full/AppConfig.h"
+#else
+ #include "../build-audio-devices/AppConfig.h"
+#endif
+
 #include "../build-audio-formats/AppConfig.h"
 #include "../build-audio-utils/AppConfig.h"
 #include "../build-core/AppConfig.h"
@@ -22,7 +28,7 @@
 //=============================================================================
 /** Config: DROWAUDIO_USE_FFTREAL
     Enables the FFTReal library. By default this is enabled except on the Mac
-    where the Accelerate framework is preferred. However, if you do explicity 
+    where the Accelerate framework is preferred. However, if you do explicity
     enable this setting fftreal can be used for testing purposes.
  */
 #if JUCE_MAC

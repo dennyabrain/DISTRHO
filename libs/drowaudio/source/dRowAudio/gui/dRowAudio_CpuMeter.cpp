@@ -29,33 +29,36 @@
   ==============================================================================
 */
 
-//=============================================================================
-/** Config: DROWAUDIO_USE_FFTREAL
-    Enables the FFTReal library. By default this is enabled except on the Mac
-    where the Accelerate framework is preferred. However, if you do explicity 
-    enable this setting fftreal can be used for testing purposes.
- */
-#ifndef DROWAUDIO_USE_FFTREAL
-    #if (! JUCE_MAC)
-        #define DROWAUDIO_USE_FFTREAL 1
-    #endif
-#endif
 
-/** Config: DROWAUDIO_USE_SOUNDTOUCH
-    Enables the SoundTouch library and the associated SoundTouch classes for
-    independant pitch and tempo scaling. By default this is enabled.
- */
-#ifndef DROWAUDIO_USE_SOUNDTOUCH
-    #define DROWAUDIO_USE_SOUNDTOUCH 1
-#endif
 
-/** Config: DROWAUDIO_USE_CURL
-    Enables the cURL library and the associated network classes. By default
-    this is enabled.
- */
-#ifndef DROWAUDIO_USE_CURL
-    #define DROWAUDIO_USE_CURL 1
-#endif
+CpuMeter::CpuMeter (AudioDeviceManager* deviceManagerToUse, int updateIntervalMs)
+	: Label ("CpuMeter", "00.00%"),
+	  deviceManager (deviceManagerToUse),
+	  updateInterval (updateIntervalMs),
+	  currentCpuUsage (0.0)
+{
+	if (deviceManagerToUse != nullptr)
+		startTimer (updateInterval);
+}
+
+CpuMeter::~CpuMeter()
+{
+}
+
+void CpuMeter::resized()
+{
+    const int w = getWidth();
+    const int h = getHeight();
+
+	setFont ((h < (w * 0.24f) ? h : w * 0.24f));
+}
+
+void CpuMeter::timerCallback()
+{
+	currentCpuUsage = (deviceManager->getCpuUsage() * 100.0);
+	String displayString (currentCpuUsage, 2);
+	displayString << "%";
     
-//=============================================================================
-#include "dRowAudio/dRowAudio.h"
+	setText (displayString, false);
+}
+

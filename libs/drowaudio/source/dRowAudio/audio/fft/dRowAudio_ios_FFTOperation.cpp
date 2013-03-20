@@ -29,33 +29,48 @@
   ==============================================================================
 */
 
-//=============================================================================
-/** Config: DROWAUDIO_USE_FFTREAL
-    Enables the FFTReal library. By default this is enabled except on the Mac
-    where the Accelerate framework is preferred. However, if you do explicity 
-    enable this setting fftreal can be used for testing purposes.
- */
-#ifndef DROWAUDIO_USE_FFTREAL
-    #if (! JUCE_MAC)
-        #define DROWAUDIO_USE_FFTREAL 1
-    #endif
-#endif
+#if JUCE_IOS && ! DROWAUDIO_USE_FFTREAL
 
-/** Config: DROWAUDIO_USE_SOUNDTOUCH
-    Enables the SoundTouch library and the associated SoundTouch classes for
-    independant pitch and tempo scaling. By default this is enabled.
- */
-#ifndef DROWAUDIO_USE_SOUNDTOUCH
-    #define DROWAUDIO_USE_SOUNDTOUCH 1
-#endif
 
-/** Config: DROWAUDIO_USE_CURL
-    Enables the cURL library and the associated network classes. By default
-    this is enabled.
- */
-#ifndef DROWAUDIO_USE_CURL
-    #define DROWAUDIO_USE_CURL 1
-#endif
-    
-//=============================================================================
-#include "dRowAudio/dRowAudio.h"
+
+FFTOperation::FFTOperation (int fftSizeLog2)
+    : fftProperties (fftSizeLog2)
+{
+	fftConfig = vDSP_create_fftsetup (fftProperties.fftSizeLog2, 0);
+
+	fftBuffer.malloc (fftProperties.fftSize);
+	fftBufferSplit.realp = fftBuffer.getData();
+	fftBufferSplit.imagp = fftBufferSplit.realp + getFFTProperties().fftSizeHalved;	
+}
+
+FFTOperation::~FFTOperation()
+{
+	vDSP_destroy_fftsetup (fftConfig);
+}
+
+void FFTOperation::setFFTSizeLog2 (int newFFTSizeLog2)
+{
+	if (newFFTSizeLog2 != fftProperties.fftSizeLog2)
+    {
+		vDSP_destroy_fftsetup (fftConfig);
+		
+		fftProperties.setFFTSizeLog2 (newFFTSizeLog2);
+		fftBuffer.malloc (fftProperties.fftSize);
+		fftBufferSplit.realp = fftBuffer.getData();
+		fftBufferSplit.imagp = fftBufferSplit.realp + getFFTProperties().fftSizeHalved;	
+		
+		fftConfig = vDSP_create_fftsetup (fftProperties.fftSizeLog2, 0);
+	}
+}
+
+void FFTOperation::performFFT (float* samples)
+{
+	vDSP_ctoz ((COMPLEX *) samples, 2, &fftBufferSplit, 1, fftProperties.fftSizeHalved);
+	vDSP_fft_zrip (fftConfig, &fftBufferSplit, 1, fftProperties.fftSizeLog2, FFT_FORWARD);
+}
+
+//============================================================================
+
+
+
+#endif //JUCE_IOS

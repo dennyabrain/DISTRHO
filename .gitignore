@@ -27,6 +27,7 @@ object_script.*.Release
 .svn
 .*.kate-swp
 .DS_Store
+.kdev_include_paths
 
 bin/*
 debian

@@ -29,33 +29,56 @@
   ==============================================================================
 */
 
-//=============================================================================
-/** Config: DROWAUDIO_USE_FFTREAL
-    Enables the FFTReal library. By default this is enabled except on the Mac
-    where the Accelerate framework is preferred. However, if you do explicity 
-    enable this setting fftreal can be used for testing purposes.
- */
-#ifndef DROWAUDIO_USE_FFTREAL
-    #if (! JUCE_MAC)
-        #define DROWAUDIO_USE_FFTREAL 1
-    #endif
-#endif
 
-/** Config: DROWAUDIO_USE_SOUNDTOUCH
-    Enables the SoundTouch library and the associated SoundTouch classes for
-    independant pitch and tempo scaling. By default this is enabled.
- */
-#ifndef DROWAUDIO_USE_SOUNDTOUCH
-    #define DROWAUDIO_USE_SOUNDTOUCH 1
-#endif
 
-/** Config: DROWAUDIO_USE_CURL
-    Enables the cURL library and the associated network classes. By default
-    this is enabled.
- */
-#ifndef DROWAUDIO_USE_CURL
-    #define DROWAUDIO_USE_CURL 1
-#endif
+OnePoleFilter::OnePoleFilter() noexcept
+    : y1 (0.0f), b0 (1.0f), a1 (0.0f)
+{
+}
+
+OnePoleFilter::~OnePoleFilter() noexcept
+{
+}
+
+void OnePoleFilter::processSamples (float* const samples,
+                                    const int numSamples) noexcept
+{
+    // make sure sample values are locked
+    const ScopedLock sl (lock);
     
-//=============================================================================
-#include "dRowAudio/dRowAudio.h"
+    for (int i = 0; i < numSamples; ++i)
+    {
+        samples[i] = (b0 * samples[i]) + (a1 * y1);
+        y1 = samples[i];
+    }
+}
+
+
+void OnePoleFilter::makeLowPass (const double sampleRate,
+                                 const double frequency) noexcept
+{
+    const double w0 = 2.0 * double_Pi * (frequency / sampleRate);
+    const double cos_w0 = cos (w0);
+
+    const double alpha = (2.0f - cos_w0) - sqrt ((2.0 - cos_w0) * (2.0 - cos_w0) - 1.0);
+
+    const ScopedLock sl (lock);
+    
+    b0 = 1.0f - (float) alpha;
+    a1 = (float) alpha;
+}
+
+void OnePoleFilter::makeHighPass (const double sampleRate,
+                                  const double frequency) noexcept
+{
+    const double w0 = 2.0 * double_Pi * (frequency / sampleRate);
+    const double cos_w0 = cos (w0);
+    
+    const double alpha = (2.0 + cos_w0) - sqrt ((2.0 + cos_w0) * (2.0 + cos_w0) - 1.0);
+
+    const ScopedLock sl (lock);
+
+    b0 = (float) alpha - 1.0f;
+    a1 = (float) -alpha;
+}
+

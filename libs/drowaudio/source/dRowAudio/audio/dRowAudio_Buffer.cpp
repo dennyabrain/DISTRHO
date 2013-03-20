@@ -29,33 +29,58 @@
   ==============================================================================
 */
 
-//=============================================================================
-/** Config: DROWAUDIO_USE_FFTREAL
-    Enables the FFTReal library. By default this is enabled except on the Mac
-    where the Accelerate framework is preferred. However, if you do explicity 
-    enable this setting fftreal can be used for testing purposes.
- */
-#ifndef DROWAUDIO_USE_FFTREAL
-    #if (! JUCE_MAC)
-        #define DROWAUDIO_USE_FFTREAL 1
-    #endif
-#endif
 
-/** Config: DROWAUDIO_USE_SOUNDTOUCH
-    Enables the SoundTouch library and the associated SoundTouch classes for
-    independant pitch and tempo scaling. By default this is enabled.
- */
-#ifndef DROWAUDIO_USE_SOUNDTOUCH
-    #define DROWAUDIO_USE_SOUNDTOUCH 1
-#endif
 
-/** Config: DROWAUDIO_USE_CURL
-    Enables the cURL library and the associated network classes. By default
-    this is enabled.
- */
-#ifndef DROWAUDIO_USE_CURL
-    #define DROWAUDIO_USE_CURL 1
-#endif
-    
-//=============================================================================
-#include "dRowAudio/dRowAudio.h"
+Buffer::Buffer (int size)
+    : bufferSize (size)
+{
+	buffer.allocate (bufferSize, true);
+}
+
+Buffer::Buffer (const Buffer& otherBuffer)
+:	bufferSize (otherBuffer.bufferSize)
+{
+	buffer.allocate (bufferSize, false);
+	memcpy (buffer, otherBuffer.buffer, bufferSize * sizeof (float));
+}
+
+Buffer::~Buffer()
+{
+}
+
+void Buffer::setSize (int newSize)
+{
+	buffer.realloc (newSize);
+	
+	if (newSize > bufferSize)
+		zeromem (buffer + bufferSize, (newSize - bufferSize) * sizeof (float));
+
+	bufferSize = newSize;
+}
+
+void Buffer::applyBuffer (float* samples, int numSamples)
+{
+	const int numToApply = jmin (bufferSize, numSamples);
+	for (int i = 0; i < numToApply; i++)
+		samples[i] *= buffer[i];
+
+	if (bufferSize < numSamples)
+		zeromem (samples + numToApply, (numSamples - numToApply) * sizeof (float));
+}
+
+void Buffer::updateListeners()
+{
+    listeners.call (&Listener::bufferChanged, this);
+}
+
+//==============================================================================
+void Buffer::addListener (Buffer::Listener* const listener)
+{
+    listeners.add (listener);
+}
+
+void Buffer::removeListener (Buffer::Listener* const listener)
+{
+    listeners.remove (listener);
+}
+

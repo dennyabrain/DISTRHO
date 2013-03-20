@@ -29,33 +29,46 @@
   ==============================================================================
 */
 
-//=============================================================================
-/** Config: DROWAUDIO_USE_FFTREAL
-    Enables the FFTReal library. By default this is enabled except on the Mac
-    where the Accelerate framework is preferred. However, if you do explicity 
-    enable this setting fftreal can be used for testing purposes.
- */
-#ifndef DROWAUDIO_USE_FFTREAL
-    #if (! JUCE_MAC)
-        #define DROWAUDIO_USE_FFTREAL 1
-    #endif
-#endif
+#ifndef __DROWAUDIO_ENVELOPEFOLLOWER_H__
+#define __DROWAUDIO_ENVELOPEFOLLOWER_H__
 
-/** Config: DROWAUDIO_USE_SOUNDTOUCH
-    Enables the SoundTouch library and the associated SoundTouch classes for
-    independant pitch and tempo scaling. By default this is enabled.
- */
-#ifndef DROWAUDIO_USE_SOUNDTOUCH
-    #define DROWAUDIO_USE_SOUNDTOUCH 1
-#endif
+#include "filters/dRowAudio_OnePoleFilter.h"
 
-/** Config: DROWAUDIO_USE_CURL
-    Enables the cURL library and the associated network classes. By default
-    this is enabled.
- */
-#ifndef DROWAUDIO_USE_CURL
-    #define DROWAUDIO_USE_CURL 1
-#endif
+//==============================================================================
+/**
+    EnvelopeFollower.
     
-//=============================================================================
-#include "dRowAudio/dRowAudio.h"
+    Envelope follower class that gives an overall amplitude response of a set of
+    samples.
+ */
+class EnvelopeFollower
+{
+public:
+    //==============================================================================
+	/** Constructor. */
+	EnvelopeFollower();
+
+	/** Destructor. */
+	~EnvelopeFollower();
+	
+    //==============================================================================
+	/** Uses different exponential attack and release coefficients.
+		Call setTimes to setup this method, ignoring the hold time.
+	 */
+	void processEnvelope (const float* inputBuffer, float* outputBuffer, int numSamples) noexcept;
+
+	/** Sets the times for the vaious stages of the envelope.
+        1 is an instant attack/release, 0 ill never change the value.
+     */
+	void setCoefficients (float attack, float release) noexcept;
+	
+private:
+    //==============================================================================
+	float envelope;
+	float envAttack, envRelease;
+
+    //==============================================================================
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EnvelopeFollower);
+};
+
+#endif // __DROWAUDIO_ENVELOPEFOLLOWER_H__

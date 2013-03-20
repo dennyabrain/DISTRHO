@@ -39,6 +39,6 @@ package.includepaths = {
 
 package.files = {
   matchfiles (
-    "../source/dRowAudio.cpp"
+    "../source/dRowAudio/dRowAudio.cpp"
   )
 }

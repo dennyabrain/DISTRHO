@@ -29,33 +29,48 @@
   ==============================================================================
 */
 
-//=============================================================================
-/** Config: DROWAUDIO_USE_FFTREAL
-    Enables the FFTReal library. By default this is enabled except on the Mac
-    where the Accelerate framework is preferred. However, if you do explicity 
-    enable this setting fftreal can be used for testing purposes.
- */
-#ifndef DROWAUDIO_USE_FFTREAL
-    #if (! JUCE_MAC)
-        #define DROWAUDIO_USE_FFTREAL 1
-    #endif
-#endif
+#ifndef __DROWAUDIO_CONSTANTS_H__
+#define __DROWAUDIO_CONSTANTS_H__
 
-/** Config: DROWAUDIO_USE_SOUNDTOUCH
-    Enables the SoundTouch library and the associated SoundTouch classes for
-    independant pitch and tempo scaling. By default this is enabled.
+//==============================================================================
+/** @file 
+ 
+	This file contains some useful constants for calculations such as reciprocals
+	to avoid using expensive divides in programs.
  */
-#ifndef DROWAUDIO_USE_SOUNDTOUCH
-    #define DROWAUDIO_USE_SOUNDTOUCH 1
-#endif
 
-/** Config: DROWAUDIO_USE_CURL
-    Enables the cURL library and the associated network classes. By default
-    this is enabled.
- */
-#ifndef DROWAUDIO_USE_CURL
-    #define DROWAUDIO_USE_CURL 1
+static const double oneOver60 = 1.0 / 60.0;
+static const double oneOver60Squared = 1.0 / (60.0 * 60.0);
+static const double oneOver180 = 1.0 / 180.0;
+static const double oneOverPi = 1.0 / double_Pi;
+static const double twoTimesPi = 2.0 * double_Pi;
+static const double fourTimesPi = 4.0 * double_Pi;
+static const double sixTimesPi = 6.0 * double_Pi;
+static const double root2 = sqrt (2.0);
+static const double oneOverRoot2 = 1.0 / sqrt (2.0);
+static const double root3 = sqrt (3.0);
+static const double oneOverRoot3 = 1.0 / sqrt (3.0);
+
+template <typename Type>
+inline Type squareNumber (Type input)
+{
+    return input * input;
+}
+
+template <typename Type>
+inline Type cubeNumber (Type input)
+{
+    return input * input * input;
+}
+
+//#define squareNumber(x)	(x * x)
+//#define cubeNumber(x)	(x * x * x)
+
+#if JUCE_WINDOWS
+template <class Type>
+inline Type log2 (Type input)
+{
+    return log (input) / log ((Type) 2);
+}
 #endif
-    
-//=============================================================================
-#include "dRowAudio/dRowAudio.h"
+#endif //__DROWAUDIO_CONSTANTS_H__
