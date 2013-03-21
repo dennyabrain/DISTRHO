@@ -26,11 +26,13 @@
 
 #include <stdint.h>
 
-#include "lv2.h"
+#include "lv2/lv2plug.in/ns/lv2core/lv2.h"
 
 #define LV2_UI_URI    "http://lv2plug.in/ns/extensions/ui"
 #define LV2_UI_PREFIX LV2_UI_URI "#"
 
+#define LV2_UI__CocoaUI          LV2_UI_PREFIX "CocoaUI"
+#define LV2_UI__Gtk3UI           LV2_UI_PREFIX "Gtk3UI"
 #define LV2_UI__GtkUI            LV2_UI_PREFIX "GtkUI"
 #define LV2_UI__PortNotification LV2_UI_PREFIX "PortNotification"
 #define LV2_UI__Qt4UI            LV2_UI_PREFIX "Qt4UI"
@@ -39,6 +41,7 @@
 #define LV2_UI__X11UI            LV2_UI_PREFIX "X11UI"
 #define LV2_UI__binary           LV2_UI_PREFIX "binary"
 #define LV2_UI__fixedSize        LV2_UI_PREFIX "fixedSize"
+#define LV2_UI__idleInterface    LV2_UI_PREFIX "idleInterface"
 #define LV2_UI__noUserResize     LV2_UI_PREFIX "noUserResize"
 #define LV2_UI__notifyType       LV2_UI_PREFIX "notifyType"
 #define LV2_UI__parent           LV2_UI_PREFIX "parent"
@@ -336,6 +339,24 @@ typedef struct _LV2UI_Touch {
 } LV2UI_Touch;
 
 /**
+   UI Idle Feature (LV2_UI__idle)
+
+   This feature is an addition to the UI API that provides a callback for the
+   host to call rapidly, e.g. to drive the idle callback of a toolkit.
+*/
+typedef struct _LV2UI_Idle_Interface {
+	/**
+	   Run a single iteration of the UI's idle loop.
+
+	   This will be called "frequently" in the UI thread at a rate appropriate
+	   for a toolkit main loop.  There are no precise timing guarantees.
+
+	   @return 0 on success, or anything else to stop being called.
+	*/
+	int (*idle)(LV2UI_Handle ui);
+} LV2UI_Idle_Interface;
+
+/**
    Peak data for a slice of time, the update format for ui:peakProtocol.
 */
 typedef struct _LV2UI_Peak_Data {
@@ -371,6 +392,7 @@ typedef struct _LV2UI_Peak_Data {
    the host should just iterate from 0 and upwards until the function returns
    NULL or a descriptor with an URI matching the one the host is looking for.
 */
+LV2_SYMBOL_EXPORT
 const LV2UI_Descriptor* lv2ui_descriptor(uint32_t index);
 
 /**

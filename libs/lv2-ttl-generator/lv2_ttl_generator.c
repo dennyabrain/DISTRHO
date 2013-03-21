@@ -26,7 +26,7 @@ int main(int argc, char* argv[])
     }
 
 #ifdef TTL_GENERATOR_WINDOWS
-    const HMODULE handle = LoadLibrary(argv[1]);
+    const HMODULE handle = LoadLibraryA(argv[1]);
 #else
     void* const handle = dlopen(argv[1], RTLD_LAZY);
 #endif

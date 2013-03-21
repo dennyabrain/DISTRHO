@@ -415,7 +415,7 @@ void TheFunctionAudioProcessor::setStateInformation (const void* data, int sizeI
 
 //==============================================================================
 // This creates new instances of the plugin..
-AudioProcessor* JUCE_CALLTYPE createPluginFilterOfType(AudioProcessor::WrapperType)
+AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new TheFunctionAudioProcessor();
 }
