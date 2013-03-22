@@ -39,3 +39,7 @@ scripts/*.pro
 
 sdks/ASIOSDK2/*
 sdks/vstsdk2.4/*
+
+_old
+ports/_todo
+
