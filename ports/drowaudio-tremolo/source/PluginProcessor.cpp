@@ -170,13 +170,13 @@ void TremoloAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer&
     const int tremoloBufferSize = tremoloBufferL.getSize();
     const float* tremoloData[2] = {tremoloBufferL.getData(), tremoloBufferR.getData()};
 
-	// find the number of samples in the buffer to process
-	int numSamples = buffer.getNumSamples();
+    // find the number of samples in the buffer to process
+    int numSamples = buffer.getNumSamples();
     const int numChannels = buffer.getNumChannels();
 
 	// initialise the pointer to samples
-	float* channelData[2];
-    for (int c = numChannels; --c >= 0;)
+	float* channelData[numChannels];
+    for (int c = 0; c < numChannels; ++c)
 		channelData[c] = buffer.getSampleData (c);
 
 	//===================================================================
@@ -184,7 +184,7 @@ void TremoloAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer&
 	//===================================================================
     while (--numSamples >= 0)
     {
-        for (int c = numChannels; --c >= 0;)
+        for (int c = 0; c < 2 && c < numChannels; ++c)
             *channelData[c]++ *= linearInterpolate (tremoloData[c], tremoloBufferSize, tremoloBufferPosition);
 
         // incriment buffer position

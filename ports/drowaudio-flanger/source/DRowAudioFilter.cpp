@@ -323,7 +323,7 @@ void DRowAudioFilter::processBlock (AudioSampleBuffer& buffer,
 	// set up array of pointers to samples
 	int numSamples = buffer.getNumSamples();
 	float* pfSample[numInputChannels];
-	for (int channel = 0; channel < getNumInputChannels(); channel++)
+	for (int channel = 0; channel < numInputChannels; channel++)
 		pfSample[channel] = buffer.getSampleData(channel);
 
 	if (numInputChannels == 2)
@@ -417,7 +417,7 @@ void DRowAudioFilter::processBlock (AudioSampleBuffer& buffer,
     // in case we have more outputs than inputs, we'll clear any output
     // channels that didn't contain input data, (because these aren't
     // guaranteed to be empty - they may contain garbage).
-    for (int i = getNumInputChannels(); i < getNumOutputChannels(); ++i)
+    for (int i = numInputChannels; i < getNumOutputChannels(); ++i)
     {
         buffer.clear (i, 0, buffer.getNumSamples());
     }

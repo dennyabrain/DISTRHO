@@ -67,16 +67,17 @@ const String ThePilgrimAudioProcessor::getParameterText (int index)
 {
 	String output;
 	double newFilterFreq;
+        double smoothValue = filterParameter.getSmoothedValue();
 
 	if (index == 0) {
 
-		if (filterParameter.getSmoothedValue() <= 0.5)
+		if (smoothValue <= 0.5)
 		{
 			newFilterFreq = filterParameter.getValue() * 2.0;						// Scale 0.0-0.5 to 0-1
 			newFilterFreq = newFilterFreq * newFilterFreq * newFilterFreq;	// Cube values for smoother control
 			newFilterFreq  = (newFilterFreq * 19940.0) + 60;				// Scale to 60Hz to 20000Hz LOWPASS
 		}
-		else if (filterParameter.getSmoothedValue() > 0.5)
+		else
 		{
 			newFilterFreq = (filterParameter.getValue() - 0.5) * 2.0;				// Scale 0.5-1.0 to 0-1
 			newFilterFreq = newFilterFreq * newFilterFreq * newFilterFreq;	// Cube values for smoother control

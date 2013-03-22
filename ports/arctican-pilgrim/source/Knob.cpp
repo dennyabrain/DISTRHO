@@ -21,20 +21,20 @@ Knob::Knob()
 	//testReadout = "o";
 	frameWidth = 90;
 	//knobType="Filter";
-	
+
 	//Knob::setSliderStyle(RotaryVerticalDrag);
-	setSliderStyle(RotaryVerticalDrag);	
+	setSliderStyle(RotaryVerticalDrag);
 	//Knob::setText;
 	setTextBoxStyle(NoTextBox, true, 0, 0);
-	
+
 	readoutText = "HELLO!!";
-	
+
 	CCNumber = -1;
 	CCText = "Off";
 	isLearning=false;
 	MIDILearnIsActive=false;
-	
-	
+
+
 }
 
 Knob::~Knob()
@@ -48,13 +48,13 @@ void Knob::paint (Graphics& g)
 	double div;
 
 	// Work out division size
-	if (knobType == dualFilterType)		div = 1.0 / 62;		// 62 frames
-	if (knobType == mixType)		div = 1.0 / 31;		// 31 frames
+	if (knobType == dualFilterType) div = 1.0 / 62; // 62 frames
+	else                            div = 1.0 / 31; // 31 frames
 
 	// Work out current frame number to be shown
 	double pos         = (int)(Knob::getValue() / div);
-	
-	
+
+
    // Little hack to get image centred when knob value at half
 	if (pos > 0)
 		pos = pos - 1;
@@ -70,18 +70,18 @@ void Knob::paint (Graphics& g)
 		g.drawImage (mixKnobImage, 0,0,90,90, 0, (int)(pos*90), 90, 90, false);
 
 	// Draw readout text
-	
-	
+
+
 	calculateReadoutValue();
 	g.setColour(juce::Colour(150,150,150));
 
-	
+
 	if (MIDILearnIsActive == true)
 	{
-		g.setColour(juce::Colour(200,150,75));		
-		if (isLearning == true) 
+		g.setColour(juce::Colour(200,150,75));
+		if (isLearning == true)
 		{
-		
+
 			g.drawFittedText("--------" , 0,105,90,50,Justification::centred,1);
 		}
 
@@ -95,9 +95,9 @@ void Knob::paint (Graphics& g)
 		}
 
 
-		
+
 	}
-	else 
+	else
 	{
 		g.setColour(juce::Colour(150,150,150));
 		g.drawFittedText(readoutText,0,90,90,50,Justification::centred,1);
@@ -116,10 +116,10 @@ void Knob::setIsLearning(bool areWeLearning)	{isLearning = areWeLearning;}
 void Knob::calculateReadoutValue()
 {
 
-	 
+
 	 if (knobType == defaultType)
 	 readoutText = (String(getValue()));
-	 
+
 	 else if (knobType == panType)
 	 {
 		 if (getValue() < 0.5)
@@ -129,7 +129,7 @@ void Knob::calculateReadoutValue()
 		 else if (getValue() > 0.5)
 			 readoutText = (String((((getValue() *2.0) -1.0) *100.0)) + "% R");
 	 }
-	 
+
 	 else if (knobType == gainType)
 	 {
 		 if (getValue() == 0)
@@ -137,7 +137,7 @@ void Knob::calculateReadoutValue()
 		 readoutText = "-infdB";
 		 //displayText = "-\u221E";
 		 }
-		 else 
+		 else
 		 {
 		 //value = value * value * value;
 		 readoutText = String(20*log(getValue()));
@@ -152,7 +152,7 @@ void Knob::calculateReadoutValue()
 	else if (knobType == dualFilterType)
 	{
 		double newFilterFreq;
-	
+
 		// If dial is in LP mode
 		if (getValue() <= 0.5)
 		{
@@ -160,23 +160,23 @@ void Knob::calculateReadoutValue()
 			newFilterFreq = getValue() * 2.0;								// Scale 0.0-0.5 to 0-1
 			newFilterFreq = newFilterFreq * newFilterFreq * newFilterFreq;	// Cube values for smoother control
 			newFilterFreq  = (newFilterFreq * 19940.0) + 60;				// Scale to 60Hz to 20000Hz LOWPASS
-			
+
 			// If frequency is in kHz region
-			if (newFilterFreq > 1000.0) 
+			if (newFilterFreq > 1000.0)
 			{
 				// Convert Hz to kHz
 				newFilterFreq = newFilterFreq / 1000.0;
 				readoutText = String(newFilterFreq);
-				
+
 				// Round to 1 decimal place
 				int rounder = readoutText.indexOfChar('.');
 				readoutText = (readoutText.substring(0, rounder+2) + "kHz LP");
 			}
-			else 
+			else
 				// Output in Hz
-				readoutText = String(int(newFilterFreq))+"Hz LP";			
+				readoutText = String(int(newFilterFreq))+"Hz LP";
 		}
-		
+
 		// If dial is in HP mode
 		else if (getValue() > 0.5)
 		{
@@ -184,25 +184,25 @@ void Knob::calculateReadoutValue()
 			newFilterFreq = (getValue() - 0.5) * 2.0;						// Scale 0.5-1.0 to 0-1
 			newFilterFreq = newFilterFreq * newFilterFreq * newFilterFreq;	// Cube values for smoother control
 			newFilterFreq = (newFilterFreq * 18980.0) + 20;					// 20Hz to 19000Hz HIGHPASS
-			
+
 			// If frequency is in kHz region
-			if (newFilterFreq > 1000.0) 
+			if (newFilterFreq > 1000.0)
 			{
 				// Convert Hz to kHz
 				newFilterFreq = newFilterFreq / 1000.0;
 				readoutText = String(newFilterFreq);
-				
+
 				// Round to 1 decimal place
 				int rounder = readoutText.indexOfChar('.');
-				
+
 				if (rounder > -1)	readoutText = (readoutText.substring(0, rounder+2) + "kHz HP");
 				else				readoutText = "19.0kHz HP";
 			}
-			else 
+			else
 				// Output in Hz
-				readoutText = String(int(newFilterFreq))+"Hz HP";		
+				readoutText = String(int(newFilterFreq))+"Hz HP";
 		}
-		
+
 		// If dial is in centre
 		if (getValue() == 0.5 || readoutText == "20Hz HP")
 			readoutText = "ALL PASS";
@@ -210,32 +210,32 @@ void Knob::calculateReadoutValue()
 	// --------------------------------------------------------------------
 	// --------------------------------------------------------------------
 
-	
+
 	// --------------------------------------------------------------------
 	// MIX TYPE -----------------------------------------------------------
 	// --------------------------------------------------------------------
 	else if (knobType == mixType)	readoutText = String(int((getValue()*100)))+"%";
 	// --------------------------------------------------------------------
-	// --------------------------------------------------------------------							 
-							 
-	 
-	 
-	 
+	// --------------------------------------------------------------------
+
+
+
+
 	 //return displayText;
 
-	
+
 }
 
 void Knob::setMIDILearn (bool isOn)
 {
-	MIDILearnIsActive = isOn; 
+	MIDILearnIsActive = isOn;
 	repaint();
-	
+
 }
 bool Knob::getMIDILearn ()
 {
 	return MIDILearnIsActive;
-	
+
 }
 
 
