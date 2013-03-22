@@ -411,7 +411,7 @@ void ThePilgrimAudioProcessor::setStateInformationString (const String& data)
 
 //==============================================================================
 // This creates new instances of the plugin..
-AudioProcessor* JUCE_CALLTYPE createPluginFilterOfType(AudioProcessor::WrapperType)
+AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new ThePilgrimAudioProcessor();
 }

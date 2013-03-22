@@ -38,7 +38,7 @@ more information.
 This function must be implemented to create a new instance of your
 plugin object.
 */
-AudioProcessor* JUCE_CALLTYPE createPluginFilterOfType(AudioProcessor::WrapperType)
+AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new TalCore();
 }

@@ -313,7 +313,7 @@ void TremoloAudioProcessor::fillBuffer (float* bufferToFill, float phaseAngleRad
 
 //==============================================================================
 // This creates new instances of the plugin..
-AudioProcessor* JUCE_CALLTYPE createPluginFilterOfType(AudioProcessor::WrapperType)
+AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new TremoloAudioProcessor();
 }

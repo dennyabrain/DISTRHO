@@ -68,33 +68,137 @@ juce_ImplementSingleton (SharedMessageThread)
 
 #endif
 
+static Array<void*> activePlugins;
+
+//==============================================================================
+/**
+    Juce LV2 handle
+*/
+class JuceLv2Wrapper : public AudioPlayHead
+{
+public:
+    //==============================================================================
+    JuceLv2Wrapper (double sampleRate_, const LV2_Feature* const* features)
+        : numInChans (JucePlugin_MaxNumInputChannels),
+          numOutChans (JucePlugin_MaxNumOutputChannels),
+          sampleRate (sampleRate_)
+    {
+       #if JUCE_LINUX
+        MessageManagerLock mmLock;
+       #endif
+
+        filter = createPluginFilterOfType (AudioProcessor::wrapperType_VST);
+        jassert(filter != nullptr);
+
+        filter->setPlayConfigDetails (numInChans, numOutChans, 0, 0);
+        filter->setPlayHead (this);
+
+#if JucePlugin_WantsMidiInput
+        portMidiIn = nullptr;
+#endif
+#if JucePlugin_ProducesMidiOutput
+        portMidiOut = nullptr;
+#endif
+        portLatency = nullptr;
+
+        for (int i=0; i < numInChans; i++)
+            portAudioIns[i] = nullptr;
+        for (int i=0; i < numOutChans; i++)
+            portAudioOuts[i] = nullptr;
+
+        portControls.insertMultiple(0, nullptr, filter->getNumParameters());
+
+        activePlugins.add (this);
+    }
+
+    ~JuceLv2Wrapper ()
+    {
+    }
+
+    //==============================================================================
+    // LV2 calls
+    void lv2ConnectPort (uint32 port, void* dataLocation)
+    {
+    }
+
+    void lv2Activate()
+    {
+    }
+
+    void lv2Deactivate()
+    {
+    }
+
+    void lv2Run (uint32 sampleCount)
+    {
+    }
+
+    //==============================================================================
+    // Juce calls
+    bool getCurrentPosition (AudioPlayHead::CurrentPositionInfo& info)
+    {
+        return false;
+    }
+
+private:
+    ScopedPointer<AudioProcessor> filter;
+    int numInChans, numOutChans;
+
+    uint32 bufferSize;
+    double sampleRate;
+    //AudioPlayHead::CurrentPositionInfo posInfo;
+
+    // LV2 ports location
+#if JucePlugin_WantsMidiInput
+    LV2_Atom_Sequence* portMidiIn;
+#endif
+#if JucePlugin_ProducesMidiOutput
+    LV2_Atom_Sequence* portMidiOut;
+#endif
+    float* portLatency;
+    float* portAudioIns[JucePlugin_MaxNumInputChannels];
+    float* portAudioOuts[JucePlugin_MaxNumOutputChannels];
+    Array<float*> portControls;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (JuceLv2Wrapper)
+};
+
 //==============================================================================
 // LV2 descriptor functions
 
 static LV2_Handle juceLV2_Instantiate(const LV2_Descriptor*, double sampleRate, const char*, const LV2_Feature* const* features)
 {
-    return nullptr;
+    return new JuceLv2Wrapper(sampleRate, features);
 }
 
-static void juceLV2_ConnectPort(LV2_Handle instance, uint32 port, void* dataLocation)
+#define handlePtr ((JuceLv2Wrapper*)handle)
+
+static void juceLV2_ConnectPort(LV2_Handle handle, uint32 port, void* dataLocation)
 {
+    handlePtr->lv2ConnectPort(port, dataLocation);
 }
 
-static void juceLV2_Activate(LV2_Handle instance)
+static void juceLV2_Activate(LV2_Handle handle)
 {
+    handlePtr->lv2Activate();
 }
 
-static void juceLV2_Run(LV2_Handle instance, uint32 sampleCount)
+static void juceLV2_Run(LV2_Handle handle, uint32 sampleCount)
 {
+    handlePtr->lv2Run(sampleCount);
 }
 
-static void juceLV2_Deactivate(LV2_Handle instance)
+static void juceLV2_Deactivate(LV2_Handle handle)
 {
+    handlePtr->lv2Deactivate();
 }
 
-static void juceLV2_Cleanup(LV2_Handle instance)
+static void juceLV2_Cleanup(LV2_Handle handle)
 {
+    delete handlePtr;
 }
+
+#undef handlePtr
 
 static const void* juceLV2_ExtensionData(const char* uri)
 {
@@ -110,14 +214,14 @@ static LV2UI_Handle juceLV2UI_Instantiate(LV2UI_Write_Function writeFunction, LV
     return nullptr;
 }
 
-LV2UI_Handle juceLV2UI_InstantiateExternal(const LV2UI_Descriptor*, const char*, const char*, LV2UI_Write_Function writeFunction,
-                                           LV2UI_Controller controller, LV2UI_Widget* widget, const LV2_Feature* const* features)
+static LV2UI_Handle juceLV2UI_InstantiateExternal(const LV2UI_Descriptor*, const char*, const char*, LV2UI_Write_Function writeFunction,
+                                                  LV2UI_Controller controller, LV2UI_Widget* widget, const LV2_Feature* const* features)
 {
     return juceLV2UI_Instantiate(writeFunction, controller, widget, features, true);
 }
 
-LV2UI_Handle juceLV2UI_InstantiateParent(const LV2UI_Descriptor*, const char*, const char*, LV2UI_Write_Function writeFunction,
-                                         LV2UI_Controller controller, LV2UI_Widget* widget, const LV2_Feature* const* features)
+static LV2UI_Handle juceLV2UI_InstantiateParent(const LV2UI_Descriptor*, const char*, const char*, LV2UI_Write_Function writeFunction,
+                                                LV2UI_Controller controller, LV2UI_Widget* widget, const LV2_Feature* const* features)
 {
     return juceLV2UI_Instantiate(writeFunction, controller, widget, features, false);
 }
