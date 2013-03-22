@@ -1,4 +1,0 @@
-In order for this plugin to work correctly, you need to install the following files:
-
-data/HybridReverb2.conf -> /etc/HybridReverb2/HybridReverb2.conf
-data/HybridReverb2      -> /usr/share/HybridReverb2
