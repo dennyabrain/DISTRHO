@@ -840,7 +840,7 @@ void editor::resized()
 #if 1
     #define initslider(slidername, param)\
     slidername->setRange(synth->paraminfos[wolp::param].min, synth->paraminfos[wolp::param].max);	\
-    slidername->setValue(synth->getParameter(wolp::param)*(synth->paraminfos[wolp::param].max-synth->paraminfos[wolp::param].min));
+    slidername->setValue(synth->getParameter(wolp::param)*(synth->paraminfos[wolp::param].max-synth->paraminfos[wolp::param].min),dontSendNotification);
     wolp *synth= (wolp*)getAudioProcessor();
     initslider(slsaw, gsaw);
     initslider(slrect, grect);
@@ -863,11 +863,11 @@ void editor::resized()
     initslider(knobRelease, release);
 
     slpasses->setRange(synth->paraminfos[wolp::nfilters].min, synth->paraminfos[wolp::nfilters].max, 1.0);
-    slpasses->setValue(synth->getParameter(wolp::nfilters)*(synth->paraminfos[wolp::nfilters].max-synth->paraminfos[wolp::nfilters].min));
+    slpasses->setValue(synth->getParameter(wolp::nfilters)*(synth->paraminfos[wolp::nfilters].max-synth->paraminfos[wolp::nfilters].min), dontSendNotification);
 
     slfilterlimits->setRange(synth->paraminfos[wolp::filtermin].min, synth->paraminfos[wolp::filtermin].max);
-    slfilterlimits->setMaxValue(synth->getParameter(wolp::filtermax)*(synth->paraminfos[wolp::filtermax].max-synth->paraminfos[wolp::filtermax].min));
-    slfilterlimits->setMinValue(synth->getParameter(wolp::filtermin)*(synth->paraminfos[wolp::filtermin].max-synth->paraminfos[wolp::filtermin].min));
+    slfilterlimits->setMaxValue(synth->getParameter(wolp::filtermax)*(synth->paraminfos[wolp::filtermax].max-synth->paraminfos[wolp::filtermax].min), dontSendNotification);
+    slfilterlimits->setMinValue(synth->getParameter(wolp::filtermin)*(synth->paraminfos[wolp::filtermin].max-synth->paraminfos[wolp::filtermin].min), dontSendNotification);
     #undef initslider
 
 	changeListenerCallback((ChangeBroadcaster *)wolp::oversampling);    // XXX
@@ -1048,7 +1048,7 @@ void editor::changeListenerCallback(ChangeBroadcaster *objectThatHasChanged)
 #define updateslider(name, slidername)		\
 		case wolp::name:	\
 			slidername->setValue( synth->params[wolp::name] * \
-								  (synth->paraminfos[idx].max-synth->paraminfos[idx].min), false );	\
+								  (synth->paraminfos[idx].max-synth->paraminfos[idx].min), dontSendNotification); \
 			break;
 
     for(int idx= 0; idx<wolp::param_size; idx++)
@@ -1077,15 +1077,15 @@ void editor::changeListenerCallback(ChangeBroadcaster *objectThatHasChanged)
                 updateslider (release, knobRelease);
                 case wolp::curcutoff:
                     slcurcutoff->setValue( synth->params[wolp::curcutoff] *
-                                          (synth->paraminfos[idx].max-synth->paraminfos[idx].min), false );
+                                          (synth->paraminfos[idx].max-synth->paraminfos[idx].min), dontSendNotification );
                     break;
                 case wolp::filtermin:
                     slfilterlimits->setMinValue( synth->params[wolp::filtermin] *
-                                (synth->paraminfos[idx].max-synth->paraminfos[idx].min), false );
+                                (synth->paraminfos[idx].max-synth->paraminfos[idx].min), dontSendNotification );
                     break;
                 case wolp::filtermax:
                     slfilterlimits->setMaxValue( synth->params[wolp::filtermax] *
-                                (synth->paraminfos[idx].max-synth->paraminfos[idx].min), false );
+                                (synth->paraminfos[idx].max-synth->paraminfos[idx].min), dontSendNotification );
                     break;
 
                 case wolp::oversampling:

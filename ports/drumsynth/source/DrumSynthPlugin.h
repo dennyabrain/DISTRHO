@@ -203,6 +203,7 @@ public:
     bool hasEditor() const { return true; }
 
     bool silenceInProducesSilenceOut() const { return false; }
+    double getTailLengthSeconds() const { return 0.0; }
 
     //==============================================================================
     const String getName() const          { return JucePlugin_Name; }
@@ -221,7 +222,7 @@ public:
     {
         return notesNames[drumNumber];
     }
-    
+
     void setDrumName (const int drumNumber, const String& drumName)
     {
         notesNames.set (drumNumber, drumName);

@@ -127,12 +127,6 @@
 */
 #define JucePlugin_ProducesMidiOutput               0
 
-/** If your plugin has a tail, you can set the length here and this information
-    will be passed on to the host.
-    (Not all formats/hosts might actually use this, though)
-*/
-#define JucePlugin_TailLengthSeconds                0
-
 /** If this is 1, it means that when the plugins input buffers are
     silent, it's output will be too.
 
@@ -166,7 +160,7 @@
 */
 #ifdef JUCE_MAC
  #define JUCE_USE_VSTSDK_2_4                 1
-#endif 
+#endif
 
 /** Defines a UID for your VST plugin.
     The default setting here is probably fine, unless you specifically need

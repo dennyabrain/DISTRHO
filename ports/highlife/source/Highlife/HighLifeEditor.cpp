@@ -53,7 +53,7 @@ public:
     {
     }
 
-    const Font getPopupMenuFont()
+    Font getPopupMenuFont()
     {
         return Font (14.0f);
     }
@@ -117,7 +117,7 @@ CHighLifeEditor::CHighLifeEditor (CHighLife *effect)
 	// menu view
 	menu_view.AddTextOption("Performance");
 	menu_view.AddTextOption("Editor");
-	
+
 	// menu options
 	menu_options.AddTextOption("Panic");
 	menu_options.AddSeparator();
@@ -154,7 +154,7 @@ CHighLifeEditor::CHighLifeEditor (CHighLife *effect)
 	// menu zone trigger
 	menu_zone_trigger.AddTextOption("Attack");
 	menu_zone_trigger.AddTextOption("Release");
-	
+
 	// menu sample editor edit
 	menu_sample_edit.AddTextOption("Cut");
 	menu_sample_edit.AddTextOption("Copy");
@@ -162,7 +162,7 @@ CHighLifeEditor::CHighLifeEditor (CHighLife *effect)
 	menu_sample_edit.AddTextOption("Trim");
 	menu_sample_edit.AddSeparator();
 	menu_sample_edit.AddTextOption("Select All");
-	
+
 	// menu sample editor loop
 	menu_sample_loop.AddTextOption("Set Loop Start");
 	menu_sample_loop.AddTextOption("Set Loop End");
@@ -174,11 +174,11 @@ CHighLifeEditor::CHighLifeEditor (CHighLife *effect)
 	menu_sample_ampl.AddSeparator();
 	menu_sample_ampl.AddTextOption("Normalize");
 	menu_sample_ampl.AddTextOption("DC Remove");
-	
+
 	// menu sample editor filt
 	menu_sample_filt.AddTextOption("Smooth");
 	menu_sample_filt.AddTextOption("Enhance");
-	
+
 	// menu sample editor spfx
 	menu_sample_spfx.AddTextOption("Reverse");
 	menu_sample_spfx.AddTextOption("Rectifier");
@@ -250,7 +250,7 @@ CHighLifeEditor::CHighLifeEditor (CHighLife *effect)
 
     // set size
     setSize (K_EDITOR_WIDTH, K_EDITOR_HEIGHT + K_EDITOR_KEY_HEIGHT);
-    
+
     // start timer
     startTimer (1000 / 25);
 }

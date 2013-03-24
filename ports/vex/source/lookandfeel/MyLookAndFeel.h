@@ -44,8 +44,8 @@ public:
 	MyLookAndFeel();
 	~MyLookAndFeel();
 
-	const Font getComboBoxFont (ComboBox& box);
-	const Font getPopupMenuFont();
+	Font getComboBoxFont (ComboBox& box);
+	Font getPopupMenuFont();
 	void getIdealPopupMenuItemSize (const String& text,
                                              const bool isSeparator,
                                              int standardMenuItemHeight,

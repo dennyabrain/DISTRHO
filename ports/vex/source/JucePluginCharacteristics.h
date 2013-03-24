@@ -131,19 +131,13 @@
 */
 #define JucePlugin_ProducesMidiOutput               0
 
-/** If your plugin has a tail, you can set the length here and this information 
-    will be passed on to the host.
-    (Not all formats/hosts might actually use this, though)
-*/
-#define JucePlugin_TailLengthSeconds                0
-
 /** If this is 1, it means that when the plugins input buffers are
     silent, it's output will be too.
 
     Some hosts may use this to avoid calling the plugin when no audio
     would be produced.
 */
-#define JucePlugin_SilenceInProducesSilenceOut      1
+#define JucePlugin_SilenceInProducesSilenceOut      0
 
 /** If set to 1, this hints that the host should ignore any keys that are pressed
     when the plugin has keyboard focus. If 0, then the host should still execute

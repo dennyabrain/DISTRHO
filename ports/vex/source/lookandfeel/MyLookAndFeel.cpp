@@ -43,7 +43,7 @@ MyLookAndFeel::MyLookAndFeel()
 
 	Topaz->setHeight (9.0f);
 	Topaz->setHorizontalScale (1.0f);
-	
+
 //	Topaz = new Font (Font::getDefaultMonospacedFontName (), 12.0f, Font::plain);
 //	Topaz->setHorizontalScale (1.0f);
 }
@@ -53,12 +53,12 @@ MyLookAndFeel::~MyLookAndFeel()
 	delete Topaz;
 }
 
-const Font MyLookAndFeel::getComboBoxFont (ComboBox& box)
+Font MyLookAndFeel::getComboBoxFont (ComboBox& box)
 {
 	return *Topaz;
 }
 
-const Font MyLookAndFeel::getPopupMenuFont()
+Font MyLookAndFeel::getPopupMenuFont()
 {
     return *Topaz;
 }
@@ -143,7 +143,7 @@ void MyLookAndFeel::drawRotarySlider (Graphics& g,
 	g.setColour (Colours::white.withAlpha (1.0f));
 
 	g.fillPath (p, AffineTransform::rotation (angle).translated (centreX, centreY));
-	
+
 	g.setColour (Colours::black.withAlpha (0.7f));
 	g.drawEllipse (rx, ry, rw, rw, 1.0f);
 }

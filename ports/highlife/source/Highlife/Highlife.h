@@ -72,6 +72,7 @@ public:
         bool hasEditor() const { return true; }
 
         bool silenceInProducesSilenceOut() const { return false; }
+    double getTailLengthSeconds() const { return 0.0; }
 
 public:
 
@@ -114,7 +115,7 @@ public:
 
 public:
     void set_suspended (int const block);
-    
+
 public:
 	void plug_save_program(int const index,CAllocatingMemStreamOut* pmo);
 	void plug_load_program(int const index,CMemStreamIn* pmi);
@@ -241,7 +242,7 @@ public:
 	int		user_ste_keyboa;
 	int		user_low_keyboa;
 	int		user_hig_keyboa;
-	int		user_route_midi;	
+	int		user_route_midi;
 	int		user_force_mono;
 	int		user_normalization;
 
@@ -256,7 +257,7 @@ public:
 
 	// midi state
 	HIGHLIFE_INPUT_STATE midi_state;
-	
+
 	// highlife voices
 	CHighLifeVoice	voice[MAX_POLYPHONY];
 	int				vt_opos[MAX_POLYPHONY];

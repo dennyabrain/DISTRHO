@@ -56,6 +56,8 @@ public:
     ~VexFilter();
 
     bool hasEditor() const { return true; }
+    bool silenceInProducesSilenceOut() const { return false; }
+    double getTailLengthSeconds() const { return 0.0; }
 
     void prepareToPlay (double sampleRate, int samplesPerBlock);
     void releaseResources();

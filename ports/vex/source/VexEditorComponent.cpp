@@ -49,7 +49,7 @@ VexEditorComponent::VexEditorComponent (VexFilter* const ownerFilter)
 	comboBox->setColour(ComboBox::textColourId, Colours::lightgrey);
 	comboBox->setColour(ComboBox::outlineColourId, Colours::grey);
 	comboBox->setColour(ComboBox::buttonColourId, Colours::grey);
-	comboBox->setWantsKeyboardFocus(false); 
+	comboBox->setWantsKeyboardFocus(false);
 	comboBox->setLookAndFeel(&mlaf);
 
     addAndMakeVisible (comboBox2 = new ComboBox (String::empty));
@@ -77,7 +77,7 @@ VexEditorComponent::VexEditorComponent (VexFilter* const ownerFilter)
 	comboBox3->setColour(ComboBox::buttonColourId, Colours::grey);
 	comboBox3->setWantsKeyboardFocus(false);
 	comboBox3->setLookAndFeel(&mlaf);
-	
+
 #if 0
 	File location = (File::getSpecialLocation(File::userHomeDirectory)).getChildFile(".vex");
 	if (! location.exists ())
@@ -125,7 +125,7 @@ VexEditorComponent::VexEditorComponent (VexFilter* const ownerFilter)
 	}
 
 	//Adjust the center of some
-    sliders[1]->setRange (0, 1, 0.25f);		
+    sliders[1]->setRange (0, 1, 0.25f);
 	sliders[1]->setSnap(0.5f, 0.05f);
     sliders[2]->setSnap(0.5f, 0.05f);
     sliders[3]->setSnap(0.5f, 0.05f);
@@ -256,7 +256,7 @@ void VexEditorComponent::resized()
 	sliders[75]->setBounds(748, 23, 28, 28);
 	sliders[76]->setBounds(623, 98, 28, 28);
 	sliders[77]->setBounds(686, 98, 28, 28);
-	sliders[78]->setBounds(748, 98, 28, 28);	
+	sliders[78]->setBounds(748, 98, 28, 28);
 	sliders[79]->setBounds(611, 173, 28, 28);
 	sliders[80]->setBounds(661, 173, 28, 28);
 	sliders[81]->setBounds(711, 173, 28, 28);
@@ -313,7 +313,7 @@ void VexEditorComponent::resized()
 	sliders[48 + 11]->setBounds(486, 223, 28, 28);
 	sliders[48 + 12]->setBounds(523, 223, 28, 28);
 	sliders[48 + 13]->setBounds(561, 223, 28, 28);
-	}	
+	}
 	{
 	sliders[14]->setBounds(11, 298, 28, 28);
 	sliders[15]->setBounds(48, 298, 28, 28);
@@ -341,7 +341,7 @@ void VexEditorComponent::resized()
 	sliders[48 + 19]->setBounds(411, 374, 28, 28);
 	sliders[48 + 20]->setBounds(486, 374, 28, 28);
 	sliders[48 + 21]->setBounds(561, 374, 28, 28);
-	}		
+	}
 	{
 	sliders[22]->setBounds(11, 448, 28, 28);
 	sliders[23]->setBounds(86, 448, 28, 28);
@@ -375,7 +375,7 @@ void VexEditorComponent::updateParametersFromFilter(bool all)
 		DBG("updateParametersFromFilter, all");
 		for(int i = 0; i < 89; i++)
 		{
-			sliders[i]->setValue( filter->getParameter(i), false);
+			sliders[i]->setValue( filter->getParameter(i), dontSendNotification);
 		}
 		TB->setToggleState (filter->getParameter(89) > 0.5f ? true : false, false);
 		TB2->setToggleState (filter->getParameter(90) > 0.5f ? true : false, false);
@@ -394,7 +394,7 @@ void VexEditorComponent::updateParametersFromFilter(bool all)
 		std::list<int>::iterator i;
 		for(i = filter->dirtyList.begin(); i != filter->dirtyList.end(); i++)
 		{
-			sliders[*i]->setValue( filter->getParameter(*i), false);
+			sliders[*i]->setValue( filter->getParameter(*i), dontSendNotification);
 		}
 		filter->dirtyList.clear();
 	}
@@ -418,7 +418,7 @@ void VexEditorComponent::comboBoxChanged(ComboBox* comboBoxThatHasChanged)
 }
 
 void VexEditorComponent::sliderValueChanged (Slider* caller)
-{	
+{
 	for(int i = 0; i < 89; i++)
 	{
 		if(caller == sliders[i])

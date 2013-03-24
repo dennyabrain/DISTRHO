@@ -97,6 +97,7 @@ public:
     bool hasEditor() const { return true; }
 
     bool silenceInProducesSilenceOut() const { return true; }
+    double getTailLengthSeconds() const { return 0.0; }
 
     //==============================================================================
     const String getName() const          { return JucePlugin_Name; }

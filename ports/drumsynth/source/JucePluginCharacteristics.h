@@ -43,7 +43,6 @@
 #define JucePlugin_IsSynth                          1
 #define JucePlugin_WantsMidiInput                   1
 #define JucePlugin_ProducesMidiOutput               0
-#define JucePlugin_TailLengthSeconds                0
 #define JucePlugin_SilenceInProducesSilenceOut      0
 #define JucePlugin_EditorRequiresKeyboardFocus      1
 
