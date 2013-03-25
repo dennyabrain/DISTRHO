@@ -8,6 +8,9 @@
 
 // TESTING, remove later
 #define JucePlugin_Build_LV2 1
+#define JucePlugin_WantsLV2Presets 1
+#define JucePlugin_WantsLV2State 1
+#define JucePlugin_WantsLV2TimePos 1
 #define JucePlugin_LV2URI "http://arcticanaudio.com/plugins/thefunction"
 #include "JucePluginMain.h"
 
@@ -19,9 +22,499 @@
 
 #if JucePlugin_Build_LV2
 
+/*
+ * Available macros:
+ * - JucePlugin_LV2Category
+ * - JucePlugin_WantsLV2State
+ * - JucePlugin_WantsLV2StateString
+ * - JucePlugin_WantsLV2Presets
+ * - JucePlugin_WantsLV2TimePos
+ */
+
+#if JucePlugin_WantsLV2StateString && ! JucePlugin_WantsLV2State
+ #undef JucePlugin_WantsLV2State
+ #define JucePlugin_WantsLV2State 1
+#endif
+
+#if JUCE_LINUX
+ //#include <X11/Xlib.h>
+ //#undef KeyPress
+#elif JUCE_WINDOWS
+ #include <windows.h>
+#endif
+
+#include <fstream>
+#include <iostream>
+
 // LV2 includes..
 #include "includes/lv2.h"
+#include "includes/atom.h"
+#include "includes/atom-util.h"
+#include "includes/buf-size.h"
+#include "includes/instance-access.h"
+#include "includes/midi.h"
+#include "includes/options.h"
+#include "includes/port-props.h"
+#include "includes/presets.h"
+#include "includes/state.h"
+#include "includes/time.h"
 #include "includes/ui.h"
+#include "includes/units.h"
+#include "includes/urid.h"
+#include "includes/lv2_external_ui.h"
+#include "includes/lv2_programs.h"
+
+namespace juce
+{
+ #if JUCE_MAC
+  extern void initialiseMac();
+ #endif
+
+ #if JUCE_LINUX
+  //extern Display* display;
+ #endif
+}
+
+#define JUCE_LV2_STATE_STRING_URI "urn:juce:stateString"
+#define JUCE_LV2_STATE_BINARY_URI "urn:juce:stateBinary"
+
+#if JucePlugin_WantsLV2State && ! JucePlugin_WantsLV2StateString
+ // FIXME - juce base64 algorithm is broken
+ #include "base64/Base64.cpp"
+#endif
+
+//==============================================================================
+// Various helper functions for creating the ttl files
+
+#if JUCE_MAC
+ #define PLUGIN_EXT ".dylib"
+#elif JUCE_LINUX
+ #define PLUGIN_EXT ".so"
+#elif JUCE_WINDOWS
+ #define PLUGIN_EXT ".dll"
+#endif
+
+/** Returns the name of the plugin binary file */
+const String getBinaryName()
+{
+    return String(JucePlugin_Name).replace(" ", "_");
+}
+
+/** Returns plugin type, defined in AppConfig.h or JucePluginCharacteristics.h */
+const String getPluginType()
+{
+    String pluginType;
+#ifdef JucePlugin_LV2Category
+    pluginType  = "lv2:" JucePlugin_LV2Category;
+    pluginType += ", ";
+#endif
+    pluginType += "lv2:Plugin";
+    return pluginType;
+}
+
+static Array<String> usedSymbols;
+
+/** Converts a parameter name to an LV2 compatible symbol. */
+const String nameToSymbol(const String& name, const uint32 portIndex)
+{
+    String symbol, trimmedName = name.trimStart().trimEnd().toLowerCase();
+
+    if (trimmedName.isEmpty())
+    {
+        symbol += "lv2_port_";
+        symbol += String(portIndex+1);
+    }
+    else
+    {
+        for (int i=0; i < trimmedName.length(); i++)
+        {
+            const juce_wchar c = trimmedName[i];
+            if (i == 0 && std::isdigit(c))
+                symbol += "_";
+            else if (std::isalpha(c) || std::isdigit(c))
+                symbol += c;
+            else
+                symbol += "_";
+        }
+    }
+
+    // Do not allow identical symbols
+    if (usedSymbols.contains(symbol))
+    {
+        int offset = 2;
+        String offsetStr = "_2";
+        symbol += offsetStr;
+
+        while (usedSymbols.contains(symbol))
+        {
+            offset += 1;
+            String newOffsetStr = "_" + String(offset);
+            symbol = symbol.replace(offsetStr, newOffsetStr);
+            offsetStr = newOffsetStr;
+        }
+    }
+    usedSymbols.add(symbol);
+
+    return symbol;
+}
+
+/** Prevents NaN or out of 0.0<->1.0 bounds parameter values. */
+float safeParamValue(float value)
+{
+    if (std::isnan(value))
+        value = 0.0f;
+    else if (value < 0.0f)
+        value = 0.0f;
+    else if (value > 1.0f)
+        value = 1.0f;
+    return value;
+}
+
+/** Create the manifest.ttl file contents */
+const String makeManifestFile(AudioProcessor* const filter, const String& binary)
+{
+    String text;
+
+    // Header
+    text += "@prefix lv2:  <" LV2_CORE_PREFIX "> .\n";
+    text += "@prefix pset: <" LV2_PRESETS_PREFIX "> .\n";
+    text += "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\n";
+    text += "@prefix ui:   <" LV2_UI_PREFIX "> .\n";
+    text += "\n";
+
+    // Plugin
+    text += "<" JucePlugin_LV2URI ">\n";
+    text += "    a lv2:Plugin ;\n";
+    text += "    lv2:binary <" + binary + PLUGIN_EXT "> ;\n";
+    text += "    rdfs:seeAlso <" + binary + ".ttl> .\n";
+    text += "\n";
+
+    // UIs
+    if (filter->hasEditor())
+    {
+        text += "<" JucePlugin_LV2URI "#ExternalUI>\n";
+        text += "    a <" LV2_EXTERNAL_UI_URI "> ;\n";
+        text += "    ui:binary <" + binary + PLUGIN_EXT "> ;\n";
+        text += "    lv2:requiredFeature <" LV2_INSTANCE_ACCESS_URI "> ;\n";
+        text += "    lv2:extensionData <" LV2_PROGRAMS__UIInterface "> .\n";
+        text += "\n";
+
+        text += "<" JucePlugin_LV2URI "#ParentUI>\n";
+#if JUCE_MAC
+        text += "    a ui:CocoaUI ;\n";
+#elif JUCE_LINUX
+        text += "    a ui:X11UI ;\n";
+#elif JUCE_WINDOWS
+        text += "    a ui:WindowsUI ;\n";
+#endif
+        text += "    ui:binary <" + binary + PLUGIN_EXT "> ;\n";
+        text += "    lv2:requiredFeature <" LV2_INSTANCE_ACCESS_URI "> ;\n";
+        text += "    lv2:optionalFeature ui:noUserResize ;\n";
+        text += "    lv2:extensionData <" LV2_PROGRAMS__UIInterface "> .\n";
+        text += "\n";
+    }
+
+#if JucePlugin_WantsLV2Presets
+    // Presets
+    for (int i = 0; i < filter->getNumPrograms(); i++)
+    {
+        text += "<" JucePlugin_LV2URI "#preset" + String::formatted("%03i", i+1) + ">\n";
+        text += "    a pset:Preset ;\n";
+        text += "    lv2:appliesTo <" JucePlugin_LV2URI "> ;\n";
+        text += "    rdfs:seeAlso <presets.ttl> .\n";
+        text += "\n";
+    }
+#endif
+
+    return text;
+}
+
+/** Create the -plugin-.ttl file contents */
+const String makePluginFile(AudioProcessor* const filter)
+{
+    String text;
+
+    // Header
+    text += "@prefix atom: <" LV2_ATOM_PREFIX "> .\n";
+    text += "@prefix doap: <http://usefulinc.com/ns/doap#> .\n";
+    text += "@prefix foaf: <http://xmlns.com/foaf/0.1/> .\n";
+    text += "@prefix lv2:  <" LV2_CORE_PREFIX "> .\n";
+    text += "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\n";
+    text += "@prefix ui:   <" LV2_UI_PREFIX "> .\n";
+    text += "@prefix unit: <" LV2_UNITS_PREFIX "> .\n";
+    text += "\n";
+
+    // Plugin
+    text += "<" JucePlugin_LV2URI ">\n";
+    text += "    a " + getPluginType() + " ;\n";
+    text += "    lv2:requiredFeature <" LV2_BUF_SIZE__boundedBlockLength "> ,\n";
+    text += "                        <" LV2_URID__map "> ;\n";
+    text += "    lv2:extensionData <" LV2_OPTIONS__interface "> ,\n";
+    text += "                      <" LV2_STATE__interface "> ,\n";
+    text += "                      <" LV2_PROGRAMS__Interface "> ;\n";
+    text += "\n";
+
+    // UIs
+    if (filter->hasEditor())
+    {
+        text += "    ui:ui <" JucePlugin_LV2URI "#ExternalUI> ,\n";
+        text += "          <" JucePlugin_LV2URI "#ParentUI> ;\n";
+        text += "\n";
+    }
+
+    uint32 portIndex = 0;
+
+    // MIDI input
+#if (JucePlugin_WantsMidiInput || JucePlugin_WantsLV2TimePos)
+    text += "    lv2:port [\n";
+    text += "        a lv2:InputPort, atom:AtomPort ;\n";
+    text += "        atom:bufferType atom:Sequence ;\n";
+#if JucePlugin_WantsMidiInput
+    text += "        atom:supports <" LV2_MIDI__MidiEvent "> ;\n";
+#endif
+#if JucePlugin_WantsLV2TimePos
+    text += "        atom:supports <" LV2_TIME__Position "> ;\n";
+#endif
+    text += "        lv2:index " + String(portIndex++) + " ;\n";
+    text += "        lv2:symbol \"lv2_events_in\" ;\n";
+    text += "        lv2:name \"Events Input\" ;\n";
+    text += "        lv2:designation lv2:control ;\n";
+ #if ! JucePlugin_IsSynth
+    text += "        lv2:portProperty lv2:connectionOptional ;\n";
+ #endif
+    text += "    ] ;\n";
+    text += "\n";
+#endif
+
+    // MIDI output
+#if JucePlugin_ProducesMidiOutput
+    text += "    lv2:port [\n";
+    text += "        a lv2:OutputPort, atom:AtomPort ;\n";
+    text += "        atom:bufferType atom:Sequence ;\n";
+    text += "        atom:supports <" LV2_MIDI__MidiEvent "> ;\n";
+    text += "        lv2:index " + String(portIndex++) + " ;\n";
+    text += "        lv2:symbol \"lv2_midi_out\" ;\n";
+    text += "        lv2:name \"MIDI Output\" ;\n";
+    text += "    ] ;\n";
+    text += "\n";
+#endif
+
+    // Freewheel and latency ports
+    text += "    lv2:port [\n";
+    text += "        a lv2:InputPort, lv2:ControlPort ;\n";
+    text += "        lv2:index " + String(portIndex++) + " ;\n";
+    text += "        lv2:symbol \"lv2_freewheel\" ;\n";
+    text += "        lv2:name \"Freewheel\" ;\n";
+    text += "        lv2:default 0.0 ;\n";
+    text += "        lv2:minimum 0.0 ;\n";
+    text += "        lv2:maximum 1.0 ;\n";
+    text += "        lv2:designation <" LV2_CORE__freeWheeling "> ;\n";
+    text += "        lv2:portProperty lv2:toggled ;\n";
+    text += "    ] ,\n";
+    text += "    [\n";
+    text += "        a lv2:OutputPort, lv2:ControlPort ;\n";
+    text += "        lv2:index " + String(portIndex++) + " ;\n";
+    text += "        lv2:symbol \"lv2_latency\" ;\n";
+    text += "        lv2:name \"Latency\" ;\n";
+    text += "        lv2:designation <" LV2_CORE__latency "> ;\n";
+    text += "    ] ;\n";
+    text += "\n";
+
+    // Audio inputs
+    for (int i=0; i < JucePlugin_MaxNumInputChannels; ++i)
+    {
+        if (i == 0)
+            text += "    lv2:port [\n";
+        else
+            text += "    [\n";
+
+        text += "        a lv2:InputPort, lv2:AudioPort ;\n";
+        text += "        lv2:index " + String(portIndex++) + " ;\n";
+        text += "        lv2:symbol \"lv2_audio_in_" + String(i+1) + "\" ;\n";
+        text += "        lv2:name \"Audio Input " + String(i+1) + "\" ;\n";
+
+        if (i+1 == JucePlugin_MaxNumInputChannels)
+            text += "    ] ;\n\n";
+        else
+            text += "    ] ,\n";
+    }
+
+    // Audio outputs
+    for (int i=0; i < JucePlugin_MaxNumOutputChannels; ++i)
+    {
+        if (i == 0)
+            text += "    lv2:port [\n";
+        else
+            text += "    [\n";
+
+        text += "        a lv2:OutputPort, lv2:AudioPort ;\n";
+        text += "        lv2:index " + String(portIndex++) + " ;\n";
+        text += "        lv2:symbol \"lv2_audio_out_" + String(i+1) + "\" ;\n";
+        text += "        lv2:name \"Audio Output " + String(i+1) + "\" ;\n";
+
+        if (i+1 == JucePlugin_MaxNumOutputChannels)
+            text += "    ] ;\n\n";
+        else
+            text += "    ] ,\n";
+    }
+
+    // Parameters
+    for (int i=0; i < filter->getNumParameters(); ++i)
+    {
+        if (i == 0)
+            text += "    lv2:port [\n";
+        else
+            text += "    [\n";
+
+        text += "        a lv2:InputPort, lv2:ControlPort ;\n";
+        text += "        lv2:index " + String(portIndex++) + " ;\n";
+        text += "        lv2:symbol \"" + nameToSymbol(filter->getParameterName(i), i) + "\" ;\n";
+
+        if (filter->getParameterName(i).isNotEmpty())
+            text += "        lv2:name \"" + filter->getParameterName(i) + "\" ;\n";
+        else
+            text += "        lv2:name \"Port " + String(i+1) + "\" ;\n";
+
+        text += "        lv2:default " + String::formatted("%f", safeParamValue(filter->getParameter(i))) + " ;\n";
+        text += "        lv2:minimum 0.0 ;\n";
+        text += "        lv2:maximum 1.0 ;\n";
+
+        String label(filter->getParameterLabel(i));
+
+        if (label.isNotEmpty())
+        {
+            text += "        units:unit [\n";
+            text += "            a units:Unit ;\n";
+            text += "            rdfs:label   \"" + label + "\" ;\n";
+            text += "            units:symbol \"" + label + "\" ;\n";
+            text += "            units:render \"%f " + label + "\" ;\n";
+            text += "        ] ;\n";
+        }
+
+        if (! filter->isParameterAutomatable(i))
+            text += "        lv2:portProperty <" LV2_PORT_PROPS__expensive "> ;\n";
+
+        if (i+1 == filter->getNumParameters())
+            text += "    ] ;\n\n";
+        else
+            text += "    ] ,\n";
+    }
+
+    text += "    doap:name \"" JucePlugin_Name "\" ;\n";
+    text += "    doap:maintainer [ foaf:name \"" JucePlugin_Manufacturer "\" ] .\n";
+
+    return text;
+}
+
+/** Create the presets.ttl file contents */
+const String makePresetsFile(AudioProcessor* const filter)
+{
+    String text;
+
+    // Header
+    text += "@prefix atom:  <" LV2_ATOM_PREFIX "> .\n";
+    text += "@prefix lv2:   <" LV2_CORE_PREFIX "> .\n";
+    text += "@prefix pset:  <" LV2_PRESETS_PREFIX "> .\n";
+    text += "@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n";
+    text += "@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .\n";
+    text += "@prefix state: <" LV2_STATE_PREFIX "> .\n";
+    text += "@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .\n";
+    text += "\n";
+
+    // Presets
+    const int numPrograms = filter->getNumPrograms();
+
+    for (int i = 0; i < numPrograms; ++i)
+    {
+        std::cout << "\nSaving preset " << i+1 << "/" << numPrograms+1 << "...";
+        std::cout.flush();
+
+        String preset;
+
+        // Label
+        filter->setCurrentProgram(i);
+        preset += "<" JucePlugin_LV2URI "#preset" + String::formatted("%03i", i+1) + "> a pset:Preset ;\n";
+        preset += "    rdfs:label \"" + filter->getProgramName(i) + "\" ;\n";
+
+        // State
+#if JucePlugin_WantsLV2State
+        preset += "    state:state [\n";
+ #if JucePlugin_WantsLV2StateString
+        preset += "        <" JUCE_LV2_STATE_STRING_URI ">\n";
+        preset += "\"\"\"\n";
+        preset += filter->getStateInformationString().replace("\r\n","\n");
+        preset += "\"\"\"\n";
+ #else
+        MemoryBlock chunkMemory;
+        filter->getCurrentProgramStateInformation(chunkMemory);
+        const String chunkString(Base64Encode(chunkMemory));
+
+        preset += "        <" JUCE_LV2_STATE_BINARY_URI "> [\n";
+        preset += "            a atom:Chunk ;\n";
+        preset += "            rdf:value \"" + chunkString + "\"^^xsd:base64Binary ;\n";
+        preset += "        ] ;\n";
+ #endif
+        if (filter->getNumParameters() > 0)
+            preset += "    ] ;\n\n";
+        else
+            preset += "    ] .\n\n";
+#endif
+
+        // Port values
+        usedSymbols.clear();
+
+        for (int j=0; j < filter->getNumParameters(); j++)
+        {
+              if (j == 0)
+                preset += "    lv2:port [\n";
+            else
+                preset += "    [\n";
+
+            preset += "        lv2:symbol \"" + nameToSymbol(filter->getParameterName(j), j) + "\" ;\n";
+            preset += "        pset:value " + String::formatted("%f", safeParamValue(filter->getParameter(j))) + " ;\n";
+
+            if (j+1 == filter->getNumParameters())
+                preset += "    ] ";
+            else
+                preset += "    ] ,\n";
+        }
+        preset += ".\n\n";
+
+        text += preset;
+    }
+
+    return text;
+}
+
+/** Creates manifest.ttl, plugin.ttl and presets.ttl files */
+void createLv2Files()
+{
+    ScopedJuceInitialiser_GUI juceInitialiser;
+    ScopedPointer<AudioProcessor> filter (createPluginFilterOfType (AudioProcessor::wrapperType_VST)); // FIXME
+
+    String binary(getBinaryName());
+    String binaryTTL(binary + ".ttl");
+
+    std::cout << "Writing manifest.ttl..."; std::cout.flush();
+    std::fstream manifest("manifest.ttl", std::ios::out);
+    manifest << makeManifestFile(filter, binary) << std::endl;
+    manifest.close();
+    std::cout << " done!" << std::endl;
+
+    std::cout << "Writing " << binary << ".ttl..."; std::cout.flush();
+    std::fstream plugin(binaryTTL.toUTF8(), std::ios::out);
+    plugin << makePluginFile(filter) << std::endl;
+    plugin.close();
+    std::cout << " done!" << std::endl;
+
+#if JucePlugin_WantsLV2Presets
+    std::cout << "Writing presets.ttl..."; std::cout.flush();
+    std::fstream presets("presets.ttl", std::ios::out);
+    presets << makePresetsFile(filter) << std::endl;
+    presets.close();
+    std::cout << " done!" << std::endl;
+#endif
+}
 
 //==============================================================================
 #if JUCE_LINUX
@@ -81,60 +574,479 @@ public:
     JuceLv2Wrapper (double sampleRate_, const LV2_Feature* const* features)
         : numInChans (JucePlugin_MaxNumInputChannels),
           numOutChans (JucePlugin_MaxNumOutputChannels),
-          sampleRate (sampleRate_)
+          bufferSize (2048),
+          sampleRate (sampleRate_),
+          uridMap (nullptr),
+          uridAtomSequence (0),
+          uridMidiEvent (0),
+          uridTimePos (0)
     {
-       #if JUCE_LINUX
+#if JUCE_LINUX
         MessageManagerLock mmLock;
-       #endif
+#endif
 
-        filter = createPluginFilterOfType (AudioProcessor::wrapperType_VST);
-        jassert(filter != nullptr);
+        filter = createPluginFilterOfType (AudioProcessor::wrapperType_VST); // FIXME
+        jassert (filter != nullptr);
 
         filter->setPlayConfigDetails (numInChans, numOutChans, 0, 0);
         filter->setPlayHead (this);
 
-#if JucePlugin_WantsMidiInput
-        portMidiIn = nullptr;
+#if (JucePlugin_WantsMidiInput || JucePlugin_WantsLV2TimePos)
+        portEventsIn = nullptr;
 #endif
 #if JucePlugin_ProducesMidiOutput
         portMidiOut = nullptr;
 #endif
-        portLatency = nullptr;
+
+        portFreewheel = nullptr;
+        portLatency   = nullptr;
 
         for (int i=0; i < numInChans; i++)
             portAudioIns[i] = nullptr;
         for (int i=0; i < numOutChans; i++)
             portAudioOuts[i] = nullptr;
 
-        portControls.insertMultiple(0, nullptr, filter->getNumParameters());
+        portControls.insertMultiple (0, nullptr, filter->getNumParameters());
+
+        for (int i=0; i < filter->getNumParameters(); i++)
+            lastControlValues.add (filter->getParameter(i));
+
+        curPosInfo.resetToDefault();
+
+        // we need URID_Map first
+        for (int i=0; features[i] != nullptr; ++i)
+        {
+            if (strcmp(features[i]->URI, LV2_URID__map) == 0)
+            {
+                uridMap = (const LV2_URID_Map*)features[i]->data;
+                break;
+            }
+        }
+
+        // we require uridMap to work properly (it's set as required feature)
+        jassert (uridMap != nullptr);
+
+        if (uridMap != nullptr)
+        {
+            for (int i=0; features[i] != nullptr; ++i)
+            {
+                if (strcmp(features[i]->URI, LV2_OPTIONS__options) == 0)
+                {
+                    const LV2_Options_Option* options = (const LV2_Options_Option*)features[i]->data;
+
+                    for (int j=0; options[j].key != 0; ++j)
+                    {
+                        if (options[j].key == uridMap->map(uridMap->handle, LV2_BUF_SIZE__maxBlockLength))
+                        {
+                            if (options[j].type == uridMap->map(uridMap->handle, LV2_ATOM__Int))
+                                bufferSize = *(int*)options[j].value;
+                            else
+                                std::cerr << "Host provides maxBlockLength but has wrong value type" << std::endl;
+
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
+
+            uridAtomSequence = uridMap->map(uridMap->handle, LV2_ATOM__Sequence);
+            uridTimePos = uridMap->map(uridMap->handle, LV2_TIME__Position);
+            uridMidiEvent = uridMap->map(uridMap->handle, LV2_MIDI__MidiEvent);
+        }
+
+        progDesc.bank = 0;
+        progDesc.program = 0;
+        progDesc.name = nullptr;
 
         activePlugins.add (this);
     }
 
     ~JuceLv2Wrapper ()
     {
+#if JUCE_LINUX
+        MessageManagerLock mmLock;
+#endif
+        filter = nullptr;
+
+        if (progDesc.name != nullptr)
+            free((void*)progDesc.name);
+
+        portControls.clear();
+        lastControlValues.clear();
+
+        jassert (activePlugins.contains (this));
+        activePlugins.removeFirstMatchingValue (this);
     }
 
     //==============================================================================
-    // LV2 calls
-    void lv2ConnectPort (uint32 port, void* dataLocation)
+    // LV2 core calls
+
+    void lv2ConnectPort (uint32 portId, void* dataLocation)
     {
+        uint32 index = 0;
+
+#if (JucePlugin_WantsMidiInput || JucePlugin_WantsLV2TimePos)
+        if (portId == index++)
+        {
+            portEventsIn = (LV2_Atom_Sequence*)dataLocation;
+            return;
+        }
+#endif
+
+#if JucePlugin_ProducesMidiOutput
+        if (portId == index++)
+        {
+            portMidiOut = (LV2_Atom_Sequence*)dataLocation;
+            return;
+        }
+#endif
+
+        if (portId == index++)
+        {
+            portFreewheel = (float*)dataLocation;
+            return;
+        }
+
+        if (portId == index++)
+        {
+            portLatency = (float*)dataLocation;
+            return;
+        }
+
+        for (int i=0; i < numInChans; ++i)
+        {
+            if (portId == index++)
+            {
+                portAudioIns[i] = (float*)dataLocation;
+                return;
+            }
+        }
+
+        for (int i=0; i < numOutChans; ++i)
+        {
+            if (portId == index++)
+            {
+                portAudioOuts[i] = (float*)dataLocation;
+                return;
+            }
+        }
+
+        for (int i=0; i < filter->getNumParameters(); ++i)
+        {
+            if (portId == index++)
+            {
+                portControls.set(i, (float*)dataLocation);
+                return;
+            }
+        }
     }
 
     void lv2Activate()
     {
+        jassert (filter != nullptr);
+
+        filter->prepareToPlay (sampleRate, bufferSize);
+
+        channels.calloc (numInChans + numOutChans);
+
+#if (JucePlugin_WantsMidiInput || JucePlugin_ProducesMidiOutput)
+        midiEvents.ensureSize (2048);
+        midiEvents.clear();
+#endif
     }
 
     void lv2Deactivate()
     {
+        jassert (filter != nullptr);
+
+        filter->releaseResources();
+
+        channels.free();
     }
 
     void lv2Run (uint32 sampleCount)
     {
+        jassert (filter != nullptr);
+
+        if (portLatency != nullptr)
+            *portLatency = filter->getLatencySamples();
+
+        if (portFreewheel != nullptr)
+            filter->setNonRealtime (*portFreewheel > 0.5f);
+
+        if (sampleCount == 0)
+        {
+            /**
+               LV2 pre-roll
+               Hosts might use this to force plugins to update its output control ports.
+               (plugins can only access port locations during run) */
+            return;
+        }
+
+        // Check for updated parameters
+        {
+            float curValue;
+
+            for (int i = 0; i < portControls.size(); ++i)
+            {
+                if (portControls[i] != nullptr)
+                {
+                    curValue = *portControls[i];
+
+                    if (lastControlValues[i] != curValue)
+                    {
+                        filter->setParameter(i, curValue);
+                        lastControlValues.setUnchecked(i, curValue);
+                    }
+                }
+            }
+        }
+
+        {
+            const ScopedLock sl (filter->getCallbackLock());
+
+            if (filter->isSuspended() && false)
+            {
+                for (int i = 0; i < numOutChans; ++i)
+                    zeromem (portAudioOuts[i], sizeof (float) * sampleCount);
+            }
+            else
+            {
+                int i;
+                for (i = 0; i < numOutChans; ++i)
+                {
+                    channels[i] = portAudioOuts[i];
+
+                    if (i < numInChans && portAudioIns[i] != portAudioOuts[i])
+                        FloatVectorOperations::copy (portAudioOuts [i], portAudioIns[i], sampleCount);
+                }
+
+                for (; i < numInChans; ++i)
+                    channels [i] = portAudioIns[i];
+
+#if (JucePlugin_WantsMidiInput || JucePlugin_WantsLV2TimePos)
+                if (portEventsIn != nullptr)
+                {
+                    midiEvents.clear();
+
+                    LV2_ATOM_SEQUENCE_FOREACH(portEventsIn, iter)
+                    {
+                        const LV2_Atom_Event* event = (const LV2_Atom_Event*)iter;
+
+                        if (event == nullptr)
+                            continue;
+
+ #if JucePlugin_WantsMidiInput
+                        if (event->body.type == uridMidiEvent)
+                        {
+                            if (event->time.frames >= sampleCount)
+                               break;
+
+                            const uint8* data = (const uint8*)(event + 1);
+                            midiEvents.addEvent(data, event->body.size, event->time.frames);
+                            continue;
+                        }
+ #endif
+ #if JucePlugin_WantsLV2TimePos
+                        if (event->body.type == uridTimePos)
+                        {
+                            // TODO
+                        }
+ #endif
+                    }
+                }
+#endif
+                {
+                    AudioSampleBuffer chans (channels, jmax (numInChans, numOutChans), sampleCount);
+                    filter->processBlock (chans, midiEvents);
+                }
+            }
+        }
+
+        if (! midiEvents.isEmpty())
+        {
+#if JucePlugin_ProducesMidiOutput
+            if (portMidiOut != nullptr)
+            {
+                const uint8* midiEventData;
+                int midiEventSize, midiEventPosition;
+                MidiBuffer::Iterator i (midiEvents);
+
+                uint32_t size, offset = 0;
+                LV2_Atom_Event* aev;
+
+                portMidiOut->atom.size = 0;
+                portMidiOut->atom.type = uridAtomSequence;
+                portMidiOut->body.unit = 0;
+                portMidiOut->body.pad  = 0;
+
+                while (i.getNextEvent (midiEventData, midiEventSize, midiEventPosition))
+                {
+                    jassert (midiEventPosition >= 0 && midiEventPosition < sampleCount);
+
+                    aev = (LV2_Atom_Event*)((char*)LV2_ATOM_CONTENTS(LV2_Atom_Sequence, portMidiOut) + offset);
+                    aev->time.frames = midiEventPosition;
+                    aev->body.type   = uridMidiEvent;
+                    aev->body.size   = midiEventSize;
+                    memcpy(LV2_ATOM_BODY(&aev->body), midiEventData, midiEventSize);
+
+                    size    = lv2_atom_pad_size(sizeof(LV2_Atom_Event) + midiEventSize);
+                    offset += size;
+                    portMidiOut->atom.size += size;
+                }
+            }
+#endif
+            midiEvents.clear();
+        }
+    }
+
+    //==============================================================================
+    // LV2 extended calls
+
+    uint32_t lv2GetOptions(LV2_Options_Option* options)
+    {
+        // currently unused
+        return LV2_OPTIONS_SUCCESS;
+    }
+
+    uint32_t lv2SetOptions(const LV2_Options_Option* options)
+    {
+        for (int j=0; options[j].key != 0; ++j)
+        {
+            if (options[j].key == uridMap->map(uridMap->handle, LV2_BUF_SIZE__maxBlockLength))
+            {
+                if (options[j].type == uridMap->map(uridMap->handle, LV2_ATOM__Int))
+                    bufferSize = *(int*)options[j].value;
+                else
+                    std::cerr << "Host changed maxBlockLength but with wrong value type" << std::endl;
+            }
+            else if (options[j].key == uridMap->map(uridMap->handle, LV2_CORE__sampleRate))
+            {
+                if (options[j].type == uridMap->map(uridMap->handle, LV2_ATOM__Double))
+                    sampleRate = *(double*)options[j].value;
+                else
+                    std::cerr << "Host changed sampleRate but with wrong value type" << std::endl;
+            }
+        }
+
+        return LV2_OPTIONS_SUCCESS;
+    }
+
+    const LV2_Program_Descriptor* lv2GetProgram(uint32_t index)
+    {
+        jassert (filter != nullptr);
+
+        if (progDesc.name != nullptr)
+        {
+            free((void*)progDesc.name);
+            progDesc.name = nullptr;
+        }
+
+        if ((int)index < filter->getNumPrograms())
+        {
+            progDesc.bank    = index / 128;
+            progDesc.program = index % 128;
+            progDesc.name    = strdup(filter->getProgramName(index).toUTF8());
+            return &progDesc;
+        }
+
+        return nullptr;
+    }
+
+    void lv2SelectProgram(uint32_t bank, uint32_t program)
+    {
+        jassert (filter != nullptr);
+
+        int realProgram = bank * 128 + program;
+
+        if (realProgram < filter->getNumPrograms())
+        {
+            filter->setCurrentProgram(realProgram);
+
+            // update input control ports now
+            for (int i = 0; i < portControls.size(); ++i)
+            {
+                float value = filter->getParameter(i);
+
+                if (portControls[i] != nullptr)
+                    *portControls[i] = value;
+
+                lastControlValues.set(i, value);
+            }
+        }
+    }
+
+    LV2_State_Status lv2SaveState(LV2_State_Store_Function store, LV2_State_Handle stateHandle)
+    {
+        jassert (filter != nullptr);
+
+#if JucePlugin_WantsLV2StateString
+        String stateData(filter->getStateInformationString().replace("\r\n","\n"));
+        CharPointer_UTF8 charData(stateData.toUTF8());
+
+        store (stateHandle,
+               uridMap->map(uridMap->handle, JUCE_LV2_STATE_STRING_URI),
+               charData.getAddress(),
+               charData.sizeInBytes(),
+               uridMap->map(uridMap->handle, LV2_ATOM__String),
+               LV2_STATE_IS_POD|LV2_STATE_IS_PORTABLE);
+#else
+        MemoryBlock chunkMemory;
+        filter->getCurrentProgramStateInformation (chunkMemory);
+
+        store (stateHandle,
+               uridMap->map(uridMap->handle, JUCE_LV2_STATE_BINARY_URI),
+               chunkMemory.getData(),
+               chunkMemory.getSize(),
+               uridMap->map(uridMap->handle, LV2_ATOM__Chunk),
+               LV2_STATE_IS_POD|LV2_STATE_IS_PORTABLE);
+#endif
+
+        return LV2_STATE_SUCCESS;
+    }
+
+    LV2_State_Status lv2RestoreState(LV2_State_Retrieve_Function retrieve, LV2_State_Handle stateHandle, uint32_t flags)
+    {
+        jassert (filter != nullptr);
+
+        size_t size;
+        uint32 type;
+        const void* data = retrieve (stateHandle,
+#if JucePlugin_WantsLV2StateString
+                                     uridMap->map(uridMap->handle, JUCE_LV2_STATE_STRING_URI),
+#else
+                                     uridMap->map(uridMap->handle, JUCE_LV2_STATE_BINARY_URI),
+#endif
+                                     &size, &type, &flags);
+
+#if JucePlugin_WantsLV2StateString
+        if (type == uridMap->map(uridMap->handle, LV2_ATOM__String))
+        {
+            String stateData(CharPointer_UTF8(static_cast<const char*>(data)));
+            filter->setStateInformationString(stateData);
+
+            // TODO - force ui repaint
+
+            return LV2_STATE_SUCCESS;
+        }
+#else
+        if (type == uridMap->map(uridMap->handle, LV2_ATOM__Chunk))
+        {
+            filter->setCurrentProgramStateInformation (data, size);
+
+            // TODO - force ui repaint
+
+            return LV2_STATE_SUCCESS;
+        }
+#endif
+
+        return LV2_STATE_ERR_BAD_TYPE;
     }
 
     //==============================================================================
     // Juce calls
+
     bool getCurrentPosition (AudioPlayHead::CurrentPositionInfo& info)
     {
         return false;
@@ -142,23 +1054,33 @@ public:
 
 private:
     ScopedPointer<AudioProcessor> filter;
+    HeapBlock<float*> channels;
+    MidiBuffer midiEvents;
     int numInChans, numOutChans;
 
-    uint32 bufferSize;
-    double sampleRate;
-    //AudioPlayHead::CurrentPositionInfo posInfo;
-
-    // LV2 ports location
-#if JucePlugin_WantsMidiInput
-    LV2_Atom_Sequence* portMidiIn;
+#if (JucePlugin_WantsMidiInput || JucePlugin_WantsLV2TimePos)
+    LV2_Atom_Sequence* portEventsIn;
 #endif
 #if JucePlugin_ProducesMidiOutput
     LV2_Atom_Sequence* portMidiOut;
 #endif
+    float* portFreewheel;
     float* portLatency;
     float* portAudioIns[JucePlugin_MaxNumInputChannels];
     float* portAudioOuts[JucePlugin_MaxNumOutputChannels];
     Array<float*> portControls;
+
+    uint32 bufferSize;
+    double sampleRate;
+    Array<float> lastControlValues;
+    AudioPlayHead::CurrentPositionInfo curPosInfo;
+
+    const LV2_URID_Map* uridMap;
+    LV2_URID uridAtomSequence;
+    LV2_URID uridMidiEvent;
+    LV2_URID uridTimePos;
+
+    LV2_Program_Descriptor progDesc;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (JuceLv2Wrapper)
 };
@@ -196,12 +1118,63 @@ static void juceLV2_Deactivate(LV2_Handle handle)
 static void juceLV2_Cleanup(LV2_Handle handle)
 {
     delete handlePtr;
+
+#if JUCE_LINUX
+    if (activePlugins.size() == 0)
+        SharedMessageThread::deleteInstance();
+#endif
+}
+
+//==============================================================================
+// LV2 extension_data() functions
+
+static uint32_t juceLV2_getOptions(LV2_Handle handle, LV2_Options_Option* options)
+{
+    return handlePtr->lv2GetOptions(options);
+}
+
+static uint32_t juceLV2_setOptions(LV2_Handle handle, const LV2_Options_Option* options)
+{
+    return handlePtr->lv2SetOptions(options);
+}
+
+static const LV2_Program_Descriptor* juceLV2_getProgram(LV2_Handle handle, uint32_t index)
+{
+    return handlePtr->lv2GetProgram(index);
+}
+
+static void juceLV2_selectProgram(LV2_Handle handle, uint32_t bank, uint32_t program)
+{
+    handlePtr->lv2SelectProgram(bank, program);
+}
+
+static LV2_State_Status juceLV2_SaveState(LV2_Handle handle, LV2_State_Store_Function store, LV2_State_Handle stateHandle,
+                                          uint32_t, const LV2_Feature* const*)
+{
+    return handlePtr->lv2SaveState(store, stateHandle);
+}
+
+static LV2_State_Status juceLV2_RestoreState(LV2_Handle handle, LV2_State_Retrieve_Function retrieve, LV2_State_Handle stateHandle,
+                                             uint32_t flags, const LV2_Feature* const*)
+{
+    return handlePtr->lv2RestoreState(retrieve, stateHandle, flags);
 }
 
 #undef handlePtr
 
 static const void* juceLV2_ExtensionData(const char* uri)
 {
+    static LV2_Options_Interface options = { juceLV2_getOptions, juceLV2_setOptions };
+    static const LV2_Programs_Interface programs = { juceLV2_getProgram, juceLV2_selectProgram };
+    static const LV2_State_Interface state = { juceLV2_SaveState, juceLV2_RestoreState };
+
+    if (strcmp(uri, LV2_OPTIONS__interface) == 0)
+        return &options;
+    if (strcmp(uri, LV2_PROGRAMS__Interface) == 0)
+        return &programs;
+    if (strcmp(uri, LV2_STATE__interface) == 0)
+        return &state;
+
     return nullptr;
 }
 
@@ -276,6 +1249,12 @@ static const LV2UI_Descriptor JuceLv2UI_Parent = {
 // Mac startup code..
 #if JUCE_MAC
 
+    JUCE_EXPORTED_FUNCTION void lv2_generate_ttl();
+    JUCE_EXPORTED_FUNCTION void lv2_generate_ttl()
+    {
+        createLv2Files();
+    }
+
     JUCE_EXPORTED_FUNCTION const LV2_Descriptor* lv2_descriptor(uint32 index);
     JUCE_EXPORTED_FUNCTION const LV2_Descriptor* lv2_descriptor(uint32 index)
     {
@@ -301,6 +1280,12 @@ static const LV2UI_Descriptor JuceLv2UI_Parent = {
 //==============================================================================
 // Linux startup code..
 #elif JUCE_LINUX
+
+    JUCE_EXPORTED_FUNCTION void lv2_generate_ttl();
+    JUCE_EXPORTED_FUNCTION void lv2_generate_ttl()
+    {
+        createLv2Files();
+    }
 
     JUCE_EXPORTED_FUNCTION const LV2_Descriptor* lv2_descriptor(uint32 index);
     JUCE_EXPORTED_FUNCTION const LV2_Descriptor* lv2_descriptor(uint32 index)
@@ -331,6 +1316,11 @@ static const LV2UI_Descriptor JuceLv2UI_Parent = {
 //==============================================================================
 // Win32 startup code..
 #elif JUCE_WINDOWS
+
+    extern "C" __declspec (dllexport) void lv2_generate_ttl()
+    {
+        createLv2Files();
+    }
 
     extern "C" __declspec (dllexport) const LV2_Descriptor* lv2_descriptor(uint32 index)
     {
