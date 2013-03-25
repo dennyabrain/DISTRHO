@@ -565,6 +565,465 @@ static Array<void*> activePlugins;
 
 //==============================================================================
 /**
+    Lightweight DocumentWindow subclass for external ui
+*/
+class JuceLv2ExternalUIWindow : public DocumentWindow
+{
+public:
+    /** Creates a Document Window wrapper */
+    JuceLv2ExternalUIWindow (AudioProcessorEditor* editor, const String& title) :
+            DocumentWindow (title, Colours::white, DocumentWindow::minimiseButton | DocumentWindow::closeButton, false),
+            closed (false),
+            lastPos (100, 100)
+    {
+        setOpaque (true);
+        setContentNonOwned (editor, true);
+        setSize(editor->getWidth(), editor->getHeight());
+        setUsingNativeTitleBar (true);
+
+        // FIXME - does not work properly on Linux
+        //setAlwaysOnTop(true);
+    }
+
+    /** Close button handler */
+    void closeButtonPressed()
+    {
+        saveLastPos();
+        removeFromDesktop();
+        closed = true;
+    }
+
+    void saveLastPos()
+    {
+        lastPos = getScreenPosition();
+    }
+
+    void restoreLastPos()
+    {
+        setTopLeftPosition(lastPos.getX(), lastPos.getY());
+    }
+
+    Point<int> getLastPos()
+    {
+        return lastPos;
+    }
+
+    bool isClosed()
+    {
+        return closed;
+    }
+
+    void reset()
+    {
+        closed = false;
+    }
+
+private:
+    bool closed;
+    Point<int> lastPos;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (JuceLv2ExternalUIWindow);
+};
+
+//==============================================================================
+/**
+    Juce LV2 External UI handle
+*/
+class JuceLv2ExternalUIWrapper : public LV2_External_UI_Widget
+{
+public:
+    JuceLv2ExternalUIWrapper (AudioProcessorEditor* editor, const String& title)
+        : window (editor, title)
+    {
+        // external UI calls
+        run  = doRun;
+        show = doShow;
+        hide = doHide;
+    }
+
+    ~JuceLv2ExternalUIWrapper()
+    {
+        if (window.isOnDesktop())
+            window.removeFromDesktop();
+    }
+
+    bool isClosed()
+    {
+        return window.isClosed();
+    }
+
+    void resetWindow()
+    {
+        window.reset();
+    }
+
+    void repaint()
+    {
+        window.repaint();
+    }
+
+    Point<int> getScreenPosition()
+    {
+        if (window.isClosed())
+            return window.getLastPos();
+        else
+            return window.getScreenPosition();
+    }
+
+    void setScreenPos(int x, int y)
+    {
+        if (! window.isClosed())
+            window.setTopLeftPosition(x, y);
+    }
+
+    //==============================================================================
+    static void doRun (LV2_External_UI_Widget* _this_)
+    {
+        const MessageManagerLock mmLock;
+        JuceLv2ExternalUIWrapper* self = (JuceLv2ExternalUIWrapper*) _this_;
+
+        if (! self->isClosed())
+            self->window.repaint();
+    }
+
+    static void doShow (LV2_External_UI_Widget* _this_)
+    {
+        const MessageManagerLock mmLock;
+        JuceLv2ExternalUIWrapper* self = (JuceLv2ExternalUIWrapper*) _this_;
+
+        if (! self->isClosed())
+        {
+            if (! self->window.isOnDesktop())
+                self->window.addToDesktop();
+
+            self->window.restoreLastPos();
+            self->window.setVisible(true);
+        }
+    }
+
+    static void doHide (LV2_External_UI_Widget* _this_)
+    {
+        const MessageManagerLock mmLock;
+        JuceLv2ExternalUIWrapper* self = (JuceLv2ExternalUIWrapper*) _this_;
+
+        if (! self->isClosed())
+        {
+            self->window.saveLastPos();
+            self->window.setVisible(false);
+        }
+    }
+
+private:
+    JuceLv2ExternalUIWindow window;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (JuceLv2ExternalUIWrapper);
+};
+
+//==============================================================================
+/**
+    Juce LV2 Parent UI container, listens for resize events and passes them to ui-resize
+*/
+class JuceLv2ParentContainer : public Component
+{
+public:
+    JuceLv2ParentContainer (AudioProcessorEditor* editor, const LV2UI_Resize* uiResize_)
+        : uiResize(uiResize_)
+    {
+        setOpaque (true);
+        editor->setOpaque (true);
+        setBounds (editor->getBounds());
+
+        editor->setTopLeftPosition (0, 0);
+        addAndMakeVisible (editor);
+    }
+
+    ~JuceLv2ParentContainer()
+    {
+    }
+
+    void paint (Graphics&) {}
+    void paintOverChildren (Graphics&) {}
+
+    void childBoundsChanged (Component* child)
+    {
+        const int cw = child->getWidth();
+        const int ch = child->getHeight();
+
+#if JUCE_LINUX
+        //XResizeWindow (display, (Window) getWindowHandle(), cw, ch);
+#else
+        setSize (cw, ch);
+#endif
+
+        if (uiResize != nullptr)
+            uiResize->ui_resize (uiResize->handle, cw, ch);
+    }
+
+    void reset (const LV2UI_Resize* uiResize_)
+    {
+        uiResize = uiResize_;
+
+        if (uiResize != nullptr)
+            uiResize->ui_resize (uiResize->handle, getWidth(), getHeight());
+    }
+
+private:
+    //==============================================================================
+    const LV2UI_Resize* uiResize;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (JuceLv2ParentContainer);
+};
+
+//==============================================================================
+/**
+    Juce LV2 UI handle
+*/
+class JuceLv2UIWrapper : public AudioProcessorListener,
+                         public Timer
+{
+public:
+    JuceLv2UIWrapper (AudioProcessor* filter_, LV2UI_Write_Function writeFunction_, LV2UI_Controller controller_,
+                      LV2UI_Widget* widget, const LV2_Feature* const* features, bool isExternal_)
+        : filter (filter_),
+          writeFunction (writeFunction_),
+          controller (controller_),
+          isExternal (isExternal_),
+          uiTouch (nullptr),
+          programsHost (nullptr),
+          externalUIHost (nullptr),
+          uiResize (nullptr)
+    {
+        filter->addListener(this);
+
+        if (filter->hasEditor())
+        {
+            editor = filter->createEditorIfNeeded();
+
+            if (editor == nullptr)
+            {
+                *widget = nullptr;
+                return;
+            }
+        }
+
+        for (int i = 0; features[i] != nullptr; ++i)
+        {
+            if (strcmp(features[i]->URI, LV2_UI__touch) == 0)
+                uiTouch = (const LV2UI_Touch*)features[i]->data;
+
+            else if (strcmp(features[i]->URI, LV2_PROGRAMS__Host) == 0)
+                programsHost = (const LV2_Programs_Host*)features[i]->data;
+        }
+
+        if (isExternal)
+        {
+            resetExternalUI (features);
+
+            if (externalUIHost != nullptr)
+            {
+                String title(filter->getName());
+
+                if (externalUIHost->plugin_human_id != nullptr)
+                    title = externalUIHost->plugin_human_id;
+
+                externalUI = new JuceLv2ExternalUIWrapper(editor, title);
+                *widget = externalUI;
+                startTimer (100);
+            }
+            else
+            {
+                *widget = nullptr;
+                std::cerr << "Failed to init external UI" << std::endl;
+            }
+        }
+        else
+        {
+            resetParentUI (features);
+
+            if (parentContainer != nullptr)
+               *widget = parentContainer->getWindowHandle();
+            else
+               *widget = nullptr;
+        }
+    }
+
+    ~JuceLv2UIWrapper()
+    {
+        PopupMenu::dismissAllActiveMenus();
+
+        filter->removeListener(this);
+
+        parentContainer = nullptr;
+        externalUI = nullptr;
+        externalUIHost = nullptr;
+
+        if (editor != nullptr)
+        {
+            filter->editorBeingDeleted(editor);
+            editor = nullptr;
+        }
+    }
+
+    //==============================================================================
+    void audioProcessorParameterChanged (AudioProcessor*, int index, float newValue)
+    {
+        //if (writeFunction != nullptr && controller != nullptr)
+        //    writeFunction(controller, index + controlPortOffset, sizeof (float), 0, &newValue);
+    }
+
+    void audioProcessorChanged (AudioProcessor*)
+    {
+        if (filter != nullptr && programsHost != nullptr)
+        {
+            //if (filter->getNumPrograms() != lastProgramCount)
+            //    hostPrograms->program_changed(hostPrograms->handle, -1);
+            //else
+            //    hostPrograms->program_changed(hostPrograms->handle, filter->getCurrentProgram());
+            //lastProgramCount = filter->getNumPrograms();
+        }
+    }
+
+    void audioProcessorParameterChangeGestureBegin (AudioProcessor*, int parameterIndex)
+    {
+        //if (uiTouch != nullptr)
+        //    uiTouch->touch(uiTouch->handle, parameterIndex + controlPortOffset, true);
+    }
+
+    void audioProcessorParameterChangeGestureEnd (AudioProcessor*, int parameterIndex)
+    {
+        //if (uiTouch != nullptr)
+        //    uiTouch->touch(uiTouch->handle, parameterIndex + controlPortOffset, false);
+    }
+
+    void timerCallback()
+    {
+        if (externalUI != nullptr && externalUI->isClosed())
+        {
+            if (externalUIHost != nullptr)
+                externalUIHost->ui_closed (controller);
+
+            if (isTimerRunning()) // prevents assertion failure
+                stopTimer();
+        }
+    }
+
+    //==============================================================================
+    void resetIfNeeded(LV2UI_Write_Function writeFunction_, LV2UI_Controller controller_, LV2UI_Widget* widget,
+                       const LV2_Feature* const* features)
+    {
+        writeFunction = writeFunction_;
+        controller    = controller_;
+
+        if (isExternal)
+        {
+            resetExternalUI (features);
+            *widget = externalUI;
+
+            if (externalUI != nullptr)
+            {
+                externalUI->resetWindow();
+                startTimer (100);
+            }
+        }
+        else
+        {
+            resetParentUI (features);
+            *widget = parentContainer->getWindowHandle();
+        }
+    }
+
+    void repaint()
+    {
+        if (editor != nullptr)
+            editor->repaint();
+
+        if (parentContainer != nullptr)
+            parentContainer->repaint();
+
+        if (externalUI != nullptr)
+            externalUI->repaint();
+    }
+
+private:
+    AudioProcessor* const filter;
+    ScopedPointer<AudioProcessorEditor> editor;
+
+    LV2UI_Write_Function writeFunction;
+    LV2UI_Controller controller;
+    const bool isExternal;
+
+    const LV2UI_Touch* uiTouch;
+    const LV2_Programs_Host* programsHost;
+
+    ScopedPointer<JuceLv2ExternalUIWrapper> externalUI;
+    const LV2_External_UI_Host* externalUIHost;
+    Point<int> lastExternalUIPos;
+
+    ScopedPointer<JuceLv2ParentContainer> parentContainer;
+    const LV2UI_Resize* uiResize;
+
+    //==============================================================================
+    void resetExternalUI(const LV2_Feature* const* features)
+    {
+        externalUIHost = nullptr;
+
+        for (int i = 0; features[i] != nullptr; ++i)
+        {
+            if (strcmp(features[i]->URI, LV2_EXTERNAL_UI__Host) == 0)
+            {
+                externalUIHost = (const LV2_External_UI_Host*)features[i]->data;
+                break;
+            }
+        }
+
+        if (externalUI != nullptr)
+            externalUI->setScreenPos(lastExternalUIPos.getX(), lastExternalUIPos.getY());
+    }
+
+    void resetParentUI(const LV2_Feature* const* features)
+    {
+        void* parent = nullptr;
+        uiResize = nullptr;
+
+        for (int i = 0; features[i] != nullptr; ++i)
+        {
+            if (strcmp(features[i]->URI, LV2_UI__parent) == 0)
+                parent = features[i]->data;
+
+            else if (strcmp(features[i]->URI, LV2_UI__resize) == 0)
+                uiResize = (const LV2UI_Resize*)features[i]->data;
+        }
+
+        if (parent != nullptr)
+        {
+            if (parentContainer == nullptr)
+                parentContainer = new JuceLv2ParentContainer(editor, uiResize);
+
+            if (parentContainer->isOnDesktop())
+                parentContainer->removeFromDesktop ();
+
+            parentContainer->setVisible (false);
+
+#if (JUCE_MAC || JUCE_WINDOWS)
+            parentContainer->addToDesktop (0, parent);
+#elif JUCE_LINUX
+            parentContainer->addToDesktop (0);
+
+            //Window hostWindow = (Window) parent;
+            //Window editorWnd  = (Window) parentContainer->getWindowHandle();
+            //XReparentWindow (display, editorWnd, hostWindow, 0, 0);
+#endif
+
+            parentContainer->setVisible (true);
+            parentContainer->reset (uiResize);
+        }
+    }
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (JuceLv2UIWrapper)
+};
+
+//==============================================================================
+/**
     Juce LV2 handle
 */
 class JuceLv2Wrapper : public AudioPlayHead
@@ -1052,8 +1511,21 @@ public:
         return false;
     }
 
+    //==============================================================================
+    JuceLv2UIWrapper* getUI(LV2UI_Write_Function writeFunction, LV2UI_Controller controller, LV2UI_Widget* widget,
+                            const LV2_Feature* const* features, bool isExternal)
+    {
+        if (ui != nullptr)
+            ui->resetIfNeeded(writeFunction, controller, widget, features);
+        else
+            ui = new JuceLv2UIWrapper(filter, writeFunction, controller, widget, features, isExternal);
+
+        return ui;
+    }
+
 private:
     ScopedPointer<AudioProcessor> filter;
+    ScopedPointer<JuceLv2UIWrapper> ui;
     HeapBlock<float*> channels;
     MidiBuffer midiEvents;
     int numInChans, numOutChans;
@@ -1126,7 +1598,7 @@ static void juceLV2_Cleanup(LV2_Handle handle)
 }
 
 //==============================================================================
-// LV2 extension_data() functions
+// LV2 extended functions
 
 static uint32_t juceLV2_getOptions(LV2_Handle handle, LV2_Options_Option* options)
 {
@@ -1184,6 +1656,18 @@ static const void* juceLV2_ExtensionData(const char* uri)
 static LV2UI_Handle juceLV2UI_Instantiate(LV2UI_Write_Function writeFunction, LV2UI_Controller controller,
                                           LV2UI_Widget* widget, const LV2_Feature* const* features, bool isExternal)
 {
+    const MessageManagerLock mmLock;
+
+    for (int i = 0; features[i] != nullptr; i++)
+    {
+        if (strcmp(features[i]->URI, LV2_INSTANCE_ACCESS_URI) == 0 && features[i]->data != nullptr)
+        {
+            JuceLv2Wrapper* wrapper = (JuceLv2Wrapper*)features[i]->data;
+            return wrapper->getUI(writeFunction, controller, widget, features, isExternal);
+        }
+    }
+
+    std::cerr << "Host does not support instance-access, cannot use UI" << std::endl;
     return nullptr;
 }
 
