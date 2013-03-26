@@ -50,6 +50,8 @@ public:
 
     bool acceptsMidi() const;
     bool producesMidi() const;
+    bool silenceInProducesSilenceOut() const;
+    double getTailLengthSeconds() const;
 
     //==============================================================================
     int getNumPrograms()                                                { return 0; }
@@ -102,7 +104,7 @@ private:
     // the synth!
     Synthesiser synth;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (JuceDemoPluginAudioProcessor);
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (JuceDemoPluginAudioProcessor)
 };
 
 #endif  // __PLUGINPROCESSOR_H_526ED7A9__

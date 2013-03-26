@@ -25,7 +25,7 @@ standalone:
 	$(MAKE) -C drumsynth/Standalone
 	$(MAKE) -C eqinox/Standalone
 	$(MAKE) -C highlife/Standalone
-# 	$(MAKE) -C juce-demo-plugin/Standalone
+	$(MAKE) -C juce-demo-plugin/Standalone
 	$(MAKE) -C tal-dub-3/Standalone
 	$(MAKE) -C tal-filter/Standalone
 	$(MAKE) -C tal-filter-2/Standalone
@@ -48,7 +48,7 @@ lv2:
 	$(MAKE) -C drumsynth/LV2
 	$(MAKE) -C eqinox/LV2
 	$(MAKE) -C highlife/LV2
-# 	$(MAKE) -C juce-demo-plugin/LV2
+	$(MAKE) -C juce-demo-plugin/LV2
 	$(MAKE) -C tal-dub-3/LV2
 	$(MAKE) -C tal-filter/LV2
 	$(MAKE) -C tal-filter-2/LV2
@@ -71,7 +71,7 @@ vst:
 	$(MAKE) -C drumsynth/VST
 	$(MAKE) -C eqinox/VST
 	$(MAKE) -C highlife/VST
-# 	$(MAKE) -C juce-demo-plugin/VST
+	$(MAKE) -C juce-demo-plugin/VST
 	$(MAKE) -C tal-dub-3/VST
 	$(MAKE) -C tal-filter/VST
 	$(MAKE) -C tal-filter-2/VST
@@ -95,7 +95,7 @@ clean:
 	$(MAKE) clean -C drumsynth/Standalone
 	$(MAKE) clean -C eqinox/Standalone
 	$(MAKE) clean -C highlife/Standalone
-# 	$(MAKE) clean -C juce-demo-plugin/Standalone
+	$(MAKE) clean -C juce-demo-plugin/Standalone
 	$(MAKE) clean -C tal-dub-3/Standalone
 	$(MAKE) clean -C tal-filter/Standalone
 	$(MAKE) clean -C tal-filter-2/Standalone
@@ -118,7 +118,7 @@ clean:
 	$(MAKE) clean -C drumsynth/LV2
 	$(MAKE) clean -C eqinox/LV2
 	$(MAKE) clean -C highlife/LV2
-# 	$(MAKE) clean -C juce-demo-plugin/LV2
+	$(MAKE) clean -C juce-demo-plugin/LV2
 	$(MAKE) clean -C tal-dub-3/LV2
 	$(MAKE) clean -C tal-filter/LV2
 	$(MAKE) clean -C tal-filter-2/LV2
@@ -141,7 +141,7 @@ clean:
 	$(MAKE) clean -C drumsynth/VST
 	$(MAKE) clean -C eqinox/VST
 	$(MAKE) clean -C highlife/VST
-# 	$(MAKE) clean -C juce-demo-plugin/VST
+	$(MAKE) clean -C juce-demo-plugin/VST
 	$(MAKE) clean -C tal-dub-3/VST
 	$(MAKE) clean -C tal-filter/VST
 	$(MAKE) clean -C tal-filter-2/VST

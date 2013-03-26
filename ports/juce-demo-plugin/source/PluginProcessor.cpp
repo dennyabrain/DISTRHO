@@ -11,14 +11,15 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
+AudioProcessor* JUCE_CALLTYPE createPluginFilter();
+
+
 //==============================================================================
 /** A demo synth sound that's just a basic sine wave.. */
 class SineWaveSound : public SynthesiserSound
 {
 public:
-    SineWaveSound()
-    {
-    }
+    SineWaveSound() {}
 
     bool appliesToNote (const int /*midiNoteNumber*/)           { return true; }
     bool appliesToChannel (const int /*midiChannel*/)           { return true; }
@@ -257,7 +258,7 @@ void JuceDemoPluginAudioProcessor::processBlock (AudioSampleBuffer& buffer, Midi
             const float in = channelData[i];
             channelData[i] += delayData[dp];
             delayData[dp] = (delayData[dp] + in) * delay;
-            if (++dp > delayBuffer.getNumSamples())
+            if (++dp >= delayBuffer.getNumSamples())
                 dp = 0;
         }
     }
@@ -273,7 +274,7 @@ void JuceDemoPluginAudioProcessor::processBlock (AudioSampleBuffer& buffer, Midi
     // ask the host for the current time so we can display it...
     AudioPlayHead::CurrentPositionInfo newTime;
 
-    if (getPlayHead() != 0 && getPlayHead()->getCurrentPosition (newTime))
+    if (getPlayHead() != nullptr && getPlayHead()->getCurrentPosition (newTime))
     {
         // Successfully got the current time from the host..
         lastPosInfo = newTime;
@@ -318,7 +319,7 @@ void JuceDemoPluginAudioProcessor::setStateInformation (const void* data, int si
     // This getXmlFromBinary() helper function retrieves our XML from the binary blob..
     ScopedPointer<XmlElement> xmlState (getXmlFromBinary (data, sizeInBytes));
 
-    if (xmlState != 0)
+    if (xmlState != nullptr)
     {
         // make sure that it's actually our type of XML object..
         if (xmlState->hasTagName ("MYPLUGINSETTINGS"))
@@ -330,26 +331,6 @@ void JuceDemoPluginAudioProcessor::setStateInformation (const void* data, int si
             gain  = (float) xmlState->getDoubleAttribute ("gain", gain);
             delay = (float) xmlState->getDoubleAttribute ("delay", delay);
         }
-    }
-}
-
-void JuceDemoPluginAudioProcessor::setStateInformationString (const String& data)
-{
-    XmlElement* const xmlState = XmlDocument::parse(data);
-
-    if (xmlState != 0)
-    {
-        // make sure that it's actually our type of XML object..
-        if (xmlState->hasTagName ("MYPLUGINSETTINGS"))
-        {
-            // ok, now pull out our parameters..
-            lastUIWidth  = xmlState->getIntAttribute ("uiWidth", lastUIWidth);
-            lastUIHeight = xmlState->getIntAttribute ("uiHeight", lastUIHeight);
-
-            gain  = (float) xmlState->getDoubleAttribute ("gain", gain);
-            delay = (float) xmlState->getDoubleAttribute ("delay", delay);
-        }
-        delete xmlState;
     }
 }
 
@@ -361,10 +342,24 @@ String JuceDemoPluginAudioProcessor::getStateInformationString ()
     // add some attributes to it..
     xml.setAttribute ("uiWidth", lastUIWidth);
     xml.setAttribute ("uiHeight", lastUIHeight);
-    xml.setAttribute ("gain", gain);
-    xml.setAttribute ("delay", delay);
 
     return xml.createDocument (String::empty);
+}
+
+void JuceDemoPluginAudioProcessor::setStateInformationString (const String& data)
+{
+    ScopedPointer<XmlElement> xmlState(XmlDocument::parse(data));
+
+    if (xmlState != nullptr)
+    {
+        // make sure that it's actually our type of XML object..
+        if (xmlState->hasTagName ("MYPLUGINSETTINGS"))
+        {
+            // ok, now pull out our parameters..
+            lastUIWidth  = xmlState->getIntAttribute ("uiWidth", lastUIWidth);
+            lastUIHeight = xmlState->getIntAttribute ("uiHeight", lastUIHeight);
+        }
+    }
 }
 
 const String JuceDemoPluginAudioProcessor::getInputChannelName (const int channelIndex) const
@@ -389,20 +384,30 @@ bool JuceDemoPluginAudioProcessor::isOutputChannelStereoPair (int /*index*/) con
 
 bool JuceDemoPluginAudioProcessor::acceptsMidi() const
 {
-#if JucePlugin_WantsMidiInput
+   #if JucePlugin_WantsMidiInput
     return true;
-#else
+   #else
     return false;
-#endif
+   #endif
 }
 
 bool JuceDemoPluginAudioProcessor::producesMidi() const
 {
-#if JucePlugin_ProducesMidiOutput
+   #if JucePlugin_ProducesMidiOutput
     return true;
-#else
+   #else
     return false;
-#endif
+   #endif
+}
+
+bool JuceDemoPluginAudioProcessor::silenceInProducesSilenceOut() const
+{
+    return false;
+}
+
+double JuceDemoPluginAudioProcessor::getTailLengthSeconds() const
+{
+    return 0.0;
 }
 
 //==============================================================================
