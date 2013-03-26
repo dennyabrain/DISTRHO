@@ -102,9 +102,6 @@ private:
     ScopedPointer <MainHostWindow> mainWindow;
 };
 
-#if JUCE_MINGW
- #include <windows.h>
-#endif
 
 // This kicks the whole thing off..
 START_JUCE_APPLICATION (PluginHostApp)

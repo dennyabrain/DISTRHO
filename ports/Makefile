@@ -3,9 +3,9 @@
 all: build
 
 
-build: libs standalone lv2 vst
+build: libs standalone standalone-host lv2 vst
 
-plugins: standalone lv2 vst
+plugins: standalone standalone-host lv2 vst
 
 
 libs:
@@ -36,6 +36,9 @@ standalone:
 	$(MAKE) -C tal-vocoder-2/Standalone
 	$(MAKE) -C vex/Standalone
 	$(MAKE) -C wolpertinger/Standalone
+
+standalone-host:
+	$(MAKE) -C juce-plugin-host/Standalone
 
 lv2:
 	$(MAKE) -C arctican-function/LV2

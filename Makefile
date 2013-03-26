@@ -5,7 +5,7 @@ all: build
 
 build:
 	$(MAKE) -C libs/drowaudio
-	$(MAKE) -C libs/juce-2.0
+	$(MAKE) -C libs/juce-2.0 all
 	$(MAKE) -C libs/juced
 	$(MAKE) -C libs/lv2-ttl-generator
 	$(MAKE) plugins -C plugins
@@ -46,6 +46,10 @@ standalone:
 	$(MAKE) -C libs/juced
 	$(MAKE) standalone -C plugins
 	$(MAKE) standalone -C ports
+
+standalone-host: standalone
+	$(MAKE) -C libs/juce-2.0 all
+	$(MAKE) standalone-host -C ports
 
 lv2:
 	$(MAKE) -C libs/drowaudio

@@ -12,6 +12,8 @@
 #include "../build-gui-basics/AppConfig.h"
 #include "../build-audio-basics/AppConfig.h"
 
+#define JUCE_PLUGINHOST_LADSPA 1
+
 //=============================================================================
 /** Config: JUCE_PLUGINHOST_VST
     Enables the VST audio plugin hosting classes. This requires the Steinberg VST SDK to be

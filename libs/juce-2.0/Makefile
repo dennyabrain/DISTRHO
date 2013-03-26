@@ -29,9 +29,6 @@ audio-processors_full:
 audio-utils:
 	$(MAKE) -C build-audio-utils
 
-browser-plugin:
-	$(MAKE) -C build-browser-plugin
-
 core:
 	$(MAKE) -C build-core
 
