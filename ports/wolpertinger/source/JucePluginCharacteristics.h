@@ -282,7 +282,6 @@
 
 #define JucePlugin_LV2URI                   "http://tumbetoene.tuxfamily.org"
 #define JucePlugin_LV2Category              "InstrumentPlugin"
-#define JucePlugin_WantsLV2InstanceAccess    1
 
 //==============================================================================
 

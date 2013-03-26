@@ -65,7 +65,6 @@
 #define JucePlugin_LV2Category              "InstrumentPlugin"
 #define JucePlugin_WantsLV2State            1
 #define JucePlugin_WantsLV2StateString      1
-#define JucePlugin_WantsLV2InstanceAccess   1
 
 //==============================================================================
 

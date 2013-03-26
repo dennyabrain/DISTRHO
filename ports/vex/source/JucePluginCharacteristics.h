@@ -263,7 +263,6 @@
 
 #define JucePlugin_LV2URI                   "urn:juce:Vex"
 #define JucePlugin_LV2Category              "InstrumentPlugin"
-#define JucePlugin_WantsLV2InstanceAccess   1
 #define JucePlugin_WantsLV2State            1
 #define JucePlugin_WantsLV2TimePos          1
 

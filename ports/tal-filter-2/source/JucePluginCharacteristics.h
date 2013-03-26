@@ -291,7 +291,6 @@
 #define JucePlugin_WantsLV2State            1
 #define JucePlugin_WantsLV2StateString      1
 #define JucePlugin_WantsLV2Presets          1
-#define JucePlugin_WantsLV2InstanceAccess   1
 
 //==============================================================================
 
