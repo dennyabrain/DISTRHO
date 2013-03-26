@@ -571,10 +571,9 @@ public:
             lastPos (0, 0)
     {
         setOpaque (true);
-        setUsingNativeTitleBar (true);
-
         setContentNonOwned (editor, true);
         setSize (editor->getWidth(), editor->getHeight());
+        setUsingNativeTitleBar (true);
 
 #if ! JUCE_LINUX
         // FIXME - does not work properly on Linux
@@ -885,15 +884,6 @@ public:
 
     //==============================================================================
     // LV2 core calls
-
-    void lv2PortEvent(uint32 portIndex, uint32 bufferSize, uint32 format, const void* buffer)
-    {
-        if (format == 0 && bufferSize == sizeof (float))
-        {
-            float value = *(float*)buffer;
-            filter->setParameter(portIndex-controlPortOffset, value);
-        }
-    }
 
     void lv2Cleanup()
     {
@@ -1781,23 +1771,12 @@ static LV2UI_Handle juceLV2UI_InstantiateParent (const LV2UI_Descriptor*, const 
     return juceLV2UI_Instantiate(writeFunction, controller, widget, features, false);
 }
 
-#define handlePtr ((JuceLv2UIWrapper*)handle)
-
-static void juceLV2UI_PortEvent (LV2UI_Handle handle, uint32 portIndex, uint32 bufferSize, uint32 format, const void* buffer)
-{
-    const MessageManagerLock mmLock;
-
-    handlePtr->lv2PortEvent (portIndex, bufferSize, format, buffer);
-}
-
 static void juceLV2UI_Cleanup (LV2UI_Handle handle)
 {
     const MessageManagerLock mmLock;
 
-    handlePtr->lv2Cleanup();
+    ((JuceLv2UIWrapper*)handle)->lv2Cleanup();
 }
-
-#undef handlePtr
 
 static const void* juceLV2UI_ExtensionData (const char*)
 {
@@ -1822,7 +1801,7 @@ static const LV2UI_Descriptor JuceLv2UI_External = {
     JucePlugin_LV2URI "#ExternalUI",
     juceLV2UI_InstantiateExternal,
     juceLV2UI_Cleanup,
-    juceLV2UI_PortEvent,
+    nullptr,
     juceLV2UI_ExtensionData
 };
 
@@ -1830,7 +1809,7 @@ static const LV2UI_Descriptor JuceLv2UI_Parent = {
     JucePlugin_LV2URI "#ParentUI",
     juceLV2UI_InstantiateParent,
     juceLV2UI_Cleanup,
-    juceLV2UI_PortEvent,
+    nullptr,
     juceLV2UI_ExtensionData
 };
 
