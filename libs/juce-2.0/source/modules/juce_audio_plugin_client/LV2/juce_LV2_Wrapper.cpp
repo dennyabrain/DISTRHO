@@ -1,18 +1,10 @@
 /*
   ==============================================================================
 
-   Juce LV2 Wrapper, based on VST Wrapper code
+   Juce LV2 Wrapper
 
   ==============================================================================
 */
-
-// TESTING, remove later
-#define JucePlugin_Build_LV2 1
-#define JucePlugin_WantsLV2Presets 1
-#define JucePlugin_WantsLV2State 1
-#define JucePlugin_WantsLV2TimePos 1
-#define JucePlugin_LV2URI "http://arcticanaudio.com/plugins/thefunction"
-#include "JucePluginMain.h"
 
 // Your project must contain an AppConfig.h file with your project-specific settings in it,
 // and your header search path must make it accessible to the module's files.
@@ -20,7 +12,7 @@
 
 #include "../utility/juce_CheckSettingMacros.h"
 
-#if JucePlugin_Build_LV2
+#if 1//JucePlugin_Build_LV2
 
 /*
  * Available macros:
@@ -37,10 +29,8 @@
 #endif
 
 #if JUCE_LINUX
- //#include <X11/Xlib.h>
- //#undef KeyPress
-#elif JUCE_WINDOWS
- #include <windows.h>
+ #include <X11/Xlib.h>
+ #undef KeyPress
 #endif
 
 #include <fstream>
@@ -64,6 +54,8 @@
 #include "includes/lv2_external_ui.h"
 #include "includes/lv2_programs.h"
 
+#include "../utility/juce_IncludeModuleHeaders.h"
+
 namespace juce
 {
  #if JUCE_MAC
@@ -71,7 +63,7 @@ namespace juce
  #endif
 
  #if JUCE_LINUX
-  //extern Display* display;
+  extern Display* display;
  #endif
 }
 
@@ -264,17 +256,17 @@ const String makePluginFile(AudioProcessor* const filter)
 
     uint32 portIndex = 0;
 
-    // MIDI input
 #if (JucePlugin_WantsMidiInput || JucePlugin_WantsLV2TimePos)
+    // MIDI input
     text += "    lv2:port [\n";
     text += "        a lv2:InputPort, atom:AtomPort ;\n";
     text += "        atom:bufferType atom:Sequence ;\n";
-#if JucePlugin_WantsMidiInput
+ #if JucePlugin_WantsMidiInput
     text += "        atom:supports <" LV2_MIDI__MidiEvent "> ;\n";
-#endif
-#if JucePlugin_WantsLV2TimePos
+ #endif
+ #if JucePlugin_WantsLV2TimePos
     text += "        atom:supports <" LV2_TIME__Position "> ;\n";
-#endif
+ #endif
     text += "        lv2:index " + String(portIndex++) + " ;\n";
     text += "        lv2:symbol \"lv2_events_in\" ;\n";
     text += "        lv2:name \"Events Input\" ;\n";
@@ -286,8 +278,8 @@ const String makePluginFile(AudioProcessor* const filter)
     text += "\n";
 #endif
 
-    // MIDI output
 #if JucePlugin_ProducesMidiOutput
+    // MIDI output
     text += "    lv2:port [\n";
     text += "        a lv2:OutputPort, atom:AtomPort ;\n";
     text += "        atom:bufferType atom:Sequence ;\n";
@@ -574,15 +566,18 @@ public:
     JuceLv2ExternalUIWindow (AudioProcessorEditor* editor, const String& title) :
             DocumentWindow (title, Colours::white, DocumentWindow::minimiseButton | DocumentWindow::closeButton, false),
             closed (false),
-            lastPos (100, 100)
+            lastPos (0, 0)
     {
         setOpaque (true);
-        setContentNonOwned (editor, true);
-        setSize(editor->getWidth(), editor->getHeight());
         setUsingNativeTitleBar (true);
 
+        setContentNonOwned (editor, true);
+        setSize (editor->getWidth(), editor->getHeight());
+
+#if ! JUCE_LINUX
         // FIXME - does not work properly on Linux
-        //setAlwaysOnTop(true);
+        setAlwaysOnTop( true);
+#endif
     }
 
     /** Close button handler */
@@ -600,7 +595,7 @@ public:
 
     void restoreLastPos()
     {
-        setTopLeftPosition(lastPos.getX(), lastPos.getY());
+        setTopLeftPosition (lastPos.getX(), lastPos.getY());
     }
 
     Point<int> getLastPos()
@@ -647,14 +642,20 @@ public:
             window.removeFromDesktop();
     }
 
+    void close()
+    {
+        window.closeButtonPressed();
+    }
+
     bool isClosed()
     {
         return window.isClosed();
     }
 
-    void resetWindow()
+    void reset(const String& title)
     {
         window.reset();
+        window.setName(title);
     }
 
     void repaint()
@@ -750,7 +751,7 @@ public:
         const int ch = child->getHeight();
 
 #if JUCE_LINUX
-        //XResizeWindow (display, (Window) getWindowHandle(), cw, ch);
+        XResizeWindow (display, (Window) getWindowHandle(), cw, ch);
 #else
         setSize (cw, ch);
 #endif
@@ -788,11 +789,16 @@ public:
           writeFunction (writeFunction_),
           controller (controller_),
           isExternal (isExternal_),
+          controlPortOffset (0),
+          lastProgramCount (0),
           uiTouch (nullptr),
           programsHost (nullptr),
           externalUIHost (nullptr),
+          lastExternalUIPos (-1, -1),
           uiResize (nullptr)
     {
+        jassert (filter != nullptr);
+
         filter->addListener(this);
 
         if (filter->hasEditor())
@@ -833,7 +839,6 @@ public:
             else
             {
                 *widget = nullptr;
-                std::cerr << "Failed to init external UI" << std::endl;
             }
         }
         else
@@ -845,6 +850,18 @@ public:
             else
                *widget = nullptr;
         }
+
+#if (JucePlugin_WantsMidiInput || JucePlugin_WantsLV2TimePos)
+        controlPortOffset += 1;
+#endif
+#if JucePlugin_ProducesMidiOutput
+        controlPortOffset += 1;
+#endif
+        controlPortOffset += 2; // freewheel and sampleRate
+        controlPortOffset += JucePlugin_MaxNumInputChannels;
+        controlPortOffset += JucePlugin_MaxNumOutputChannels;
+
+        lastProgramCount = filter->getNumPrograms();
     }
 
     ~JuceLv2UIWrapper()
@@ -859,40 +876,77 @@ public:
 
         if (editor != nullptr)
         {
-            filter->editorBeingDeleted(editor);
+            filter->editorBeingDeleted (editor);
             editor = nullptr;
         }
     }
 
     //==============================================================================
+    // LV2 core calls
+
+    void lv2PortEvent(uint32 portIndex, uint32 bufferSize, uint32 format, const void* buffer)
+    {
+        if (format == 0 && bufferSize == sizeof (float))
+        {
+            float value = *(float*)buffer;
+            filter->setParameter(portIndex-controlPortOffset, value);
+        }
+    }
+
+    void lv2Cleanup()
+    {
+        if (isExternal)
+        {
+            if (isTimerRunning())
+                stopTimer();
+
+            externalUIHost = nullptr;
+
+            if (externalUI != nullptr)
+            {
+                lastExternalUIPos = externalUI->getScreenPosition();
+                externalUI->close();
+            }
+        }
+        else
+        {
+            if (parentContainer != nullptr && parentContainer->isOnDesktop())
+                parentContainer->removeFromDesktop();
+        }
+    }
+
+    //==============================================================================
+    // Juce calls
+
     void audioProcessorParameterChanged (AudioProcessor*, int index, float newValue)
     {
-        //if (writeFunction != nullptr && controller != nullptr)
-        //    writeFunction(controller, index + controlPortOffset, sizeof (float), 0, &newValue);
+        if (writeFunction != nullptr && controller != nullptr)
+            writeFunction (controller, index + controlPortOffset, sizeof (float), 0, &newValue);
     }
 
     void audioProcessorChanged (AudioProcessor*)
     {
         if (filter != nullptr && programsHost != nullptr)
         {
-            //if (filter->getNumPrograms() != lastProgramCount)
-            //    hostPrograms->program_changed(hostPrograms->handle, -1);
-            //else
-            //    hostPrograms->program_changed(hostPrograms->handle, filter->getCurrentProgram());
-            //lastProgramCount = filter->getNumPrograms();
+            if (filter->getNumPrograms() != lastProgramCount)
+                programsHost->program_changed (programsHost->handle, -1);
+            else
+                programsHost->program_changed (programsHost->handle, filter->getCurrentProgram());
+
+            lastProgramCount = filter->getNumPrograms();
         }
     }
 
     void audioProcessorParameterChangeGestureBegin (AudioProcessor*, int parameterIndex)
     {
-        //if (uiTouch != nullptr)
-        //    uiTouch->touch(uiTouch->handle, parameterIndex + controlPortOffset, true);
+        if (uiTouch != nullptr)
+            uiTouch->touch (uiTouch->handle, parameterIndex + controlPortOffset, true);
     }
 
     void audioProcessorParameterChangeGestureEnd (AudioProcessor*, int parameterIndex)
     {
-        //if (uiTouch != nullptr)
-        //    uiTouch->touch(uiTouch->handle, parameterIndex + controlPortOffset, false);
+        if (uiTouch != nullptr)
+            uiTouch->touch (uiTouch->handle, parameterIndex + controlPortOffset, false);
     }
 
     void timerCallback()
@@ -902,28 +956,33 @@ public:
             if (externalUIHost != nullptr)
                 externalUIHost->ui_closed (controller);
 
-            if (isTimerRunning()) // prevents assertion failure
+            if (isTimerRunning())
                 stopTimer();
         }
     }
 
     //==============================================================================
-    void resetIfNeeded(LV2UI_Write_Function writeFunction_, LV2UI_Controller controller_, LV2UI_Widget* widget,
-                       const LV2_Feature* const* features)
+    void resetIfNeeded (LV2UI_Write_Function writeFunction_, LV2UI_Controller controller_, LV2UI_Widget* widget,
+                        const LV2_Feature* const* features)
     {
         writeFunction = writeFunction_;
-        controller    = controller_;
+        controller = controller_;
+        uiTouch = nullptr;
+        programsHost = nullptr;
+
+        for (int i = 0; features[i] != nullptr; ++i)
+        {
+            if (strcmp(features[i]->URI, LV2_UI__touch) == 0)
+                uiTouch = (const LV2UI_Touch*)features[i]->data;
+
+            else if (strcmp(features[i]->URI, LV2_PROGRAMS__Host) == 0)
+                programsHost = (const LV2_Programs_Host*)features[i]->data;
+        }
 
         if (isExternal)
         {
             resetExternalUI (features);
             *widget = externalUI;
-
-            if (externalUI != nullptr)
-            {
-                externalUI->resetWindow();
-                startTimer (100);
-            }
         }
         else
         {
@@ -934,6 +993,8 @@ public:
 
     void repaint()
     {
+        const MessageManagerLock mmLock;
+
         if (editor != nullptr)
             editor->repaint();
 
@@ -952,6 +1013,9 @@ private:
     LV2UI_Controller controller;
     const bool isExternal;
 
+    uint32 controlPortOffset;
+    int lastProgramCount;
+
     const LV2UI_Touch* uiTouch;
     const LV2_Programs_Host* programsHost;
 
@@ -963,7 +1027,7 @@ private:
     const LV2UI_Resize* uiResize;
 
     //==============================================================================
-    void resetExternalUI(const LV2_Feature* const* features)
+    void resetExternalUI (const LV2_Feature* const* features)
     {
         externalUIHost = nullptr;
 
@@ -977,10 +1041,21 @@ private:
         }
 
         if (externalUI != nullptr)
-            externalUI->setScreenPos(lastExternalUIPos.getX(), lastExternalUIPos.getY());
+        {
+            String title(filter->getName());
+
+            if (externalUIHost->plugin_human_id != nullptr)
+                title = externalUIHost->plugin_human_id;
+
+            if (lastExternalUIPos.getX() != -1 && lastExternalUIPos.getY() != -1)
+                externalUI->setScreenPos(lastExternalUIPos.getX(), lastExternalUIPos.getY());
+
+            externalUI->reset(title);
+            startTimer (100);
+        }
     }
 
-    void resetParentUI(const LV2_Feature* const* features)
+    void resetParentUI (const LV2_Feature* const* features)
     {
         void* parent = nullptr;
         uiResize = nullptr;
@@ -997,25 +1072,25 @@ private:
         if (parent != nullptr)
         {
             if (parentContainer == nullptr)
-                parentContainer = new JuceLv2ParentContainer(editor, uiResize);
-
-            if (parentContainer->isOnDesktop())
-                parentContainer->removeFromDesktop ();
+                parentContainer = new JuceLv2ParentContainer (editor, uiResize);
 
             parentContainer->setVisible (false);
+
+            if (parentContainer->isOnDesktop())
+                parentContainer->removeFromDesktop();
 
 #if (JUCE_MAC || JUCE_WINDOWS)
             parentContainer->addToDesktop (0, parent);
 #elif JUCE_LINUX
             parentContainer->addToDesktop (0);
 
-            //Window hostWindow = (Window) parent;
-            //Window editorWnd  = (Window) parentContainer->getWindowHandle();
-            //XReparentWindow (display, editorWnd, hostWindow, 0, 0);
+            Window hostWindow = (Window) parent;
+            Window editorWnd  = (Window) parentContainer->getWindowHandle();
+            XReparentWindow (display, editorWnd, hostWindow, 0, 0);
 #endif
 
-            parentContainer->setVisible (true);
             parentContainer->reset (uiResize);
+            parentContainer->setVisible (true);
         }
     }
 
@@ -1040,10 +1115,6 @@ public:
           uridMidiEvent (0),
           uridTimePos (0)
     {
-#if JUCE_LINUX
-        MessageManagerLock mmLock;
-#endif
-
         filter = createPluginFilterOfType (AudioProcessor::wrapperType_VST); // FIXME
         jassert (filter != nullptr);
 
@@ -1123,9 +1194,7 @@ public:
 
     ~JuceLv2Wrapper ()
     {
-#if JUCE_LINUX
-        MessageManagerLock mmLock;
-#endif
+        ui = nullptr;
         filter = nullptr;
 
         if (progDesc.name != nullptr)
@@ -1363,13 +1432,13 @@ public:
     //==============================================================================
     // LV2 extended calls
 
-    uint32_t lv2GetOptions(LV2_Options_Option* options)
+    uint32_t lv2GetOptions (LV2_Options_Option* options)
     {
         // currently unused
         return LV2_OPTIONS_SUCCESS;
     }
 
-    uint32_t lv2SetOptions(const LV2_Options_Option* options)
+    uint32_t lv2SetOptions (const LV2_Options_Option* options)
     {
         for (int j=0; options[j].key != 0; ++j)
         {
@@ -1392,7 +1461,7 @@ public:
         return LV2_OPTIONS_SUCCESS;
     }
 
-    const LV2_Program_Descriptor* lv2GetProgram(uint32_t index)
+    const LV2_Program_Descriptor* lv2GetProgram (uint32_t index)
     {
         jassert (filter != nullptr);
 
@@ -1413,7 +1482,7 @@ public:
         return nullptr;
     }
 
-    void lv2SelectProgram(uint32_t bank, uint32_t program)
+    void lv2SelectProgram (uint32_t bank, uint32_t program)
     {
         jassert (filter != nullptr);
 
@@ -1436,7 +1505,7 @@ public:
         }
     }
 
-    LV2_State_Status lv2SaveState(LV2_State_Store_Function store, LV2_State_Handle stateHandle)
+    LV2_State_Status lv2SaveState (LV2_State_Store_Function store, LV2_State_Handle stateHandle)
     {
         jassert (filter != nullptr);
 
@@ -1465,7 +1534,7 @@ public:
         return LV2_STATE_SUCCESS;
     }
 
-    LV2_State_Status lv2RestoreState(LV2_State_Retrieve_Function retrieve, LV2_State_Handle stateHandle, uint32_t flags)
+    LV2_State_Status lv2RestoreState (LV2_State_Retrieve_Function retrieve, LV2_State_Handle stateHandle, uint32_t flags)
     {
         jassert (filter != nullptr);
 
@@ -1480,21 +1549,23 @@ public:
                                      &size, &type, &flags);
 
 #if JucePlugin_WantsLV2StateString
-        if (type == uridMap->map(uridMap->handle, LV2_ATOM__String))
+        if (type == uridMap->map (uridMap->handle, LV2_ATOM__String))
         {
-            String stateData(CharPointer_UTF8(static_cast<const char*>(data)));
-            filter->setStateInformationString(stateData);
+            String stateData (CharPointer_UTF8(static_cast<const char*>(data)));
+            filter->setStateInformationString (stateData);
 
-            // TODO - force ui repaint
+            if (ui != nullptr)
+                ui->repaint();
 
             return LV2_STATE_SUCCESS;
         }
 #else
-        if (type == uridMap->map(uridMap->handle, LV2_ATOM__Chunk))
+        if (type == uridMap->map (uridMap->handle, LV2_ATOM__Chunk))
         {
             filter->setCurrentProgramStateInformation (data, size);
 
-            // TODO - force ui repaint
+            if (ui != nullptr)
+                ui->repaint();
 
             return LV2_STATE_SUCCESS;
         }
@@ -1512,13 +1583,13 @@ public:
     }
 
     //==============================================================================
-    JuceLv2UIWrapper* getUI(LV2UI_Write_Function writeFunction, LV2UI_Controller controller, LV2UI_Widget* widget,
-                            const LV2_Feature* const* features, bool isExternal)
+    JuceLv2UIWrapper* getUI (LV2UI_Write_Function writeFunction, LV2UI_Controller controller, LV2UI_Widget* widget,
+                             const LV2_Feature* const* features, bool isExternal)
     {
         if (ui != nullptr)
-            ui->resetIfNeeded(writeFunction, controller, widget, features);
+            ui->resetIfNeeded (writeFunction, controller, widget, features);
         else
-            ui = new JuceLv2UIWrapper(filter, writeFunction, controller, widget, features, isExternal);
+            ui = new JuceLv2UIWrapper (filter, writeFunction, controller, widget, features, isExternal);
 
         return ui;
     }
@@ -1560,62 +1631,86 @@ private:
 //==============================================================================
 // LV2 descriptor functions
 
-static LV2_Handle juceLV2_Instantiate(const LV2_Descriptor*, double sampleRate, const char*, const LV2_Feature* const* features)
+static LV2_Handle juceLV2_Instantiate (const LV2_Descriptor*, double sampleRate, const char*, const LV2_Feature* const* features)
 {
-    return new JuceLv2Wrapper(sampleRate, features);
+    JUCE_AUTORELEASEPOOL
+
+    if (activePlugins.size() == 0)
+    {
+        initialiseJuce_GUI();
+#if JUCE_LINUX
+        SharedMessageThread::getInstance();
+#endif
+    }
+
+#if JUCE_LINUX
+    MessageManagerLock mmLock;
+#endif
+
+    return new JuceLv2Wrapper (sampleRate, features);
 }
 
 #define handlePtr ((JuceLv2Wrapper*)handle)
 
-static void juceLV2_ConnectPort(LV2_Handle handle, uint32 port, void* dataLocation)
+static void juceLV2_ConnectPort (LV2_Handle handle, uint32 port, void* dataLocation)
 {
-    handlePtr->lv2ConnectPort(port, dataLocation);
+    handlePtr->lv2ConnectPort (port, dataLocation);
 }
 
-static void juceLV2_Activate(LV2_Handle handle)
+static void juceLV2_Activate (LV2_Handle handle)
 {
     handlePtr->lv2Activate();
 }
 
-static void juceLV2_Run(LV2_Handle handle, uint32 sampleCount)
+static void juceLV2_Run( LV2_Handle handle, uint32 sampleCount)
 {
-    handlePtr->lv2Run(sampleCount);
+    handlePtr->lv2Run (sampleCount);
 }
 
-static void juceLV2_Deactivate(LV2_Handle handle)
+static void juceLV2_Deactivate (LV2_Handle handle)
 {
     handlePtr->lv2Deactivate();
 }
 
-static void juceLV2_Cleanup(LV2_Handle handle)
+static void juceLV2_Cleanup (LV2_Handle handle)
 {
-    delete handlePtr;
+    JUCE_AUTORELEASEPOOL
 
+    {
 #if JUCE_LINUX
+        MessageManagerLock mmLock;
+#endif
+        delete handlePtr;
+    }
+
     if (activePlugins.size() == 0)
+    {
+#if JUCE_LINUX
         SharedMessageThread::deleteInstance();
 #endif
+        shutdownJuce_GUI();
+    }
 }
 
 //==============================================================================
 // LV2 extended functions
 
-static uint32_t juceLV2_getOptions(LV2_Handle handle, LV2_Options_Option* options)
+static uint32_t juceLV2_getOptions (LV2_Handle handle, LV2_Options_Option* options)
 {
     return handlePtr->lv2GetOptions(options);
 }
 
-static uint32_t juceLV2_setOptions(LV2_Handle handle, const LV2_Options_Option* options)
+static uint32_t juceLV2_setOptions (LV2_Handle handle, const LV2_Options_Option* options)
 {
     return handlePtr->lv2SetOptions(options);
 }
 
-static const LV2_Program_Descriptor* juceLV2_getProgram(LV2_Handle handle, uint32_t index)
+static const LV2_Program_Descriptor* juceLV2_getProgram (LV2_Handle handle, uint32_t index)
 {
     return handlePtr->lv2GetProgram(index);
 }
 
-static void juceLV2_selectProgram(LV2_Handle handle, uint32_t bank, uint32_t program)
+static void juceLV2_selectProgram (LV2_Handle handle, uint32_t bank, uint32_t program)
 {
     handlePtr->lv2SelectProgram(bank, program);
 }
@@ -1626,17 +1721,17 @@ static LV2_State_Status juceLV2_SaveState(LV2_Handle handle, LV2_State_Store_Fun
     return handlePtr->lv2SaveState(store, stateHandle);
 }
 
-static LV2_State_Status juceLV2_RestoreState(LV2_Handle handle, LV2_State_Retrieve_Function retrieve, LV2_State_Handle stateHandle,
-                                             uint32_t flags, const LV2_Feature* const*)
+static LV2_State_Status juceLV2_RestoreState (LV2_Handle handle, LV2_State_Retrieve_Function retrieve, LV2_State_Handle stateHandle,
+                                              uint32_t flags, const LV2_Feature* const*)
 {
     return handlePtr->lv2RestoreState(retrieve, stateHandle, flags);
 }
 
 #undef handlePtr
 
-static const void* juceLV2_ExtensionData(const char* uri)
+static const void* juceLV2_ExtensionData (const char* uri)
 {
-    static LV2_Options_Interface options = { juceLV2_getOptions, juceLV2_setOptions };
+    static const LV2_Options_Interface options = { juceLV2_getOptions, juceLV2_setOptions };
     static const LV2_Programs_Interface programs = { juceLV2_getProgram, juceLV2_selectProgram };
     static const LV2_State_Interface state = { juceLV2_SaveState, juceLV2_RestoreState };
 
@@ -1653,9 +1748,10 @@ static const void* juceLV2_ExtensionData(const char* uri)
 //==============================================================================
 // LV2 UI descriptor functions
 
-static LV2UI_Handle juceLV2UI_Instantiate(LV2UI_Write_Function writeFunction, LV2UI_Controller controller,
-                                          LV2UI_Widget* widget, const LV2_Feature* const* features, bool isExternal)
+static LV2UI_Handle juceLV2UI_Instantiate (LV2UI_Write_Function writeFunction, LV2UI_Controller controller,
+                                           LV2UI_Widget* widget, const LV2_Feature* const* features, bool isExternal)
 {
+    JUCE_AUTORELEASEPOOL
     const MessageManagerLock mmLock;
 
     for (int i = 0; features[i] != nullptr; i++)
@@ -1671,33 +1767,44 @@ static LV2UI_Handle juceLV2UI_Instantiate(LV2UI_Write_Function writeFunction, LV
     return nullptr;
 }
 
-static LV2UI_Handle juceLV2UI_InstantiateExternal(const LV2UI_Descriptor*, const char*, const char*, LV2UI_Write_Function writeFunction,
-                                                  LV2UI_Controller controller, LV2UI_Widget* widget, const LV2_Feature* const* features)
+static LV2UI_Handle juceLV2UI_InstantiateExternal (const LV2UI_Descriptor*, const char*, const char*, LV2UI_Write_Function writeFunction,
+                                                   LV2UI_Controller controller, LV2UI_Widget* widget, const LV2_Feature* const* features)
 {
     return juceLV2UI_Instantiate(writeFunction, controller, widget, features, true);
 }
 
-static LV2UI_Handle juceLV2UI_InstantiateParent(const LV2UI_Descriptor*, const char*, const char*, LV2UI_Write_Function writeFunction,
-                                                LV2UI_Controller controller, LV2UI_Widget* widget, const LV2_Feature* const* features)
+static LV2UI_Handle juceLV2UI_InstantiateParent (const LV2UI_Descriptor*, const char*, const char*, LV2UI_Write_Function writeFunction,
+                                                 LV2UI_Controller controller, LV2UI_Widget* widget, const LV2_Feature* const* features)
 {
     return juceLV2UI_Instantiate(writeFunction, controller, widget, features, false);
 }
 
-static void juceLV2UI_Cleanup(LV2UI_Handle instance)
+#define handlePtr ((JuceLv2UIWrapper*)handle)
+
+static void juceLV2UI_PortEvent (LV2UI_Handle handle, uint32 portIndex, uint32 bufferSize, uint32 format, const void* buffer)
 {
+    const MessageManagerLock mmLock;
+
+    handlePtr->lv2PortEvent (portIndex, bufferSize, format, buffer);
 }
 
-static void juceLV2UI_PortEvent(LV2UI_Handle instance, uint32 portIndex, uint32 bufferSize, uint32 format, const void* buffer)
+static void juceLV2UI_Cleanup (LV2UI_Handle handle)
 {
+    const MessageManagerLock mmLock;
+
+    handlePtr->lv2Cleanup();
 }
 
-static const void* juceLV2UI_ExtensionData(const char* uri)
+#undef handlePtr
+
+static const void* juceLV2UI_ExtensionData (const char*)
 {
     return nullptr;
 }
 
 //==============================================================================
 // static LV2 Descriptor objects
+
 static const LV2_Descriptor JuceLv2Plugin = {
     JucePlugin_LV2URI,
     juceLV2_Instantiate,
@@ -1725,104 +1832,46 @@ static const LV2UI_Descriptor JuceLv2UI_Parent = {
     juceLV2UI_ExtensionData
 };
 
-#if ! JUCE_WINDOWS
+#if JUCE_WINDOWS
+ #define JUCE_EXPORTED_FUNCTION extern "C" __declspec (dllexport)
+#else
  #define JUCE_EXPORTED_FUNCTION extern "C" __attribute__ ((visibility("default")))
 #endif
 
 //==============================================================================
-// Mac startup code..
+// startup code..
+
+LV2_SYMBOL_EXPORT const LV2_Descriptor* lv2_descriptor(uint32 index)
+{
 #if JUCE_MAC
-
-    JUCE_EXPORTED_FUNCTION void lv2_generate_ttl();
-    JUCE_EXPORTED_FUNCTION void lv2_generate_ttl()
-    {
-        createLv2Files();
-    }
-
-    JUCE_EXPORTED_FUNCTION const LV2_Descriptor* lv2_descriptor(uint32 index);
-    JUCE_EXPORTED_FUNCTION const LV2_Descriptor* lv2_descriptor(uint32 index)
-    {
-        initialiseMac();
-        return (index == 0) ? &JuceLv2Plugin : nullptr;
-    }
-
-    JUCE_EXPORTED_FUNCTION const LV2UI_Descriptor* lv2ui_descriptor(uint32 index);
-    JUCE_EXPORTED_FUNCTION const LV2UI_Descriptor* lv2ui_descriptor(uint32 index)
-    {
-        initialiseMac();
-        switch (index)
-        {
-        case 0:
-            return &JuceLv2UI_External;
-        case 1:
-            return &JuceLv2UI_Parent;
-        default:
-            return nullptr;
-        }
-    }
-
-//==============================================================================
-// Linux startup code..
-#elif JUCE_LINUX
-
-    JUCE_EXPORTED_FUNCTION void lv2_generate_ttl();
-    JUCE_EXPORTED_FUNCTION void lv2_generate_ttl()
-    {
-        createLv2Files();
-    }
-
-    JUCE_EXPORTED_FUNCTION const LV2_Descriptor* lv2_descriptor(uint32 index);
-    JUCE_EXPORTED_FUNCTION const LV2_Descriptor* lv2_descriptor(uint32 index)
-    {
-        SharedMessageThread::getInstance();
-        return (index == 0) ? &JuceLv2Plugin : nullptr;
-    }
-
-    JUCE_EXPORTED_FUNCTION const LV2UI_Descriptor* lv2ui_descriptor(uint32 index);
-    JUCE_EXPORTED_FUNCTION const LV2UI_Descriptor* lv2ui_descriptor(uint32 index)
-    {
-        SharedMessageThread::getInstance();
-        switch (index)
-        {
-        case 0:
-            return &JuceLv2UI_External;
-        case 1:
-            return &JuceLv2UI_Parent;
-        default:
-            return nullptr;
-        }
-    }
-
-    // don't put initialiseJuce_GUI or shutdownJuce_GUI in these... it will crash!
-    __attribute__((constructor)) void myPluginInit() {}
-    __attribute__((destructor))  void myPluginFini() {}
-
-//==============================================================================
-// Win32 startup code..
-#elif JUCE_WINDOWS
-
-    extern "C" __declspec (dllexport) void lv2_generate_ttl()
-    {
-        createLv2Files();
-    }
-
-    extern "C" __declspec (dllexport) const LV2_Descriptor* lv2_descriptor(uint32 index)
-    {
-        return (index == 0) ? &JuceLv2Plugin : nullptr;
-    }
-
-    extern "C" __declspec (dllexport) const LV2UI_Descriptor* lv2ui_descriptor(uint32 index)
-    {
-        switch (index)
-        {
-        case 0:
-            return &JuceLv2UI_External;
-        case 1:
-            return &JuceLv2UI_Parent;
-        default:
-            return nullptr;
-        }
-    }
+    initialiseMac();
 #endif
+    return (index == 0) ? &JuceLv2Plugin : nullptr;
+}
+
+LV2_SYMBOL_EXPORT const LV2UI_Descriptor* lv2ui_descriptor(uint32 index)
+{
+#if JUCE_MAC
+    initialiseMac();
+#endif
+    switch (index)
+    {
+    case 0:
+        return &JuceLv2UI_External;
+    case 1:
+        return &JuceLv2UI_Parent;
+    default:
+        return nullptr;
+    }
+}
+
+JUCE_EXPORTED_FUNCTION void lv2_generate_ttl();
+JUCE_EXPORTED_FUNCTION void lv2_generate_ttl()
+{
+#if JUCE_MAC
+    initialiseMac();
+#endif
+    createLv2Files();
+}
 
 #endif
