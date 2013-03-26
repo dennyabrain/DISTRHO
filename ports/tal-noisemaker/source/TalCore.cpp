@@ -912,7 +912,7 @@ void TalCore::setXmlPrograms(XmlElement* e, int programNumber, float version)
 {
     if (e->hasTagName("program") && programNumber < this->numPrograms)
     {
-        talPresets[programNumber]->name = e->getStringAttribute ("programname", "Not Saved" + programNumber);
+        talPresets[programNumber]->name = e->getStringAttribute ("programname", "Not Saved" + String(programNumber));
         talPresets[programNumber]->programData[VOLUME] = (float) e->getDoubleAttribute ("volume", 0.5f);
 
         talPresets[programNumber]->programData[FILTERTYPE] = (float) e->getDoubleAttribute ("filtertype", 1.0f);
