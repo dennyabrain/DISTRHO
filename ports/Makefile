@@ -38,27 +38,27 @@ standalone:
 	$(MAKE) -C wolpertinger/Standalone
 
 lv2:
-# 	$(MAKE) -C arctican-function/LV2
-# 	$(MAKE) -C arctican-pilgrim/LV2
-# 	$(MAKE) -C drowaudio-distortion/LV2
-# 	$(MAKE) -C drowaudio-distortionshaper/LV2
-# 	$(MAKE) -C drowaudio-flanger/LV2
-# 	$(MAKE) -C drowaudio-reverb/LV2
-# 	$(MAKE) -C drowaudio-tremolo/LV2
-# 	$(MAKE) -C drumsynth/LV2
-# 	$(MAKE) -C eqinox/LV2
-# 	$(MAKE) -C highlife/LV2
+	$(MAKE) -C arctican-function/LV2
+	$(MAKE) -C arctican-pilgrim/LV2
+	$(MAKE) -C drowaudio-distortion/LV2
+	$(MAKE) -C drowaudio-distortionshaper/LV2
+	$(MAKE) -C drowaudio-flanger/LV2
+	$(MAKE) -C drowaudio-reverb/LV2
+	$(MAKE) -C drowaudio-tremolo/LV2
+	$(MAKE) -C drumsynth/LV2
+	$(MAKE) -C eqinox/LV2
+	$(MAKE) -C highlife/LV2
 # 	$(MAKE) -C juce-demo-plugin/LV2
-# 	$(MAKE) -C tal-dub-3/LV2
-# 	$(MAKE) -C tal-filter/LV2
-# 	$(MAKE) -C tal-filter-2/LV2
-# 	$(MAKE) -C tal-noisemaker/LV2
-# 	$(MAKE) -C tal-reverb/LV2
-# 	$(MAKE) -C tal-reverb-2/LV2
-# 	$(MAKE) -C tal-reverb-3/LV2
-# 	$(MAKE) -C tal-vocoder-2/LV2
-# 	$(MAKE) -C vex/LV2
-# 	$(MAKE) -C wolpertinger/LV2
+	$(MAKE) -C tal-dub-3/LV2
+	$(MAKE) -C tal-filter/LV2
+	$(MAKE) -C tal-filter-2/LV2
+	$(MAKE) -C tal-noisemaker/LV2
+	$(MAKE) -C tal-reverb/LV2
+	$(MAKE) -C tal-reverb-2/LV2
+	$(MAKE) -C tal-reverb-3/LV2
+	$(MAKE) -C tal-vocoder-2/LV2
+	$(MAKE) -C vex/LV2
+	$(MAKE) -C wolpertinger/LV2
 
 vst:
 	$(MAKE) -C arctican-function/VST
