@@ -54,6 +54,7 @@ lv2:
 	$(MAKE) -C libs/lv2-ttl-generator
 	$(MAKE) lv2 -C plugins
 	$(MAKE) lv2 -C ports
+	$(MAKE) gen
 
 vst:
 	$(MAKE) -C libs/drowaudio
