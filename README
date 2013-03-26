@@ -2,7 +2,7 @@
 -  README for DISTRHO  -
 -----------------------
 
-DISTRHO is an open source project that has the goal of making cross-platform plugins and Linux LV2 ports.
+DISTRHO is an open source project that has the goal of making cross-platform plugins and Linux ports.
 The DISTRHO Team currently has 2 members - falkTX (the coder) and nieee (graphics designer).
 
 The source repository is layered out this way:
@@ -24,11 +24,11 @@ In order to build the plugins, first run:
 
 $ ./scripts/premake-update.sh _OS_
 
-where _OS_ can be 'linux', 'mac' or 'windows'. This operation requires 'premake' (version 3) to be installed on your system.
-On Linux and MacOS this will create a set of Makefiles, on Windows it will generate VC-2005 projects.
+where _OS_ can be 'linux', 'mac', 'windows' or 'mingw'. This operation requires 'premake' (version 3) to be installed on your system.
+On Linux, MacOS and MinGW this will create a set of Makefiles, on Windows it will generate VC-2005 projects.
 
 
-You are now ready to start building. If you run Linux or MacOS, run this on the source root folder:
+You are now ready to start building. If you ran Linux, MacOS or MinGW, run this on the source root folder:
 
 $ make
 
@@ -43,13 +43,6 @@ $ make gen
 to generate to static LV2 turtle data.
 
 
-Note that some plugins may require extra files to be installed on your system in order to work.
-We created a README for each one them. Currently they are:
-
- - ports/hybridreverb2/
-
-
-
 -------------------------------------------------------------------------------------------------------------------
 ---- BUILD DEPENDENCIES
 
@@ -57,8 +50,7 @@ To build plugins, you first need to install the following dependencies:
 
  All OSes:
 
-- fftw3
-- premake
+- premake (version 3)
 - Qt4
 
 
@@ -67,5 +59,4 @@ To build plugins, you first need to install the following dependencies:
 - ALSA
 - JACK
 - freetype2
-- X11 core
-- X11 extensions (Xinerama, X Shared memory/Xshm, XRender and XCursor)
+- X11 core and extensions (Xinerama, XShm, XRender and XCursor)
