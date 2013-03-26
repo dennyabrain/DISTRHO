@@ -8,9 +8,7 @@ The DISTRHO Team currently has 2 members - falkTX (the coder) and nieee (graphic
 The source repository is layered out this way:
  bin/                 - directory where all the compiled binaries will be placed
  libs/                - libraries
- libs/distrho-ports/  - disthro own code to take care of standard-to-standard conversion, currently only has a small vst-to-lv2 helper
  libs/juce-2.0/       - juce 2.0 source code and build scripts
- libs/juce-lv2/       - juce lv2 wrapper code
  libs/juce-plugin/    - disthro own juce code, created to make building separate plugin types easy (Standalone, VST and LV2)
  plugins/             - plugins developed and/or designed by the DISTRHO Team
  ports/               - all plugin ports (plugins not made by us) will be placed here
