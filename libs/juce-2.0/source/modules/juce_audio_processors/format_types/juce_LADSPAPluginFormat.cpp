@@ -678,7 +678,7 @@ FileSearchPath LADSPAPluginFormat::getDefaultLocationsToSearch()
     if (const char* ladspaPath = getenv("LADSPA_PATH"))
         return FileSearchPath (String (ladspaPath).replace (":", ";"));
 
-    return FileSearchPath ("/usr/lib/ladspa");
+    return FileSearchPath ("/usr/lib/ladspa;/usr/local/lib/ladspa;~/.ladspa");
 }
 
 #endif
