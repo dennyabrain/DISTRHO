@@ -99,6 +99,8 @@ const String getPluginType()
 #ifdef JucePlugin_LV2Category
     pluginType  = "lv2:" JucePlugin_LV2Category;
     pluginType += ", ";
+#elif JucePlugin_IsSynth
+    pluginType  = "lv2:InstrumentPlugin, ";
 #endif
     pluginType += "lv2:Plugin";
     return pluginType;
