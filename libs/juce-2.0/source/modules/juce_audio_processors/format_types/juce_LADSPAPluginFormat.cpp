@@ -675,6 +675,9 @@ void LADSPAPluginFormat::recursiveFileSearch (StringArray& results, const File& 
 
 FileSearchPath LADSPAPluginFormat::getDefaultLocationsToSearch()
 {
+    if (const char* ladspaPath = getenv("LADSPA_PATH"))
+        return FileSearchPath (String (ladspaPath).replace (":", ";"));
+
     return FileSearchPath ("/usr/lib/ladspa");
 }
 
