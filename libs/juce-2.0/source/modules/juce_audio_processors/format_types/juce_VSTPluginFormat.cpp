@@ -2844,9 +2844,9 @@ FileSearchPath VSTPluginFormat::getDefaultLocationsToSearch()
    #if JUCE_MAC
     return FileSearchPath ("~/Library/Audio/Plug-Ins/VST;/Library/Audio/Plug-Ins/VST");
    #elif JUCE_LINUX
-    if (const char* vstPath = getenv("VST_PATH"))
-        return FileSearchPath (String (vstPath).replace (":", ";"));
-    return FileSearchPath ("/usr/lib/vst;/usr/local/lib/vst;~/.vst");
+    return FileSearchPath (SystemStats::getEnvironmentVariable ("VST_PATH",
+                                                                "/usr/lib/vst;/usr/local/lib/vst;~/.vst")
+                             .replace (":", ";"));
    #elif JUCE_WINDOWS
     const String programFiles (File::getSpecialLocation (File::globalApplicationsDirectory).getFullPathName());
 

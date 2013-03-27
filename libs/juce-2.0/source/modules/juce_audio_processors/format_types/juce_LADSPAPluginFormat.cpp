@@ -461,7 +461,7 @@ public:
 
     bool isValid() const
     {
-        return (handle != nullptr);
+        return handle != nullptr;
     }
 
     LADSPAModuleHandle::Ptr module;
@@ -675,10 +675,9 @@ void LADSPAPluginFormat::recursiveFileSearch (StringArray& results, const File& 
 
 FileSearchPath LADSPAPluginFormat::getDefaultLocationsToSearch()
 {
-    if (const char* ladspaPath = getenv("LADSPA_PATH"))
-        return FileSearchPath (String (ladspaPath).replace (":", ";"));
-
-    return FileSearchPath ("/usr/lib/ladspa;/usr/local/lib/ladspa;~/.ladspa");
+    return FileSearchPath (SystemStats::getEnvironmentVariable ("LADSPA_PATH",
+                                                                "/usr/lib/ladspa;/usr/local/lib/ladspa;~/.ladspa")
+                             .replace (":", ";"));
 }
 
 #endif
