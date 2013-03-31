@@ -150,6 +150,15 @@ public:
 
         handle = plugin->instantiate (plugin, (uint32) sampleRate);
 
+        // some plugins might crash if we don't call this
+        if (handle != nullptr)
+        {
+            if (plugin->activate != nullptr)
+                plugin->activate (handle);
+            if (plugin->deactivate != nullptr)
+                plugin->deactivate (handle);
+        }
+
         --insideLADSPACallback;
     }
 
@@ -272,10 +281,16 @@ public:
                 setParameter (0, old);
             }
         }
+
+        if (handle != nullptr && plugin != nullptr && plugin->activate != nullptr)
+            plugin->activate (handle);
     }
 
     void releaseResources()
     {
+        if (handle != nullptr && plugin != nullptr && plugin->deactivate != nullptr)
+            plugin->deactivate (handle);
+
         tempBuffer.setSize (1, 1);
     }
 
