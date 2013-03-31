@@ -359,7 +359,16 @@ public:
 
     //==============================================================================
     int getNumParameters()                              { return handle != nullptr ? parameters.size() : 0; }
-    bool isParameterAutomatable (int index) const       { return true; }
+
+    bool isParameterAutomatable (int index) const
+    {
+        if (plugin != nullptr)
+        {
+            return (plugin->PortDescriptors [parameters[index]] & LADSPA_PORT_INPUT) != 0;
+        }
+
+        return false;
+    }
 
     float getParameter (int index)
     {
