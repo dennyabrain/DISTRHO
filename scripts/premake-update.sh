@@ -4,7 +4,6 @@ set -e
 
 LINUX=0
 MAC=0
-WINDOWS=0
 MINGW=0
 
 if [ "$1" = "" ]; then
@@ -16,8 +15,6 @@ if [ "$1" = "linux" ]; then
   LINUX=1
 elif [ "$1" = "mac" ]; then
   MAC=1
-elif [ "$1" = "windows" ]; then
-  WINDOWS=1
 elif [ "$1" = "mingw" ]; then
   MINGW=1
 else
@@ -30,6 +27,15 @@ if [ -d ../libs ]; then
   cd ..
 fi
 
+run_premake()
+{
+  echo premake --os $1 --target gnu --cc gcc
+  premake --os $1 --target gnu --cc gcc
+
+  echo sed \""s/\\\$(LDFLAGS)/\\\$(LDFLAGS) \\\$(LDFLAGS)/\"" -i `find . -name \*.make`
+  sed "s/\$(LDFLAGS)/\$(LDFLAGS) \$(LDFLAGS)/" -i `find . -name \*.make`
+}
+
 # ------------------------------------------------------------------------------------------------------------
 
 FILES=`find . -name premake.lua`
@@ -41,37 +47,11 @@ for i in $FILES; do
   cd $FOLDER
 
   if [ $LINUX = 1 ]; then
-
-    echo premake --os linux --target gnu --cc gcc
-    premake --os linux --target gnu --cc gcc
-
-    echo sed \""s/\\\$(LDFLAGS)/\\\$(LDFLAGS) \\\$(LDFLAGS)/\"" -i `find . -name \*.make`
-    sed "s/\$(LDFLAGS)/\$(LDFLAGS) \$(LDFLAGS)/" -i `find . -name \*.make`
-
+      run_premake "linux"
   elif [ $MAC = 1 ]; then
-
-    echo premake --os macosx --target gnu --cc gcc
-    premake --os macosx --target gnu --cc gcc
-
-  elif [ $WINDOWS = 1 ]; then
-
-    echo premake --os windows --target vs2005
-    premake --os windows --target vs2005
-
-    echo sed \""s/SubSystem=\\\"1\\\"/SubSystem=\\\"2\\\"/\"" -i `find . -name \*.vcproj`
-    sed "s/SubSystem=\"1\"/SubSystem=\"2\"/" -i `find . -name \*.vcproj`
-
-    echo sed \""s/\t\t\t\tEntryPointSymbol=\\\"mainCRTStartup\\\"//\"" -i `find . -name \*.vcproj`
-    sed "s/\t\t\t\tEntryPointSymbol=\"mainCRTStartup\"//" -i `find . -name \*.vcproj`
-
+      run_premake "macosx"
   elif [ $MINGW = 1 ]; then
-
-    echo premake --os windows --target gnu --cc gcc
-    premake --os windows --target gnu --cc gcc
-
-    echo sed \""s/\\\$(LDFLAGS)/\\\$(LDFLAGS) \\\$(LDFLAGS)/\"" -i `find . -name \*.make`
-    sed "s/\$(LDFLAGS)/\$(LDFLAGS) \$(LDFLAGS)/" -i `find . -name \*.make`
-
+      run_premake "windows"
   fi
 
   if [ -d ../libs ]; then
