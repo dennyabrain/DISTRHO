@@ -1822,7 +1822,17 @@ static const LV2UI_Descriptor JuceLv2UI_Parent = {
 //==============================================================================
 // startup code..
 
-LV2_SYMBOL_EXPORT const LV2_Descriptor* lv2_descriptor(uint32 index)
+JUCE_EXPORTED_FUNCTION void lv2_generate_ttl();
+JUCE_EXPORTED_FUNCTION void lv2_generate_ttl()
+{
+#if JUCE_MAC
+    initialiseMac();
+#endif
+    createLv2Files();
+}
+
+JUCE_EXPORTED_FUNCTION const LV2_Descriptor* lv2_descriptor(uint32 index);
+JUCE_EXPORTED_FUNCTION const LV2_Descriptor* lv2_descriptor(uint32 index)
 {
 #if JUCE_MAC
     initialiseMac();
@@ -1830,7 +1840,8 @@ LV2_SYMBOL_EXPORT const LV2_Descriptor* lv2_descriptor(uint32 index)
     return (index == 0) ? &JuceLv2Plugin : nullptr;
 }
 
-LV2_SYMBOL_EXPORT const LV2UI_Descriptor* lv2ui_descriptor(uint32 index)
+JUCE_EXPORTED_FUNCTION const LV2UI_Descriptor* lv2ui_descriptor(uint32 index);
+JUCE_EXPORTED_FUNCTION const LV2UI_Descriptor* lv2ui_descriptor(uint32 index)
 {
 #if JUCE_MAC
     initialiseMac();
@@ -1844,15 +1855,6 @@ LV2_SYMBOL_EXPORT const LV2UI_Descriptor* lv2ui_descriptor(uint32 index)
     default:
         return nullptr;
     }
-}
-
-JUCE_EXPORTED_FUNCTION void lv2_generate_ttl();
-JUCE_EXPORTED_FUNCTION void lv2_generate_ttl()
-{
-#if JUCE_MAC
-    initialiseMac();
-#endif
-    createLv2Files();
 }
 
 #endif
