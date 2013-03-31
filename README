@@ -17,33 +17,31 @@ The source repository is layered out this way:
 
 
 
--------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
 ---- BUILD and INSTALL
 
 In order to build the plugins, first run:
 
 $ ./scripts/premake-update.sh _OS_
 
-where _OS_ can be 'linux', 'mac', 'windows' or 'mingw'. This operation requires 'premake' (version 3) to be installed on your system.
-On Linux, MacOS and MinGW this will create a set of Makefiles, on Windows it will generate VC-2005 projects.
+where _OS_ can be 'linux', 'mac' or 'mingw'. This operation requires 'premake' (version 3) to be installed on your system.
 
 
-You are now ready to start building. If you ran Linux, MacOS or MinGW, run this on the source root folder:
+You are now ready to start building. Run this on the source root folder:
 
 $ make
 
 If you just want to build specific plugin versions, you can use 'make standalone', 'make lv2' or 'make vst' to build their respective versions.
-On Windows, you need to go through all build folders and open the VC-2005 projects one at a time and compile them.
 
 
-When you're done, and if you built LV2 versions (yes by default), run this:
+When you're done, and if you built LV2 versions (yes by default) but not lv2 specifically, run this:
 
 $ make gen
 
 to generate to static LV2 turtle data.
 
 
--------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
 ---- BUILD DEPENDENCIES
 
 To build plugins, you first need to install the following dependencies:

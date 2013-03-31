@@ -9,14 +9,14 @@ package.name = project.name
 package.kind = "exe"
 package.language = "c++"
 
-package.defines   = { "JucePlugin_Build_Standalone=1", "JucePlugin_Build_Host=1" }
+package.defines   = { "JucePlugin_Build_AU=0", "JucePlugin_Build_LV2=0", "JucePlugin_Build_RTAS=0", "JucePlugin_Build_VST=0", "JucePlugin_Build_Standalone=1", "JucePlugin_Build_Host=1" }
 package.linkflags = { "no-symbols", "static-runtime" }
 
 package.config["Release"].target       = project.name
 package.config["Release"].objdir       = "intermediate/Release"
 package.config["Release"].defines      = { "NDEBUG=1" }
 package.config["Release"].buildflags   = { "no-symbols", "optimize-speed" }
-package.config["Release"].buildoptions = { "-O2 -ffast-math -fomit-frame-pointer -fvisibility=hidden -mtune=generic -msse -mfpmath=sse" }
+package.config["Release"].buildoptions = { "-O2 -ffast-math -fomit-frame-pointer -fvisibility=hidden -mtune=generic -msse -msse2 -mfpmath=sse" }
 package.config["Release"].links        = { "juce-core", "juce-audio-basics", "juce-audio-devices_full", "juce-audio-formats", "juce-audio-processors_full", "juce-audio-utils", "juce-data-structures", "juce-events", "juce-graphics", "juce-gui-basics", "juce-gui-extra" }
 
 package.config["Debug"].target         = project.name .. "_debug"

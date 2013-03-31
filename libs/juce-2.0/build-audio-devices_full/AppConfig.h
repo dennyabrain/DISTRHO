@@ -21,7 +21,7 @@ static inline
 const char* jucelinux__getAppName()
 {
     using namespace juce;
-    JUCEApplication* app = JUCEApplication::getInstance();
+    JUCEApplication* const app(JUCEApplication::getInstance());
 
     if (app != nullptr)
         return app->getApplicationName().toUTF8();

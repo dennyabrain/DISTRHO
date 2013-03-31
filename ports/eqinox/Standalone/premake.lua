@@ -16,7 +16,7 @@ package.config["Release"].target       = project.name
 package.config["Release"].objdir       = "intermediate/Release"
 package.config["Release"].defines      = { "NDEBUG=1" }
 package.config["Release"].buildflags   = { "no-symbols", "optimize-speed" }
-package.config["Release"].buildoptions = { "-O2 -ffast-math -fomit-frame-pointer -fvisibility=hidden -mtune=generic -msse -mfpmath=sse" }
+package.config["Release"].buildoptions = { "-O2 -ffast-math -fomit-frame-pointer -fvisibility=hidden -mtune=generic -msse -msse2 -mfpmath=sse" }
 package.config["Release"].links        = { "juce-core", "juce-audio-basics", "juce-audio-devices_full", "juce-audio-formats", "juce-audio-processors", "juce-audio-utils", "juce-data-structures", "juce-events", "juce-graphics", "juce-gui-basics", "juced" }
 
 package.config["Debug"].target         = project.name .. "_debug"
