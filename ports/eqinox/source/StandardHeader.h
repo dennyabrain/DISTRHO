@@ -39,6 +39,7 @@
 #ifndef __JUCETICE_XEQ_STANDARDHEADER_HEADER__
 #define __JUCETICE_XEQ_STANDARDHEADER_HEADER__
 
+#define USE_JUCED 1
 #include "JucePluginMain.h"
 #include "juced.h"
 

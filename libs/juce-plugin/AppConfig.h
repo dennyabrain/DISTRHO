@@ -25,4 +25,12 @@
 #include "../build-graphics/AppConfig.h"
 #include "../build-gui-basics/AppConfig.h"
 
+#if USE_DROWAUDIO
+ #include "../build-drowaudio/AppConfig.h"
+#endif
+
+#if USE_JUCED
+ #include "../build-juced/AppConfig.h"
+#endif
+
 #endif // __DISTRHO_PLUGIN_APPCONFIG_H__

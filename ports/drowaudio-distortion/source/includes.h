@@ -29,7 +29,7 @@
   ==============================================================================
 */
 
-
+#define USE_DROWAUDIO 1
 #include "JucePluginMain.h"
 #include "dRowAudio.h"
 
