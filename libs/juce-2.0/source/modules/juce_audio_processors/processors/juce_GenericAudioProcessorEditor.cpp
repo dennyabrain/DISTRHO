@@ -133,9 +133,6 @@ GenericAudioProcessorEditor::GenericAudioProcessorEditor (AudioProcessor* const 
 
     for (int i = 0; i < numParams; ++i)
     {
-        if (! owner_->isParameterAutomatable (i))
-            continue;
-
         String name (owner_->getParameterName (i));
         if (name.trim().isEmpty())
             name = "Unnamed";
