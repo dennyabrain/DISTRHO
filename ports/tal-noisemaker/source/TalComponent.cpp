@@ -400,39 +400,39 @@ void TalComponent::updateInfo(Slider* caller)
     TalCore* const filter = getProcessor();
     if (caller == osc1TuneKnob || caller == osc2TuneKnob)
     {
-        infoText->setText(juce::String(audioUtils.getOscTuneValue((float)caller->getValue()), 0), false);
+        infoText->setText(juce::String(audioUtils.getOscTuneValue((float)caller->getValue()), 0), dontSendNotification);
     }
     else if (caller == osc1FineTuneKnob || caller == osc2FineTuneKnob || caller == oscMasterTuneKnob)
     {
-        infoText->setText(juce::String(audioUtils.getOscFineTuneValue((float)caller->getValue()), 4), false);
+        infoText->setText(juce::String(audioUtils.getOscFineTuneValue((float)caller->getValue()), 4), dontSendNotification);
     }
     else if (caller == filterContourKnob)
     {
-        infoText->setText(juce::String(audioUtils.getLogScaledLinearValueCentered((float)caller->getValue()), 2), false);
+        infoText->setText(juce::String(audioUtils.getLogScaledLinearValueCentered((float)caller->getValue()), 2), dontSendNotification);
     }
     else if (caller == lfo1AmountKnob || caller == lfo2AmountKnob || caller == freeAdAmountKnob)
     {
-        infoText->setText(juce::String(audioUtils.getLogScaledValueCentered((float)caller->getValue()), 4), false);
+        infoText->setText(juce::String(audioUtils.getLogScaledValueCentered((float)caller->getValue()), 4), dontSendNotification);
     }
     else if (caller == osc1VolumeKnob || caller == osc2VolumeKnob || caller == osc3VolumeKnob)
     {
-        infoText->setText(juce::String(audioUtils.getLogScaledValueInDecibel((float)caller->getValue(), 1) , 2) + " dB", false);
+        infoText->setText(juce::String(audioUtils.getLogScaledValueInDecibel((float)caller->getValue(), 1) , 2) + " dB", dontSendNotification);
     }
     else if (caller == volumeKnob)
     {
-        infoText->setText(juce::String(audioUtils.getLogScaledValueInDecibel((float)caller->getValue(), 2) , 2) + " dB", false);
+        infoText->setText(juce::String(audioUtils.getLogScaledValueInDecibel((float)caller->getValue(), 2) , 2) + " dB", dontSendNotification);
     }
     else if (caller == pitchwheelPitchKnob)
     {
-        infoText->setText(juce::String(12.0f * (float)caller->getValue() , 2), false);
+        infoText->setText(juce::String(12.0f * (float)caller->getValue() , 2), dontSendNotification);
     }
     else if (caller == transposeKnob)
     {
-        infoText->setText(juce::String(audioUtils.getTranspose((float)caller->getValue()), 2), false);
+        infoText->setText(juce::String(audioUtils.getTranspose((float)caller->getValue()), 2), dontSendNotification);
     }
     else if (caller == osc1PwKnob)
     {
-        infoText->setText(juce::String(audioUtils.getLogScaledLinearValueCentered((float)caller->getValue()), 2), false);
+        infoText->setText(juce::String(audioUtils.getLogScaledLinearValueCentered((float)caller->getValue()), 2), dontSendNotification);
     }
     else if (caller == lfo1RateKnob || caller == lfo2RateKnob)
     {
@@ -446,11 +446,11 @@ void TalComponent::updateInfo(Slider* caller)
         {
             float value = (float)caller->getValue();
             char *text = audioUtils.getSyncedRateAndGetText(&value, filter->getBpm());
-            infoText->setText(juce::String(text), false);
+            infoText->setText(juce::String(text), dontSendNotification);
         }
         else
         {
-            infoText->setText(juce::String(audioUtils.getLogScaledRate((float)caller->getValue()), 2) + " Hz", false);
+            infoText->setText(juce::String(audioUtils.getLogScaledRate((float)caller->getValue()), 2) + " Hz", dontSendNotification);
         }
     }
     else if (caller == delayTimeKnob)
@@ -459,20 +459,20 @@ void TalComponent::updateInfo(Slider* caller)
         {
             float value = (float)caller->getValue();
             char *text = audioUtils.getDelaySyncTimeAndText(&value);
-            infoText->setText(juce::String(text), false);
+            infoText->setText(juce::String(text), dontSendNotification);
         }
         else
         {
-            infoText->setText(juce::String(audioUtils.getLogScaledValue((float)caller->getValue()) * 4000.0f, 2) + " ms", false);
+            infoText->setText(juce::String(audioUtils.getLogScaledValue((float)caller->getValue()) * 4000.0f, 2) + " ms", dontSendNotification);
         }
     }
     else if (caller == delayFeedbackKnob)
     {
-        infoText->setText(juce::String(audioUtils.getDelayFeedback(caller->getValue()), 2), false);
+        infoText->setText(juce::String(audioUtils.getDelayFeedback(caller->getValue()), 2), dontSendNotification);
     }
     else
     {
-        infoText->setText(juce::String(caller->getValue(), 2), false);
+        infoText->setText(juce::String(caller->getValue(), 2), dontSendNotification);
     }
 }
 

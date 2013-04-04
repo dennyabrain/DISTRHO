@@ -144,15 +144,15 @@ void TalComponent::sliderValueChanged (Slider* caller)
 
 void TalComponent::updateInfo(Slider* caller)
 {
-    if (caller == this->preDelaySlider) this->infoLabel->setText(juce::String((int)(audioUtils.getLogScaledValue((float)preDelaySlider->getValue()) * 1000.0f)) + T(" ms"), false);
-    if (caller == lowShelfGainSlider) this->infoLabel->setText(juce::String(lowShelfGainSlider->getValue(), 4), false);
-    if (caller == highShelfGainSlider) this->infoLabel->setText(juce::String(highShelfGainSlider->getValue(), 4), false);
+    if (caller == this->preDelaySlider) this->infoLabel->setText(juce::String((int)(audioUtils.getLogScaledValue((float)preDelaySlider->getValue()) * 1000.0f)) + T(" ms"), dontSendNotification);
+    if (caller == lowShelfGainSlider) this->infoLabel->setText(juce::String(lowShelfGainSlider->getValue(), 4), dontSendNotification);
+    if (caller == highShelfGainSlider) this->infoLabel->setText(juce::String(highShelfGainSlider->getValue(), 4), dontSendNotification);
 
-    if (caller == stereoWidthSlider) this->infoLabel->setText(juce::String(stereoWidthSlider->getValue(), 4), false);
-    if (caller == decayTimeSlider) this->infoLabel->setText(juce::String(decayTimeSlider->getValue(), 4), false);
+    if (caller == stereoWidthSlider) this->infoLabel->setText(juce::String(stereoWidthSlider->getValue(), 4), dontSendNotification);
+    if (caller == decayTimeSlider) this->infoLabel->setText(juce::String(decayTimeSlider->getValue(), 4), dontSendNotification);
 
-    if (caller == drySlider) this->infoLabel->setText(juce::String(audioUtils.getLogScaledValueInDecibelFilter((float)drySlider->getValue(), 2), 4) + T(" dB"), false);
-    if (caller == wetSlider) this->infoLabel->setText(juce::String(audioUtils.getLogScaledValueInDecibelFilter((float)wetSlider->getValue(), 2), 4) + T(" dB"), false);
+    if (caller == drySlider) this->infoLabel->setText(juce::String(audioUtils.getLogScaledValueInDecibelFilter((float)drySlider->getValue(), 2), 4) + T(" dB"), dontSendNotification);
+    if (caller == wetSlider) this->infoLabel->setText(juce::String(audioUtils.getLogScaledValueInDecibelFilter((float)wetSlider->getValue(), 2), 4) + T(" dB"), dontSendNotification);
 }
 
 void TalComponent::buttonClicked (Button* caller)

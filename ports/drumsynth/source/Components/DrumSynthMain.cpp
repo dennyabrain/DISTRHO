@@ -475,7 +475,7 @@ DrumSynthMain::DrumSynthMain (DrumSynthPlugin* plugin_, DrumSynthComponent* edit
     setSize (682, 320);
 
     //[Constructor] You can add your own custom stuff here..
-    versionLabel->setText (JucePlugin_VersionString, false);
+    versionLabel->setText (JucePlugin_VersionString, dontSendNotification);
 
     filterButton->setCurrentValues (0.0f, 1.0f);
     hipassButton->setCurrentValues (0.0f, 1.0f);

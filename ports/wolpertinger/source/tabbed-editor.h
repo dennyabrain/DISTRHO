@@ -48,7 +48,7 @@ public:
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
-    void setPolyText(String text) { polytext->setText(text, false); }
+    void setPolyText(String text) { polytext->setText(text, dontSendNotification); }
     //[/UserMethods]
 
     void paint (Graphics& g);

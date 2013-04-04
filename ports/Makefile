@@ -26,6 +26,7 @@ standalone:
 	$(MAKE) -C eqinox/Standalone
 	$(MAKE) -C highlife/Standalone
 	$(MAKE) -C juce-demo-plugin/Standalone
+	$(MAKE) -C midiLooper/Standalone
 	$(MAKE) -C tal-dub-3/Standalone
 	$(MAKE) -C tal-filter/Standalone
 	$(MAKE) -C tal-filter-2/Standalone
@@ -52,6 +53,7 @@ lv2:
 	$(MAKE) -C eqinox/LV2
 	$(MAKE) -C highlife/LV2
 	$(MAKE) -C juce-demo-plugin/LV2
+	$(MAKE) -C midiLooper/LV2
 	$(MAKE) -C tal-dub-3/LV2
 	$(MAKE) -C tal-filter/LV2
 	$(MAKE) -C tal-filter-2/LV2
@@ -75,6 +77,7 @@ vst:
 	$(MAKE) -C eqinox/VST
 	$(MAKE) -C highlife/VST
 	$(MAKE) -C juce-demo-plugin/VST
+	$(MAKE) -C midiLooper/VST
 	$(MAKE) -C tal-dub-3/VST
 	$(MAKE) -C tal-filter/VST
 	$(MAKE) -C tal-filter-2/VST
@@ -99,6 +102,7 @@ clean:
 	$(MAKE) clean -C eqinox/Standalone
 	$(MAKE) clean -C highlife/Standalone
 	$(MAKE) clean -C juce-demo-plugin/Standalone
+	$(MAKE) clean -C midiLooper/Standalone
 	$(MAKE) clean -C tal-dub-3/Standalone
 	$(MAKE) clean -C tal-filter/Standalone
 	$(MAKE) clean -C tal-filter-2/Standalone
@@ -109,6 +113,9 @@ clean:
 	$(MAKE) clean -C tal-vocoder-2/Standalone
 	$(MAKE) clean -C vex/Standalone
 	$(MAKE) clean -C wolpertinger/Standalone
+	
+	# Standalone-Host
+	$(MAKE) clean -C juce-plugin-host/Standalone
 
 	# LV2
 	$(MAKE) clean -C arctican-function/LV2
@@ -122,6 +129,7 @@ clean:
 	$(MAKE) clean -C eqinox/LV2
 	$(MAKE) clean -C highlife/LV2
 	$(MAKE) clean -C juce-demo-plugin/LV2
+	$(MAKE) clean -C midiLooper/LV2
 	$(MAKE) clean -C tal-dub-3/LV2
 	$(MAKE) clean -C tal-filter/LV2
 	$(MAKE) clean -C tal-filter-2/LV2
@@ -145,6 +153,7 @@ clean:
 	$(MAKE) clean -C eqinox/VST
 	$(MAKE) clean -C highlife/VST
 	$(MAKE) clean -C juce-demo-plugin/VST
+	$(MAKE) clean -C midiLooper/VST
 	$(MAKE) clean -C tal-dub-3/VST
 	$(MAKE) clean -C tal-filter/VST
 	$(MAKE) clean -C tal-filter-2/VST
