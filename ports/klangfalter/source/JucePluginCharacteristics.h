@@ -126,4 +126,9 @@
  #define JucePlugin_AAXDisableBypass       0
 #endif
 
+#define JucePlugin_LV2URI               "https://github.com/HiFi-LoFi/KlangFalter"
+#define JucePlugin_LV2Category          "ReverbPlugin"
+#define JucePlugin_WantsLV2State        1
+#define JucePlugin_WantsLV2TimePos      1
+
 #endif  // __JUCE_APPCONFIG_IRCJCT__
