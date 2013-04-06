@@ -59,4 +59,8 @@
 
 #define JUCE_ObjCExtraSuffix PIZ_MIDILOOPER_130
 
+#define JucePlugin_LV2URI               "http://thepiz.org/plugins/?p=midiLooper"
+#define JucePlugin_WantsLV2State        1
+#define JucePlugin_WantsLV2TimePos      1
+
 #endif
