@@ -182,22 +182,7 @@ public:
 
         void menuItemSelected (int menuItemID, int /*topLevelMenuIndex*/)
         {
-            if (menuItemID >= recentProjectsBaseID && menuItemID < recentProjectsBaseID + 100)
-            {
-                // open a file from the "recent files" menu
-                getApp().openFile (getAppSettings().recentFiles.getFile (menuItemID - recentProjectsBaseID));
-            }
-            else if (menuItemID >= activeDocumentsBaseID && menuItemID < activeDocumentsBaseID + 200)
-            {
-                if (OpenDocumentManager::Document* doc = getApp().openDocumentManager.getOpenDocument (menuItemID - activeDocumentsBaseID))
-                    getApp().mainWindowList.openDocument (doc, true);
-                else
-                    jassertfalse;
-            }
-            else if (menuItemID >= colourSchemeBaseID && menuItemID < colourSchemeBaseID + 200)
-            {
-                getAppSettings().appearance.selectPresetScheme (menuItemID - colourSchemeBaseID);
-            }
+            getApp().handleMainMenuCommand (menuItemID);
         }
     };
 
@@ -232,7 +217,7 @@ public:
         menu.addCommandItem (commandManager, CommandIDs::open);
 
         PopupMenu recentFiles;
-        getAppSettings().recentFiles.createPopupMenuItems (recentFiles, recentProjectsBaseID, true, true);
+        settings->recentFiles.createPopupMenuItems (recentFiles, recentProjectsBaseID, true, true);
         menu.addSubMenu ("Open Recent", recentFiles);
 
         menu.addSeparator();
@@ -305,11 +290,11 @@ public:
         menu.addCommandItem (commandManager, CommandIDs::goToCounterpart);
         menu.addSeparator();
 
-        const int numDocs = jmin (50, getApp().openDocumentManager.getNumOpenDocuments());
+        const int numDocs = jmin (50, openDocumentManager.getNumOpenDocuments());
 
         for (int i = 0; i < numDocs; ++i)
         {
-            OpenDocumentManager::Document* doc = getApp().openDocumentManager.getOpenDocument(i);
+            OpenDocumentManager::Document* doc = openDocumentManager.getOpenDocument(i);
             menu.addItem (activeDocumentsBaseID + i, doc->getName());
         }
 
@@ -321,6 +306,26 @@ public:
     {
         menu.addCommandItem (commandManager, CommandIDs::updateModules);
         menu.addCommandItem (commandManager, CommandIDs::showUTF8Tool);
+    }
+
+    virtual void handleMainMenuCommand (int menuItemID)
+    {
+        if (menuItemID >= recentProjectsBaseID && menuItemID < recentProjectsBaseID + 100)
+        {
+            // open a file from the "recent files" menu
+            openFile (settings->recentFiles.getFile (menuItemID - recentProjectsBaseID));
+        }
+        else if (menuItemID >= activeDocumentsBaseID && menuItemID < activeDocumentsBaseID + 200)
+        {
+            if (OpenDocumentManager::Document* doc = openDocumentManager.getOpenDocument (menuItemID - activeDocumentsBaseID))
+                mainWindowList.openDocument (doc, true);
+            else
+                jassertfalse;
+        }
+        else if (menuItemID >= colourSchemeBaseID && menuItemID < colourSchemeBaseID + 200)
+        {
+            settings->appearance.selectPresetScheme (menuItemID - colourSchemeBaseID);
+        }
     }
 
     //==============================================================================
@@ -515,7 +520,23 @@ public:
 
     virtual void doExtraInitialisation() {}
     virtual void addExtraConfigItems (Project&, TreeViewItem&) {}
+
     virtual String getLogFolderName() const    { return "com.juce.introjucer"; }
+
+    virtual PropertiesFile::Options getPropertyFileOptionsFor (const String& filename)
+    {
+        PropertiesFile::Options options;
+        options.applicationName     = filename;
+        options.filenameSuffix      = "settings";
+        options.osxLibrarySubFolder = "Application Support";
+       #if JUCE_LINUX
+        options.folderName          = ".introjucer";
+       #else
+        options.folderName          = "Introjucer";
+       #endif
+
+        return options;
+    }
 
     virtual Component* createProjectContentComponent() const
     {
@@ -551,7 +572,7 @@ private:
             delete this;
 
             if (JUCEApplication::getInstance() != nullptr)
-                IntrojucerApp::getApp().closeModalCompsAndQuit();
+                getApp().closeModalCompsAndQuit();
         }
 
         JUCE_DECLARE_NON_COPYABLE (AsyncQuitRetrier)

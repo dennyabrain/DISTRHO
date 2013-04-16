@@ -55,7 +55,7 @@ Processor::Processor() :
   _beatsPerMinute(0.0f),
   _irCalculationMutex(),
   _irCalculation()
-{ 
+{
   _parameterSet.registerParameter(Parameters::WetOn);
   _parameterSet.registerParameter(Parameters::WetDecibels);
   _parameterSet.registerParameter(Parameters::DryOn);
@@ -125,6 +125,11 @@ const String Processor::getParameterName(int index)
 }
 
 const String Processor::getParameterText(int index)
+{
+  return String(getParameter(index), 3);
+}
+
+String Processor::getParameterLabel(int index)
 {
   return _parameterSet.getParameterDescriptor(index).getUnit();
 }
@@ -252,7 +257,7 @@ void Processor::releaseResources()
 
 
 void Processor::processBlock(AudioSampleBuffer& buffer, MidiBuffer& /*midiMessages*/)
-{ 
+{
   const int numInputChannels = getNumInputChannels();
   const int numOutputChannels = getNumOutputChannels();
   const size_t samplesToProcess = buffer.getNumSamples();
@@ -261,7 +266,7 @@ void Processor::processBlock(AudioSampleBuffer& buffer, MidiBuffer& /*midiMessag
   float* channelData0 = nullptr;
   float* channelData1 = nullptr;
   if (numInputChannels == 1)
-  {    
+  {
     channelData0 = buffer.getSampleData(0);
     channelData1 = buffer.getSampleData(0);
   }
@@ -298,7 +303,7 @@ void Processor::processBlock(AudioSampleBuffer& buffer, MidiBuffer& /*midiMessag
 
     IRAgent* irAgent10 = getAgent(1, 0);
     if (irAgent10 && irAgent10->getConvolver() && numInputChannels >= 2 && numOutputChannels >= 1)
-    {      
+    {
       irAgent10->process(channelData1, &_convolutionBuffer[0], samplesToProcess);
       _wetBuffer.addFrom(0, 0, &_convolutionBuffer[0], samplesToProcess, autoGain);
     }
@@ -334,7 +339,7 @@ void Processor::processBlock(AudioSampleBuffer& buffer, MidiBuffer& /*midiMessag
 
   // Level measurement (dry)
   if (numInputChannels == 1)
-  {    
+  {
     _levelMeasurementsDry[0].process(samplesToProcess, buffer.getSampleData(0));
     _levelMeasurementsDry[1].reset();
   }
@@ -563,7 +568,7 @@ void Processor::setReverse(bool reverse)
     if (_reverse != reverse)
     {
       _reverse = reverse;
-      _envelope.setReverse(reverse);    
+      _envelope.setReverse(reverse);
       changed = true;
     }
   }
@@ -635,7 +640,7 @@ void Processor::setFileBeginSeconds(double fileBeginSeconds)
     {
       _fileBeginSeconds = fileBeginSeconds;
       changed = true;
-    }    
+    }
   }
   if (changed)
   {

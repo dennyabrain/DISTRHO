@@ -86,6 +86,7 @@ public:
 
   const juce::String getParameterName (int index);
   const juce::String getParameterText (int index);
+  juce::String getParameterLabel (int index);
 
   const juce::String getInputChannelName (int channelIndex) const;
   const juce::String getOutputChannelName (int channelIndex) const;
@@ -128,7 +129,7 @@ public:
   bool getReverse() const;
 
   void setEnvelope(const Envelope& envelope);
-  Envelope getEnvelope() const; 
+  Envelope getEnvelope() const;
 
   size_t getIRSampleCount() const;
   double getIRDuration() const;
@@ -148,7 +149,7 @@ public:
 private:
   juce::AudioSampleBuffer _wetBuffer;
   std::vector<float> _convolutionBuffer;
-  ParameterSet _parameterSet;  
+  ParameterSet _parameterSet;
   std::vector<LevelMeasurement> _levelMeasurementsDry;
   std::vector<LevelMeasurement> _levelMeasurementsWet;
   std::vector<LevelMeasurement> _levelMeasurementsOut;
