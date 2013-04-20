@@ -187,7 +187,7 @@ const String makeManifestFile(AudioProcessor* const filter, const String& binary
     if (filter->hasEditor())
     {
         text += "<" JucePlugin_LV2URI "#ExternalUI>\n";
-        text += "    a <" LV2_EXTERNAL_UI_URI "> ;\n";
+        text += "    a <" LV2_EXTERNAL_UI__Widget "> ;\n";
         text += "    ui:binary <" + binary + PLUGIN_EXT "> ;\n";
         text += "    lv2:requiredFeature <" LV2_INSTANCE_ACCESS_URI "> ;\n";
         text += "    lv2:extensionData <" LV2_PROGRAMS__UIInterface "> .\n";
