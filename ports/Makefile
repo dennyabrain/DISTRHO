@@ -24,7 +24,6 @@ standalone:
 	$(MAKE) -C drowaudio-tremolo/Standalone
 	$(MAKE) -C drumsynth/Standalone
 	$(MAKE) -C eqinox/Standalone
-	$(MAKE) -C highlife/Standalone
 	$(MAKE) -C juce-demo-plugin/Standalone
 	$(MAKE) -C klangfalter/Standalone
 	$(MAKE) -C midiChords/Standalone
@@ -53,7 +52,6 @@ lv2:
 	$(MAKE) -C drowaudio-tremolo/LV2
 	$(MAKE) -C drumsynth/LV2
 	$(MAKE) -C eqinox/LV2
-	$(MAKE) -C highlife/LV2
 	$(MAKE) -C juce-demo-plugin/LV2
 	$(MAKE) -C klangfalter/LV2
 	$(MAKE) -C midiChords/LV2
@@ -79,7 +77,6 @@ vst:
 	$(MAKE) -C drowaudio-tremolo/VST
 	$(MAKE) -C drumsynth/VST
 	$(MAKE) -C eqinox/VST
-	$(MAKE) -C highlife/VST
 	$(MAKE) -C juce-demo-plugin/VST
 	$(MAKE) -C klangfalter/VST
 	$(MAKE) -C midiChords/VST
@@ -106,7 +103,6 @@ clean:
 	$(MAKE) clean -C drowaudio-tremolo/Standalone
 	$(MAKE) clean -C drumsynth/Standalone
 	$(MAKE) clean -C eqinox/Standalone
-	$(MAKE) clean -C highlife/Standalone
 	$(MAKE) clean -C juce-demo-plugin/Standalone
 	$(MAKE) clean -C klangfalter/Standalone
 	$(MAKE) clean -C midiChords/Standalone
@@ -135,7 +131,6 @@ clean:
 	$(MAKE) clean -C drowaudio-tremolo/LV2
 	$(MAKE) clean -C drumsynth/LV2
 	$(MAKE) clean -C eqinox/LV2
-	$(MAKE) clean -C highlife/LV2
 	$(MAKE) clean -C juce-demo-plugin/LV2
 	$(MAKE) clean -C klangfalter/LV2
 	$(MAKE) clean -C midiChords/LV2
@@ -161,7 +156,6 @@ clean:
 	$(MAKE) clean -C drowaudio-tremolo/VST
 	$(MAKE) clean -C drumsynth/VST
 	$(MAKE) clean -C eqinox/VST
-	$(MAKE) clean -C highlife/VST
 	$(MAKE) clean -C juce-demo-plugin/VST
 	$(MAKE) clean -C klangfalter/VST
 	$(MAKE) clean -C midiChords/VST
