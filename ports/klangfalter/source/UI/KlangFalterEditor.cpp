@@ -1249,7 +1249,7 @@ void KlangFalterEditor::updateUI()
           {
             IRComponent* irComponent = new IRComponent();
             irComponent->init(_processor.getAgent(input, output));
-            _irTabComponent->addTab(juce::String(static_cast<int>(input)) + juce::String("-") + juce::String(static_cast<int>(output)),
+            _irTabComponent->addTab(juce::String(static_cast<int>(input+1)) + juce::String("-") + juce::String(static_cast<int>(output+1)),
                                     juce::Colour(0xffb0b0b6),
                                     irComponent,
                                     true);

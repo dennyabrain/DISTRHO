@@ -129,6 +129,11 @@ const String Processor::getParameterName(int index)
 
 const String Processor::getParameterText(int index)
 {
+  return String(getParameter(index), 3);
+}
+
+juce::String Processor::getParameterLabel (int index)
+{
   return _parameterSet.getParameterDescriptor(index).getUnit();
 }
 
