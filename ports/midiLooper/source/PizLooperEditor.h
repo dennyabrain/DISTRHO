@@ -131,8 +131,6 @@ private:
 	int loopDragStart;
 	MidiKeyboardState keySelectorState;
 	MidiKeyboardComponent* keyboard;
-	int counter;
-	int demo;
     Path internalPath1;
     Path internalPath2;
 
@@ -230,7 +228,6 @@ private:
     TextButton* b_ZoomIn;
     Label* numerator;
     Label* denominator;
-    Label* loopinfoLabel3;
     ToggleButton* b_UseScaleChannel;
     VSTSlider* s_ScaleChannel;
     Label* label25;

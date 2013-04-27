@@ -71,7 +71,6 @@ MidiChordsEditor::MidiChordsEditor (MidiChords* const ownerFilter)
       prevButton (0),
       triggerNoteLabel (0),
       learnChanSlider (0),
-      demoLabel (0),
       guitar (0),
       versionLabel (0),
       transposeInputButton (0),
@@ -350,14 +349,6 @@ MidiChordsEditor::MidiChordsEditor (MidiChords* const ownerFilter)
     learnChanSlider->setColour (Slider::backgroundColourId, Colours::white);
     learnChanSlider->addListener (this);
 
-    addAndMakeVisible (demoLabel = new Label (L"new label",
-                                              L"UNREGISTERED\nDEMO VERSION"));
-    demoLabel->setFont (Font (L"OCR A Extended", 10.0000f, Font::plain));
-    demoLabel->setJustificationType (Justification::centred);
-    demoLabel->setEditable (false, false, false);
-    demoLabel->setColour (TextEditor::textColourId, Colours::black);
-    demoLabel->setColour (TextEditor::backgroundColourId, Colour (0x0));
-
     addAndMakeVisible (guitar = new ChordsGuitar (ownerFilter->chordKbState, ownerFilter));
     guitar->setName (L"new component");
 
@@ -625,8 +616,6 @@ MidiChordsEditor::MidiChordsEditor (MidiChords* const ownerFilter)
     //[Constructor] You can add your own custom stuff here..
 	versionLabel->setText(JucePlugin_VersionString,dontSendNotification);
 	ownerFilter->addChangeListener(this);
-	if (!ownerFilter->demo)
-		demoLabel->setVisible(false);
 	updateParametersFromFilter();
     //[/Constructor]
 }
@@ -679,7 +668,6 @@ MidiChordsEditor::~MidiChordsEditor()
     deleteAndZero (prevButton);
     deleteAndZero (triggerNoteLabel);
     deleteAndZero (learnChanSlider);
-    deleteAndZero (demoLabel);
     deleteAndZero (guitar);
     deleteAndZero (versionLabel);
     deleteAndZero (transposeInputButton);
@@ -858,7 +846,6 @@ void MidiChordsEditor::resized()
     prevButton->setBounds (90, 204, 23, 21);
     triggerNoteLabel->setBounds (558, 203, 73, 24);
     learnChanSlider->setBounds (6, 56, 38, 16);
-    demoLabel->setBounds (327, 5, 88, 24);
     guitar->setBounds (8, 99, getWidth() - 16, 89);
     versionLabel->setBounds (352, 28, 58, 24);
     transposeInputButton->setBounds (545, 370, 91, 21);
@@ -1843,12 +1830,6 @@ void MidiChordsEditor::filesDropped (const StringArray& filenames, int mouseX, i
 	if ( file.hasFileExtension("chords") || file.hasFileExtension("fxp") || file.hasFileExtension("fxb")
 		|| file.hasFileExtension("xml"))
 		loadPreset(file);
-	else if (file.getFileName() == "midiChordsKey.txt" || file.getFileName() == "midiChordsKey.zip") {
-		getFilter()->readKeyFile(File(filenames[0]));
-		if (!getFilter()->demo) {
-			demoLabel->setVisible(false);
-		}
-	}
 }
 
 bool MidiChordsEditor::isInterestedInFileDrag (const StringArray& files){

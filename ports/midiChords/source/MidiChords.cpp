@@ -102,7 +102,6 @@ MidiChords::MidiChords() : programs(0), curProgram(0)
 		}
 	}
 
-	demo = !readKeyFile();
 	fillChordDatabase();
 	programs = new MidiChordsPrograms();
 	memset(numChordNotes,0,sizeof(numChordNotes));
@@ -1457,13 +1456,6 @@ void MidiChords::savePreset(String name)
 		file.create();
 		file.replaceWithText(contents);
 	}
-}
-
-bool MidiChords::readKeyFile(File file)
-{
-	DBG("readKeyFile()");
-	demo=false;
-	return true;
 }
 
 void MidiChords::readChorderPreset(File file)

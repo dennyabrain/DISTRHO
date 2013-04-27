@@ -119,7 +119,6 @@ PizLooperEditor::PizLooperEditor (PizLooper* const ownerFilter)
       b_ZoomIn (0),
       numerator (0),
       denominator (0),
-      loopinfoLabel3 (0),
       b_UseScaleChannel (0),
       s_ScaleChannel (0),
       label25 (0),
@@ -972,15 +971,6 @@ PizLooperEditor::PizLooperEditor (PizLooper* const ownerFilter)
     denominator->setColour (TextEditor::textColourId, Colours::black);
     denominator->setColour (TextEditor::backgroundColourId, Colour (0x0));
     denominator->addListener (this);
-
-    addAndMakeVisible (loopinfoLabel3 = new Label (L"Loop Info 2",
-                                                   L"DEMO VERSION"));
-    loopinfoLabel3->setFont (Font (15.0000f, Font::bold));
-    loopinfoLabel3->setJustificationType (Justification::centred);
-    loopinfoLabel3->setEditable (false, false, false);
-    loopinfoLabel3->setColour (Label::textColourId, Colour (0xffdfdfdf));
-    loopinfoLabel3->setColour (TextEditor::textColourId, Colours::black);
-    loopinfoLabel3->setColour (TextEditor::backgroundColourId, Colour (0x0));
 
     addAndMakeVisible (b_UseScaleChannel = new ToggleButton (L"new toggle button"));
     b_UseScaleChannel->setTooltip (L"When checked, input notes on \"Scale Ch\" will be used to define the scale");
@@ -1971,9 +1961,6 @@ PizLooperEditor::PizLooperEditor (PizLooper* const ownerFilter)
 	keySelector->setAvailableRange(0,11);
 	keySelector->addChangeListener(this);
 	ownerFilter->keySelectorState.addListener(this);
-	demo = ownerFilter->demo?1:0;
-	loopinfoLabel3->setText(demo?"DEMO VERSION":String::empty,dontSendNotification);
-	counter=0;
 	startTimer(75);
 
 	static NonShinyLookAndFeel Look;
@@ -2092,7 +2079,6 @@ PizLooperEditor::~PizLooperEditor()
     deleteAndZero (b_ZoomIn);
     deleteAndZero (numerator);
     deleteAndZero (denominator);
-    deleteAndZero (loopinfoLabel3);
     deleteAndZero (b_UseScaleChannel);
     deleteAndZero (s_ScaleChannel);
     deleteAndZero (label25);
@@ -2494,7 +2480,6 @@ void PizLooperEditor::resized()
     b_ZoomIn->setBounds (674, 64, 18, 18);
     numerator->setBounds (555, 64, 27, 18);
     denominator->setBounds (584, 64, 29, 18);
-    loopinfoLabel3->setBounds (5, 47, 141, 16);
     b_UseScaleChannel->setBounds (11, 329, 129, 17);
     s_ScaleChannel->setBounds (10, 283, 60, 20);
     label25->setBounds (13, 267, 54, 16);
@@ -3643,14 +3628,6 @@ void PizLooperEditor::filesDropped (const StringArray& filenames, int mouseX, in
 {
 	if (File(filenames[0]).hasFileExtension("mid"))
 		getFilter()->loadMidiFile(File(filenames[0]));
-	else if (File(filenames[0]).getFileName() == "midiLooperKey.txt") {
-		getFilter()->readKeyFile(File(filenames[0]));
-		if (!getFilter()->demo) {
-			loopinfoLabel3->setVisible(false);
-			demo = 0;
-			counter = 0;
-		}
-	}
 }
 
 bool PizLooperEditor::isInterestedInFileDrag (const StringArray& files){
@@ -3662,11 +3639,6 @@ bool PizLooperEditor::isInterestedInFileDrag (const StringArray& files){
 
 void PizLooperEditor::timerCallback() {
 	pianoRoll->setPlayTime(960.0 * getFilter()->getPlayPosition(pianoRoll->playing,pianoRoll->recording));
-	counter+=demo;
-	if (counter==500) {
-		loopinfoLabel3->setColour(Label::textColourId,Colour(Random::getSystemRandom().nextInt()).withAlpha(1.f).withMultipliedSaturation(0.7f));
-		counter=0;
-	}
 }
 
 void PizLooperEditor::handleNoteOn(MidiKeyboardState *source, int midiChannel, int midiNoteNumber, float velocity)

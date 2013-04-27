@@ -283,8 +283,6 @@ public:
     Info* info;
     void killNotes(int slot);
 	bool newLoop;
-	bool readKeyFile(File file=File::nonexistent);
-	bool demo;
 
     void loadMidiFile(File file);
 	Loop* getActiveLoop();

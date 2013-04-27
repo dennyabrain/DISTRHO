@@ -360,8 +360,6 @@ public:
 		return programs->get(curProgram,"StrumUp"+String(curTrigger));
 	}
 	void readChorderPreset(File file);
-	bool readKeyFile(File file=File::nonexistent);
-	bool demo;
 
 	Array<GuitarDefinition> guitarPresets;
 	void fillGuitarPresetList ();

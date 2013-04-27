@@ -599,7 +599,6 @@ private:
     TextButton* prevButton;
     Label* triggerNoteLabel;
     ChannelSlider* learnChanSlider;
-    Label* demoLabel;
     ChordsGuitar* guitar;
     Label* versionLabel;
     ToggleButton* transposeInputButton;

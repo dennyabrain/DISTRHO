@@ -87,7 +87,6 @@ JuceProgram::~JuceProgram()
 PizLooper::PizLooper() : programs(0), slotLimit(numSlots)
 {
 	DBG("PizLooper()");
-	demo = !readKeyFile();
     init = true;
 	newLoop = false;
     curProgram=0;
@@ -196,16 +195,6 @@ PizLooper::~PizLooper() {
 		midiOutput->stopBackgroundThread();
 		delete midiOutput;
 	}
-}
-
-bool PizLooper::readKeyFile(File file)
-{
-	DBG("readKeyFile()");
-	bool copy = false;
-
-	demo=false;
-	sendChangeMessage();
-	return true;
 }
 
 
