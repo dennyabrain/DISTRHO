@@ -18,6 +18,8 @@
           <Add option="-O0"/>
           <Add option="-std=gnu++0x"/>
           <Add option="-march=pentium4"/>
+          <Add option="-mstackrealign"/>
+          <Add option="-g"/>
           <Add option="-D__MINGW__=1"/>
           <Add option="-D__MINGW_EXTENSION="/>
           <Add option="-DJUCER_CODEBLOCKS_20734A5D=1"/>
@@ -50,6 +52,7 @@
           <Add option="-Os"/>
           <Add option="-std=gnu++0x"/>
           <Add option="-march=pentium4"/>
+          <Add option="-mstackrealign"/>
           <Add option="-D__MINGW__=1"/>
           <Add option="-D__MINGW_EXTENSION="/>
           <Add option="-DJUCER_CODEBLOCKS_20734A5D=1"/>
@@ -602,6 +605,10 @@
       <Option link="0"/>
     </Unit>
     <Unit filename="../../Source/BinaryData/jucer_ContentCompTemplate.h">
+      <Option compile="0"/>
+      <Option link="0"/>
+    </Unit>
+    <Unit filename="../../Source/BinaryData/jucer_InlineComponentTemplate.h">
       <Option compile="0"/>
       <Option link="0"/>
     </Unit>
@@ -1874,6 +1881,10 @@
       <Option link="0"/>
     </Unit>
     <Unit filename="../../../../modules/juce_graphics/native/juce_android_GraphicsContext.cpp">
+      <Option compile="0"/>
+      <Option link="0"/>
+    </Unit>
+    <Unit filename="../../../../modules/juce_graphics/native/juce_freetype_Fonts.cpp">
       <Option compile="0"/>
       <Option link="0"/>
     </Unit>

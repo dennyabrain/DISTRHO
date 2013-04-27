@@ -338,7 +338,7 @@ JucerDocumentEditor::JucerDocumentEditor (JucerDocument* const doc)
 
         updateTabs();
 
-        tabbedComponent.setCurrentTabIndex (0);
+        tabbedComponent.setCurrentTabIndex (1);
 
         document->addChangeListener (this);
 
@@ -514,6 +514,14 @@ double JucerDocumentEditor::getZoom() const
         return panel->getZoom();
 
     return 1.0;
+}
+
+static double snapToIntegerZoom (double zoom)
+{
+    if (zoom >= 1.0)
+        return (double) (int) (zoom + 0.5);
+
+    return 1.0 / (int) (1.0 / zoom + 0.5);
 }
 
 void JucerDocumentEditor::addElement (const int index)
@@ -919,17 +927,9 @@ bool JucerDocumentEditor::perform (const InvocationInfo& info)
             showGraphics (0);
             break;
 
-        case JucerCommandIDs::zoomIn:
-            setZoom (getZoom() * 2.0);
-            break;
-
-        case JucerCommandIDs::zoomOut:
-            setZoom (getZoom() / 2.0);
-            break;
-
-        case JucerCommandIDs::zoomNormal:
-            setZoom (1.0);
-            break;
+        case JucerCommandIDs::zoomIn:      setZoom (snapToIntegerZoom (getZoom() * 2.0)); break;
+        case JucerCommandIDs::zoomOut:     setZoom (snapToIntegerZoom (getZoom() / 2.0)); break;
+        case JucerCommandIDs::zoomNormal:  setZoom (1.0); break;
 
         case JucerCommandIDs::spaceBarDrag:
             if (EditingPanelBase* panel = dynamic_cast <EditingPanelBase*> (tabbedComponent.getCurrentContentComponent()))
@@ -1099,6 +1099,9 @@ Image JucerDocumentEditor::createComponentLayerSnapshot() const
     return Image();
 }
 
+const int gridSnapMenuItemBase = 0x8723620;
+const int snapSizes[] = { 2, 3, 4, 5, 6, 8, 10, 12, 16, 20, 24, 32 };
+
 void createGUIEditorMenu (PopupMenu& menu)
 {
     menu.addCommandItem (commandManager, JucerCommandIDs::editCompLayout);
@@ -1140,12 +1143,12 @@ void createGUIEditorMenu (PopupMenu& menu)
     JucerDocumentEditor* holder = JucerDocumentEditor::getActiveDocumentHolder();
 
     {
-        const int snapSizes[] = { 2, 3, 4, 5, 6, 8, 10, 12, 16, 20, 24, 32 };
         const int currentSnapSize = holder != nullptr ? holder->getDocument()->getSnappingGridSize() : -1;
 
         PopupMenu m;
         for (int i = 0; i < numElementsInArray (snapSizes); ++i)
-            m.addItem (300 + i, String (snapSizes[i]) + " pixels", true, snapSizes[i] == currentSnapSize);
+            m.addItem (gridSnapMenuItemBase + i, String (snapSizes[i]) + " pixels",
+                       true, snapSizes[i] == currentSnapSize);
 
         menu.addSubMenu ("Grid size", m, currentSnapSize >= 0);
     }
@@ -1165,6 +1168,23 @@ void createGUIEditorMenu (PopupMenu& menu)
         overlays.addCommandItem (commandManager, JucerCommandIDs::compOverlay100);
 
         menu.addSubMenu ("Component Overlay", overlays, holder != nullptr);
+    }
+}
+
+void handleGUIEditorMenuCommand (int menuItemID)
+{
+    if (JucerDocumentEditor* ed = JucerDocumentEditor::getActiveDocumentHolder())
+    {
+        int gridIndex = menuItemID - gridSnapMenuItemBase;
+
+        if (isPositiveAndBelow (gridIndex, numElementsInArray (snapSizes)))
+        {
+            JucerDocument& doc = *ed->getDocument();
+
+            doc.setSnappingGrid (snapSizes [gridIndex],
+                                 doc.isSnapActive (false),
+                                 doc.isSnapShown());
+        }
     }
 }
 

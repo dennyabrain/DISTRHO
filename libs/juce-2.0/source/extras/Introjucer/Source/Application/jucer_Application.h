@@ -33,6 +33,7 @@
 #include "../Code Editor/jucer_SourceCodeEditor.h"
 
 void createGUIEditorMenu (PopupMenu&);
+void handleGUIEditorMenuCommand (int);
 void registerGUIEditorCommands();
 
 //==============================================================================
@@ -87,13 +88,24 @@ public:
         else
             mainWindowList.reopenLastProjects();
 
-        makeSureUserHasSelectedModuleFolder();
-
         mainWindowList.createWindowIfNoneAreOpen();
 
        #if JUCE_MAC
         MenuBarModel::setMacMainMenu (menuModel, nullptr, "Open Recent");
        #endif
+
+        struct ModuleFolderChecker  : public CallbackMessage
+        {
+            ModuleFolderChecker() {}
+
+            void messageCallback()
+            {
+                if (IntrojucerApp* const app = dynamic_cast<IntrojucerApp*> (JUCEApplication::getInstance()))
+                    app->makeSureUserHasSelectedModuleFolder();
+            }
+        };
+
+        (new ModuleFolderChecker())->post();
     }
 
     void shutdown()
@@ -325,6 +337,10 @@ public:
         else if (menuItemID >= colourSchemeBaseID && menuItemID < colourSchemeBaseID + 200)
         {
             settings->appearance.selectPresetScheme (menuItemID - colourSchemeBaseID);
+        }
+        else
+        {
+            handleGUIEditorMenuCommand (menuItemID);
         }
     }
 

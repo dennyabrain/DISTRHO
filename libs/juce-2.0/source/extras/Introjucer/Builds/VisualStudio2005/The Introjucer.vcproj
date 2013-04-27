@@ -422,6 +422,16 @@
             <Tool Name="VCCLCompilerTool"/>
           </FileConfiguration>
         </File>
+        <File RelativePath="..\..\Source\BinaryData\jucer_InlineComponentTemplate.h">
+          <FileConfiguration Name="Debug|Win32"
+                             ExcludedFromBuild="true">
+            <Tool Name="VCCLCompilerTool"/>
+          </FileConfiguration>
+          <FileConfiguration Name="Release|Win32"
+                             ExcludedFromBuild="true">
+            <Tool Name="VCCLCompilerTool"/>
+          </FileConfiguration>
+        </File>
         <File RelativePath="..\..\Source\BinaryData\jucer_MainConsoleAppTemplate.cpp">
           <FileConfiguration Name="Debug|Win32"
                              ExcludedFromBuild="true">
@@ -2065,6 +2075,16 @@
             </FileConfiguration>
           </File>
           <File RelativePath="..\..\..\..\modules\juce_graphics\native\juce_android_GraphicsContext.cpp">
+            <FileConfiguration Name="Debug|Win32"
+                               ExcludedFromBuild="true">
+              <Tool Name="VCCLCompilerTool"/>
+            </FileConfiguration>
+            <FileConfiguration Name="Release|Win32"
+                               ExcludedFromBuild="true">
+              <Tool Name="VCCLCompilerTool"/>
+            </FileConfiguration>
+          </File>
+          <File RelativePath="..\..\..\..\modules\juce_graphics\native\juce_freetype_Fonts.cpp">
             <FileConfiguration Name="Debug|Win32"
                                ExcludedFromBuild="true">
               <Tool Name="VCCLCompilerTool"/>

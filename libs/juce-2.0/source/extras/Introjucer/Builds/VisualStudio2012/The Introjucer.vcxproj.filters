@@ -808,6 +808,9 @@
     <ClCompile Include="..\..\..\..\modules\juce_graphics\native\juce_android_GraphicsContext.cpp">
       <Filter>Juce Modules\juce_graphics\native</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\modules\juce_graphics\native\juce_freetype_Fonts.cpp">
+      <Filter>Juce Modules\juce_graphics\native</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\..\modules\juce_graphics\native\juce_linux_Fonts.cpp">
       <Filter>Juce Modules\juce_graphics\native</Filter>
     </ClCompile>
@@ -1618,6 +1621,9 @@
       <Filter>The Introjucer\BinaryData</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\BinaryData\jucer_ContentCompTemplate.h">
+      <Filter>The Introjucer\BinaryData</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\BinaryData\jucer_InlineComponentTemplate.h">
       <Filter>The Introjucer\BinaryData</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\BinaryData\jucer_NewComponentTemplate.h">

@@ -310,12 +310,12 @@ void JucerDocument::getOptionalMethods (StringArray& baseClasses,
     addMethod ("Component", "void", "inputAttemptWhenModal()", "", baseClasses, returnValues, methods, initialContents);
 }
 
-void JucerDocument::setOptionalMethodEnabled (const String& methodSigniture, const bool enable)
+void JucerDocument::setOptionalMethodEnabled (const String& methodSignature, const bool enable)
 {
     if (enable)
-        activeExtraMethods.addIfNotAlreadyThere (methodSigniture);
+        activeExtraMethods.addIfNotAlreadyThere (methodSignature);
     else
-        activeExtraMethods.removeString (methodSigniture);
+        activeExtraMethods.removeString (methodSignature);
 
     changed();
 }
@@ -574,6 +574,7 @@ bool JucerDocument::flushChangesToDocuments()
             cpp->getCodeDocument().replaceAllContent (cppTemplate);
     }
 
+    userDocChangeTimer = nullptr;
     return true;
 }
 
@@ -671,6 +672,21 @@ public:
     JucerComponentDocument (Project* p, const File& f)
         : SourceCodeDocument (p, f)
     {
+    }
+
+    bool save()
+    {
+        return SourceCodeDocument::save() && saveHeader();
+    }
+
+    bool saveHeader()
+    {
+        OpenDocumentManager& odm = IntrojucerApp::getApp().openDocumentManager;
+
+        if (OpenDocumentManager::Document* header = odm.openFile (nullptr, getFile().withFileExtension (".h")))
+            return header->save();
+
+        return false;
     }
 
     Component* createEditor()
