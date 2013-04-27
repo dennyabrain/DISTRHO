@@ -109,7 +109,7 @@ const String getPluginType()
 static Array<String> usedSymbols;
 
 /** Converts a parameter name to an LV2 compatible symbol. */
-const String nameToSymbol(const String& name, const uint32 portIndex)
+const String nameToSymbol (const String& name, const uint32 portIndex)
 {
     String symbol, trimmedName = name.trimStart().trimEnd().toLowerCase();
 
@@ -120,7 +120,7 @@ const String nameToSymbol(const String& name, const uint32 portIndex)
     }
     else
     {
-        for (int i=0; i < trimmedName.length(); i++)
+        for (int i=0; i < trimmedName.length(); ++i)
         {
             const juce_wchar c = trimmedName[i];
             if (i == 0 && std::isdigit(c))
@@ -153,7 +153,7 @@ const String nameToSymbol(const String& name, const uint32 portIndex)
 }
 
 /** Prevents NaN or out of 0.0<->1.0 bounds parameter values. */
-float safeParamValue(float value)
+float safeParamValue (float value)
 {
     if (std::isnan(value))
         value = 0.0f;
@@ -165,7 +165,7 @@ float safeParamValue(float value)
 }
 
 /** Create the manifest.ttl file contents */
-const String makeManifestFile(AudioProcessor* const filter, const String& binary)
+const String makeManifestFile (AudioProcessor* const filter, const String& binary)
 {
     String text;
 
@@ -210,7 +210,7 @@ const String makeManifestFile(AudioProcessor* const filter, const String& binary
 
 #if JucePlugin_WantsLV2Presets
     // Presets
-    for (int i = 0; i < filter->getNumPrograms(); i++)
+    for (int i = 0; i < filter->getNumPrograms(); ++i)
     {
         text += "<" JucePlugin_LV2URI "#preset" + String::formatted("%03i", i+1) + ">\n";
         text += "    a pset:Preset ;\n";
@@ -224,7 +224,7 @@ const String makeManifestFile(AudioProcessor* const filter, const String& binary
 }
 
 /** Create the -plugin-.ttl file contents */
-const String makePluginFile(AudioProcessor* const filter)
+const String makePluginFile (AudioProcessor* const filter)
 {
     String text;
 
@@ -401,7 +401,7 @@ const String makePluginFile(AudioProcessor* const filter)
 }
 
 /** Create the presets.ttl file contents */
-const String makePresetsFile(AudioProcessor* const filter)
+const String makePresetsFile (AudioProcessor* const filter)
 {
     String text;
 
@@ -457,7 +457,7 @@ const String makePresetsFile(AudioProcessor* const filter)
         // Port values
         usedSymbols.clear();
 
-        for (int j=0; j < filter->getNumParameters(); j++)
+        for (int j=0; j < filter->getNumParameters(); ++j)
         {
               if (j == 0)
                 preset += "    lv2:port [\n";
@@ -577,7 +577,7 @@ public:
 
 #if ! JUCE_LINUX
         // FIXME - does not work properly on Linux
-        setAlwaysOnTop( true);
+        setAlwaysOnTop (true);
 #endif
     }
 
@@ -672,7 +672,7 @@ public:
             return window.getScreenPosition();
     }
 
-    void setScreenPos(int x, int y)
+    void setScreenPos (int x, int y)
     {
         if (! window.isClosed())
             window.setTopLeftPosition(x, y);
@@ -828,12 +828,12 @@ public:
 
             if (externalUIHost != nullptr)
             {
-                String title(filter->getName());
+                String title (filter->getName());
 
                 if (externalUIHost->plugin_human_id != nullptr)
                     title = externalUIHost->plugin_human_id;
 
-                externalUI = new JuceLv2ExternalUIWrapper(editor, title);
+                externalUI = new JuceLv2ExternalUIWrapper (editor, title);
                 *widget = externalUI;
                 startTimer (100);
             }
@@ -1103,9 +1103,19 @@ public:
           bufferSize (2048),
           sampleRate (sampleRate_),
           uridMap (nullptr),
+          uridAtomBlank (0),
+          uridAtomFloat (0),
+          uridAtomLong (0),
           uridAtomSequence (0),
           uridMidiEvent (0),
-          uridTimePos (0)
+          uridTimePos (0),
+          uridTimeBar (0),
+          uridTimeBarBeat (0),
+          uridTimeBeatsPerBar (0),
+          uridTimeBeatsPerMinute (0),
+          uridTimeBeatUnit (0),
+          uridTimeFrame (0),
+          uridTimeSpeed (0)
     {
         filter = createPluginFilterOfType (AudioProcessor::wrapperType_VST); // FIXME
         jassert (filter != nullptr);
@@ -1123,14 +1133,14 @@ public:
         portFreewheel = nullptr;
         portLatency   = nullptr;
 
-        for (int i=0; i < numInChans; i++)
+        for (int i=0; i < numInChans; ++i)
             portAudioIns[i] = nullptr;
-        for (int i=0; i < numOutChans; i++)
+        for (int i=0; i < numOutChans; ++i)
             portAudioOuts[i] = nullptr;
 
         portControls.insertMultiple (0, nullptr, filter->getNumParameters());
 
-        for (int i=0; i < filter->getNumParameters(); i++)
+        for (int i=0; i < filter->getNumParameters(); ++i)
             lastControlValues.add (filter->getParameter(i));
 
         curPosInfo.resetToDefault();
@@ -1172,9 +1182,19 @@ public:
                 }
             }
 
+            uridAtomBlank = uridMap->map(uridMap->handle, LV2_ATOM__Blank);
+            uridAtomFloat = uridMap->map(uridMap->handle, LV2_ATOM__Float);
+            uridAtomLong = uridMap->map(uridMap->handle, LV2_ATOM__Long);
             uridAtomSequence = uridMap->map(uridMap->handle, LV2_ATOM__Sequence);
-            uridTimePos = uridMap->map(uridMap->handle, LV2_TIME__Position);
             uridMidiEvent = uridMap->map(uridMap->handle, LV2_MIDI__MidiEvent);
+            uridTimePos = uridMap->map(uridMap->handle, LV2_TIME__Position);
+            uridTimeBar = uridMap->map(uridMap->handle, LV2_TIME__bar);
+            uridTimeBarBeat = uridMap->map(uridMap->handle, LV2_TIME__barBeat);
+            uridTimeBeatsPerBar = uridMap->map(uridMap->handle, LV2_TIME__beatsPerBar);
+            uridTimeBeatsPerMinute = uridMap->map(uridMap->handle, LV2_TIME__beatsPerMinute);
+            uridTimeBeatUnit = uridMap->map(uridMap->handle, LV2_TIME__beatUnit);
+            uridTimeFrame = uridMap->map(uridMap->handle, LV2_TIME__frame);
+            uridTimeSpeed = uridMap->map(uridMap->handle, LV2_TIME__speed);
         }
 
         progDesc.bank = 0;
@@ -1316,8 +1336,8 @@ public:
 
                     if (lastControlValues[i] != curValue)
                     {
-                        filter->setParameter(i, curValue);
-                        lastControlValues.setUnchecked(i, curValue);
+                        filter->setParameter (i, curValue);
+                        lastControlValues.setUnchecked (i, curValue);
                     }
                 }
             }
@@ -1356,22 +1376,75 @@ public:
 
                         if (event == nullptr)
                             continue;
+                        if (event->time.frames >= sampleCount)
+                            break;
 
  #if JucePlugin_WantsMidiInput
                         if (event->body.type == uridMidiEvent)
                         {
-                            if (event->time.frames >= sampleCount)
-                               break;
-
                             const uint8* data = (const uint8*)(event + 1);
                             midiEvents.addEvent(data, event->body.size, event->time.frames);
                             continue;
                         }
  #endif
  #if JucePlugin_WantsLV2TimePos
-                        if (event->body.type == uridTimePos)
+                        if (event->body.type == uridAtomBlank)
                         {
-                            // TODO
+                            const LV2_Atom_Object* obj = (LV2_Atom_Object*)&event->body;;
+
+                            if (obj->body.otype != uridTimePos)
+                                continue;
+
+                            LV2_Atom* bar = nullptr;
+                            LV2_Atom* barBeat = nullptr;
+                            LV2_Atom* beatsPerBar = nullptr;
+                            LV2_Atom* bpm = nullptr;
+                            LV2_Atom* beatUnit = nullptr;
+                            LV2_Atom* frame = nullptr;
+                            LV2_Atom* speed = nullptr;
+
+                            lv2_atom_object_get (obj,
+                                                 uridTimeBar, &bar,
+                                                 uridTimeBarBeat, &barBeat,
+                                                 uridTimeBeatsPerBar, &beatsPerBar,
+                                                 uridTimeBeatsPerMinute, &bpm,
+                                                 uridTimeBeatUnit, &beatUnit,
+                                                 uridTimeFrame, &frame,
+                                                 uridTimeSpeed, &speed,
+                                                 nullptr);
+
+                            if (bpm != nullptr && bpm->type == uridAtomFloat)
+                                curPosInfo.bpm = ((LV2_Atom_Float*)bpm)->body;
+
+                            if (beatsPerBar != nullptr && beatsPerBar->type == uridAtomFloat)
+                            {
+                                float beatsPerBarValue = ((LV2_Atom_Float*)beatsPerBar)->body;
+                                curPosInfo.timeSigNumerator = beatsPerBarValue;
+
+                                if (bar != nullptr && bar->type == uridAtomLong)
+                                {
+                                    float barValue = ((LV2_Atom_Long*)bar)->body;
+                                    curPosInfo.ppqPositionOfLastBarStart = barValue * beatsPerBarValue;
+
+                                    if (barBeat != nullptr && barBeat->type == uridAtomFloat)
+                                    {
+                                        float barBeatValue = ((LV2_Atom_Float*)barBeat)->body;
+                                        curPosInfo.ppqPosition = curPosInfo.ppqPositionOfLastBarStart + barBeatValue;
+                                    }
+                                }
+                            }
+
+                            if (beatUnit != nullptr && beatUnit->type == uridAtomFloat)
+                                curPosInfo.timeSigDenominator = ((LV2_Atom_Float*)beatUnit)->body;
+
+                            if (frame != nullptr && frame->type == uridAtomLong)
+                            {
+                                curPosInfo.timeInSamples = ((LV2_Atom_Long*)frame)->body;
+                                curPosInfo.timeInSeconds = double(curPosInfo.timeInSamples)/sampleRate;
+                            }
+
+                            if (speed != nullptr && speed->type == uridAtomFloat)
+                                curPosInfo.isPlaying = ((LV2_Atom_Float*)speed)->body == 1.0f;
                         }
  #endif
                     }
@@ -1571,7 +1644,12 @@ public:
 
     bool getCurrentPosition (AudioPlayHead::CurrentPositionInfo& info)
     {
+#if JucePlugin_WantsLV2TimePos
+        info = curPosInfo;
+        return true;
+#else
         return false;
+#endif
     }
 
     //==============================================================================
@@ -1611,9 +1689,19 @@ private:
     AudioPlayHead::CurrentPositionInfo curPosInfo;
 
     const LV2_URID_Map* uridMap;
+    LV2_URID uridAtomBlank;
+    LV2_URID uridAtomFloat;
+    LV2_URID uridAtomLong;
     LV2_URID uridAtomSequence;
     LV2_URID uridMidiEvent;
     LV2_URID uridTimePos;
+    LV2_URID uridTimeBar;
+    LV2_URID uridTimeBarBeat;
+    LV2_URID uridTimeBeatsPerBar;    // timeSigNumerator
+    LV2_URID uridTimeBeatsPerMinute; // bpm
+    LV2_URID uridTimeBeatUnit;       // timeSigDenominator
+    LV2_URID uridTimeFrame;          // timeInSamples
+    LV2_URID uridTimeSpeed;
 
     LV2_Program_Descriptor progDesc;
 
@@ -1707,8 +1795,8 @@ static void juceLV2_selectProgram (LV2_Handle handle, uint32_t bank, uint32_t pr
     handlePtr->lv2SelectProgram(bank, program);
 }
 
-static LV2_State_Status juceLV2_SaveState(LV2_Handle handle, LV2_State_Store_Function store, LV2_State_Handle stateHandle,
-                                          uint32_t, const LV2_Feature* const*)
+static LV2_State_Status juceLV2_SaveState (LV2_Handle handle, LV2_State_Store_Function store, LV2_State_Handle stateHandle,
+                                           uint32_t, const LV2_Feature* const*)
 {
     return handlePtr->lv2SaveState(store, stateHandle);
 }
@@ -1746,7 +1834,7 @@ static LV2UI_Handle juceLV2UI_Instantiate (LV2UI_Write_Function writeFunction, L
     JUCE_AUTORELEASEPOOL
     const MessageManagerLock mmLock;
 
-    for (int i = 0; features[i] != nullptr; i++)
+    for (int i = 0; features[i] != nullptr; ++i)
     {
         if (strcmp(features[i]->URI, LV2_INSTANCE_ACCESS_URI) == 0 && features[i]->data != nullptr)
         {
@@ -1778,11 +1866,6 @@ static void juceLV2UI_Cleanup (LV2UI_Handle handle)
     ((JuceLv2UIWrapper*)handle)->lv2Cleanup();
 }
 
-static const void* juceLV2UI_ExtensionData (const char*)
-{
-    return nullptr;
-}
-
 //==============================================================================
 // static LV2 Descriptor objects
 
@@ -1802,7 +1885,7 @@ static const LV2UI_Descriptor JuceLv2UI_External = {
     juceLV2UI_InstantiateExternal,
     juceLV2UI_Cleanup,
     nullptr,
-    juceLV2UI_ExtensionData
+    nullptr
 };
 
 static const LV2UI_Descriptor JuceLv2UI_Parent = {
@@ -1810,7 +1893,7 @@ static const LV2UI_Descriptor JuceLv2UI_Parent = {
     juceLV2UI_InstantiateParent,
     juceLV2UI_Cleanup,
     nullptr,
-    juceLV2UI_ExtensionData
+    nullptr
 };
 
 #if JUCE_WINDOWS
@@ -1831,8 +1914,8 @@ JUCE_EXPORTED_FUNCTION void lv2_generate_ttl()
     createLv2Files();
 }
 
-JUCE_EXPORTED_FUNCTION const LV2_Descriptor* lv2_descriptor(uint32 index);
-JUCE_EXPORTED_FUNCTION const LV2_Descriptor* lv2_descriptor(uint32 index)
+JUCE_EXPORTED_FUNCTION const LV2_Descriptor* lv2_descriptor (uint32 index);
+JUCE_EXPORTED_FUNCTION const LV2_Descriptor* lv2_descriptor (uint32 index)
 {
 #if JUCE_MAC
     initialiseMac();
@@ -1840,8 +1923,8 @@ JUCE_EXPORTED_FUNCTION const LV2_Descriptor* lv2_descriptor(uint32 index)
     return (index == 0) ? &JuceLv2Plugin : nullptr;
 }
 
-JUCE_EXPORTED_FUNCTION const LV2UI_Descriptor* lv2ui_descriptor(uint32 index);
-JUCE_EXPORTED_FUNCTION const LV2UI_Descriptor* lv2ui_descriptor(uint32 index)
+JUCE_EXPORTED_FUNCTION const LV2UI_Descriptor* lv2ui_descriptor (uint32 index);
+JUCE_EXPORTED_FUNCTION const LV2UI_Descriptor* lv2ui_descriptor (uint32 index)
 {
 #if JUCE_MAC
     initialiseMac();
