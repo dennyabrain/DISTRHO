@@ -42,11 +42,14 @@ Processor::Processor() :
   _agents(),
   _stretch(1.0),
   _reverse(false),
-  _envelope(1.0, 1.0),
   _convolverHeadBlockSize(0),
   _convolverTailBlockSize(0),
-  _fileBeginSeconds(0.0),
+  _irBegin(0.0),
+  _irEnd(1.0),
   _predelayMs(0.0),
+  _attackLength(0.0),
+  _attackShape(0.0),
+  _decayShape(0.0),
   _stereoWidth(),
   _dryOn(Parameters::DryOn.getDefaultValue() ? 1.0f : 0.0f),
   _wetOn(Parameters::WetOn.getDefaultValue() ? 1.0f : 0.0f),
@@ -55,7 +58,7 @@ Processor::Processor() :
   _beatsPerMinute(0.0f),
   _irCalculationMutex(),
   _irCalculation()
-{
+{ 
   _parameterSet.registerParameter(Parameters::WetOn);
   _parameterSet.registerParameter(Parameters::WetDecibels);
   _parameterSet.registerParameter(Parameters::DryOn);
@@ -125,11 +128,6 @@ const String Processor::getParameterName(int index)
 }
 
 const String Processor::getParameterText(int index)
-{
-  return String(getParameter(index), 3);
-}
-
-String Processor::getParameterLabel(int index)
 {
   return _parameterSet.getParameterDescriptor(index).getUnit();
 }
@@ -257,7 +255,7 @@ void Processor::releaseResources()
 
 
 void Processor::processBlock(AudioSampleBuffer& buffer, MidiBuffer& /*midiMessages*/)
-{
+{ 
   const int numInputChannels = getNumInputChannels();
   const int numOutputChannels = getNumOutputChannels();
   const size_t samplesToProcess = buffer.getNumSamples();
@@ -266,7 +264,7 @@ void Processor::processBlock(AudioSampleBuffer& buffer, MidiBuffer& /*midiMessag
   float* channelData0 = nullptr;
   float* channelData1 = nullptr;
   if (numInputChannels == 1)
-  {
+  {    
     channelData0 = buffer.getSampleData(0);
     channelData1 = buffer.getSampleData(0);
   }
@@ -303,7 +301,7 @@ void Processor::processBlock(AudioSampleBuffer& buffer, MidiBuffer& /*midiMessag
 
     IRAgent* irAgent10 = getAgent(1, 0);
     if (irAgent10 && irAgent10->getConvolver() && numInputChannels >= 2 && numOutputChannels >= 1)
-    {
+    {      
       irAgent10->process(channelData1, &_convolutionBuffer[0], samplesToProcess);
       _wetBuffer.addFrom(0, 0, &_convolutionBuffer[0], samplesToProcess, autoGain);
     }
@@ -339,7 +337,7 @@ void Processor::processBlock(AudioSampleBuffer& buffer, MidiBuffer& /*midiMessag
 
   // Level measurement (dry)
   if (numInputChannels == 1)
-  {
+  {    
     _levelMeasurementsDry[0].process(samplesToProcess, buffer.getSampleData(0));
     _levelMeasurementsDry[1].reset();
   }
@@ -512,8 +510,11 @@ void Processor::clearConvolvers()
     _reverse = false;
     _predelayMs = 0.0;
     _stretch = 1.0;
-    _fileBeginSeconds = 0.0;
-    _envelope.reset();
+    _irBegin = 0.0;
+    _irEnd = 1.0;
+    _attackLength = 0.0;
+    _attackShape = 0.0;
+    _decayShape = 0.0;
   }
 
   setParameterNotifyingHost(Parameters::EqLowCutFreq, Parameters::EqLowCutFreq.getDefaultValue());
@@ -568,7 +569,6 @@ void Processor::setReverse(bool reverse)
     if (_reverse != reverse)
     {
       _reverse = reverse;
-      _envelope.setReverse(reverse);
       changed = true;
     }
   }
@@ -584,24 +584,6 @@ bool Processor::getReverse() const
 {
   juce::ScopedLock convolverLock(_convolverMutex);
   return _reverse;
-}
-
-
-void Processor::setEnvelope(const Envelope& envelope)
-{
-  {
-    juce::ScopedLock convolverLock(_convolverMutex);
-    _envelope = envelope;
-  }
-  notifyAboutChange();
-  updateConvolvers();
-}
-
-
-Envelope Processor::getEnvelope() const
-{
-  juce::ScopedLock convolverLock(_convolverMutex);
-  return _envelope;
 }
 
 
@@ -631,14 +613,15 @@ double Processor::getPredelayMs() const
 }
 
 
-void Processor::setFileBeginSeconds(double fileBeginSeconds)
+void Processor::setAttackLength(double length)
 {
   bool changed = false;
+  length = std::max(0.0, std::min(1.0, length));
   {
     juce::ScopedLock convolverLock(_convolverMutex);
-    if (_fileBeginSeconds != fileBeginSeconds)
+    if (_attackLength != length)
     {
-      _fileBeginSeconds = fileBeginSeconds;
+      _attackLength = length;
       changed = true;
     }
   }
@@ -650,13 +633,134 @@ void Processor::setFileBeginSeconds(double fileBeginSeconds)
 }
 
 
-double Processor::getFileBeginSeconds() const
+double Processor::getAttackLength() const
 {
-  const double irDuration = getIRDuration();
+  juce::ScopedLock convolverLock(_convolverMutex);
+  return _attackLength;
+}
+
+
+void Processor::setAttackShape(double shape)
+{
+  bool changed = false;
   {
     juce::ScopedLock convolverLock(_convolverMutex);
-    return std::max(0.0, std::min(irDuration, _fileBeginSeconds));
+    if (_attackShape != shape)
+    {
+      _attackShape = shape;
+      changed = true;
+    }
   }
+  if (changed)
+  {
+    notifyAboutChange();
+    updateConvolvers();
+  }
+}
+
+
+double Processor::getAttackShape() const
+{
+  juce::ScopedLock convolverLock(_convolverMutex);
+  return _attackShape;
+}
+
+
+void Processor::setDecayShape(double shape)
+{
+  bool changed = false;
+  {
+    juce::ScopedLock convolverLock(_convolverMutex);
+    if (_decayShape != shape)
+    {
+      _decayShape = shape;
+      changed = true;
+    }
+  }
+  if (changed)
+  {
+    notifyAboutChange();
+    updateConvolvers();
+  }
+}
+
+
+double Processor::getDecayShape() const
+{
+  juce::ScopedLock convolverLock(_convolverMutex);
+  return _decayShape;
+}
+
+
+void Processor::setIRBegin(double irBegin)
+{
+  bool changed = false;  
+  bool irChanged = false;
+  {
+    juce::ScopedLock convolverLock(_convolverMutex);
+    double irBeginClamped = std::min(_irEnd, std::max(0.0, irBegin));
+    if (::fabs(irBeginClamped-irBegin) > 0.0001)
+    {
+      changed = true;
+    }
+    if (::fabs(_irBegin-irBeginClamped) > 0.0001)
+    {
+      _irBegin = irBeginClamped;
+      changed = true;
+      irChanged = true;
+    }
+  }
+  if (changed)
+  {
+    notifyAboutChange();
+  }
+  if (irChanged)
+  {
+    updateConvolvers();
+  }
+}
+
+
+double Processor::getIRBegin() const
+{
+  juce::ScopedLock convolverLock(_convolverMutex);
+  return _irBegin;
+}
+
+
+void Processor::setIREnd(double irEnd)
+{
+  bool changed = false;
+  bool irChanged = false;
+  {
+    juce::ScopedLock convolverLock(_convolverMutex);
+    double irEndClamped = std::min(1.0, std::max(_irBegin, irEnd));
+    if (::fabs(irEndClamped-irEnd) > 0.0001)
+    {
+      changed = true;
+    }
+    if (::fabs(_irEnd-irEndClamped) > 0.0001)
+    {
+      _irEnd = irEndClamped;
+      changed = true;
+      irChanged = true;
+    }    
+  }
+  if (changed)
+  {
+    notifyAboutChange();    
+  }
+  if (irChanged)
+  {
+    updateConvolvers();
+  }
+}
+
+
+double Processor::getIREnd() const
+{
+  juce::ScopedLock convolverLock(_convolverMutex);
+  return _irEnd;
 }
 
 
@@ -711,6 +815,19 @@ double Processor::getMaxFileDuration() const
     }
   }
   return maxDuration;
+}
+
+
+bool Processor::irAvailable() const
+{
+  for (auto it=_agents.begin(); it!=_agents.end(); ++it)
+  {
+    if ((*it)->getFile() != File::nonexistent)
+    {
+      return true;
+    }
+  }
+  return false;
 }
 
 

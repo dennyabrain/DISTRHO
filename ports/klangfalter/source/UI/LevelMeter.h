@@ -18,7 +18,7 @@
 #ifndef _LEVELMETER_H
 #define _LEVELMETER_H
 
-#include "../JuceHeader.h"
+#include "JuceHeader.h"
 
 #include "../LevelMeasurement.h"
 

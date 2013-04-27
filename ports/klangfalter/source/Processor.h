@@ -21,7 +21,6 @@
 #include "JuceHeader.h"
 
 #include "ChangeNotifier.h"
-#include "Envelope.h"
 #include "IRAgent.h"
 #include "LevelMeasurement.h"
 #include "ParameterSet.h"
@@ -86,7 +85,6 @@ public:
 
   const juce::String getParameterName (int index);
   const juce::String getParameterText (int index);
-  juce::String getParameterLabel (int index);
 
   const juce::String getInputChannelName (int channelIndex) const;
   const juce::String getOutputChannelName (int channelIndex) const;
@@ -128,19 +126,29 @@ public:
   void setReverse(bool reverse);
   bool getReverse() const;
 
-  void setEnvelope(const Envelope& envelope);
-  Envelope getEnvelope() const;
-
   size_t getIRSampleCount() const;
   double getIRDuration() const;
   double getMaxFileDuration() const;
+  bool irAvailable() const;
 
-  void setFileBeginSeconds(double fileBeginSeconds);
-  double getFileBeginSeconds() const;
+  void setIRBegin(double irBegin);
+  double getIRBegin() const;
+
+  void setIREnd(double irEnd);
+  double getIREnd() const;
 
   void setPredelayMs(double predelayMs);
   double getPredelayMs() const;
 
+  void setAttackLength(double length);
+  double getAttackLength() const;
+
+  void setAttackShape(double shape);
+  double getAttackShape() const;
+
+  void setDecayShape(double shape);
+  double getDecayShape() const;
+  
   void clearConvolvers();
   void updateConvolvers();
 
@@ -149,7 +157,7 @@ public:
 private:
   juce::AudioSampleBuffer _wetBuffer;
   std::vector<float> _convolutionBuffer;
-  ParameterSet _parameterSet;
+  ParameterSet _parameterSet;  
   std::vector<LevelMeasurement> _levelMeasurementsDry;
   std::vector<LevelMeasurement> _levelMeasurementsWet;
   std::vector<LevelMeasurement> _levelMeasurementsOut;
@@ -159,11 +167,14 @@ private:
   IRAgentContainer _agents;
   double _stretch;
   bool _reverse;
-  Envelope _envelope;
   size_t _convolverHeadBlockSize;
   size_t _convolverTailBlockSize;
-  double _fileBeginSeconds;
+  double _irBegin;
+  double _irEnd;
   double _predelayMs;
+  double _attackLength;
+  double _attackShape;
+  double _decayShape;
   StereoWidth _stereoWidth;
   SmoothValue<float> _dryOn;
   SmoothValue<float> _wetOn;
