@@ -51,8 +51,8 @@
 #include "audio/beat/jucetice_BeatDetector.cpp"
 #include "audio/fft/jucetice_FFTWrapper.cpp"
 
-#include "audio/formats/jucetice_MADAudioFormat.cpp"
-#include "audio/formats/jucetice_MPCAudioFormat.cpp"
+//#include "audio/formats/jucetice_MADAudioFormat.cpp"
+//#include "audio/formats/jucetice_MPCAudioFormat.cpp"
 
 #include "audio/lash/jucetice_LashManager.cpp"
 #include "audio/midi/jucetice_MidiAutomatorManager.cpp"

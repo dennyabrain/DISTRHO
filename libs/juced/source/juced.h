@@ -166,11 +166,11 @@ BEGIN_JUCE_NAMESPACE
 #endif
 
 #ifndef __JUCETICE_MADAUDIOFORMAT_HEADER__
- #include "audio/formats/jucetice_MADAudioFormat.h"
+// #include "audio/formats/jucetice_MADAudioFormat.h"
 #endif
 
 #ifndef __JUCETICE_MPCAUDIOFORMAT_HEADER__
- #include "audio/formats/jucetice_MPCAudioFormat.h"
+// #include "audio/formats/jucetice_MPCAudioFormat.h"
 #endif
 
 #ifndef __JUCETICE_LASHMANAGER_HEADER__
