@@ -11,8 +11,9 @@
 #include "AppConfig.h"
 
 #include "../utility/juce_CheckSettingMacros.h"
+#include "juce_core/system/juce_TargetPlatform.h" // for JUCE_LINUX
 
-#if 1//JucePlugin_Build_LV2
+#if JucePlugin_Build_LV2
 
 /*
  * Available macros:
