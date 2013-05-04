@@ -26,15 +26,7 @@
 #ifndef __JUCE_STANDALONEFILTERWINDOW_JUCEHEADER__
 #define __JUCE_STANDALONEFILTERWINDOW_JUCEHEADER__
 
-#include "JucePluginCharacteristics.h"
-
-#include "modules/juce_core/juce_core.h"
-#include "modules/juce_audio_basics/juce_audio_basics.h"
-#include "modules/juce_audio_plugin_client/utility/juce_IncludeModuleHeaders.h"
-#include "modules/juce_audio_processors/juce_audio_processors.h"
-#include "modules/juce_audio_devices/juce_audio_devices.h"
-#include "modules/juce_audio_utils/juce_audio_utils.h"
-#include "modules/juce_gui_basics/juce_gui_basics.h"
+#include "JucePluginMain.h"
 
 // resources
 #include "icon/DistrhoIcon.h"
@@ -138,8 +130,10 @@ public:
             const int y = settings->getIntValue ("windowY", -100);
             const bool native = settings->getBoolValue("nativeTitleBar", true);
 
-            setDropShadowEnabled (false);
             setUsingNativeTitleBar (native);
+
+            if (! native)
+                setDropShadowEnabled (false);
 
             if (x != -100 && y != -100)
                 setBoundsConstrained (Rectangle<int> (x, y, getWidth(), getHeight()));
@@ -148,7 +142,6 @@ public:
         }
         else
         {
-            setDropShadowEnabled (false);
             setUsingNativeTitleBar (true);
             centreWithSize (getWidth(), getHeight());
         }
@@ -160,7 +153,6 @@ public:
 #endif
 
         addToDesktop();
-        setVisible (true);
     }
 
     ~StandaloneFilterWindow()

@@ -73,13 +73,13 @@ public:
     {
         DBG ("StandaloneFilterApplication::shutdown");
 
-        if (window)
+        if (window != nullptr)
         {
             window->setVisible (false);
             window = nullptr;
         }
 
-        if (appProperties)
+        if (appProperties != nullptr)
         {
             appProperties->saveIfNeeded ();
             appProperties->closeFiles ();

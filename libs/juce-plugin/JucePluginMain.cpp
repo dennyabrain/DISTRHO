@@ -8,6 +8,8 @@
 
 #include "JucePluginMain.h"
 
+#include "modules/juce_audio_plugin_client/utility/juce_PluginUtilities.cpp"
+
 #if JucePlugin_Build_AU
  #include "modules/juce_audio_plugin_client/AU/juce_AU_Wrapper.mm"
 #elif JucePlugin_Build_LV2
@@ -22,5 +24,3 @@
 #else
  #error Invalid configuration
 #endif
-
-#include "modules/juce_audio_plugin_client/utility/juce_PluginUtilities.cpp"
