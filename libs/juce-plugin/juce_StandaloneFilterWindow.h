@@ -27,6 +27,7 @@
 #define __JUCE_STANDALONEFILTERWINDOW_JUCEHEADER__
 
 #include "JucePluginMain.h"
+#include "modules/juce_audio_plugin_client/utility/juce_PluginUtilities.cpp"
 
 // resources
 #include "icon/DistrhoIcon.h"
