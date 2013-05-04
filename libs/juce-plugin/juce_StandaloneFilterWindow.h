@@ -408,7 +408,7 @@ public:
 
 private:
     //==============================================================================
-    ScopedPointer<PropertySet> settings;
+    PropertySet* settings;
     ScopedPointer<AudioProcessor> filter;
     ScopedPointer<AudioDeviceManager> deviceManager;
     AudioProcessorPlayer player;
