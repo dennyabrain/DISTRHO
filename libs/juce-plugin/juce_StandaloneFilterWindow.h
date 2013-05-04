@@ -67,45 +67,13 @@ public:
           settings (settingsToUse),
           nativeTitleBarCheck (false)
     {
-        JUCE_TRY
-        {
-            filter = createPluginFilterOfType(AudioProcessor::wrapperType_Standalone);
-        }
-        JUCE_CATCH_ALL
+        createFilter();
 
         if (filter == nullptr)
         {
             jassertfalse    // Your filter didn't create correctly! In a standalone app that's not too great.
             JUCEApplication::quit();
         }
-
-        if (settings != nullptr)
-        {
-            const int x = settings->getIntValue ("windowX", -100);
-            const int y = settings->getIntValue ("windowY", -100);
-            const bool native = settings->getBoolValue("nativeTitleBar", true);
-
-            if (native == false)
-                setDropShadowEnabled (false);
-
-            setUsingNativeTitleBar (native);
-
-            if (x != -100 && y != -100)
-                setTopLeftPosition(x, y);
-            else
-                centreWithSize (1, 1);
-        }
-        else
-        {
-            setUsingNativeTitleBar (true);
-            centreWithSize (1, 1);
-        }
-
-#if JUCE_MAC
-        setMacMainMenu (this);
-#else
-        setMenuBar (this);
-#endif
 
         filter->setPlayConfigDetails (JucePlugin_MaxNumInputChannels,
                                       JucePlugin_MaxNumOutputChannels,
@@ -162,11 +130,36 @@ public:
             }
         }
 
-        // We need addToDesktop so the GUI gets painted and properly resized, but it can flash while resizing.
-        // so hide it, add to desktop, and show it back
-        setVisible (false);
-        addToDesktop ();
         setContentOwned (filter->createEditorIfNeeded(), true);
+
+        if (settings != nullptr)
+        {
+            const int x = settings->getIntValue ("windowX", -100);
+            const int y = settings->getIntValue ("windowY", -100);
+            const bool native = settings->getBoolValue("nativeTitleBar", true);
+
+            setDropShadowEnabled (false);
+            setUsingNativeTitleBar (native);
+
+            if (x != -100 && y != -100)
+                setBoundsConstrained (Rectangle<int> (x, y, getWidth(), getHeight()));
+            else
+                centreWithSize (getWidth(), getHeight());
+        }
+        else
+        {
+            setDropShadowEnabled (false);
+            setUsingNativeTitleBar (true);
+            centreWithSize (getWidth(), getHeight());
+        }
+
+#if JUCE_MAC
+        setMacMainMenu (this);
+#else
+        setMenuBar (this);
+#endif
+
+        addToDesktop();
         setVisible (true);
     }
 
@@ -210,9 +203,7 @@ public:
 
     void initIcon()
     {
-        ComponentPeer* const peer = getPeer();
-
-        if (peer)
+        if (ComponentPeer* const peer = getPeer())
         {
             icon = ImageFileFormat::loadFrom (DistrhoIcon::logo_png, DistrhoIcon::logo_pngSize);
             peer->setIcon (icon);
@@ -222,7 +213,7 @@ public:
     //==============================================================================
     StringArray getMenuBarNames()
     {
-        const char* const names[] = { "File", "Presets", "Options", 0 };
+        const char* const names[] = { "File", "Presets", "Options", nullptr };
 
         return StringArray (names);
     }
@@ -256,9 +247,9 @@ public:
             menu.addItem (6, TRANS("Audio Settings..."));
             menu.addSeparator();
             if (isUsingNativeTitleBar())
-                menu.addItem (7, "Use JUCE Titlebar");
+                menu.addItem (7, TRANS("Use JUCE Titlebar"));
             else
-                menu.addItem (7, "Use Native Titlebar");
+                menu.addItem (7, TRANS("Use Native Titlebar"));
         }
         return menu;
     }
@@ -291,12 +282,21 @@ public:
     }
 
     //==============================================================================
+    AudioProcessor* getAudioProcessor() const noexcept      { return filter; }
+    AudioDeviceManager* getDeviceManager() const noexcept   { return deviceManager; }
+
+    void createFilter()
+    {
+        AudioProcessor::setTypeOfNextNewPlugin (AudioProcessor::wrapperType_Standalone);
+        filter = createPluginFilter();
+        AudioProcessor::setTypeOfNextNewPlugin (AudioProcessor::wrapperType_Undefined);
+    }
+
     /** Deletes and re-creates the filter and its UI. */
     void resetFilter()
     {
         deleteFilter();
-
-        filter = createPluginFilterOfType(AudioProcessor::wrapperType_Standalone);
+        createFilter();
 
         if (filter != nullptr)
         {
@@ -308,8 +308,6 @@ public:
 
         if (settings != nullptr)
             settings->removeValue ("filterState");
-
-        //saveFileName = String::empty;
     }
 
     /** Save state replacing old file. */
@@ -388,19 +386,24 @@ public:
     }
 
     /** Shows the audio properties dialog box modally. */
-    virtual void showAudioSettingsDialog()
+    void showAudioSettingsDialog()
     {
-        AudioDeviceSelectorComponent selectorComp (*deviceManager,
-                                                   filter->getNumInputChannels(),
-                                                   filter->getNumInputChannels(),
-                                                   filter->getNumOutputChannels(),
-                                                   filter->getNumOutputChannels(),
-                                                   true, false, true, false);
+        DialogWindow::LaunchOptions o;
+        o.content.setOwned (new AudioDeviceSelectorComponent (*deviceManager,
+                                                              filter->getNumInputChannels(),
+                                                              filter->getNumInputChannels(),
+                                                              filter->getNumOutputChannels(),
+                                                              filter->getNumOutputChannels(),
+                                                              true, false, true, false));
+        o.content->setSize (500, 450);
 
-        selectorComp.setSize (500, 450);
+        o.dialogTitle                   = TRANS("Audio Settings");
+        o.dialogBackgroundColour        = Colours::lightgrey;
+        o.escapeKeyTriggersCloseButton  = true;
+        o.useNativeTitleBar             = isUsingNativeTitleBar();
+        o.resizable                     = false;
 
-        DialogWindow::showModalDialog (TRANS("Audio Settings"), &selectorComp, this,
-                                       Colours::lightgrey, true, false, false, isUsingNativeTitleBar());
+        o.launchAsync();
     }
 
     //==============================================================================
@@ -410,15 +413,9 @@ public:
         JUCEApplication::quit();
     }
 
-    /** @internal */
-    void resized()
-    {
-        DocumentWindow::resized();
-    }
-
 private:
     //==============================================================================
-    PropertySet* settings;
+    ScopedPointer<PropertySet> settings;
     ScopedPointer<AudioProcessor> filter;
     ScopedPointer<AudioDeviceManager> deviceManager;
     AudioProcessorPlayer player;
@@ -439,7 +436,7 @@ private:
         filter = nullptr;
     }
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (StandaloneFilterWindow);
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (StandaloneFilterWindow)
 };
 
 #endif   // __JUCE_STANDALONEFILTERWINDOW_JUCEHEADER__
