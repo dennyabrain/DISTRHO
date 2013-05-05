@@ -1288,6 +1288,7 @@ public:
         jassert (filter != nullptr);
 
         filter->prepareToPlay (sampleRate, bufferSize);
+        filter->setPlayConfigDetails (numInChans, numOutChans, sampleRate, bufferSize);
 
         channels.calloc (numInChans + numOutChans);
 
