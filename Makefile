@@ -12,6 +12,7 @@ build:
 	$(MAKE) plugins -C ports
 
 gen:
+	@./scripts/generate-cabbage-lv2.sh
 	@./scripts/generate-ttl.sh
 
 	# Copy manually modified ttls with extra data
