@@ -3,6 +3,7 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 
 #ifdef _WIN32
  #include <windows.h>
@@ -15,7 +16,7 @@
  #define nullptr (0)
 #endif
 
-typedef void (*TTL_Generator_Function)(void);
+typedef void (*TTL_Generator_Function)(const char* basename);
 
 int main(int argc, char* argv[])
 {
@@ -47,8 +48,26 @@ int main(int argc, char* argv[])
     const TTL_Generator_Function ttlFn = (TTL_Generator_Function)dlsym(handle, "lv2_generate_ttl");
 #endif
 
-    if (ttlFn)
-        ttlFn();
+    if (ttlFn != NULL)
+    {
+        char basename[strlen(argv[1])+1];
+
+#ifdef TTL_GENERATOR_WINDOWS
+        if (char* base2 = strrchr(argv[1], '\\'))
+#else
+        if (char* base2 = strrchr(argv[1], '/'))
+#endif
+        {
+            strcpy(basename, base2+1);
+            basename[strrchr(base2, '.')-base2-1] = '\0';
+        }
+        else
+            strcpy(basename, argv[1]);
+
+        printf("Generate ttl data for '%s', basename: '%s'\n", argv[1], basename);
+
+        ttlFn(basename);
+    }
     else
         printf("Failed to find 'lv2_generate_ttl' function\n");
 

@@ -17,6 +17,7 @@ libs:
 standalone:
 	$(MAKE) -C arctican-function/Standalone
 	$(MAKE) -C arctican-pilgrim/Standalone
+	$(MAKE) -C cabbage/Standalone
 	$(MAKE) -C drowaudio-distortion/Standalone
 	$(MAKE) -C drowaudio-distortionshaper/Standalone
 	$(MAKE) -C drowaudio-flanger/Standalone
@@ -45,6 +46,8 @@ standalone-host:
 lv2:
 	$(MAKE) -C arctican-function/LV2
 	$(MAKE) -C arctican-pilgrim/LV2
+	$(MAKE) -C cabbage/LV2-fx
+	$(MAKE) -C cabbage/LV2-ins
 	$(MAKE) -C drowaudio-distortion/LV2
 	$(MAKE) -C drowaudio-distortionshaper/LV2
 	$(MAKE) -C drowaudio-flanger/LV2
@@ -70,6 +73,8 @@ lv2:
 vst:
 	$(MAKE) -C arctican-function/VST
 	$(MAKE) -C arctican-pilgrim/VST
+	$(MAKE) -C cabbage/VST-fx
+	$(MAKE) -C cabbage/VST-ins
 	$(MAKE) -C drowaudio-distortion/VST
 	$(MAKE) -C drowaudio-distortionshaper/VST
 	$(MAKE) -C drowaudio-flanger/VST
@@ -96,6 +101,7 @@ clean:
 	# Standalone
 	$(MAKE) clean -C arctican-function/Standalone
 	$(MAKE) clean -C arctican-pilgrim/Standalone
+	$(MAKE) clean -C cabbage/Standalone
 	$(MAKE) clean -C drowaudio-distortion/Standalone
 	$(MAKE) clean -C drowaudio-distortionshaper/Standalone
 	$(MAKE) clean -C drowaudio-flanger/Standalone
@@ -124,6 +130,8 @@ clean:
 	# LV2
 	$(MAKE) clean -C arctican-function/LV2
 	$(MAKE) clean -C arctican-pilgrim/LV2
+	$(MAKE) clean -C cabbage/LV2-fx
+	$(MAKE) clean -C cabbage/LV2-ins
 	$(MAKE) clean -C drowaudio-distortion/LV2
 	$(MAKE) clean -C drowaudio-distortionshaper/LV2
 	$(MAKE) clean -C drowaudio-flanger/LV2
@@ -149,6 +157,8 @@ clean:
 	# VST
 	$(MAKE) clean -C arctican-function/VST
 	$(MAKE) clean -C arctican-pilgrim/VST
+	$(MAKE) clean -C cabbage/VST-fx
+	$(MAKE) clean -C cabbage/VST-ins
 	$(MAKE) clean -C drowaudio-distortion/VST
 	$(MAKE) clean -C drowaudio-distortionshaper/VST
 	$(MAKE) clean -C drowaudio-flanger/VST

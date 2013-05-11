@@ -87,12 +87,6 @@ namespace juce
  #define PLUGIN_EXT ".dll"
 #endif
 
-/** Returns the name of the plugin binary file */
-const String getBinaryName()
-{
-    return String(JucePlugin_Name).replace(" ", "_");
-}
-
 /** Returns plugin type, defined in AppConfig.h or JucePluginCharacteristics.h */
 const String getPluginType()
 {
@@ -105,6 +99,17 @@ const String getPluginType()
 #endif
     pluginType += "lv2:Plugin";
     return pluginType;
+}
+
+/** Returns plugin URI */
+static const String& getPluginURI()
+{
+#ifdef Cabbage_Plugin_LV2
+    static const String pluginURI(String("urn:cabbage:")+File::getSpecialLocation(File::currentExecutableFile).getFileNameWithoutExtension());
+#else
+    static const String pluginURI(JucePlugin_LV2URI);
+#endif
+    return pluginURI;
 }
 
 static Array<String> usedSymbols;
@@ -178,7 +183,7 @@ const String makeManifestFile (AudioProcessor* const filter, const String& binar
     text += "\n";
 
     // Plugin
-    text += "<" JucePlugin_LV2URI ">\n";
+    text += "<" + getPluginURI() + ">\n";
     text += "    a lv2:Plugin ;\n";
     text += "    lv2:binary <" + binary + PLUGIN_EXT "> ;\n";
     text += "    rdfs:seeAlso <" + binary + ".ttl> .\n";
@@ -187,14 +192,14 @@ const String makeManifestFile (AudioProcessor* const filter, const String& binar
     // UIs
     if (filter->hasEditor())
     {
-        text += "<" JucePlugin_LV2URI "#ExternalUI>\n";
+        text += "<" + getPluginURI() + "#ExternalUI>\n";
         text += "    a <" LV2_EXTERNAL_UI__Widget "> ;\n";
         text += "    ui:binary <" + binary + PLUGIN_EXT "> ;\n";
         text += "    lv2:requiredFeature <" LV2_INSTANCE_ACCESS_URI "> ;\n";
         text += "    lv2:extensionData <" LV2_PROGRAMS__UIInterface "> .\n";
         text += "\n";
 
-        text += "<" JucePlugin_LV2URI "#ParentUI>\n";
+        text += "<" + getPluginURI() + "#ParentUI>\n";
 #if JUCE_MAC
         text += "    a ui:CocoaUI ;\n";
 #elif JUCE_LINUX
@@ -213,9 +218,9 @@ const String makeManifestFile (AudioProcessor* const filter, const String& binar
     // Presets
     for (int i = 0; i < filter->getNumPrograms(); ++i)
     {
-        text += "<" JucePlugin_LV2URI "#preset" + String::formatted("%03i", i+1) + ">\n";
+        text += "<" + getPluginURI() + "#preset" + String::formatted("%03i", i+1) + ">\n";
         text += "    a pset:Preset ;\n";
-        text += "    lv2:appliesTo <" JucePlugin_LV2URI "> ;\n";
+        text += "    lv2:appliesTo <" + getPluginURI() + "> ;\n";
         text += "    rdfs:seeAlso <presets.ttl> .\n";
         text += "\n";
     }
@@ -240,7 +245,7 @@ const String makePluginFile (AudioProcessor* const filter)
     text += "\n";
 
     // Plugin
-    text += "<" JucePlugin_LV2URI ">\n";
+    text += "<" + getPluginURI() + ">\n";
     text += "    a " + getPluginType() + " ;\n";
     text += "    lv2:requiredFeature <" LV2_BUF_SIZE__boundedBlockLength "> ,\n";
     text += "                        <" LV2_URID__map "> ;\n";
@@ -252,8 +257,8 @@ const String makePluginFile (AudioProcessor* const filter)
     // UIs
     if (filter->hasEditor())
     {
-        text += "    ui:ui <" JucePlugin_LV2URI "#ExternalUI> ,\n";
-        text += "          <" JucePlugin_LV2URI "#ParentUI> ;\n";
+        text += "    ui:ui <" + getPluginURI() + "#ExternalUI> ,\n";
+        text += "          <" + getPluginURI() + "#ParentUI> ;\n";
         text += "\n";
     }
 
@@ -428,7 +433,7 @@ const String makePresetsFile (AudioProcessor* const filter)
 
         // Label
         filter->setCurrentProgram(i);
-        preset += "<" JucePlugin_LV2URI "#preset" + String::formatted("%03i", i+1) + "> a pset:Preset ;\n";
+        preset += "<" + getPluginURI() + "#preset" + String::formatted("%03i", i+1) + "> a pset:Preset ;\n";
         preset += "    rdfs:label \"" + filter->getProgramName(i) + "\" ;\n";
 
         // State
@@ -482,12 +487,12 @@ const String makePresetsFile (AudioProcessor* const filter)
 }
 
 /** Creates manifest.ttl, plugin.ttl and presets.ttl files */
-void createLv2Files()
+void createLv2Files(const char* basename)
 {
     ScopedJuceInitialiser_GUI juceInitialiser;
     ScopedPointer<AudioProcessor> filter (createPluginFilterOfType (AudioProcessor::wrapperType_VST)); // FIXME
 
-    String binary(getBinaryName());
+    String binary(basename);
     String binaryTTL(binary + ".ttl");
 
     std::cout << "Writing manifest.ttl..."; std::cout.flush();
@@ -1872,7 +1877,7 @@ static void juceLV2UI_Cleanup (LV2UI_Handle handle)
 // static LV2 Descriptor objects
 
 static const LV2_Descriptor JuceLv2Plugin = {
-    JucePlugin_LV2URI,
+    strdup(getPluginURI().toRawUTF8()),
     juceLV2_Instantiate,
     juceLV2_ConnectPort,
     juceLV2_Activate,
@@ -1883,7 +1888,7 @@ static const LV2_Descriptor JuceLv2Plugin = {
 };
 
 static const LV2UI_Descriptor JuceLv2UI_External = {
-    JucePlugin_LV2URI "#ExternalUI",
+    strdup(String(getPluginURI() + "#ExternalUI").toRawUTF8()),
     juceLV2UI_InstantiateExternal,
     juceLV2UI_Cleanup,
     nullptr,
@@ -1891,12 +1896,21 @@ static const LV2UI_Descriptor JuceLv2UI_External = {
 };
 
 static const LV2UI_Descriptor JuceLv2UI_Parent = {
-    JucePlugin_LV2URI "#ParentUI",
+    strdup(String(getPluginURI() + "#ParentUI").toRawUTF8()),
     juceLV2UI_InstantiateParent,
     juceLV2UI_Cleanup,
     nullptr,
     nullptr
 };
+
+static const struct DescriptorCleanup {
+    ~DescriptorCleanup()
+    {
+        free((void*)JuceLv2Plugin.URI);
+        free((void*)JuceLv2UI_External.URI);
+        free((void*)JuceLv2UI_Parent.URI);
+    }
+} _descCleanup;
 
 #if JUCE_WINDOWS
  #define JUCE_EXPORTED_FUNCTION extern "C" __declspec (dllexport)
@@ -1907,13 +1921,13 @@ static const LV2UI_Descriptor JuceLv2UI_Parent = {
 //==============================================================================
 // startup code..
 
-JUCE_EXPORTED_FUNCTION void lv2_generate_ttl();
-JUCE_EXPORTED_FUNCTION void lv2_generate_ttl()
+JUCE_EXPORTED_FUNCTION void lv2_generate_ttl (const char* basename);
+JUCE_EXPORTED_FUNCTION void lv2_generate_ttl (const char* basename)
 {
 #if JUCE_MAC
     initialiseMac();
 #endif
-    createLv2Files();
+    createLv2Files (basename);
 }
 
 JUCE_EXPORTED_FUNCTION const LV2_Descriptor* lv2_descriptor (uint32 index);
