@@ -16,6 +16,6 @@
     This lets you disable the WebBrowserComponent class (Mac and Windows).
     If you're not using any embedded web-pages, turning this off may reduce your code size.
 */
-#define JUCE_WEB_BROWSER 0
+#define JUCE_WEB_BROWSER 1
 
 #endif // __DISTRHO_JUCE_GUI_EXTRA_APPCONFIG_H__
