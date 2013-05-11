@@ -2,7 +2,7 @@
 
 
 build: audio-basics audio-devices audio-devices_full audio-formats audio-processors audio-utils \
-	core data-structures events graphics gui-basics
+	core data-structures events graphics gui-basics gui-extra
 
 all: audio-basics audio-devices audio-devices_full audio-formats audio-processors audio-processors_full audio-utils \
 	core cryptography data-structures events graphics gui-basics gui-extra video
