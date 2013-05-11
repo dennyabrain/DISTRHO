@@ -94,7 +94,7 @@ rslider bounds(  5,  8, 55, 55), text("Ampl."),  colour(255,186,58), FontColour(
 rslider bounds( 55,  8, 55, 55), text("Tone"),   colour(255,186,58), FontColour(50,50,50), channel("RelTone"),  range(100, 8000, 1000)
 rslider bounds(105,  8, 55, 55), text("D.Time"), colour(255,186,58), FontColour(50,50,50), channel("RelDTime"), range(0.001, 1, 0.01, 0.5, 0.001)
 rslider bounds(155,  8, 55, 55), text("Damp"),   colour(255,186,58), FontColour(50,50,50), channel("RelDamp"),  range(0.1, 0.99, 0.95)
-rslider bounds(205,  8, 55, 55), text("A.Time"), colour(255,186,58), FontColour(50,50,50), channel("RelATime"), range(0.01,20, 0.05, 0.5, 0.01)
+rslider bounds(205,  8, 55, 55), text("A.Time"), colour(255,186,58), FontColour(50,50,50), channel("RelATime"), range(0.01, 2, 0.05, 0.5, 0.01)
 }
 
 ; controls pertaining to the setup of the instrument's bandpass filters accessed in a pop-up panel
@@ -125,7 +125,7 @@ line bounds(114, 25,  1, 150), colour(50,50,50)
 line bounds(169, 25,  1, 150), colour(50,50,50)
 }
 
-rslider  bounds(470,  5, 75, 75), text("Level"), colour(255,186,58), FontColour(50,50,50), channel("level"), range(0, 8, 0.5, 0.5)
+rslider  bounds(470,  5, 75, 75), text("Level"), colour(255,186,58), FontColour(50,50,50), channel("level"), range(0, 50, 0.5, 0.5, 0.001)
 
 keyboard bounds(10,  85, 530,80)
 image bounds(5, 170, 420, 20), colour(75, 85, 90, 50), plant("credit"){
