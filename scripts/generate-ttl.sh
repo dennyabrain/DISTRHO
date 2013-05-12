@@ -28,3 +28,7 @@ for i in $FOLDERS; do
   echo cd ../..
   cd ../..
 done
+
+# Remove cabbage logs
+echo rm -f lv2/cabbage_*.lv2/CabbageLog.txt
+rm -f lv2/cabbage_*.lv2/CabbageLog.txt
