@@ -41,4 +41,12 @@ for i in $FILES; do
 
 done
 
+# Special files
+cp cabbage/Synths/bassline.snaps lv2/cabbage_Synths-bassline.lv2/
+cp cabbage/Synths/Clavinet.snaps lv2/cabbage_Synths-Clavinet.lv2/
+cp cabbage/Synths/TR-808_pattern.0.txt lv2/cabbage_Synths-TR-808.lv2/
+
+# Remove cabbage logs
+rm lv2/cabbage_*.lv2/CabbageLog.txt
+
 cd ..
