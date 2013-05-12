@@ -250,7 +250,9 @@ const String makePluginFile (AudioProcessor* const filter)
     text += "    lv2:requiredFeature <" LV2_BUF_SIZE__boundedBlockLength "> ,\n";
     text += "                        <" LV2_URID__map "> ;\n";
     text += "    lv2:extensionData <" LV2_OPTIONS__interface "> ,\n";
+#if JucePlugin_WantsLV2State
     text += "                      <" LV2_STATE__interface "> ,\n";
+#endif
     text += "                      <" LV2_PROGRAMS__Interface "> ;\n";
     text += "\n";
 
