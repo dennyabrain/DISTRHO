@@ -400,7 +400,7 @@ const String makePluginFile (AudioProcessor* const filter)
             text += "    ] ,\n";
     }
 
-    text += "    doap:name \"" JucePlugin_Name "\" ;\n";
+    text += "    doap:name \"" + filter->getName() + "\" ;\n";
     text += "    doap:maintainer [ foaf:name \"" JucePlugin_Manufacturer "\" ] .\n";
 
     return text;

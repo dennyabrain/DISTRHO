@@ -29,17 +29,14 @@
 //if you define this in the IDE make sure to remove it when building from the command line...
 #ifdef Cabbage_Plugin_Synth
  #define JucePlugin_IsSynth              1
- #define JucePlugin_MaxNumInputChannels  0
- #define JucePlugin_MaxNumOutputChannels 2
- #define JucePlugin_PreferredChannelConfigurations   {0, 1}, {0, 2}
 #else
  #define JucePlugin_IsSynth              0
- #define JucePlugin_MaxNumInputChannels  2
- #define JucePlugin_MaxNumOutputChannels 2
- #define JucePlugin_PreferredChannelConfigurations   {1, 1}, {2, 2}
 #endif
+#define JucePlugin_MaxNumInputChannels   2
+#define JucePlugin_MaxNumOutputChannels  2
+#define JucePlugin_PreferredChannelConfigurations   {1, 1}, {2, 2}
 #define JucePlugin_WantsMidiInput       1
-#define JucePlugin_ProducesMidiOutput   0
+#define JucePlugin_ProducesMidiOutput   1
 #define JucePlugin_SilenceInProducesSilenceOut  1
 #define JucePlugin_TailLengthSeconds    0
 #define JucePlugin_EditorRequiresKeyboardFocus  1
@@ -62,7 +59,6 @@
 #ifdef Cabbage_Plugin_Synth
  #define JucePlugin_LV2Category         "InstrumentPlugin"
 #endif
-#define JucePlugin_WantsLV2State        1
 #define JucePlugin_WantsLV2TimePos      1
 
 #endif   // __PLUGINCHARACTERISTICS_81BD1C82__
