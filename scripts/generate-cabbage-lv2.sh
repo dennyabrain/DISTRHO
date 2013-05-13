@@ -28,7 +28,7 @@ for i in $FILES; do
   echo mkdir -p $lv2dir
   mkdir -p $lv2dir
 
-  if ( echo $i | grep "./cabbage/Synths/" ); then
+  if ( echo $i | grep "./cabbage/Synths/" > /dev/null ); then
     echo cp `pwd`/standalone/CabbagePluginSynthLv2.so $lv2dir/$basename.$EXT
     cp `pwd`/standalone/CabbagePluginSynthLv2.so $lv2dir/$basename.$EXT
   else
