@@ -59,10 +59,6 @@
 
 namespace juce
 {
- #if JUCE_MAC
-  extern void initialiseMac();
- #endif
-
  #if JUCE_LINUX
   extern Display* display;
  #endif
@@ -1906,6 +1902,7 @@ static const LV2UI_Descriptor JuceLv2UI_Parent = {
 };
 
 static const struct DescriptorCleanup {
+    DescriptorCleanup() {}
     ~DescriptorCleanup()
     {
         free((void*)JuceLv2Plugin.URI);
@@ -1926,27 +1923,18 @@ static const struct DescriptorCleanup {
 JUCE_EXPORTED_FUNCTION void lv2_generate_ttl (const char* basename);
 JUCE_EXPORTED_FUNCTION void lv2_generate_ttl (const char* basename)
 {
-#if JUCE_MAC
-    initialiseMac();
-#endif
     createLv2Files (basename);
 }
 
 JUCE_EXPORTED_FUNCTION const LV2_Descriptor* lv2_descriptor (uint32 index);
 JUCE_EXPORTED_FUNCTION const LV2_Descriptor* lv2_descriptor (uint32 index)
 {
-#if JUCE_MAC
-    initialiseMac();
-#endif
     return (index == 0) ? &JuceLv2Plugin : nullptr;
 }
 
 JUCE_EXPORTED_FUNCTION const LV2UI_Descriptor* lv2ui_descriptor (uint32 index);
 JUCE_EXPORTED_FUNCTION const LV2UI_Descriptor* lv2ui_descriptor (uint32 index)
 {
-#if JUCE_MAC
-    initialiseMac();
-#endif
     switch (index)
     {
     case 0:
