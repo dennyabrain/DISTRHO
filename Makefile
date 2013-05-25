@@ -4,6 +4,7 @@ all: build
 
 
 build:
+	$(MAKE) -C libs/distrho/dgl
 	$(MAKE) -C libs/drowaudio
 	$(MAKE) -C libs/juce-2.0 all
 	$(MAKE) -C libs/juced
@@ -19,6 +20,7 @@ mingw:
 	$(MAKE) -C libs/lv2-ttl-generator mingw
 
 clean:
+	$(MAKE) clean -C libs/distrho/dgl
 	$(MAKE) clean -C libs/drowaudio
 	$(MAKE) clean -C libs/juce-2.0
 	$(MAKE) clean -C libs/juced
@@ -28,6 +30,7 @@ clean:
 	rm -rf bin/lv2/*.lv2
 
 distclean: clean
+	$(MAKE) distclean -C libs/distrho/dgl
 	$(MAKE) distclean -C libs/drowaudio
 	$(MAKE) distclean -C libs/juce-2.0
 	$(MAKE) distclean -C libs/juced
@@ -37,6 +40,7 @@ distclean: clean
 
 # Custom build types
 standalone:
+	$(MAKE) -C libs/distrho/dgl
 	$(MAKE) -C libs/drowaudio
 	$(MAKE) -C libs/juce-2.0
 	$(MAKE) -C libs/juced
@@ -47,7 +51,11 @@ standalone-host: standalone
 	$(MAKE) -C libs/juce-2.0 all
 	$(MAKE) standalone-host -C ports
 
+dssi:
+	$(MAKE) -C libs/distrho/dgl
+
 lv2:
+	$(MAKE) -C libs/distrho/dgl
 	$(MAKE) -C libs/drowaudio
 	$(MAKE) -C libs/juce-2.0
 	$(MAKE) -C libs/juced
@@ -57,6 +65,7 @@ lv2:
 	$(MAKE) gen
 
 vst:
+	$(MAKE) -C libs/distrho/dgl
 	$(MAKE) -C libs/drowaudio
 	$(MAKE) -C libs/juce-2.0
 	$(MAKE) -C libs/juced

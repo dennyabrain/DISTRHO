@@ -39,6 +39,8 @@ debian
 intermediate
 lv2_ttl_generator
 
+libs/distrho/dgl/Makefile.copy
+
 scripts/*.h
 scripts/*.pro
 

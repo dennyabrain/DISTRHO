@@ -35,7 +35,7 @@ if (windows) then
 elseif (macosx) then
   package.defines      = { package.defines, "MAC=1" }
   package.buildoptions = { "-ObjC++" }
-  package.linkoptions  = { "-framework AudioToolbox -framework Cocoa -framework CoreAudio -framework CoreMidi -framework QuartzCore" }
+  package.linkoptions  = { "-framework Accelerate -framework AudioToolbox -framework Cocoa -framework CoreAudio -framework CoreMIDI -framework QuartzCore" }
 else
   package.defines      = { package.defines, "LINUX=1" }
   package.buildoptions = { "-std=c++0x" }

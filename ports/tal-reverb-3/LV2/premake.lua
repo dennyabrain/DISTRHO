@@ -34,7 +34,7 @@ elseif (macosx) then
   package.defines      = { package.defines, "MAC=1" }
   package.targetextension = "dylib"
   package.buildoptions = { "-ObjC++" }
-  package.linkoptions  = { "-bundle -framework Cocoa -framework QuartzCore" }
+  package.linkoptions  = { "-bundle -framework Accelerate -framework Cocoa -framework QuartzCore" }
 else
   package.defines      = { package.defines, "LINUX=1" }
   package.buildoptions = { "-std=c++0x" }

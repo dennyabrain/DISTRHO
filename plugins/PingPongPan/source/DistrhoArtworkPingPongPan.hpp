@@ -6,7 +6,7 @@
 namespace DistrhoArtworkPingPongPan
 {
     extern const char* aboutData;
-    const unsigned int aboutDataSize = 230280;
+    const unsigned int aboutDataSize = 172710;
     const unsigned int aboutWidth    = 303;
     const unsigned int aboutHeight   = 190;
 
@@ -21,7 +21,7 @@ namespace DistrhoArtworkPingPongPan
     const unsigned int aboutButtonNormalHeight   = 25;
 
     extern const char* backgroundData;
-    const unsigned int backgroundDataSize = 200736;
+    const unsigned int backgroundDataSize = 150552;
     const unsigned int backgroundWidth    = 369;
     const unsigned int backgroundHeight   = 136;
 

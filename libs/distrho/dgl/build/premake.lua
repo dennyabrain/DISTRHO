@@ -41,3 +41,10 @@ package.files = {
     "../src/*.cpp"
   )
 }
+
+if (macosx) then
+  package.files = {
+    package.files,
+    "../src/pugl/pugl_osx.m.cpp"
+  }
+end
