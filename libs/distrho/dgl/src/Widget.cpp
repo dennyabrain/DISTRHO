@@ -39,14 +39,14 @@ Widget::~Widget()
     fParent->removeWidget(this);
 }
 
-bool Widget::isVisible()
+bool Widget::isVisible() const
 {
     return fVisible;
 }
 
 void Widget::setVisible(bool yesNo)
 {
-    if (yesNo == fVisible)
+    if (fVisible == yesNo)
         return;
 
     fVisible = yesNo;

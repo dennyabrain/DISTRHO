@@ -24,7 +24,9 @@
 #if DGL_OS_WINDOWS
 # include "pugl/pugl_win.cpp"
 #elif DGL_OS_MAC
-// compiled separately
+extern "C" {
+# include "pugl/pugl_osx_extended.h"
+}
 #elif DGL_OS_LINUX
 extern "C" {
 # include "pugl/pugl_x11.c"
@@ -58,12 +60,8 @@ public:
           kView(puglCreate(parentId, "Window", 600, 500, false, (parentId != 0))),
           fParent(parent),
           fChildFocus(nullptr),
-#if DGL_OS_MAC
-          fVisible(true),
-#else
           fVisible((parentId != 0)),
-#endif
-          fClosed(false),
+          fOnModal(false),
           fResizable(false),
 #if DGL_OS_WINDOWS
           hwnd(0)
@@ -111,15 +109,11 @@ public:
 #endif
 
         kAppPriv->addWindow(kSelf);
-
-#if DGL_OS_MAC
-        // TODO
-        kAppPriv->oneShown();
-#endif
     }
 
     ~Private()
     {
+        fOnModal = false;
         fWidgets.clear();
 
         if (kView != nullptr)
@@ -129,9 +123,10 @@ public:
         }
     }
 
-    void exec()
+    void exec_init()
     {
-        fClosed = false;
+        fOnModal = true;
+        assert(fParent != nullptr);
 
         if (fParent != nullptr)
         {
@@ -157,21 +152,39 @@ public:
         }
 
         show();
+    }
 
-        while (isVisible() && ! fClosed)
-        {
-            idle();
-
-            if (fParent != nullptr)
-                fParent->idle();
-
-            dgl_msleep(10);
-        }
-
-        fClosed = true;
+    void exec_fini()
+    {
+        fOnModal = false;
 
         if (fParent != nullptr)
             fParent->fChildFocus = nullptr;
+    }
+
+    void exec(bool block)
+    {
+        exec_init();
+
+        if (block)
+        {
+            while (fVisible && fOnModal)
+            {
+                // idle()
+                puglProcessEvents(kView);
+
+                if (fParent != nullptr)
+                    fParent->idle();
+
+                dgl_msleep(10);
+            }
+
+            exec_fini();
+        }
+        else
+        {
+            idle();
+        }
     }
 
     void focus()
@@ -180,6 +193,8 @@ public:
         SetForegroundWindow(hwnd);
         SetActiveWindow(hwnd);
         SetFocus(hwnd);
+#elif DGL_OS_MAC
+		puglImplFocus(kView);
 #elif DGL_OS_LINUX
         XRaiseWindow(xDisplay, xWindow);
         XSetInputFocus(xDisplay, xWindow, RevertToPointerRoot, CurrentTime);
@@ -190,6 +205,9 @@ public:
     void idle()
     {
         puglProcessEvents(kView);
+
+        if (fVisible && fOnModal && fParent != nullptr)
+            fParent->idle();
     }
 
     void repaint()
@@ -229,14 +247,6 @@ public:
 
     void setVisible(bool yesNo, bool closed = false)
     {
-#if DGL_OS_MAC
-        // TODO
-        if (closed && ! yesNo)
-            kAppPriv->oneHidden();
-
-        return;
-#endif
-
         if (fVisible == yesNo)
             return;
 
@@ -255,6 +265,8 @@ public:
         }
 
         UpdateWindow(hwnd);
+#elif DGL_OS_MAC
+		puglImplSetVisible(kView, yesNo);
 #elif DGL_OS_LINUX
         if (yesNo)
             XMapRaised(xDisplay, xWindow);
@@ -265,9 +277,17 @@ public:
 #endif
 
         if (yesNo)
+        {
             kAppPriv->oneShown();
-        else if (closed)
-            kAppPriv->oneHidden();
+        }
+        else
+        {
+            if (fOnModal)
+                exec_fini();
+
+            if (closed)
+                kAppPriv->oneHidden();
+        }
     }
 
     void setSize(unsigned int width, unsigned int height)
@@ -283,6 +303,8 @@ public:
 
         SetWindowPos(hwnd, 0, 0, 0, wr.right-wr.left, wr.bottom-wr.top, SWP_NOACTIVATE|SWP_NOMOVE|SWP_NOOWNERZORDER|SWP_NOZORDER);
         UpdateWindow(hwnd);
+#elif DGL_OS_MAC
+		puglImplSetSize(kView, width, height);
 #elif DGL_OS_LINUX
         // TODO - handle fResizable
         XSizeHints sizeHints;
@@ -304,6 +326,8 @@ public:
     {
 #if DGL_OS_WINDOWS
         SetWindowTextA(hwnd, title);
+#elif DGL_OS_MAC
+		puglImplSetTitle(kView, title);
 #elif DGL_OS_LINUX
         XStoreName(xDisplay, xWindow, title);
         XFlush(xDisplay);
@@ -439,7 +463,7 @@ protected:
 
     void onClose()
     {
-        fClosed = true;
+        fOnModal = false;
 
         if (fChildFocus != nullptr)
             fChildFocus->onClose();
@@ -462,7 +486,7 @@ private:
     Private* fParent;
     Private* fChildFocus;
     bool     fVisible;
-    bool     fClosed;
+    bool     fOnModal;
     bool     fResizable;
 
     std::list<Widget*> fWidgets;
@@ -542,9 +566,9 @@ Window::~Window()
     delete kPrivate;
 }
 
-void Window::exec()
+void Window::exec(bool lock)
 {
-    kPrivate->exec();
+    kPrivate->exec(lock);
 }
 
 void Window::focus()

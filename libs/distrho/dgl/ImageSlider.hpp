@@ -37,12 +37,15 @@ public:
     };
 
     ImageSlider(Window* parent, const Image& image);
+    ImageSlider(Widget* widget, const Image& image);
     ImageSlider(const ImageSlider& imageSlider);
 
     float getValue() const;
 
     void setStartPos(const Point<int>& startPos);
+    void setStartPos(int x, int y);
     void setEndPos(const Point<int>& endPos);
+    void setEndPos(int x, int y);
 
     void setRange(float min, float max);
     void setValue(float value, bool sendCallback = false);
@@ -50,9 +53,9 @@ public:
     void setCallback(Callback* callback);
 
 protected:
-     void onDisplay();
-     bool onMouse(int button, bool press, int x, int y);
-     bool onMotion(int x, int y);
+     void onDisplay() override;
+     bool onMouse(int button, bool press, int x, int y) override;
+     bool onMotion(int x, int y) override;
 
 private:
     Image fImage;

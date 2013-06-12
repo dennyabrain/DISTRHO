@@ -34,6 +34,20 @@ ImageSlider::ImageSlider(Window* parent, const Image& image)
     setSize(fImage.getSize());
 }
 
+ImageSlider::ImageSlider(Widget* widget, const Image& image)
+    : Widget(widget->getParent()),
+      fImage(image),
+      fMinimum(0.0f),
+      fMaximum(1.0f),
+      fValue(0.5f),
+      fDragging(false),
+      fStartedX(0),
+      fStartedY(0),
+      fCallback(nullptr)
+{
+    setSize(fImage.getSize());
+}
+
 ImageSlider::ImageSlider(const ImageSlider& imageSlider)
     : Widget(imageSlider.getParent()),
       fImage(imageSlider.fImage),
@@ -62,10 +76,20 @@ void ImageSlider::setStartPos(const Point<int>& startPos)
     _recheckArea();
 }
 
+void ImageSlider::setStartPos(int x, int y)
+{
+    setStartPos(Point<int>(x, y));
+}
+
 void ImageSlider::setEndPos(const Point<int>& endPos)
 {
     fEndPos = endPos;
     _recheckArea();
+}
+
+void ImageSlider::setEndPos(int x, int y)
+{
+    setEndPos(Point<int>(x, y));
 }
 
 void ImageSlider::setRange(float min, float max)
