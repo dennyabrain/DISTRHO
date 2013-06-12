@@ -73,6 +73,45 @@ bool ModuleList::isLocalModulesFolderValid()
     return isModulesFolder (getModulesFolderForJuceOrModulesFolder (getLocalModulesFolder (nullptr)));
 }
 
+static int getVersionElement (const String& v, int index)
+{
+    StringArray parts;
+    parts.addTokens (v, "., ", String::empty);
+
+    return parts [parts.size() - index - 1].getIntValue();
+}
+
+static int getJuceVersion (const String& v)
+{
+    return getVersionElement (v, 2) * 100000
+         + getVersionElement (v, 1) * 1000
+         + getVersionElement (v, 0);
+}
+
+static int getBuiltJuceVersion()
+{
+    return JUCE_MAJOR_VERSION * 100000
+         + JUCE_MINOR_VERSION * 1000
+         + JUCE_BUILDNUMBER;
+}
+
+bool ModuleList::isLibraryNewerThanIntrojucer()
+{
+    ModuleList list;
+    list.rescan (getModulesFolderForJuceOrModulesFolder (getLocalModulesFolder (nullptr)));
+
+    for (int i = list.modules.size(); --i >= 0;)
+    {
+        const Module* m = list.modules.getUnchecked(i);
+
+        if (m->uid.startsWith ("juce_")
+             && getJuceVersion (m->version) > getBuiltJuceVersion())
+            return true;
+    }
+
+    return false;
+}
+
 bool ModuleList::isJuceFolder (const File& folder)
 {
     return folder.getFileName().containsIgnoreCase ("juce")
@@ -184,21 +223,17 @@ Result ModuleList::rescan (const File& newModulesFolder)
             {
                 LibraryModule m (moduleDef);
 
-                if (m.isValid())
-                {
-                    Module* info = new Module();
-                    modules.add (info);
-
-                    info->uid = m.getID();
-                    info->version = m.getVersion();
-                    info->name = m.moduleInfo ["name"];
-                    info->description = m.moduleInfo ["description"];
-                    info->file = moduleDef;
-                }
-                else
-                {
+                if (! m.isValid())
                     return Result::fail ("Failed to load module manifest: " + moduleDef.getFullPathName());
-                }
+
+                Module* info = new Module();
+                modules.add (info);
+
+                info->uid = m.getID();
+                info->version = m.getVersion();
+                info->name = m.moduleInfo ["name"];
+                info->description = m.moduleInfo ["description"];
+                info->file = moduleDef;
             }
         }
     }
@@ -211,7 +246,7 @@ bool ModuleList::loadFromWebsite()
 {
     modules.clear();
 
-    URL baseURL ("http://www.rawmaterialsoftware.com/juce/modules");
+    URL baseURL ("http://www.juce.com/juce/modules");
     URL url (baseURL.getChildURL ("modulelist.php"));
 
     var infoList (JSON::parse (url.readEntireTextStream (false)));
@@ -717,10 +752,10 @@ static void addFileWithGroups (Project::Item& group, const RelativePath& file, c
 void LibraryModule::findBrowseableFiles (const File& localModuleFolder, Array<File>& filesFound) const
 {
     const var filesArray (moduleInfo ["browse"]);
-    const Array<var>* const files = filesArray.getArray();
 
-    for (int i = 0; i < files->size(); ++i)
-        findWildcardMatches (localModuleFolder, files->getReference(i), filesFound);
+    if (const Array<var>* const files = filesArray.getArray())
+        for (int i = 0; i < files->size(); ++i)
+            findWildcardMatches (localModuleFolder, files->getReference(i), filesFound);
 }
 
 void LibraryModule::addBrowsableCode (ProjectExporter& exporter, const Array<File>& compiled, const File& localModuleFolder) const

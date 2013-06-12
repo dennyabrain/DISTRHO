@@ -103,7 +103,9 @@ public:
                 return true;
 
             MemoryBlock mb;
-            if (file.loadFileAsData (mb) && seemsToBeText (static_cast <const char*> (mb.getData()), (int) mb.getSize()))
+            if (file.loadFileAsData (mb)
+                 && seemsToBeText (static_cast <const char*> (mb.getData()), (int) mb.getSize())
+                 && ! file.hasFileExtension ("svg"))
                 return true;
 
             return false;
@@ -146,8 +148,8 @@ public:
     void createEditor (CodeDocument& codeDocument);
     void setEditor (CodeEditorComponent*);
 
-    void scrollToKeepRangeOnScreen (const Range<int>& range);
-    void highlight (const Range<int>& range, bool cursorAtStart);
+    void scrollToKeepRangeOnScreen (Range<int> range);
+    void highlight (Range<int> range, bool cursorAtStart);
 
     ScopedPointer<CodeEditorComponent> editor;
 
