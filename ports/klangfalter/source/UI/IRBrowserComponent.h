@@ -19,7 +19,7 @@
 #define _IRBROWSERCOMPONENT_H
 
 
-#include "JuceHeader.h"
+#include "../JuceHeader.h"
 
 #include "../Processor.h"
 #include "../Settings.h"

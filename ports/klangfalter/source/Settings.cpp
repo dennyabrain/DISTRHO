@@ -24,7 +24,7 @@ Settings::Settings() :
   juce::PropertiesFile::Options fileOptions;
   fileOptions.applicationName = "KlangFalter";
   fileOptions.filenameSuffix = "settings";
-#ifdef JUCE_LINUX
+#ifdef JUCE_LINUX 
   fileOptions.folderName = ".config/KlangFalter";
 #else
   fileOptions.folderName = "KlangFalter";

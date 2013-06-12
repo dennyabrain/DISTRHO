@@ -23,7 +23,7 @@
 #define __JUCER_HEADER_KLANGFALTEREDITOR_KLANGFALTEREDITOR_F5E4498E__
 
 //[Headers]     -- You can add your own extra header files here --
-#include "JuceHeader.h"
+#include "../JuceHeader.h"
 
 #include "CustomLookAndFeel.h"
 #include "DecibelScale.h"
@@ -78,7 +78,7 @@ private:
     //[UserVariables]   -- You can add your own custom variables in this section.
     CustomLookAndFeel _customLookAndFeel;
     Processor& _processor;
-    juce::ScopedPointer<SettingsDialogComponent> _settingsDialog;
+    juce::Component::SafePointer<juce::DialogWindow> _settingsDialogWindow;
     std::map<std::pair<size_t, size_t>, IRComponent*> _irComponents;
     //[/UserVariables]
 

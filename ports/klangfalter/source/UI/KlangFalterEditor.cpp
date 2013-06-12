@@ -712,6 +712,7 @@ KlangFalterEditor::KlangFalterEditor (Processor& processor)
 KlangFalterEditor::~KlangFalterEditor()
 {
     //[Destructor_pre]. You can add your own custom destruction code here..
+    _settingsDialogWindow.deleteAndZero();
     _processor.removeNotificationListener(this);
     _processor.getSettings().removeChangeListener(this);
     //[/Destructor_pre]
@@ -1023,12 +1024,18 @@ void KlangFalterEditor::buttonClicked (Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == _settingsButton)
     {
         //[UserButtonCode__settingsButton] -- add your button handler code here..
-        _settingsDialog = new SettingsDialogComponent(_processor);
-        juce::DialogWindow::showDialog("Settings",
-                                       _settingsDialog,
-                                       this,
-                                       juce::Colours::white,
-                                       true);
+        if (!_settingsDialogWindow)            
+        {
+        juce::DialogWindow::LaunchOptions launchOptions;
+        launchOptions.dialogTitle = juce::String("Settings");
+        launchOptions.content.setOwned(new SettingsDialogComponent(_processor));
+        launchOptions.componentToCentreAround = this;
+        launchOptions.escapeKeyTriggersCloseButton = true;
+        launchOptions.useNativeTitleBar = false;
+        launchOptions.resizable = false;
+        launchOptions.useBottomRightCornerResizer = false;
+        _settingsDialogWindow = launchOptions.launchAsync();
+        }
         //[/UserButtonCode__settingsButton]
     }
     else if (buttonThatWasClicked == _wetButton)
@@ -1089,13 +1096,12 @@ void KlangFalterEditor::updateUI()
   const bool irAvailable = _processor.irAvailable();
   const size_t numInputChannels = static_cast<size_t>(std::min(_processor.getNumInputChannels(), 2));
   const size_t numOutputChannels = static_cast<size_t>(std::min(_processor.getNumOutputChannels(), 2));
-  const double irLengthSeconds = _processor.getIRDuration();
   {
     const double stretch = _processor.getStretch();
     _stretchSlider->setEnabled(irAvailable);
     _stretchSlider->setRange(0.5, 1.5);
     _stretchSlider->setValue(stretch, juce::dontSendNotification);
-    _stretchLabel->setText(String(static_cast<int>(100.0*stretch)) + String("%"), sendNotificationSync);
+    _stretchLabel->setText(String(static_cast<int>(100.0*stretch)) + String("%"), sendNotification);
   }
   {
     const float db = _processor.getParameter(Parameters::DryDecibels);
@@ -1103,7 +1109,7 @@ void KlangFalterEditor::updateUI()
     _drySlider->setEnabled(true);
     _drySlider->setRange(0.0, 1.0);
     _drySlider->setValue(scale, juce::dontSendNotification);
-    _dryLevelLabel->setText(DecibelScaling::DecibelString(db), sendNotificationSync);
+    _dryLevelLabel->setText(DecibelScaling::DecibelString(db), sendNotification);
     _dryButton->setToggleState(_processor.getParameter(Parameters::DryOn), false);
   }
   {
@@ -1112,7 +1118,7 @@ void KlangFalterEditor::updateUI()
     _wetSlider->setEnabled(true);
     _wetSlider->setRange(0.0, 1.0);
     _wetSlider->setValue(scale, juce::dontSendNotification);
-    _wetLevelLabel->setText(DecibelScaling::DecibelString(db), sendNotificationSync);
+    _wetLevelLabel->setText(DecibelScaling::DecibelString(db), sendNotification);
     _wetButton->setToggleState(_processor.getParameter(Parameters::WetOn), false);
   }
   {
@@ -1123,37 +1129,37 @@ void KlangFalterEditor::updateUI()
     const double irBegin = _processor.getIRBegin();
     _beginSlider->setEnabled(irAvailable);
     _beginSlider->setValue(irBegin, juce::dontSendNotification);
-    _beginLabel->setText(juce::String(static_cast<int>(100.0 * irBegin)) + juce::String("%"), sendNotificationSync);
+    _beginLabel->setText(juce::String(static_cast<int>(100.0 * irBegin)) + juce::String("%"), sendNotification);
   }
   {
     const double irEnd = _processor.getIREnd();
     _endSlider->setEnabled(irAvailable);
     _endSlider->setValue(irEnd, juce::dontSendNotification);
-    _endLabel->setText(juce::String(static_cast<int>(100.0 * irEnd)) + juce::String("%"), sendNotificationSync);
+    _endLabel->setText(juce::String(static_cast<int>(100.0 * irEnd)) + juce::String("%"), sendNotification);
   }
   {
     const double predelayMs = _processor.getPredelayMs();
     _predelaySlider->setValue(predelayMs);
     _predelaySlider->setEnabled(irAvailable);
-    _predelayLabel->setText(FormatSeconds(predelayMs / 1000.0), sendNotificationSync);
+    _predelayLabel->setText(FormatSeconds(predelayMs / 1000.0), sendNotification);
   }
   {
     const double attackLength = _processor.getAttackLength();
     _attackLengthSlider->setValue(attackLength);
     _attackLengthSlider->setEnabled(irAvailable);
-    _attackLengthLabel->setText(juce::String(100.0 * attackLength, 1)+juce::String("%"), sendNotificationSync);
+    _attackLengthLabel->setText(juce::String(100.0 * attackLength, 1)+juce::String("%"), sendNotification);
   }
   {
     const double attackShape = _processor.getAttackShape();
     _attackShapeSlider->setValue(attackShape);
     _attackShapeSlider->setEnabled(irAvailable);
-    _attackShapeLabel->setText((attackShape < 0.0001) ? juce::String("Neutral") : juce::String(attackShape, 2), sendNotificationSync);
+    _attackShapeLabel->setText((attackShape < 0.0001) ? juce::String("Neutral") : juce::String(attackShape, 2), sendNotification);
   }
   {
     const double decayShape = _processor.getDecayShape();
     _decayShapeSlider->setValue(decayShape);
     _decayShapeSlider->setEnabled(irAvailable);
-    _decayShapeLabel->setText((decayShape < 0.0001) ? juce::String("Neutral") : juce::String(decayShape, 2), sendNotificationSync);
+    _decayShapeLabel->setText((decayShape < 0.0001) ? juce::String("Neutral") : juce::String(decayShape, 2), sendNotification);
   }
   {
     const float autoGainDecibels = _processor.getParameter(Parameters::AutoGainDecibels);

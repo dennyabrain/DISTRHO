@@ -129,7 +129,7 @@ const String Processor::getParameterName(int index)
 
 const String Processor::getParameterText(int index)
 {
-  return String(getParameter(index), 3);
+  return _parameterSet.getFormattedParameterValue(index);
 }
 
 juce::String Processor::getParameterLabel (int index)

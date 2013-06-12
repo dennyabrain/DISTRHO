@@ -19,7 +19,7 @@
 #define _WAVEFORMCOMPONENT_H
 
 
-#include "JuceHeader.h"
+#include "../JuceHeader.h"
 
 #include "../Envelope.h"
 #include "../IRAgent.h"
