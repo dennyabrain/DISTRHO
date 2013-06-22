@@ -12,9 +12,16 @@ build:
 	$(MAKE) plugins -C plugins
 	$(MAKE) plugins -C ports
 
-gen:
+	
+gen: gen_lv2 gen_vst
+
+gen_lv2:
 	@./scripts/generate-cabbage-lv2.sh
 	@./scripts/generate-ttl.sh
+
+gen_vst:
+	@./scripts/generate-cabbage-vst.sh
+
 
 mingw:
 	$(MAKE) -C libs/lv2-ttl-generator mingw
@@ -48,7 +55,7 @@ standalone:
 	$(MAKE) standalone -C ports
 
 standalone-host: standalone
-	$(MAKE) -C libs/juce-2.0 all
+	$(MAKE) all -C libs/juce-2.0
 	$(MAKE) standalone-host -C ports
 
 dssi:
@@ -62,7 +69,7 @@ lv2:
 	$(MAKE) -C libs/lv2-ttl-generator
 	$(MAKE) lv2 -C plugins
 	$(MAKE) lv2 -C ports
-	$(MAKE) gen
+	$(MAKE) gen_lv2
 
 vst:
 	$(MAKE) -C libs/distrho/dgl
@@ -71,3 +78,4 @@ vst:
 	$(MAKE) -C libs/juced
 	$(MAKE) vst -C plugins
 	$(MAKE) vst -C ports
+	$(MAKE) gen_vst
