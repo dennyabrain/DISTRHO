@@ -412,7 +412,7 @@ public:
     //==============================================================================
     bool getEffectName (char* name)
     {
-        String (JucePlugin_Name).copyToUTF8 (name, 64);
+        filter->getName().copyToUTF8 (name, 64);
         return true;
     }
 

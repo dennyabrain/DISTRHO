@@ -1062,9 +1062,10 @@ if(!isSuspended()){
 	midiBuffer = midiMessages;
 	ccBuffer = midiMessages;
 	
-
+#if JucePlugin_ProducesMidiOutput
 	if(!midiOutputBuffer.isEmpty())
 		midiMessages.swapWith(midiOutputBuffer);
+#endif
 
 	for(int i=0;i<buffer.getNumSamples();i++, csndIndex++)
 	   {                                
@@ -1121,9 +1122,10 @@ if(!isSuspended()){
 		}
 		#endif
 }
+#if JucePlugin_ProducesMidiOutput
 	if(!midiBuffer.isEmpty())
 	midiMessages.swapWith(midiOutputBuffer);
-
+#endif
 }
 
 

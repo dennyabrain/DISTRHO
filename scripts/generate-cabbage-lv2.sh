@@ -10,6 +10,8 @@ else
   exit
 fi
 
+mkdir -p lv2
+
 GEN=../../../libs/lv2_ttl_generator
 EXT=so
 
