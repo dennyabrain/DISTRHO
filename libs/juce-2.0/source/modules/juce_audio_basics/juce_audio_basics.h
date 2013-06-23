@@ -47,6 +47,9 @@ namespace juce
 #ifndef __JUCE_IIRFILTER_JUCEHEADER__
  #include "effects/juce_IIRFilter.h"
 #endif
+#ifndef __JUCE_IIRFILTER_OLD_JUCEHEADER__
+ #include "effects/juce_IIRFilterOld.h"
+#endif
 #ifndef __JUCE_LAGRANGEINTERPOLATOR_JUCEHEADER__
  #include "effects/juce_LagrangeInterpolator.h"
 #endif

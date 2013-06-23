@@ -155,7 +155,7 @@ private:
 	TappedDelayLine delayLineL, delayLineR;					// early reflections
 	LBCF combFilterL[8], combFilterR[8];					// late reverb
 	AllpassFilter allpassFilterL[4], allpassFilterR[4];		// late reverb diffusion
-	IIRFilter lowEQL, lowEQR, highEQL, highEQR;				// room EQ
+	IIRFilterOld lowEQL, lowEQR, highEQL, highEQR;				// room EQ
 
 	// helper method to set up a LBCF filter
 	inline void setupFilter(LBCF &filter, float fbCoeff, float delayTime, float filterCf);

@@ -38,7 +38,7 @@
 	This filter is a subclass of the Juce IIR filter but uses
 	some additional methods to give more filter designs.
  */
-class BiquadFilter : public IIRFilter
+class BiquadFilter : public IIRFilterOld
 {
 public:
     //==============================================================================

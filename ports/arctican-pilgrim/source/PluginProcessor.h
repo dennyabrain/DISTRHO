@@ -83,10 +83,10 @@ public:
 	PluginParameter filterParameter;
 	PluginParameter mixParameter;
 
-	IIRFilter highFilterL;
-	IIRFilter highFilterR;
-	IIRFilter lowFilterL;
-	IIRFilter lowFilterR;
+	IIRFilterOld highFilterL;
+	IIRFilterOld highFilterR;
+	IIRFilterOld lowFilterL;
+	IIRFilterOld lowFilterR;
 
 	double globalSampleRate;
 

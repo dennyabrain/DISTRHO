@@ -10,7 +10,13 @@
 #define __DISTRHO_JUCED_APPCONFIG_H__
 
 #include "../build-audio-basics/AppConfig.h"
-#include "../build-audio-devices/AppConfig.h"
+
+#if JucePlugin_Build_Standalone
+ #include "../build-audio-devices_full/AppConfig.h"
+#else
+ #include "../build-audio-devices/AppConfig.h"
+#endif
+
 #include "../build-audio-formats/AppConfig.h"
 #include "../build-audio-processors/AppConfig.h"
 #include "../build-audio-utils/AppConfig.h"

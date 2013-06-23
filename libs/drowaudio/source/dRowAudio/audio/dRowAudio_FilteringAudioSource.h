@@ -91,7 +91,7 @@ private:
     //==============================================================================
     OptionalScopedPointer<AudioSource> input;
     float gains[numFilters];
-	IIRFilter filter[2][numFilters];
+	IIRFilterOld filter[2][numFilters];
 	
     double sampleRate;
 	bool filterSource;

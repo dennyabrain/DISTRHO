@@ -39,7 +39,7 @@
 void BiquadFilter::processSamples (float* const samples,
                                    const int numSamples) noexcept
 {
-    IIRFilter::processSamples (samples, numSamples);
+    IIRFilterOld::processSamples (samples, numSamples);
 }
 
 void BiquadFilter::processSamples (int* const samples,

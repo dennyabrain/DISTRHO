@@ -156,7 +156,7 @@ private:
     float minFrequency, maxFrequency;
     Buffer buffer1, buffer2;
 
-    IIRFilter highFilter, lowFilter;
+    IIRFilterOld highFilter, lowFilter;
     int numSamplesNeededForDetection;
     Buffer currentBlockBuffer;
     FifoBuffer<float> inputFifoBuffer;
