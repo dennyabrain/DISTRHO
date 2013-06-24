@@ -157,6 +157,9 @@ const String TalCore::getParameterName (int index)
 		case ENVELOPESPEED: return T("envelopespeed");
 		case LFOWIDTH: return T("lfowidth");
 		case MIDITRIGGER: return T("miditrigger");
+		case UNUSED1:
+		case UNUSED2:
+		    return "unused";
 	}
     return String::empty;
 }
