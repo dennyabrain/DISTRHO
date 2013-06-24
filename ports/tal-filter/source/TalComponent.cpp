@@ -70,6 +70,7 @@ TalComponent::TalComponent (TalCore* const ownerFilter)
 	filterTypeComboBox->addItem(T("Reserved"),5);
 	filterTypeComboBox->addItem(T("Reserved"),6);
 	filterTypeComboBox->addItem(T("Reserved"),7);
+	filterTypeComboBox->addItem(T("-"),8);
 
 	addAndMakeVisible(lfoWaveformComboBox = new ComboBox(T("filterTypeComboBox")));
 	lfoWaveformComboBox->setBounds(30, 230, 100, 20);
@@ -82,6 +83,7 @@ TalComponent::TalComponent (TalCore* const ownerFilter)
 	lfoWaveformComboBox->addItem(T("sq"),4);
 	lfoWaveformComboBox->addItem(T("s&h"),5);
 	lfoWaveformComboBox->addItem(T("noise"),6);
+	lfoWaveformComboBox->addItem(T("-"),7);
 
 	addAndMakeVisible(lfoSyncComboBox = new ComboBox(T("lfoSyncComboBox")));
 	lfoSyncComboBox->setBounds(152, 230, 100, 20);
@@ -107,6 +109,7 @@ TalComponent::TalComponent (TalCore* const ownerFilter)
 	lfoSyncComboBox->addItem(T("1/2T"),17);
 	lfoSyncComboBox->addItem(T("1/1T"),18);
 	lfoSyncComboBox->addItem(T("2/1T"),19);
+	lfoSyncComboBox->addItem(T("-"),20);
 
 	// Version info
 	versionLabel = new Label("Version Info", "V 1.56");
@@ -212,9 +215,9 @@ void TalComponent::sliderValueChanged (Slider* caller)
 void TalComponent::comboBoxChanged (ComboBox* caller)
 {
     TalCore* const filter = getFilter();
-	if (caller == filterTypeComboBox) filter->setParameterNotifyingHost(FILTERTYPE, filterTypeComboBox->getSelectedId());
-	if (caller == lfoWaveformComboBox) filter->setParameterNotifyingHost(LFOWAVEFORM, lfoWaveformComboBox->getSelectedId());
-	if (caller == lfoSyncComboBox) filter->setParameterNotifyingHost(LFOSYNC, lfoSyncComboBox->getSelectedId());
+	if (caller == filterTypeComboBox) filter->setParameterNotifyingHost(FILTERTYPE, float(filterTypeComboBox->getSelectedId())/7.0f-0.1f);
+	if (caller == lfoWaveformComboBox) filter->setParameterNotifyingHost(LFOWAVEFORM, float(lfoWaveformComboBox->getSelectedId())/6.0f-0.1f);
+	if (caller == lfoSyncComboBox) filter->setParameterNotifyingHost(LFOSYNC, float(lfoSyncComboBox->getSelectedId())/19.0f-0.1f);
 }
 
 void TalComponent::buttonClicked (Button* caller)

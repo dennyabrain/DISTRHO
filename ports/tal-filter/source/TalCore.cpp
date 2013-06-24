@@ -111,7 +111,17 @@ void TalCore::setParameter (int index, float newValue)
 		case LFORATE:
 			engine->setSync((int)talPresets[curProgram]->programData[LFOSYNC], newValue);
 			break;
+		case FILTERTYPE:
+			if (newValue < 1.0f)
+			    newValue = newValue * 7.0f + 1.0f;
+			break;
+		case LFOWAVEFORM:
+			if (newValue < 1.0f)
+			    newValue = newValue * 6.0f + 1.0f;
+			break;
 		case LFOSYNC:
+			if (newValue < 1.0f)
+			    newValue = newValue * 19.0f + 1.0f;
 			engine->setSync((int)newValue, talPresets[curProgram]->programData[LFORATE]);
 			break;
 		case VOLUME:
