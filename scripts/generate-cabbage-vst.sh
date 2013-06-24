@@ -10,6 +10,9 @@ else
   exit
 fi
 
+if [ ! -f standalone/CabbagePluginSynth.so ]; then exit 0; fi
+if [ ! -f standalone/CabbagePluginEffect.so ]; then exit 0; fi
+
 mkdir -p vst
 
 if [ -f ../libs/lv2_ttl_generator.exe ]; then

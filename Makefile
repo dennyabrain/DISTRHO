@@ -16,6 +16,7 @@ build:
 gen: gen_lv2 gen_vst
 
 gen_lv2:
+	$(MAKE) -C libs/lv2-ttl-generator
 	@./scripts/generate-cabbage-lv2.sh
 	@./scripts/generate-ttl.sh
 

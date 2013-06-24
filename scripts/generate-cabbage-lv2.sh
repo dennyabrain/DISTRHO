@@ -10,6 +10,9 @@ else
   exit
 fi
 
+if [ ! -f standalone/CabbagePluginSynthLv2.so ]; then exit 0; fi
+if [ ! -f standalone/CabbagePluginEffectLv2.so ]; then exit 0; fi
+
 mkdir -p lv2
 
 GEN=../../../libs/lv2_ttl_generator
