@@ -38,7 +38,7 @@ done
 
 # Special files
 cp cabbage/Synths/bassline.snaps vst/
-cp cabbage/Synths/Clavinet.snaps vst/
-cp cabbage/Synths/TR-808_pattern.0.txt vst/
+# cp cabbage/Synths/Clavinet.snaps vst/
+# cp cabbage/Synths/TR-808_pattern.0.txt vst/
 
 cd ..
