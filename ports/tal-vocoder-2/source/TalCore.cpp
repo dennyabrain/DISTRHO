@@ -80,9 +80,6 @@ TalCore::TalCore()
     delete destData;
     delete mainElement;
 
-	// used for midi learn
-	lastMovedController = 0;
-
     nextMidiMessage = new MidiMessage(0xF0);
     midiMessage = new MidiMessage(0xF0);
 }
@@ -220,9 +217,6 @@ void TalCore::setParameter (int index, float newValue)
 		}
 
 		sendChangeMessage();
-
-		// for midi learn
-		this->lastMovedController = index;
 	}
 }
 
@@ -392,7 +386,6 @@ void TalCore::processMidiPerSample(MidiBuffer::Iterator *midiIterator, int sampl
     {
         if (midiMessage->isController())
         {
-            handleController(midiMessage->getControllerNumber(), midiMessage->getControllerValue());
         }
         else if (midiMessage->isNoteOn())
         {
@@ -423,23 +416,6 @@ inline bool TalCore::getNextEvent(MidiBuffer::Iterator *midiIterator, const int 
         return true;
     }
     return false;
-}
-
-void TalCore::handleController (const int controllerNumber,
-								const int controllerValue)
-{
-	// no midi
-	//if (params[REALSTEREOMODE] > 0.0f)
-	//{
-	//	for (int i = 0; i < NUMPROGRAMS; i++)
-	//	{
-	//		talPresets[i].midiMap[controllerNumber] = lastMovedController;
-	//	}
-	//}
-	//if (talPresets[curProgram].midiMap[controllerNumber] > 0)
-	//{
-	//	setParameter (talPresets[curProgram].midiMap[controllerNumber], controllerValue / 127.0f);
-	//}
 }
 
 AudioProcessorEditor* TalCore::createEditor()

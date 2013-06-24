@@ -111,7 +111,6 @@ public:
 
     // midi
     bool getNextEvent(MidiBuffer::Iterator *midiIterator, const int samplePos);
-	void handleController (const int controllerNumber, const int controllerValue);
 	void processMidiPerSample (MidiBuffer::Iterator *midiIterator, int samplePos);
 
     void setNewSampleRate();
@@ -148,7 +147,6 @@ private:
 	int midiEventPos;
 	bool hasMoreMidiMessages;
 
-	int lastMovedController;
     MidiMessage *nextMidiMessage;
     MidiMessage *midiMessage;
 	bool hasMidiMessage;
