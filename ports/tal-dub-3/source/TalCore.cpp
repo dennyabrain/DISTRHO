@@ -182,6 +182,7 @@ const String TalCore::getParameterName (int index)
 		case DRY: return T("dry");
 		case WET: return T("wet");
 		case LIVEMODE: return T("livemode");
+		case UNUSED: return "unused";
 	}
     return String::empty;
 }

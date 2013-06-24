@@ -164,6 +164,8 @@ const String TalCore::getParameterName (int index)
 
 		case STEREO: return T("stereo");
 		case REALSTEREOMODE: return T("stereo input");
+
+		case UNUSED: return "unused";
 	}
     return String::empty;
 }

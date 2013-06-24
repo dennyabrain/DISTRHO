@@ -112,6 +112,7 @@ const String TalCore::getParameterName (int index)
 		case LOWCUT: return T("Low Cut");
 		case HIGHCUT: return T("High Cut");
 		case STEREO: return T("Stereo");
+		case UNUSED: return "unused";
 	}
     return String::empty;
 }

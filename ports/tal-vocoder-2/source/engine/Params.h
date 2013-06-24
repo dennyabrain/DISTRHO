@@ -35,7 +35,8 @@ Parameter table
 enum SYNTHPARAMETERS
 {
   // Controllable values [0.0..1.0
-  TAL_VOLUME= 0,
+  UNUSED= 0,
+  TAL_VOLUME,
   HARMONICS,
 
   NOISEVOLUME,

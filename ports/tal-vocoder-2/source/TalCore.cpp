@@ -257,6 +257,8 @@ const String TalCore::getParameterName (int index)
 		case VOCODERBAND08: return T("VOCODERBAND08");
 		case VOCODERBAND09: return T("VOCODERBAND09");
 		case VOCODERBAND10: return T("VOCODERBAND10");
+
+		case UNUSED: return "unused";
 	}
     return String::empty;
 }
@@ -438,8 +440,6 @@ void TalCore::getStateInformation (MemoryBlock& destData)
     }
     tal.addChildElement(programList);
 
-    storeMidiMapping(&tal);
-
     // then use this helper function to stuff it into the binary blob and return it..
     copyXmlToBinary (tal, destData);
 }
@@ -457,8 +457,6 @@ void TalCore::getCurrentProgramStateInformation (MemoryBlock& destData)
 
     getXmlPrograms(programList, this->curProgram);
     tal.addChildElement(programList);
-
-    storeMidiMapping(&tal);
 
     // then use this helper function to stuff it into the binary blob and return it..
     copyXmlToBinary (tal, destData);
@@ -510,8 +508,6 @@ void TalCore::setStateInformationFromXml(XmlElement* xmlState)
                 this->setXmlPrograms(programs->getFirstChildElement(), curProgram, version);
             }
         }
-
-        this->restoreMidiMapping(xmlState);
 
         delete xmlState;
         this->setCurrentProgram(curProgram);
@@ -605,42 +601,6 @@ void TalCore::setXmlPrograms(XmlElement* e, int programNumber, float version)
     }
 }
 
-void TalCore::storeMidiMapping(XmlElement* tal)
-{
-    XmlElement *midiMapList = new XmlElement ("midimap");
-    for (int i = 0; i < 256; i++)
-    {
-        if (talPresets[0]->midiMap[i] != 0)
-        {
-            XmlElement* map = new XmlElement ("map");
-            map->setAttribute (T("param"), talPresets[0]->midiMap[i]);
-            map->setAttribute (T("controllernumber"), i);
-            midiMapList->addChildElement(map);
-        }
-    }
-
-    tal->addChildElement(midiMapList);
-}
-
-void TalCore::restoreMidiMapping(XmlElement* xmlState)
-{
-    XmlElement* midiMap = xmlState->getChildByName(T("midimap"));
-    if (midiMap != 0 && midiMap->hasTagName(T("midimap")))
-    {
-        forEachXmlChildElement (*midiMap, e)
-        {
-            for (int j = 0; j < this->numberOfPrograms; j++)
-            {
-                int controller = e->getIntAttribute(T("controllernumber"), 0);
-                if (controller < 255 && controller > 0)
-                {
-                    talPresets[j]->midiMap[controller] = e->getIntAttribute(T("param"), 0);
-                }
-            }
-        }
-    }
-}
-
 void TalCore::setStateInformationString (const String& data)
 {
     XmlElement* const xmlState = XmlDocument::parse(data);
@@ -659,8 +619,6 @@ String TalCore::getStateInformationString ()
 
     getXmlPrograms(programList, this->curProgram);
     tal.addChildElement(programList);
-
-    storeMidiMapping(&tal);
 
     return tal.createDocument (String::empty);
 }

@@ -482,6 +482,10 @@ const String TalCore::getParameterName (int index)
     case DELAYHIGHSHELF: return "delayhighshelf";
     case DELAYLOWSHELF: return "delaylowshelf";
     case DELAYFEEDBACK: return "delayfeedback";
+    
+    case UNUSED1:
+    case UNUSED2:
+        return "unused";
     }
     return String::empty;
 }
