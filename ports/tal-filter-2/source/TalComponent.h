@@ -57,7 +57,7 @@ public:
     void sliderValueChanged (Slider*);
     void comboBoxChanged (ComboBox*);
 
-	void buttonClicked (Button *);
+    void buttonClicked (Button *);
     void paint (Graphics& g);
 
     static const char* bmp00128_png;
@@ -68,8 +68,6 @@ public:
 
 private:
     Image* internalCachedBackgroundImage;
-	// FilmStripKnob *cutoffKnob; 
-
     EnvelopeEditorView* envelopeEditorView;
 
     ComboBox* speedFactorComboBox;

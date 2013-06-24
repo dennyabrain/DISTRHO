@@ -59,8 +59,7 @@ public:
     void prepareToPlay (double sampleRate, int samplesPerBlock);
     void releaseResources();
 
-	void processBlock (AudioSampleBuffer& buffer,
-                       MidiBuffer& midiMessages);
+    void processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages);
 
     //==============================================================================
     AudioProcessorEditor* createEditor();
@@ -104,30 +103,15 @@ public:
     String getStateInformationString ();
     void setStateInformationString (const String& data);
 
-	void handleController (const int controllerNumber,
-                           const int controllerValue);
-
-	void processMidiPerSample (MidiBuffer::Iterator *midiIterator,
-							   MidiMessage controllerMidiMessage, int samplePos);
-
     EnvelopeEditor * getEnvelopeEditor();
     void envelopeChanged();
 
-    juce_UseDebuggingNewOperator
-
 private:
-
 	Engine *engine;
 	float sampleRate;
 
 	TalPreset **talPresets;
 	int curProgram;
-
-	// Midi values
-	int midiEventPos;
-	bool hasMoreMidiMessages;
-
-	int lastMovedController;
 
     AudioPlayHead::CurrentPositionInfo pos;
     float bpm;

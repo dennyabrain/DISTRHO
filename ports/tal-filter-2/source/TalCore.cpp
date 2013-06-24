@@ -59,9 +59,6 @@ TalCore::TalCore()
 	engine = new Engine(sampleRate);
 	talPresets = new TalPreset*[NUMPROGRAMS];
 
-	// used for midi learn
-	lastMovedController = 0;
-
     // load factory presets
     talPresets = new TalPreset*[NUMPROGRAMS];
     for (int i = 0; i < NUMPROGRAMS; i++) talPresets[i] = new TalPreset();
@@ -133,9 +130,6 @@ void TalCore::setParameter (int index, float newValue)
 		}
 		talPresets[curProgram]->programData[index] = newValue;
 		sendChangeMessage ();
-
-		// for midi learn
-		lastMovedController = index;
 	}
 }
 
@@ -184,7 +178,7 @@ bool TalCore::isOutputChannelStereoPair (int index) const
 
 bool TalCore::acceptsMidi() const
 {
-    return true;
+    return false;
 }
 
 bool TalCore::producesMidi() const
@@ -268,15 +262,6 @@ void TalCore::processBlock (AudioSampleBuffer& buffer,
     {
         buffer.clear (i, 0, buffer.getNumSamples());
     }
-}
-
-void TalCore::processMidiPerSample(MidiBuffer::Iterator *midiIterator, MidiMessage controllerMidiMessage, int samplePos)
-{
-}
-
-void TalCore::handleController (const int controllerNumber,
-								const int controllerValue)
-{
 }
 
 AudioProcessorEditor* TalCore::createEditor()

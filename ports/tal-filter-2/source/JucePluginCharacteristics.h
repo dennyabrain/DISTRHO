@@ -129,7 +129,7 @@
 /** Set this to 1 if your plugin needs to receive midi messages, or 0 if
     it doesn't.
 */
-#define JucePlugin_WantsMidiInput                   1
+#define JucePlugin_WantsMidiInput                   0
 
 /** Set this to 1 if your plugin wants to output midi messages, or 0 if
     it doesn't.
@@ -163,11 +163,6 @@
 
 //==============================================================================
 /*                                VST settings                                */
-
-/** For VSTs, if you're compiling against the V2.3 SDK, set this to zero. If
-    you're using V2.4 or later, make sure it's set to 1.
-*/
-#define JUCE_USE_VSTSDK_2_4                 1
 
 /** Defines a UID for your VST plugin.
     The default setting here is probably fine, unless you specifically need
