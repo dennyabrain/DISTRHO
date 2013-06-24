@@ -36,8 +36,7 @@ Parameter table
 enum SYNTHPARAMETERS
 {
   // Controllable values [0.0..1.0
-  UNKNOWN= 0,
-  DRY,
+  DRY= 0,
   WET,
 
   ROOMSIZE,
@@ -47,8 +46,6 @@ enum SYNTHPARAMETERS
   LOWCUT,
   DAMP,
   STEREO,
-
-  MIDILEARN,
 
   // Number of controllable synth paramenters
   NUMPARAM,

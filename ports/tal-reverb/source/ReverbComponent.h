@@ -53,8 +53,7 @@
 */
 class ReverbComponent   : public AudioProcessorEditor,
                           public ChangeListener,
-                          public SliderListener,
-						  public ButtonListener
+                          public SliderListener
 {
 public:
     /** Constructor.
@@ -111,8 +110,6 @@ private:
 
 	ImageSlider *drySlider; 
 	ImageSlider *wetSlider;
-
-	ImageToggleButton *midiLearnButton;
 
 	Label *versionLabel;
 

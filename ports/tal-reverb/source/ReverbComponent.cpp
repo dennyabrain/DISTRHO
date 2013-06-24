@@ -53,10 +53,6 @@ ReverbComponent::ReverbComponent (TalCore* const ownerFilter)
 	Image offButtonImg = ImageCache::getFromMemory(bmp00132_png, bmp00132_pngSize);
 	Image onButtonImg = ImageCache::getFromMemory(bmp00133_png, bmp00133_pngSize);
 
-	midiLearnButton = new ImageToggleButton("Toggle Button", offButtonImg, onButtonImg);
-	midiLearnButton->setBounds(462, 53, 69, 39);
-	addAndMakeVisible(midiLearnButton);
-
     // set our component's initial size to be the last one that was stored in the filter's settings
     setSize (800, 285);
 
@@ -79,7 +75,6 @@ ReverbComponent::ReverbComponent (TalCore* const ownerFilter)
 	stereoWithKnob->addListener (this);
 	drySlider->addListener (this);
 	wetSlider->addListener (this);
-	midiLearnButton->addListener (this);
 
     // register ourselves with the filter - it will use its ChangeBroadcaster base
     // class to tell us when something has changed, and this will call our changeListenerCallback()
@@ -138,17 +133,6 @@ void ReverbComponent::sliderValueChanged (Slider* caller)
 	if (caller == wetSlider) filter->setParameterNotifyingHost(WET, (float)wetSlider->getValue());
 }
 
-void ReverbComponent::buttonClicked (Button* caller)
-{
-    TalCore* const filter = getFilter();
-	if (caller == midiLearnButton)
-	{
-		float midiLearn = 0.0f;
-		if (caller->getToggleState() == true) midiLearn = 1.0f;
-		filter->setParameterNotifyingHost(MIDILEARN, midiLearn);
-	}
-}
-
 //==============================================================================
 void ReverbComponent::updateParametersFromFilter()
 {
@@ -170,8 +154,6 @@ void ReverbComponent::updateParametersFromFilter()
 	float dry = filter->getParameter(DRY);
 	float wet = filter->getParameter(WET);
 
-	float midiLearn = filter->getParameter(MIDILEARN);
-
     // ..release the lock ASAP
     filter->getCallbackLock().exit();
 
@@ -183,15 +165,6 @@ void ReverbComponent::updateParametersFromFilter()
 	stereoWithKnob->setValue(stereo, dontSendNotification);
 	drySlider->setValue(dry, dontSendNotification);
 	wetSlider->setValue(wet, dontSendNotification);
-
-	if (midiLearn > 0.0f)
-	{
-		midiLearnButton->setToggleState(true, false);
-	}
-	else
-	{
-		midiLearnButton->setToggleState(false, false);
-	}
 }
 
 //==============================================================================
