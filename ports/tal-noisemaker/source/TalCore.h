@@ -105,14 +105,9 @@ public:
 
     void getXmlPrograms(XmlElement *programList, int programNumber);
     void setXmlPrograms(XmlElement *programList, int programNumber, float version);
-    void restoreMidiMapping(XmlElement* e);
-    void storeMidiMapping(XmlElement* tal);
 
     String getStateInformationString ();
     void setStateInformationString (const String& data);
-
-	void handleController (const int controllerNumber,
-                           const int controllerValue);
 
 	void processMidiPerSample (MidiBuffer::Iterator *midiIterator, int samplePos);
     bool getNextEvent (MidiBuffer::Iterator *midiIterator, int samplePos);
@@ -121,27 +116,6 @@ public:
     void envelopeChanged();
 
     float getBpm();
-    int getValueChangedMidiController();
-
-
-    //==============================================================================
-    // These properties are public so that our editor component can access them
-    //  - a bit of a hacky way to do it, but it's only a demo!
-
-    // this is kept up to date with the midi messages that arrive, and the UI component
-    // registers with it so it can represent the incoming messages
-    // MidiKeyboardState keyboardState;
-
-    // this keeps a copy of the last set of time info that was acquired during an audio
-    // callback - the UI component will read this and display it.
-    // AudioPlayHead::CurrentPositionInfo lastPosInfo;
-
-    // these are used to persist the UI's size - the values are stored along with the
-    // filter's other parameters, and the UI component will update them when it gets
-    // resized.
-    //int lastUIWidth, lastUIHeight;
-
-    //==============================================================================
 
 private:
 	TalPreset **talPresets;
@@ -155,8 +129,6 @@ private:
 	bool hasMidiMessage;
 	bool hasMidiMessageInBuffer;
 
-	int lastMovedController;
-    int valueChangedMidiController;
 	float currentNumberOfVoicesNormalized;
 
     MidiMessage *nextMidiMessage;

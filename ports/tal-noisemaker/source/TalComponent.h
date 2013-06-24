@@ -174,7 +174,6 @@ private:
 
 	ImageToggleButton *oscSyncButton;
 	ImageToggleButton *panicButton;
-	ImageToggleButton *midiLearnButton;
 	ImageToggleButton *chorus1Button;
 	ImageToggleButton *chorus2Button;
 

@@ -106,11 +106,6 @@ class TalPreset
         this->splinePoints = splinePoints;
     }
 
-    void resetMidiLearn()
-    {
-        programData[MIDILEARN] = 0.0f;
-    }
-
     Array<SplinePoint*> getPoints()
     {
        return this->splinePoints;

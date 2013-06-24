@@ -257,8 +257,6 @@ TalComponent::TalComponent (TalCore* const ownerFilter)
     infoText->setColour(Label::backgroundColourId, Colour((juce::uint8)100, (juce::uint8)100, (juce::uint8)100, (juce::uint8)0));
     this->logoPanel->addAndMakeVisible(infoText);
 
-    midiLearnButton = addNormalButton(this->logoPanel, 442, 5, ownerFilter, buttonImage, false, MIDILEARN);
-
     loadButton = addNormalButton(this->logoPanel, 544, -13, ownerFilter, loadButtonImage, true, PRESETLOAD);
     saveButton = addNormalButton(this->logoPanel, 544, 8, ownerFilter, saveButtonImage, true, PRESETSAVE);
 
@@ -700,8 +698,6 @@ void TalComponent::updateParametersFromFilter()
     float tab3Open = filter->getParameter(TAB3OPEN);
     float tab4Open = filter->getParameter(TAB4OPEN);
 
-    float midilearn = filter->getParameter(MIDILEARN);
-
     float delayWet = filter->getParameter(DELAYWET);
     float delayTime = filter->getParameter(DELAYTIME);
     float delaySync= filter->getParameter(DELAYSYNC);
@@ -796,7 +792,6 @@ void TalComponent::updateParametersFromFilter()
 	lfo2KeyTriggerButton->setToggleState(lfo2KeyTrigger > 0, false);
     chorus1Button->setToggleState(chorus1 > 0, false);
     chorus2Button->setToggleState(chorus2 > 0, false);
-    midiLearnButton->setToggleState(midilearn > 0, false);
 
     delaySyncButton->setToggleState(delaySync > 0, false);
     delayFactorLButton->setToggleState(delayFactorL > 0, false);
