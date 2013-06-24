@@ -73,9 +73,6 @@ TalCore::TalCore()
 	copyXmlToBinary(*mainElement, *destData);
 	setStateInformation(destData->getData(), destData->getSize());
 	setCurrentProgram(curProgram);
-
-	// used for midi learn
-	lastMovedController = 0;
 }
 
 TalCore::~TalCore()
@@ -140,9 +137,6 @@ void TalCore::setParameter (int index, float newValue)
 		params[index] = newValue;
 		talPresets[curProgram]->programData[index] = newValue;
 		sendChangeMessage ();
-
-		// for midi learn
-		lastMovedController = index;
 	}
 }
 
@@ -163,7 +157,6 @@ const String TalCore::getParameterName (int index)
 		case ENVELOPESPEED: return T("envelopespeed");
 		case LFOWIDTH: return T("lfowidth");
 		case MIDITRIGGER: return T("miditrigger");
-		case MIDILEARN: return T("Midi Learn");
 	}
     return String::empty;
 }
@@ -314,11 +307,6 @@ void TalCore::processMidiPerSample(MidiBuffer::Iterator *midiIterator, MidiMessa
 	// There can be more than one event at the same position
 	while (hasMoreMidiMessages && midiEventPos == samplePos)
 	{
-		if (controllerMidiMessage.isController())
-		{
-			handleController (controllerMidiMessage.getControllerNumber(),
-							  controllerMidiMessage.getControllerValue());
-		}
 		if (controllerMidiMessage.isNoteOn()
 			&& talPresets[curProgram]->programData[MIDITRIGGER] > 0.5f)
 		{
@@ -326,22 +314,6 @@ void TalCore::processMidiPerSample(MidiBuffer::Iterator *midiIterator, MidiMessa
 			engine->setLfoPhase(0.0f);
 		}
 		hasMoreMidiMessages = midiIterator->getNextEvent (controllerMidiMessage, midiEventPos);
-	}
-}
-
-void TalCore::handleController (const int controllerNumber,
-								const int controllerValue)
-{
-	if (params[MIDILEARN] > 0.0f)
-	{
-		for (int i = 0; i < NUMPROGRAMS; i++)
-		{
-			talPresets[i]->midiMap[controllerNumber] = lastMovedController;
-		}
-	}
-	if (talPresets[curProgram]->midiMap[controllerNumber] > 0)
-	{
-		setParameter (talPresets[curProgram]->midiMap[controllerNumber], controllerValue / 127.0f);
 	}
 }
 
@@ -386,33 +358,8 @@ void TalCore::getStateInformation (MemoryBlock& destData)
 	}
 	tal.addChildElement(programList);
 
-	// midi params
-	XmlElement *midiMapList = new XmlElement ("midimap");
-	for (int i = 0; i < 255; i++)
-	{
-		if (talPresets[0]->midiMap[i] != 0)
-		{
-			XmlElement* map = new XmlElement ("map");
-			map->setAttribute (T("param"), talPresets[0]->midiMap[i]);
-			map->setAttribute (T("controllernumber"), i);
-			midiMapList->addChildElement(map);
-		}
-	}
-	tal.addChildElement(midiMapList);
-
-	// Reset midi learn
-	//setParameter(MIDILEARN, 0.0f);
-	//sendChangeMessage (this);
-
-    // then use this helper function to stuff it into the binary blob and return it..
-    copyXmlToBinary (tal, destData);
-
-	// use this for new factory presets
-	//#ifdef _DEBUG && WIN32
-	//File *file = new File("e:/presets.txt");
-	//String myXmlDoc = tal.createDocument (String::empty);
-	//file->replaceWithText(myXmlDoc);
-	//#endif
+	// then use this helper function to stuff it into the binary blob and return it..
+	copyXmlToBinary (tal, destData);
 }
 
 void TalCore::setStateInformation (const void* data, int sizeInBytes)
@@ -447,23 +394,6 @@ void TalCore::setStateInformation (const void* data, int sizeInBytes)
 					talPresets[i]->programData[LFOWIDTH] = (float) e->getDoubleAttribute (T("lfowidth"), 1.0f);
 					talPresets[i]->programData[MIDITRIGGER] = (float) e->getDoubleAttribute (T("miditrigger"), 0.0f);
 					i++;
-				}
-			}
-		}
-
-		// restore midi mapping
-		XmlElement* midiMap = xmlState->getChildByName(T("midimap"));
-		if (midiMap != 0 && midiMap->hasTagName(T("midimap")))
-		{
-			forEachXmlChildElement (*midiMap, e)
-			{
-				for (int j = 0; j < NUMPROGRAMS; j++)
-				{
-					int controller = e->getIntAttribute(T("controllernumber"), 0);
-					if (controller < 255 && controller > 0)
-					{
-						talPresets[j]->midiMap[controller] = e->getIntAttribute(T("param"), 0);
-					}
 				}
 			}
 		}
@@ -509,23 +439,6 @@ void TalCore::setStateInformationString (const String& data)
                     }
             }
 
-            // restore midi mapping
-            XmlElement* midiMap = xmlState->getChildByName(T("midimap"));
-            if (midiMap != 0 && midiMap->hasTagName(T("midimap")))
-            {
-                    forEachXmlChildElement (*midiMap, e)
-                    {
-                            for (int j = 0; j < NUMPROGRAMS; j++)
-                            {
-                                    int controller = e->getIntAttribute(T("controllernumber"), 0);
-                                    if (controller < 255 && controller > 0)
-                                    {
-                                            talPresets[j]->midiMap[controller] = e->getIntAttribute(T("param"), 0);
-                                    }
-                            }
-                    }
-            }
-
             delete xmlState;
             setCurrentProgram(curProgram);
             sendChangeMessage ();
@@ -563,20 +476,6 @@ String TalCore::getStateInformationString ()
     }
     tal.addChildElement(programList);
 
-    // midi params
-    XmlElement *midiMapList = new XmlElement ("midimap");
-    for (int i = 0; i < 255; i++)
-    {
-            if (talPresets[0]->midiMap[i] != 0)
-            {
-                    XmlElement* map = new XmlElement ("map");
-                    map->setAttribute (T("param"), talPresets[0]->midiMap[i]);
-                    map->setAttribute (T("controllernumber"), i);
-                    midiMapList->addChildElement(map);
-            }
-    }
-    tal.addChildElement(midiMapList);
-
     return tal.createDocument (String::empty);
 }
 
@@ -599,7 +498,6 @@ void TalCore::setCurrentProgram (int index)
 		{
 			setParameter(i, talPresets[index]->programData[i]);
 		}
-        setParameter(MIDILEARN, 0.0f);
 
 		sendChangeMessage ();
 	}

@@ -124,7 +124,6 @@ private:
 	ComboBox *lfoWaveformComboBox;
 	ComboBox *lfoSyncComboBox;
 
-	ImageToggleButton *midiLearnButton;
 	ImageToggleButton *midiTriggerButton;
 
 	Label *versionLabel;

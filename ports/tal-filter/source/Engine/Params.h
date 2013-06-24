@@ -36,8 +36,7 @@ Parameter table
 enum SYNTHPARAMETERS
 {
   // Controllable values [0.0..1.0
-  UNKNOWN= 0,
-  CUTOFF,
+  CUTOFF=0,
   RESONANCE,
   FILTERTYPE,
 
@@ -53,7 +52,6 @@ enum SYNTHPARAMETERS
   ENVELOPESPEED,
   LFOWIDTH,
 
-  MIDILEARN,
   MIDITRIGGER,
 
   // Number of controllable synth paramenters

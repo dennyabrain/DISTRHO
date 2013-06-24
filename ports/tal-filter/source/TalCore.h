@@ -99,9 +99,6 @@ public:
     String getStateInformationString ();
     void setStateInformationString (const String& data);
 
-	void handleController (const int controllerNumber,
-                           const int controllerValue);
-
 	void processMidiPerSample (MidiBuffer::Iterator *midiIterator,
 							   MidiMessage controllerMidiMessage, int samplePos);
 

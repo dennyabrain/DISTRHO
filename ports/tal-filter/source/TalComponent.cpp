@@ -117,14 +117,6 @@ TalComponent::TalComponent (TalCore* const ownerFilter)
 	versionLabel->setColour(Label::textColourId, Colour((juce::uint8)100, (juce::uint8)100, (juce::uint8)100, 0.8f));
 	addAndMakeVisible(versionLabel);
 
-	//// Midi learn
-	Image offMidiLearnButtonImg = ImageCache::getFromMemory(bmp00132_png, bmp00132_pngSize);
-	Image onMidiLearnButtonImg = ImageCache::getFromMemory(bmp00133_png, bmp00133_pngSize);
-
-	midiLearnButton = new ImageToggleButton(T("Toggle Button"), offMidiLearnButtonImg, onMidiLearnButtonImg);
-	midiLearnButton->setBounds(162, 438, 69, 39);
-	addAndMakeVisible(midiLearnButton, 0);
-
 	//// Midi trigger
 	Image offMidiTriggerButtonImg = ImageCache::getFromMemory(bmp00134_png, bmp00134_pngSize);
 	Image onMidiTriggerButtonImg = ImageCache::getFromMemory(bmp00135_png, bmp00135_pngSize);
@@ -143,7 +135,6 @@ TalComponent::TalComponent (TalCore* const ownerFilter)
 	envelopeIntesityKnob->addListener (this);
 	envelopeSpeedKnob->addListener (this);
 	lfoWidthKnob->addListener (this);
-	midiLearnButton->addListener (this);
 	midiTriggerButton->addListener (this);
 
 	filterTypeComboBox->addListener (this);
@@ -215,20 +206,14 @@ void TalComponent::sliderValueChanged (Slider* caller)
 void TalComponent::comboBoxChanged (ComboBox* caller)
 {
     TalCore* const filter = getFilter();
-	if (caller == filterTypeComboBox) filter->setParameterNotifyingHost(FILTERTYPE, float(filterTypeComboBox->getSelectedId())/7.0f-0.1f);
-	if (caller == lfoWaveformComboBox) filter->setParameterNotifyingHost(LFOWAVEFORM, float(lfoWaveformComboBox->getSelectedId())/6.0f-0.1f);
-	if (caller == lfoSyncComboBox) filter->setParameterNotifyingHost(LFOSYNC, float(lfoSyncComboBox->getSelectedId())/19.0f-0.1f);
+	if (caller == filterTypeComboBox) filter->setParameterNotifyingHost(FILTERTYPE, float(filterTypeComboBox->getSelectedId())/7.0f-0.001f);
+	if (caller == lfoWaveformComboBox) filter->setParameterNotifyingHost(LFOWAVEFORM, float(lfoWaveformComboBox->getSelectedId())/6.0f-0.001f);
+	if (caller == lfoSyncComboBox) filter->setParameterNotifyingHost(LFOSYNC, float(lfoSyncComboBox->getSelectedId())/19.0f-0.001f);
 }
 
 void TalComponent::buttonClicked (Button* caller)
 {
     TalCore* const filter = getFilter();
-	if (caller == midiLearnButton)
-	{
-		float midiLearn = 0.0f;
-		if (caller->getToggleState() == true) midiLearn = 1.0f;
-		filter->setParameterNotifyingHost(MIDILEARN, midiLearn);
-	}
 	if (caller == midiTriggerButton)
 	{
 		float midiTrigger = 0.0f;
@@ -263,7 +248,6 @@ void TalComponent::updateParametersFromFilter()
 	float envelopeSpeed = filter->getParameter(ENVELOPESPEED);
 	float lfoWidth = filter->getParameter(LFOWIDTH);
 
-	float midiLearn = filter->getParameter(MIDILEARN);
 	float midiTrigger = filter->getParameter(MIDITRIGGER);
 
     // ..release the lock ASAP
@@ -284,7 +268,6 @@ void TalComponent::updateParametersFromFilter()
 	lfoWaveformComboBox->setSelectedId(lfoWaveform, true);
 	lfoSyncComboBox->setSelectedId(lfoSync, true);
 
-	midiLearnButton->setValue(midiLearn, dontSendNotification);
 	midiTriggerButton->setValue(midiTrigger, dontSendNotification);
 }
 
