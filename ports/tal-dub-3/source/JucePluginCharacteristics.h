@@ -39,7 +39,7 @@
 /*                          Plugin Formats to build                           */
 
 #ifndef JucePlugin_Build_Standalone
- #define JUCE_ObjCExtraSuffix           tal_filter
+ #define JUCE_ObjCExtraSuffix           tal_dub3
 #endif
 
 //==============================================================================
@@ -129,7 +129,7 @@
 /** Set this to 1 if your plugin needs to receive midi messages, or 0 if
     it doesn't.
 */
-#define JucePlugin_WantsMidiInput                   1
+#define JucePlugin_WantsMidiInput                   0
 
 /** Set this to 1 if your plugin wants to output midi messages, or 0 if
     it doesn't.
@@ -232,7 +232,7 @@
     plugin's plist, it allows the plugin to work out its own path, which is
     needed if you want to use File::getSpecialLocation (currentExecutableFile)
 */
-#define JucePlugin_CFBundleIdentifier       "ch.toguaudioline.talfilter"
+#define JucePlugin_CFBundleIdentifier       "ch.toguaudioline.taldub3"
 
 /** In an AU, some hosts take the name of Cocoa class that creates the UI and
     actually show it to the user in a list (why??)... Anyway, this macro lets you

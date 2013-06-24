@@ -135,8 +135,6 @@ private:
 
 	Label *versionLabel;
 	TalMeter *meter;
-	ImageToggleButton *midiLearnButton;
-	// ImageToggleButton *liveModeButton;
 	ImageToggleButton *delayTwiceLButton;
 	ImageToggleButton *delayTwiceRButton;
 

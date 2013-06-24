@@ -61,9 +61,6 @@ TalComponent::TalComponent (TalCore* const ownerFilter)
 	versionLabel->setColour(Label::textColourId, Colour((juce::uint8)166, (juce::uint8)166, (juce::uint8)166, 0.8f));
 	addAndMakeVisible(versionLabel);
 
-	midiLearnButton = addToggleButton(610, 147, ownerFilter, bmp00132_png, bmp00132_pngSize, bmp00133_png, bmp00133_pngSize, -1);
-	// liveModeButton = addToggleButton(500, 147, ownerFilter, bmp00138_png, bmp00138_pngSize, bmp00139_png, bmp00139_pngSize, -1);
-
 	tabButton = addTabButton(720, 147, ownerFilter, bmp00136_png, bmp00136_pngSize, bmp00137_png, bmp00137_pngSize, -1);
 
 	delayTwiceLButton = addToggleButton(209, 58, ownerFilter, bmp00134_png, bmp00134_pngSize, bmp00135_png, bmp00135_pngSize, DELAYTWICE_L);
@@ -200,18 +197,6 @@ void TalComponent::comboBoxChanged (ComboBox* caller)
 void TalComponent::buttonClicked (Button* caller)
 {
     TalCore* const filter = getFilter();
-	if (caller == midiLearnButton)
-	{
-		float midiLearn = 0.0f;
-		if (caller->getToggleState()) midiLearn = 1.0f;
-		filter->setParameterNotifyingHost(MIDILEARN, midiLearn);
-	}
-	//if (caller == liveModeButton)
-	//{
-	//	float liveMode = 0.0f;
-	//	if (caller->getToggleState()) liveMode = 1.0f;
-	//	filter->setParameterNotifyingHost(LIVEMODE, liveMode);
-	//}
 	if (caller == delayTwiceLButton)
 	{
 		float value = 0.0f;
@@ -276,9 +261,6 @@ void TalComponent::updateParametersFromFilter()
 
 	//float lfoSync = filter->getParameter(LFOSYNC);
 
-	float midiLearn = filter->getParameter(MIDILEARN);
-	// float liveMode = filter->getParameter(LIVEMODE);
-
     // ..release the lock ASAP
     filter->getCallbackLock().exit();
 
@@ -290,8 +272,6 @@ void TalComponent::updateParametersFromFilter()
 	wetKnob->setValue(wet, dontSendNotification);
 	dryKnob->setValue(dry, dontSendNotification);
 
-	midiLearnButton->setValue(midiLearn, dontSendNotification);
-	// liveModeButton->setValue(liveMode, dontSendNotification);
 	delayTwiceLButton->setValue(delayTimeTwiceL, dontSendNotification);
 	delayTwiceRButton->setValue(delayTimeTwiceR, dontSendNotification);
 
