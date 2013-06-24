@@ -143,8 +143,8 @@ void TalComponent::sliderValueChanged (Slider* caller)
 void TalComponent::comboBoxChanged (ComboBox* caller)
 {
     TalCore* const filter = getFilter();
-	if (caller == speedFactorComboBox) filter->setParameterNotifyingHost(SPEEDFACTOR, (float)speedFactorComboBox->getSelectedId());
-	if (caller == filtertypeComboBox) filter->setParameterNotifyingHost(FILTERTYPE, (float)filtertypeComboBox->getSelectedId());
+	if (caller == speedFactorComboBox) filter->setParameterNotifyingHost(SPEEDFACTOR, float(speedFactorComboBox->getSelectedId())/6.0f-0.1f);
+	if (caller == filtertypeComboBox) filter->setParameterNotifyingHost(FILTERTYPE, float(filtertypeComboBox->getSelectedId())/9.0f-0.1f);
 }
 
 void TalComponent::buttonClicked (Button* caller)
