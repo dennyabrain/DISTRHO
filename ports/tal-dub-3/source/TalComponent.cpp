@@ -52,6 +52,7 @@ TalComponent::TalComponent (TalCore* const ownerFilter)
 	delaySyncComboBox->addItem("1/2T",17);
 	delaySyncComboBox->addItem("1/1T",18);
 	delaySyncComboBox->addItem("2/1T",19);
+	delaySyncComboBox->addItem("-",20);
 	delaySyncComboBox->setSelectedId(ownerFilter->getParameter(DELAYTIMESYNC), true);
 	delaySyncComboBox->addListener (this);
 
@@ -68,9 +69,6 @@ TalComponent::TalComponent (TalCore* const ownerFilter)
 
 	// set our component's initial size to be the last one that was stored in the filter's settings
     setSize (internalCachedBackgroundImage.getWidth(), internalCachedBackgroundImage.getHeight());
-
-	// cant do this, it notifies the host and overwrites loaded values
-	//delaySyncComboBox->setSelectedId(ownerFilter->getParameter(LFOSYNC), true);
 
     // register ourselves with the filter - it will use its ChangeBroadcaster base
     // class to tell us when something has changed, and this will call our changeListenerCallback()
@@ -191,7 +189,7 @@ void TalComponent::setTooltip(Slider* slider)
 void TalComponent::comboBoxChanged (ComboBox* caller)
 {
     TalCore* const filter = getFilter();
-	if (caller == delaySyncComboBox) filter->setParameterNotifyingHost(DELAYTIMESYNC, (float)delaySyncComboBox->getSelectedId());
+	if (caller == delaySyncComboBox) filter->setParameterNotifyingHost(DELAYTIMESYNC, float(delaySyncComboBox->getSelectedId())/19.0f-0.001f);
 }
 
 void TalComponent::buttonClicked (Button* caller)

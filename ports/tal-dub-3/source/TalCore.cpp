@@ -108,9 +108,6 @@ void TalCore::setParameter (int index, float newValue)
 {
 	if (index < NUMPARAM)
 	{
-		params[index] = newValue;
-		talPresets[curProgram]->programData[index] = newValue;
-
 		switch(index)
 		{
 		case DRY:
@@ -151,6 +148,8 @@ void TalCore::setParameter (int index, float newValue)
 			engine->setHighCut(newValue);
 			break;
 		case DELAYTIMESYNC:
+			if (newValue < 1.0f)
+			    newValue = newValue * 19.0f + 1.0f;
 			engine->setDelay(
 				talPresets[curProgram]->programData[DELAYTIME],
 				(int)newValue,
@@ -159,6 +158,9 @@ void TalCore::setParameter (int index, float newValue)
 				true);
 			break;
 		}
+
+		params[index] = newValue;
+		talPresets[curProgram]->programData[index] = newValue;
 
 		sendChangeMessage ();
 	}
