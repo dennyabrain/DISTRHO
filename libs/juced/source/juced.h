@@ -90,26 +90,6 @@
  #define JUCE_SUPPORT_SCRIPTING 0
 #endif
 
-/** Config: JUCETICE_INCLUDE_MADLIB_CODE
-	Enables direct inclusion of the mad library.
-	Enabled by default.
- 
-	@see MADAudioFormat
-*/
-#ifndef JUCETICE_INCLUDE_MADLIB_CODE
- #define JUCETICE_INCLUDE_MADLIB_CODE  1
-#endif
-
-/** Config: JUCETICE_INCLUDE_MPCLIB_CODE
- Enables direct inclusion of the mpc library.
- Enabled by default.
- 
- @see MPCAudioFormat
-*/
-#ifndef JUCETICE_INCLUDE_MPCLIB_CODE
- #define JUCETICE_INCLUDE_MPCLIB_CODE  1
-#endif
-
 /** Config: JUCETICE_INCLUDE_ANGELSCRIPT_CODE
  Enables direct inclusion of the angelscript library.
  Enabled by default.
@@ -163,14 +143,6 @@ BEGIN_JUCE_NAMESPACE
 #endif
 #ifndef __JUCETICE_FFTWRAPPER_HEADER__
  #include "audio/fft/jucetice_FFTWrapper.h"
-#endif
-
-#ifndef __JUCETICE_MADAUDIOFORMAT_HEADER__
-// #include "audio/formats/jucetice_MADAudioFormat.h"
-#endif
-
-#ifndef __JUCETICE_MPCAUDIOFORMAT_HEADER__
-// #include "audio/formats/jucetice_MPCAudioFormat.h"
 #endif
 
 #ifndef __JUCETICE_LASHMANAGER_HEADER__
@@ -339,13 +311,6 @@ BEGIN_JUCE_NAMESPACE
 #endif
 #ifndef __JUCETICE_MIDIPAD_HEADER__
  #include "controls/pads/jucetice_MidiPad.h"
-#endif
-
-#ifndef __JUCETICE_DIGITALDISPLAYCOMPONENT_HEADER__
- #include "controls/player/jucetice_DigitalDisplayComponent.h"
-#endif
-#ifndef __JUCETICE_PLAYERCOMPONENT_HEADER__
- #include "controls/player/jucetice_PlayerComponent.h"
 #endif
 
 #ifndef __JUCETICE_PRESETSELECTORCOMPONENT_HEADER__

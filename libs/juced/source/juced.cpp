@@ -51,9 +51,6 @@
 #include "audio/beat/jucetice_BeatDetector.cpp"
 #include "audio/fft/jucetice_FFTWrapper.cpp"
 
-//#include "audio/formats/jucetice_MADAudioFormat.cpp"
-//#include "audio/formats/jucetice_MPCAudioFormat.cpp"
-
 #include "audio/lash/jucetice_LashManager.cpp"
 #include "audio/midi/jucetice_MidiAutomatorManager.cpp"
 #include "audio/midi/jucetice_MidiFilter.cpp"
@@ -96,8 +93,6 @@
 #include "controls/meter/jucetice_MeterComponent.cpp"
 #include "controls/pads/jucetice_DrawablePad.cpp"
 #include "controls/pads/jucetice_MidiPad.cpp"
-#include "controls/player/jucetice_DigitalDisplayComponent.cpp"
-#include "controls/player/jucetice_PlayerComponent.cpp"
 
 #include "database/jucetice_Sqlite.cpp"
 

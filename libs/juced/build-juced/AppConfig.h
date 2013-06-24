@@ -61,18 +61,6 @@
 */
 #define JUCE_SUPPORT_SCRIPTING 0
 
-/** Config: JUCETICE_INCLUDE_MADLIB_CODE
-        Enables direct inclusion of the mad library.
-        Enabled by default.
-*/
-#define JUCETICE_INCLUDE_MADLIB_CODE  1
-
-/** Config: JUCETICE_INCLUDE_MPCLIB_CODE
- Enables direct inclusion of the mpc library.
- Enabled by default.
-*/
-#define JUCETICE_INCLUDE_MPCLIB_CODE  1
-
 /** Config: JUCETICE_INCLUDE_ANGELSCRIPT_CODE
  Enables direct inclusion of the angelscript library.
  Enabled by default.
