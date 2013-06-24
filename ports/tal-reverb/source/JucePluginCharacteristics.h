@@ -121,7 +121,7 @@
 /** Set this to 1 if your plugin needs to receive midi messages, or 0 if
     it doesn't.
 */
-#define JucePlugin_WantsMidiInput                   1
+#define JucePlugin_WantsMidiInput                   0
 
 /** Set this to 1 if your plugin wants to output midi messages, or 0 if
     it doesn't.
