@@ -2538,7 +2538,7 @@ for(int i=0;i<(int)getFilter()->getGUILayoutCtrlsSize();i++){
         else if(getFilter()->getGUILayoutCtrls(i).getStringProp("type")==String("hostppqpos")){     
     if (getFilter()->getPlayHead() != 0 && getFilter()->getPlayHead()->getCurrentPosition (hostInfo))
                 getFilter()->getCsound()->SetChannel(getFilter()->getGUILayoutCtrls(i).getStringProp("channel").toUTF8(), hostInfo.ppqPosition);
-        debugLabel->setText(String(hostInfo.ppqPosition), dontSendNotification;
+        debugLabel->setText(String(hostInfo.ppqPosition), dontSendNotification);
         }
 }
 #endif
