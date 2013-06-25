@@ -60,7 +60,8 @@ yieldCounter(10),
 isNativeThreadRunning(false),
 soundFileIndex(0),
 scoreEvents(),
-nativePluginEditor(false)
+nativePluginEditor(false),
+averageSampleIndex(0)
 {
 #ifdef Cabbage_Logger
 logFile = File((appProperties->getCommonSettings(true)->getFile().getParentDirectory().getFullPathName()+"/CabbageLog.txt"));
@@ -173,7 +174,8 @@ updateTable(false),
 yieldCallbackBool(false),
 yieldCounter(10),
 soundFileIndex(0),
-nativePluginEditor(false)
+nativePluginEditor(false),
+averageSampleIndex(0)
 {
 //Cabbage plugins always try to load a csd file with the same name as the plugin library.
 //Therefore we need to find the name of the library and append a '.csd' to it. 
@@ -1056,21 +1058,26 @@ if(!isSuspended()){
 	float* audioBuffer;
 	float lastOutputAmp;
 	#ifndef Cabbage_No_Csound
+	int numSamples = buffer.getNumSamples();
 
 	if(csCompileResult==0){
 	keyboardState.processNextMidiBuffer (midiMessages, 0, buffer.getNumSamples(), true);
 	midiBuffer = midiMessages;
 	ccBuffer = midiMessages;
-	
-#if JucePlugin_ProducesMidiOutput
+
+	//if no inputs are used clear buffer in case it's not empty..
+	if(getNumInputChannels()==0)
+		buffer.clear();
+
+#if JucePlugin_ProducesMidiOutput 
 	if(!midiOutputBuffer.isEmpty())
 		midiMessages.swapWith(midiOutputBuffer);
 #endif
 
-	for(int i=0;i<buffer.getNumSamples();i++, csndIndex++)
+	for(int i=0;i<numSamples;i++, csndIndex++)
 	   {                                
 
-		for(int channel = 0; channel < getNumInputChannels(); channel++ )
+		for(int channel = 0; channel < getNumOutputChannels(); channel++ )
 			{
 			audioBuffer = buffer.getSampleData(channel,0);
 			if(csndIndex == csound->GetKsmps())
@@ -1085,26 +1092,28 @@ if(!isSuspended()){
 				}
 				if(audioSourcesArray.size()>0)
 				sendAudioToCsoundFromSoundFilers(csound->GetKsmps());		
-
+				
 				CSCompResult = csound->PerformKsmps();					
+				if(CSCompResult!=0)
+					suspendProcessing(true);
 				getCallbackLock().exit();
 				csndIndex = 0;
 			}
 			if(!CSCompResult)
 				{
-				pos = csndIndex*getNumInputChannels();
+				pos = csndIndex*getNumOutputChannels();
 				CSspin[channel+pos] = audioBuffer[i]*cs_scale;  
 				audioBuffer[i] = (CSspout[channel+pos]/cs_scale);     
-				lastOutputAmp = audioBuffer[i]; 
-				outputNo1 = lastOutputAmp;
+				//lastOutputAmp = audioBuffer[i]; 
+				//outputNo1 = lastOutputAmp;
 				}
-			//else audioBuffer[i]=0; 
+			else audioBuffer[i]=0; 
 			}
                         
 		}
 	}//if not compiled just mute output
 	else{
-			for(int i=0;i<buffer.getNumSamples();i++, csndIndex++)
+			for(int i=0;i<numSamples;i++, csndIndex++)
 					{
 					for(int channel = 0; channel < getNumInputChannels(); channel++ )
 							{
@@ -1113,16 +1122,11 @@ if(!isSuspended()){
 							}
 					}
 	}
-		// in case we have more outputs than inputs, we'll clear any output
-		// channels that didn't contain input data, (because these aren't
-		// guaranteed to be empty - they may contain garbage).
-		for (int i = getNumInputChannels(); i < getNumOutputChannels(); ++i)
-		{
-			buffer.clear (i, 0, buffer.getNumSamples());
-		}
-		#endif
+
+	#endif
 }
-#if JucePlugin_ProducesMidiOutput
+
+#if JucePlugin_ProducesMidiOutput 
 	if(!midiBuffer.isEmpty())
 	midiMessages.swapWith(midiOutputBuffer);
 #endif
@@ -1152,7 +1156,7 @@ unsigned char *mbuf, int nbytes)
         if(!userData){
                 cout << "\n\nInvalid";
                 return 0;
-                }
+                } 
         int cnt=0;
 
         if(!midiData->midiBuffer.isEmpty() && cnt <= (nbytes - 3)){
@@ -1162,25 +1166,25 @@ unsigned char *mbuf, int nbytes)
            while (i.getNextEvent (message, messageFrameRelativeTothisProcess))
            {
                    if(message.isNoteOn()){
-                        *mbuf++ = (unsigned char)0x90 + message.getChannel();
+                        *mbuf++ = (unsigned char)0x90 + message.getChannel()-1;
                    *mbuf++ = (unsigned char)message.getNoteNumber();
                    *mbuf++ = (unsigned char)message.getVelocity();
                    cnt += 3;
                    }
                    else if(message.isNoteOff()){
-                        *mbuf++ = (unsigned char)0x80 + message.getChannel();
+                        *mbuf++ = (unsigned char)0x80 + message.getChannel()-1;
                    *mbuf++ = (unsigned char)message.getNoteNumber();
                    *mbuf++ = (unsigned char)message.getVelocity();
                    cnt += 3;
                    }
 				   else if(message.isAllSoundOff()){
-                        *mbuf++ = (unsigned char)0x7B + message.getChannel();
+                        *mbuf++ = (unsigned char)0x7B + message.getChannel()-1;
                    *mbuf++ = (unsigned char)message.getNoteNumber();
                    *mbuf++ = (unsigned char)message.getVelocity();
                    cnt += 3;
                    }
 				   else if(message.isController()){
-						*mbuf++ = (unsigned char)0xB0 + message.getChannel();
+						*mbuf++ = (unsigned char)0xB0 + message.getChannel()-1;
 				   *mbuf++ = (unsigned char)message.getControllerNumber();
 				   *mbuf++ = (unsigned char)message.getControllerValue();
 				   cnt += 3;

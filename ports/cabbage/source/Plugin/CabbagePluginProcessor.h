@@ -27,7 +27,7 @@
 #include "../XYPadAutomation.h"
 #include "../CabbageMessageSystem.h"
 #include "../Soundfiler.h"
-#include "CabbageGenericAudioProcessorEditor.h"
+#include "CabbageGenericAudioProcessorEditor.h" 
 
 
 
@@ -145,11 +145,9 @@ public:
 		return csound->GetNchnls();
 	}
 
-#if 0 // csound5
 	int getNumberCsoundInChannels(){
-		return csound->GetInNchnls();
+		//return csound->GetInNchnls();
 	}
-#endif
 
 	int getCsoundSamplingRate(){
 		return csound->GetSr();
