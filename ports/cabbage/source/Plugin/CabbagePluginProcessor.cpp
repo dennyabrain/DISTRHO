@@ -1177,12 +1177,6 @@ unsigned char *mbuf, int nbytes)
                    *mbuf++ = (unsigned char)message.getVelocity();
                    cnt += 3;
                    }
-				   else if(message.isAllSoundOff()){
-                        *mbuf++ = (unsigned char)0x7B + message.getChannel()-1;
-                   *mbuf++ = (unsigned char)message.getNoteNumber();
-                   *mbuf++ = (unsigned char)message.getVelocity();
-                   cnt += 3;
-                   }
 				   else if(message.isController()){
 						*mbuf++ = (unsigned char)0xB0 + message.getChannel()-1;
 				   *mbuf++ = (unsigned char)message.getControllerNumber();
