@@ -27,12 +27,21 @@
 #define JucePlugin_ManufacturerCode     'Cabbu'
 #define JucePlugin_PluginCode           'RORY'
 
-#ifdef Cabbage_Plugin_Synth
+#if defined(Cabbage_Plugin_Midi)
+ #define JucePlugin_IsSynth              0
+ #define JucePlugin_MaxNumInputChannels  0
+ #define JucePlugin_MaxNumOutputChannels 1 // FIXME - we shouldn't need any audio here
+ #define JucePlugin_PreferredChannelConfigurations
+ #define JucePlugin_WantsMidiInput       1
+ #define JucePlugin_ProducesMidiOutput   1
+//#define JucePlugin_LV2Category          "MidiPlugin"
+#elif defined(Cabbage_Plugin_Synth)
  #define JucePlugin_IsSynth              1
  #define JucePlugin_MaxNumInputChannels  0
  #define JucePlugin_MaxNumOutputChannels 2
  #define JucePlugin_PreferredChannelConfigurations {0, 2}
  #define JucePlugin_WantsMidiInput       1
+ #define JucePlugin_ProducesMidiOutput   0
  #define JucePlugin_LV2Category          "InstrumentPlugin"
 #else
  #define JucePlugin_IsSynth              0
@@ -40,9 +49,9 @@
  #define JucePlugin_MaxNumOutputChannels 2
  #define JucePlugin_PreferredChannelConfigurations {1, 1}, {2, 2}
  #define JucePlugin_WantsMidiInput       0
+ #define JucePlugin_ProducesMidiOutput   0
 #endif
 
-#define JucePlugin_ProducesMidiOutput   0
 #define JucePlugin_TailLengthSeconds    0
 #define JucePlugin_SilenceInProducesSilenceOut  1
 #define JucePlugin_EditorRequiresKeyboardFocus  1
