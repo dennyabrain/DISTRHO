@@ -10,7 +10,8 @@ else
   exit
 fi
 
-if [ ! -f standalone/CabbagePluginSynth.so ]; then exit 0; fi
+if [ ! -f standalone/CabbagePluginSynth.so  ]; then exit 0; fi
+if [ ! -f standalone/CabbagePluginMidi.so   ]; then exit 0; fi
 if [ ! -f standalone/CabbagePluginEffect.so ]; then exit 0; fi
 
 mkdir -p vst
@@ -29,6 +30,9 @@ for i in $FILES; do
   if ( echo $i | grep "./cabbage/Synths/" > /dev/null ); then
     echo cp `pwd`/standalone/CabbagePluginSynth.so vst/$basename.$EXT
     cp `pwd`/standalone/CabbagePluginSynth.so vst/$basename.$EXT
+  elif ( echo $i | grep "./cabbage/MIDI/" > /dev/null ); then
+    echo cp `pwd`/standalone/CabbagePluginMidi.so vst/$basename.$EXT
+    cp `pwd`/standalone/CabbagePluginMidi.so vst/$basename.$EXT
   else
     echo cp `pwd`/standalone/CabbagePluginEffect.so vst/$basename.$EXT
     cp `pwd`/standalone/CabbagePluginEffect.so vst/$basename.$EXT
