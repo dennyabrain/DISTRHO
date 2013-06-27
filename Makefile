@@ -59,8 +59,12 @@ standalone-host: standalone
 	$(MAKE) all -C libs/juce-2.0
 	$(MAKE) standalone-host -C ports
 
+ladspa:
+	$(MAKE) ladspa -C plugins
+
 dssi:
 	$(MAKE) -C libs/distrho/dgl
+	$(MAKE) dssi -C plugins
 
 lv2:
 	$(MAKE) -C libs/distrho/dgl

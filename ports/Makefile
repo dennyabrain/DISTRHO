@@ -15,6 +15,7 @@ libs:
 	$(MAKE) -C ../libs/lv2-ttl-generator
 
 standalone:
+	mkdir -p ../bin/standalone
 	$(MAKE) -C arctican-function/Standalone
 	$(MAKE) -C arctican-pilgrim/Standalone
 	$(MAKE) -C cabbage/Standalone
@@ -41,9 +42,11 @@ standalone:
 	$(MAKE) -C wolpertinger/Standalone
 
 standalone-host:
+	mkdir -p ../bin/standalone
 	$(MAKE) -C juce-plugin-host/Standalone
 
 lv2:
+	mkdir -p ../bin/lv2
 	$(MAKE) -C arctican-function/LV2
 	$(MAKE) -C arctican-pilgrim/LV2
 	$(MAKE) -C cabbage/LV2-fx
@@ -72,6 +75,7 @@ lv2:
 	$(MAKE) -C wolpertinger/LV2
 
 vst:
+	mkdir -p ../bin/vst
 	$(MAKE) -C arctican-function/VST
 	$(MAKE) -C arctican-pilgrim/VST
 	$(MAKE) -C cabbage/VST-fx
