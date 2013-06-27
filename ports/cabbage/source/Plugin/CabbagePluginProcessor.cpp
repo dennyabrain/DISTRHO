@@ -1105,9 +1105,7 @@ if(!isSuspended()){
 				}
 			}
 			else audioBuffer[i]=0; 
-			}
-                        
-		}
+	   }
 	}//if not compiled just mute output
 	else{
 		for(int channel = 0; channel < getNumInputChannels(); channel++ )
