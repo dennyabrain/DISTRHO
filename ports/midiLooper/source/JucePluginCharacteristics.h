@@ -11,11 +11,11 @@
 #define JucePlugin_Manufacturer             "Insert Piz Here"
 #define JucePlugin_ManufacturerCode         'IPHz'
 #define JucePlugin_PluginCode               'L0OP'
-#define JucePlugin_MaxNumInputChannels              2
-#define JucePlugin_MaxNumOutputChannels             2
-#define JucePlugin_PreferredChannelConfigurations   { 2, 2 }
+#define JucePlugin_MaxNumInputChannels              0
+#define JucePlugin_MaxNumOutputChannels             0
+#define JucePlugin_PreferredChannelConfigurations   { 0, 0 }
 #define JucePlugin_TailLengthSeconds                0
-#define JucePlugin_IsSynth                          1
+#define JucePlugin_IsSynth                          0
 #define JucePlugin_WantsMidiInput                   1
 #define JucePlugin_ProducesMidiOutput               1
 #define JucePlugin_SilenceInProducesSilenceOut      0
