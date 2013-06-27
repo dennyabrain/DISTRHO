@@ -1076,13 +1076,8 @@ if(!isSuspended()){
 
 	for(int i=0;i<numSamples;i++, csndIndex++)
 	   {                                
-
-		for(int channel = 0; channel < getNumOutputChannels(); channel++ )
-			{
-			audioBuffer = buffer.getSampleData(channel,0);
 			if(csndIndex == csound->GetKsmps())
 			{
-				
 				getCallbackLock().enter();
 				//slow down calls to these functions, no need for them to be firing at k-rate
 				yieldCounter = (yieldCounter>10) ? 0 : yieldCounter+1;
@@ -1100,27 +1095,28 @@ if(!isSuspended()){
 				csndIndex = 0;
 			}
 			if(!CSCompResult)
+			{
+				for(int channel = 0; channel < getNumOutputChannels(); channel++ )
 				{
+				audioBuffer = buffer.getSampleData(channel,0);
 				pos = csndIndex*getNumOutputChannels();
 				CSspin[channel+pos] = audioBuffer[i]*cs_scale;  
 				audioBuffer[i] = (CSspout[channel+pos]/cs_scale);     
-				//lastOutputAmp = audioBuffer[i]; 
-				//outputNo1 = lastOutputAmp;
 				}
+			}
 			else audioBuffer[i]=0; 
 			}
                         
 		}
 	}//if not compiled just mute output
 	else{
+		for(int channel = 0; channel < getNumInputChannels(); channel++ )
+		{
+			audioBuffer = buffer.getSampleData(channel,0);
+
 			for(int i=0;i<numSamples;i++, csndIndex++)
-					{
-					for(int channel = 0; channel < getNumInputChannels(); channel++ )
-							{
-							audioBuffer = buffer.getSampleData(channel,0);
-							audioBuffer[i]=0;
-							}
-					}
+				audioBuffer[i]=0;
+		}
 	}
 
 	#endif
