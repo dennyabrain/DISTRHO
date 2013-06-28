@@ -156,14 +156,17 @@ public:
     void exec()
     {
 #ifdef DISTRHO_UI_QT
-        qtTimer = startTimer(30);
+        assert(qtTimer == 0);
+
+        qtTimer = startTimer(50);
         qApp->exec();
 #else
         while (! glApp.isQuiting())
         {
             fOscData.idle();
+            fUI.idle();
             glApp.idle();
-            dgl_msleep(30);
+            dgl_msleep(50);
         }
 #endif
     }
