@@ -44,28 +44,6 @@ struct OscData {
           path(nullptr),
           server(nullptr) {}
 
-    ~OscData()
-    {
-        free();
-    }
-
-    void free()
-    {
-        assert(server == nullptr);
-
-        if (addr != nullptr)
-        {
-            lo_address_free(addr);
-            addr = nullptr;
-        }
-
-        if (path != nullptr)
-        {
-            delete[] path;
-            path = nullptr;
-        }
-    }
-
     void idle() const
     {
         if (server == nullptr)
@@ -610,10 +588,14 @@ int main(int argc, char* argv[])
     lo_server_add_method(oscServer, nullptr, nullptr, osc_debug_handler, nullptr);
 
     gUiTitle = uiTitle;
+
+    gOscData.addr   = oscAddr;
+    gOscData.path   = oscPath;
+    gOscData.server = oscServer;
     gOscData.send_update(pluginPath);
 
     // wait for init
-    for (int i=0; i < 1000; ++i)
+    for (int i=0; i < 100; ++i)
     {
         lo_server_recv(oscServer);
 
