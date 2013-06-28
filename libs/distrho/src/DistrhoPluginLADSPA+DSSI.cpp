@@ -316,11 +316,11 @@ private:
     LADSPA_DataPtr  fPortLatency;
 #endif
 
+    LADSPA_Data* fLastControlValues;
+
 #if DISTRHO_PLUGIN_IS_SYNTH
     MidiEvent fMidiEvents[MAX_MIDI_EVENTS];
 #endif
-
-    LADSPA_Data* fLastControlValues;
 
     // ---------------------------------------------
 
