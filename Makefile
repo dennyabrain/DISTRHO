@@ -11,6 +11,7 @@ build:
 	$(MAKE) -C libs/lv2-ttl-generator
 	$(MAKE) plugins -C plugins
 	$(MAKE) plugins -C ports
+	$(MAKE) gen
 
 
 gen: gen_lv2 gen_vst

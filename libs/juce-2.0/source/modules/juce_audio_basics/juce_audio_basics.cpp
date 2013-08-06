@@ -22,7 +22,7 @@
   ==============================================================================
 */
 
-#if defined (__JUCE_AUDIO_BASICS_JUCEHEADER__) && ! JUCE_AMALGAMATED_INCLUDE
+#if defined (JUCE_AUDIO_BASICS_H_INCLUDED) && ! JUCE_AMALGAMATED_INCLUDE
  /* When you add this cpp file to your project, you mustn't include it in a file where you've
     already included any other headers - just put it inside a file on its own, possibly with your config
     flags preceding it, but don't include anything else. That also includes avoiding any automatic prefix
@@ -61,7 +61,6 @@ namespace juce
 #include "buffers/juce_AudioSampleBuffer.cpp"
 #include "buffers/juce_FloatVectorOperations.cpp"
 #include "effects/juce_IIRFilter.cpp"
-#include "effects/juce_IIRFilterOld.cpp"
 #include "effects/juce_LagrangeInterpolator.cpp"
 #include "midi/juce_MidiBuffer.cpp"
 #include "midi/juce_MidiFile.cpp"

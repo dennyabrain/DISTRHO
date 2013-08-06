@@ -232,7 +232,7 @@ public:
         changeWidthToFitText();
     }
 
-    void clicked()
+    void clicked() override
     {
         ColourSelector* colourSelector = new ColourSelector();
         colourSelector->setName ("background");
@@ -399,7 +399,7 @@ static Component* createRadioButtonPage()
         tb->setTooltip ("a set of mutually-exclusive radio buttons");
 
         if (i == 0)
-            tb->setToggleState (true, false);
+            tb->setToggleState (true, dontSendNotification);
     }
 
     for (int i = 0; i < 4; ++i)
@@ -429,7 +429,7 @@ static Component* createRadioButtonPage()
         db->setBounds (25 + i * buttonSize, 180, buttonSize, buttonSize);
 
         if (i == 0)
-            db->setToggleState (true, false);
+            db->setToggleState (true, dontSendNotification);
     }
 
     for (int i = 0; i < 4; ++i)
@@ -447,7 +447,7 @@ static Component* createRadioButtonPage()
                                 | ((i != 3) ? Button::ConnectedOnRight : 0));
 
         if (i == 0)
-            tb->setToggleState (true, false);
+            tb->setToggleState (true, dontSendNotification);
     }
 
     return page;
@@ -520,7 +520,7 @@ public:
         //==============================================================================
         HyperlinkButton* hyperlink
             = new HyperlinkButton ("this is a HyperlinkButton",
-                                    URL ("http://www.rawmaterialsoftware.com/juce"));
+                                    URL ("http://www.juce.com"));
 
         hyperlink->setBounds (10, 130, 200, 24);
         addAndMakeVisible (hyperlink);
@@ -839,10 +839,10 @@ private:
                 comboBox.setEditableText (true);
             }
 
-            bool getToolbarItemSizes (int /*toolbarDepth*/, bool isToolbarVertical,
+            bool getToolbarItemSizes (int /*toolbarDepth*/, bool isVertical,
                                       int& preferredSize, int& minSize, int& maxSize)
             {
-                if (isToolbarVertical)
+                if (isVertical)
                     return false;
 
                 preferredSize = 250;
@@ -855,12 +855,12 @@ private:
             {
             }
 
-            void contentAreaChanged (const Rectangle<int>& contentArea)
+            void contentAreaChanged (const Rectangle<int>& newArea)
             {
-                comboBox.setSize (contentArea.getWidth() - 2,
-                                  jmin (contentArea.getHeight() - 2, 22));
+                comboBox.setSize (newArea.getWidth() - 2,
+                                  jmin (newArea.getHeight() - 2, 22));
 
-                comboBox.setCentrePosition (contentArea.getCentreX(), contentArea.getCentreY());
+                comboBox.setCentrePosition (newArea.getCentreX(), newArea.getCentreY());
             }
 
         private:
@@ -963,7 +963,7 @@ public:
         setStatusMessage ("Getting ready...");
     }
 
-    void run()
+    void run() override
     {
         setProgress (-1.0); // setting a value beyond the range 0 -> 1 will show a spinning bar..
         setStatusMessage ("Preparing to do some stuff...");
@@ -1074,7 +1074,7 @@ public:
         addAndMakeVisible (&enableButton);
         enableButton.setBounds (230, 10, 180, 24);
         enableButton.setTooltip ("Enables/disables all the components");
-        enableButton.setToggleState (true, false);
+        enableButton.setToggleState (true, dontSendNotification);
         enableButton.addListener (this);
 
         addAndMakeVisible (&transformSlider);

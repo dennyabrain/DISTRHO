@@ -41,6 +41,7 @@ StringArray ProjectExporter::getExporterNames()
     s.add (MSVCProjectExporterVC2008::getName());
     s.add (MSVCProjectExporterVC2010::getName());
     s.add (MSVCProjectExporterVC2012::getName());
+    s.add (MSVCProjectExporterVC2013::getName());
     s.add (MakefileProjectExporter::getNameLinux());
     s.add (AndroidProjectExporter::getNameAndroid());
     s.add (CodeBlocksProjectExporter::getNameCodeBlocks());
@@ -72,9 +73,10 @@ ProjectExporter* ProjectExporter::createNewExporter (Project& project, const int
         case 3:     exp = new MSVCProjectExporterVC2008 (project, ValueTree (MSVCProjectExporterVC2008::getValueTreeTypeName())); break;
         case 4:     exp = new MSVCProjectExporterVC2010 (project, ValueTree (MSVCProjectExporterVC2010::getValueTreeTypeName())); break;
         case 5:     exp = new MSVCProjectExporterVC2012 (project, ValueTree (MSVCProjectExporterVC2012::getValueTreeTypeName())); break;
-        case 6:     exp = new MakefileProjectExporter   (project, ValueTree (MakefileProjectExporter  ::getValueTreeTypeName())); break;
-        case 7:     exp = new AndroidProjectExporter    (project, ValueTree (AndroidProjectExporter   ::getValueTreeTypeName())); break;
-        case 8:     exp = new CodeBlocksProjectExporter (project, ValueTree (CodeBlocksProjectExporter::getValueTreeTypeName())); break;
+        case 6:     exp = new MSVCProjectExporterVC2013 (project, ValueTree (MSVCProjectExporterVC2013::getValueTreeTypeName())); break;
+        case 7:     exp = new MakefileProjectExporter   (project, ValueTree (MakefileProjectExporter  ::getValueTreeTypeName())); break;
+        case 8:     exp = new AndroidProjectExporter    (project, ValueTree (AndroidProjectExporter   ::getValueTreeTypeName())); break;
+        case 9:     exp = new CodeBlocksProjectExporter (project, ValueTree (CodeBlocksProjectExporter::getValueTreeTypeName())); break;
 
         default:    jassertfalse; return 0;
     }
@@ -103,6 +105,7 @@ ProjectExporter* ProjectExporter::createExporter (Project& project, const ValueT
     if (exp == nullptr)    exp = MSVCProjectExporterVC2008::createForSettings (project, settings);
     if (exp == nullptr)    exp = MSVCProjectExporterVC2010::createForSettings (project, settings);
     if (exp == nullptr)    exp = MSVCProjectExporterVC2012::createForSettings (project, settings);
+    if (exp == nullptr)    exp = MSVCProjectExporterVC2013::createForSettings (project, settings);
     if (exp == nullptr)    exp = XCodeProjectExporter     ::createForSettings (project, settings);
     if (exp == nullptr)    exp = MakefileProjectExporter  ::createForSettings (project, settings);
     if (exp == nullptr)    exp = AndroidProjectExporter   ::createForSettings (project, settings);
@@ -126,6 +129,7 @@ bool ProjectExporter::canProjectBeLaunched (Project* project)
             MSVCProjectExporterVC2008::getValueTreeTypeName(),
             MSVCProjectExporterVC2010::getValueTreeTypeName(),
             MSVCProjectExporterVC2012::getValueTreeTypeName(),
+            MSVCProjectExporterVC2013::getValueTreeTypeName(),
            #elif JUCE_LINUX
             // (this doesn't currently launch.. not really sure what it would do on linux)
             //MakefileProjectExporter::getValueTreeTypeName(),
@@ -143,7 +147,7 @@ bool ProjectExporter::canProjectBeLaunched (Project* project)
 }
 
 //==============================================================================
-ProjectExporter::ProjectExporter (Project& project_, const ValueTree& settings_)
+ProjectExporter::ProjectExporter (Project& p, const ValueTree& settings_)
     : xcodeIsBundle (false),
       xcodeCreatePList (false),
       xcodeCanUseDwarf (true),
@@ -151,10 +155,10 @@ ProjectExporter::ProjectExporter (Project& project_, const ValueTree& settings_)
       msvcIsDLL (false),
       msvcIsWindowsSubsystem (true),
       settings (settings_),
-      project (project_),
-      projectType (project_.getProjectType()),
-      projectName (project_.getTitle()),
-      projectFolder (project_.getFile().getParentDirectory()),
+      project (p),
+      projectType (p.getProjectType()),
+      projectName (p.getTitle()),
+      projectFolder (p.getFile().getParentDirectory()),
       modulesGroup (nullptr)
 {
 }
@@ -480,8 +484,8 @@ bool ProjectExporter::ConstConfigIterator::next()
 }
 
 //==============================================================================
-ProjectExporter::BuildConfiguration::BuildConfiguration (Project& project_, const ValueTree& configNode)
-   : config (configNode), project (project_)
+ProjectExporter::BuildConfiguration::BuildConfiguration (Project& p, const ValueTree& configNode)
+   : config (configNode), project (p)
 {
 }
 

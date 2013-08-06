@@ -51,32 +51,32 @@ public:
     CallbackHandler (AudioDeviceManager& adm) noexcept  : owner (adm) {}
 
 private:
-    void audioDeviceIOCallback (const float** ins, int numIns, float** outs, int numOuts, int numSamples)
+    void audioDeviceIOCallback (const float** ins, int numIns, float** outs, int numOuts, int numSamples) override
     {
         owner.audioDeviceIOCallbackInt (ins, numIns, outs, numOuts, numSamples);
     }
 
-    void audioDeviceAboutToStart (AudioIODevice* device)
+    void audioDeviceAboutToStart (AudioIODevice* device) override
     {
         owner.audioDeviceAboutToStartInt (device);
     }
 
-    void audioDeviceStopped()
+    void audioDeviceStopped() override
     {
         owner.audioDeviceStoppedInt();
     }
 
-    void audioDeviceError (const String& message)
+    void audioDeviceError (const String& message) override
     {
         owner.audioDeviceErrorInt (message);
     }
 
-    void handleIncomingMidiMessage (MidiInput* source, const MidiMessage& message)
+    void handleIncomingMidiMessage (MidiInput* source, const MidiMessage& message) override
     {
         owner.handleIncomingMidiMessageInt (source, message);
     }
 
-    void audioDeviceListChanged()
+    void audioDeviceListChanged() override
     {
         owner.audioDeviceListChanged();
     }
@@ -160,8 +160,8 @@ void AudioDeviceManager::createAudioDeviceTypes (OwnedArray <AudioIODeviceType>&
     addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_ASIO());
     addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_CoreAudio());
     addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_iOSAudio());
-    addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_JACK());
     addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_ALSA());
+    addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_JACK());
     addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_OpenSLES());
     addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_Android());
 }
@@ -886,8 +886,7 @@ void AudioDeviceManager::setDefaultMidiOutput (const String& deviceName)
 
         {
             const ScopedLock sl (audioCallbackLock);
-            oldCallbacks = callbacks;
-            callbacks.clear();
+            oldCallbacks.swapWith (callbacks);
         }
 
         if (currentAudioDevice != nullptr)
@@ -906,7 +905,7 @@ void AudioDeviceManager::setDefaultMidiOutput (const String& deviceName)
 
         {
             const ScopedLock sl (audioCallbackLock);
-            callbacks = oldCallbacks;
+            oldCallbacks.swapWith (callbacks);
         }
 
         updateXml();

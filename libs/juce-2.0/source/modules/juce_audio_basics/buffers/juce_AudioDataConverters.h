@@ -22,8 +22,8 @@
   ==============================================================================
 */
 
-#ifndef __JUCE_AUDIODATACONVERTERS_JUCEHEADER__
-#define __JUCE_AUDIODATACONVERTERS_JUCEHEADER__
+#ifndef JUCE_AUDIODATACONVERTERS_H_INCLUDED
+#define JUCE_AUDIODATACONVERTERS_H_INCLUDED
 
 
 //==============================================================================
@@ -350,8 +350,8 @@ public:
         /** Creates a pointer from some raw data in the appropriate format with the specified number of interleaved channels.
             For non-interleaved data, use the other constructor.
         */
-        Pointer (typename Constness::VoidType* sourceData, int numInterleavedChannels) noexcept
-            : InterleavingType (numInterleavedChannels), data (Constness::toVoidPtr (sourceData))
+        Pointer (typename Constness::VoidType* sourceData, int numInterleaved) noexcept
+            : InterleavingType (numInterleaved), data (Constness::toVoidPtr (sourceData))
         {
         }
 
@@ -688,4 +688,4 @@ private:
 };
 
 
-#endif   // __JUCE_AUDIODATACONVERTERS_JUCEHEADER__
+#endif   // JUCE_AUDIODATACONVERTERS_H_INCLUDED

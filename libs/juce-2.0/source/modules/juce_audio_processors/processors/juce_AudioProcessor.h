@@ -22,8 +22,8 @@
   ==============================================================================
 */
 
-#ifndef __JUCE_AUDIOPROCESSOR_JUCEHEADER__
-#define __JUCE_AUDIOPROCESSOR_JUCEHEADER__
+#ifndef JUCE_AUDIOPROCESSOR_H_INCLUDED
+#define JUCE_AUDIOPROCESSOR_H_INCLUDED
 
 #include "juce_AudioProcessorEditor.h"
 #include "juce_AudioProcessorListener.h"
@@ -403,6 +403,37 @@ public:
     /** Returns the value of a parameter as a text string. */
     virtual const String getParameterText (int parameterIndex) = 0;
 
+    /** Returns the name of a parameter as a text string with a preferred maximum length.
+        If you want to provide customised short versions of your parameter names that
+        will look better in constrained spaces (e.g. the displays on hardware controller
+        devices or mixing desks) then you should implement this method.
+        If you don't override it, the default implementation will call getParameterText(int),
+        and truncate the result.
+    */
+    virtual String getParameterName (int parameterIndex, int maximumStringLength);
+
+    /** Returns the value of a parameter as a text string with a preferred maximum length.
+        If you want to provide customised short versions of your parameter values that
+        will look better in constrained spaces (e.g. the displays on hardware controller
+        devices or mixing desks) then you should implement this method.
+        If you don't override it, the default implementation will call getParameterText(int),
+        and truncate the result.
+    */
+    virtual String getParameterText (int parameterIndex, int maximumStringLength);
+
+    /** Returns the number of discrete steps that this parameter can represent.
+        The default return value if you don't implement this method is 0x7fffffff.
+        If your parameter is boolean, then you may want to make this return 2.
+        The value that is returned may or may not be used, depending on the host.
+    */
+    virtual int getParameterNumSteps (int parameterIndex);
+
+    /** Returns the default value for the parameter.
+        By default, this just returns 0.
+        The value that is returned may or may not be used, depending on the host.
+    */
+    virtual float getParameterDefaultValue (int parameterIndex);
+
     /** Some plugin types may be able to return a label string for a
         parameter's units.
     */
@@ -553,11 +584,6 @@ public:
     virtual void numChannelsChanged();
 
     //==============================================================================
-    /** LV2 specific calls, saving/restore as string. */
-    virtual String getStateInformationString () { return String::empty; }
-    virtual void setStateInformationString (const String& data) {}
-
-    //==============================================================================
     /** Adds a listener that will be called when an aspect of this processor changes. */
     virtual void addListener (AudioProcessorListener* newListener);
 
@@ -646,4 +672,4 @@ private:
 };
 
 
-#endif   // __JUCE_AUDIOPROCESSOR_JUCEHEADER__
+#endif   // JUCE_AUDIOPROCESSOR_H_INCLUDED

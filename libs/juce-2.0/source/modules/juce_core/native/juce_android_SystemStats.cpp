@@ -112,7 +112,7 @@ JNIEnv* getEnv() noexcept
     {
         DBG ("*** Call to getEnv() when system not initialised");
         jassertfalse;
-        exit (0);
+        std::exit (EXIT_FAILURE);
     }
    #endif
 
@@ -125,7 +125,7 @@ extern "C" jint JNI_OnLoad (JavaVM*, void*)
 }
 
 //==============================================================================
-AndroidSystem::AndroidSystem() : screenWidth (0), screenHeight (0)
+AndroidSystem::AndroidSystem() : screenWidth (0), screenHeight (0), dpi (160)
 {
 }
 
@@ -133,6 +133,7 @@ void AndroidSystem::initialise (JNIEnv* env, jobject activity_,
                                 jstring appFile_, jstring appDataDir_)
 {
     screenWidth = screenHeight = 0;
+    dpi = 160;
     JNIClassBase::initialiseAllClasses (env);
 
     threadLocalJNIEnvHolder.initialise (env);
@@ -267,14 +268,8 @@ String SystemStats::getUserRegion()      { return AndroidStatsHelpers::getLocale
 String SystemStats::getDisplayLanguage() { return getUserLanguage(); }
 
 //==============================================================================
-SystemStats::CPUFlags::CPUFlags()
+void CPUInformation::initialise() noexcept
 {
-    // TODO
-    hasMMX = false;
-    hasSSE = false;
-    hasSSE2 = false;
-    has3DNow = false;
-
     numCpus = jmax (1, sysconf (_SC_NPROCESSORS_ONLN));
 }
 

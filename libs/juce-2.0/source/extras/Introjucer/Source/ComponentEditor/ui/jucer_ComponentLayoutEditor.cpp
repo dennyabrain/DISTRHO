@@ -23,6 +23,7 @@
 */
 
 #include "../../jucer_Headers.h"
+#include "../../Application/jucer_Application.h"
 #include "jucer_ComponentLayoutEditor.h"
 #include "../ui/jucer_JucerCommandIDs.h"
 #include "../jucer_ObjectTypes.h"
@@ -215,6 +216,8 @@ void ComponentLayoutEditor::refreshAllComponents()
     for (int i = layout.getNumComponents(); --i >= 0;)
     {
         Component* const c = layout.getComponent (i);
+        jassert (c != nullptr);
+
         ComponentOverlayComponent* overlay = getOverlayCompFor (c);
 
         bool isNewOverlay = false;
@@ -264,6 +267,8 @@ void ComponentLayoutEditor::mouseDown (const MouseEvent& e)
 {
     if (e.mods.isPopupMenu())
     {
+        ApplicationCommandManager* commandManager = &IntrojucerApp::getCommandManager();
+
         PopupMenu m;
 
         m.addCommandItem (commandManager, JucerCommandIDs::editCompLayout);

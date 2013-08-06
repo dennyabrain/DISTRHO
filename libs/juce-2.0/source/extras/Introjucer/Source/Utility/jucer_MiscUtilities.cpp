@@ -23,7 +23,7 @@
 */
 
 #include "../jucer_Headers.h"
-
+#include "../Application/jucer_Application.h"
 
 //==============================================================================
 String createAlphaNumericUID()
@@ -400,10 +400,10 @@ public:
         startTimer (500);
     }
 
-    void timerCallback()
+    void timerCallback() override
     {
         stopTimer();
-        commandManager->invoke (info, true);
+        IntrojucerApp::getCommandManager().invoke (info, true);
         delete this;
     }
 

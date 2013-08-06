@@ -22,8 +22,8 @@
   ==============================================================================
 */
 
-#ifndef __JUCE_INITIALISATION_JUCEHEADER__
-#define __JUCE_INITIALISATION_JUCEHEADER__
+#ifndef JUCE_INITIALISATION_H_INCLUDED
+#define JUCE_INITIALISATION_H_INCLUDED
 
 
 //==============================================================================
@@ -88,7 +88,7 @@ public:
 
 #else
  #if JUCE_WINDOWS
-  #if defined (WINAPI) || defined (_WINDOWS_) || defined(JUCE_MINGW)
+  #if defined (WINAPI) || defined (_WINDOWS_)
    #define JUCE_MAIN_FUNCTION       int __stdcall WinMain (HINSTANCE, HINSTANCE, const LPSTR, int)
   #elif defined (_UNICODE)
    #define JUCE_MAIN_FUNCTION       int __stdcall WinMain (void*, void*, const wchar_t*, int)
@@ -110,4 +110,4 @@ public:
     }
 #endif
 
-#endif   // __JUCE_INITIALISATION_JUCEHEADER__
+#endif   // JUCE_INITIALISATION_H_INCLUDED

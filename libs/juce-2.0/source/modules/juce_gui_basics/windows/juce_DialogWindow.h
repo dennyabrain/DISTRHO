@@ -22,8 +22,8 @@
   ==============================================================================
 */
 
-#ifndef __JUCE_DIALOGWINDOW_JUCEHEADER__
-#define __JUCE_DIALOGWINDOW_JUCEHEADER__
+#ifndef JUCE_DIALOGWINDOW_H_INCLUDED
+#define JUCE_DIALOGWINDOW_H_INCLUDED
 
 #include "juce_DocumentWindow.h"
 
@@ -64,7 +64,7 @@ public:
                                     desktop; if false, you can use it as a child component
     */
     DialogWindow (const String& name,
-                  const Colour& backgroundColour,
+                  Colour backgroundColour,
                   bool escapeKeyTriggersCloseButton,
                   bool addToDesktop = true);
 
@@ -192,11 +192,10 @@ public:
     static void showDialog (const String& dialogTitle,
                             Component* contentComponent,
                             Component* componentToCentreAround,
-                            const Colour& backgroundColour,
+                            Colour backgroundColour,
                             bool escapeKeyTriggersCloseButton,
                             bool shouldBeResizable = false,
-                            bool useBottomRightCornerResizer = false,
-                            bool useNativeTitleBar = false);
+                            bool useBottomRightCornerResizer = false);
 
    #if JUCE_MODAL_LOOPS_PERMITTED || DOXYGEN
     /** Easy way of quickly showing a dialog box containing a given component.
@@ -241,20 +240,19 @@ public:
     static int showModalDialog (const String& dialogTitle,
                                 Component* contentComponent,
                                 Component* componentToCentreAround,
-                                const Colour& backgroundColour,
+                                Colour backgroundColour,
                                 bool escapeKeyTriggersCloseButton,
                                 bool shouldBeResizable = false,
-                                bool useBottomRightCornerResizer = false,
-                                bool useNativeTitleBar = false);
+                                bool useBottomRightCornerResizer = false);
    #endif
 
 
 protected:
     //==============================================================================
     /** @internal */
-    void resized();
+    void resized() override;
     /** @internal */
-    bool keyPressed (const KeyPress&);
+    bool keyPressed (const KeyPress&) override;
 
 private:
     bool escapeKeyTriggersCloseButton;
@@ -262,4 +260,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DialogWindow)
 };
 
-#endif   // __JUCE_DIALOGWINDOW_JUCEHEADER__
+#endif   // JUCE_DIALOGWINDOW_H_INCLUDED

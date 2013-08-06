@@ -180,6 +180,21 @@ bool File::setAsCurrentWorkingDirectory() const
 }
 
 //==============================================================================
+// The unix siginterrupt function is deprecated - this does the same job.
+int juce_siginterrupt (int sig, int flag)
+{
+    struct ::sigaction act;
+    (void) ::sigaction (sig, nullptr, &act);
+
+    if (flag != 0)
+        act.sa_flags &= ~SA_RESTART;
+    else
+        act.sa_flags |= SA_RESTART;
+
+    return ::sigaction (sig, &act, nullptr);
+}
+
+//==============================================================================
 namespace
 {
    #if JUCE_LINUX || (JUCE_IOS && ! __DARWIN_ONLY_64_BIT_INO_T) // (this iOS stuff is to avoid a simulator bug)
@@ -867,15 +882,19 @@ void Thread::killThread()
     }
 }
 
-void Thread::setCurrentThreadName (const String& name)
+void JUCE_CALLTYPE Thread::setCurrentThreadName (const String& name)
 {
    #if JUCE_IOS || (JUCE_MAC && defined (MAC_OS_X_VERSION_10_5) && MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_5)
     JUCE_AUTORELEASEPOOL
     {
         [[NSThread currentThread] setName: juceStringToNS (name)];
     }
-   #elif JUCE_LINUX && (__GLIBC__ * 1000 + __GLIBC_MINOR__) >= 2012
-    pthread_setname_np (pthread_self(), name.toRawUTF8());
+   #elif JUCE_LINUX
+    #if (__GLIBC__ * 1000 + __GLIBC_MINOR__) >= 2012
+     pthread_setname_np (pthread_self(), name.toRawUTF8());
+    #else
+     prctl (PR_SET_NAME, name.toRawUTF8(), 0, 0, 0);
+    #endif
    #endif
 }
 
@@ -900,12 +919,12 @@ bool Thread::setThreadPriority (void* handle, int priority)
     return pthread_setschedparam ((pthread_t) handle, policy, &param) == 0;
 }
 
-Thread::ThreadID Thread::getCurrentThreadId()
+Thread::ThreadID JUCE_CALLTYPE Thread::getCurrentThreadId()
 {
     return (ThreadID) pthread_self();
 }
 
-void Thread::yield()
+void JUCE_CALLTYPE Thread::yield()
 {
     sched_yield();
 }
@@ -919,7 +938,7 @@ void Thread::yield()
  #define SUPPORT_AFFINITIES 1
 #endif
 
-void Thread::setCurrentThreadAffinityMask (const uint32 affinityMask)
+void JUCE_CALLTYPE Thread::setCurrentThreadAffinityMask (const uint32 affinityMask)
 {
    #if SUPPORT_AFFINITIES
     cpu_set_t affinity;

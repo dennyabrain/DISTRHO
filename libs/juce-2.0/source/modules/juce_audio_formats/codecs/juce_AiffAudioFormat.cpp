@@ -540,7 +540,7 @@ public:
 
     //==============================================================================
     bool readSamples (int** destSamples, int numDestChannels, int startOffsetInDestBuffer,
-                      int64 startSampleInFile, int numSamples)
+                      int64 startSampleInFile, int numSamples) override
     {
         clearSamplesBeyondAvailableLength (destSamples, numDestChannels, startOffsetInDestBuffer,
                                            startSampleInFile, numSamples, lengthInSamples);
@@ -643,7 +643,7 @@ public:
     }
 
     //==============================================================================
-    bool write (const int** data, int numSamples)
+    bool write (const int** data, int numSamples) override
     {
         jassert (data != nullptr && *data != nullptr); // the input must contain at least one channel!
 
@@ -792,15 +792,15 @@ private:
 class MemoryMappedAiffReader   : public MemoryMappedAudioFormatReader
 {
 public:
-    MemoryMappedAiffReader (const File& file, const AiffAudioFormatReader& reader)
-        : MemoryMappedAudioFormatReader (file, reader, reader.dataChunkStart,
+    MemoryMappedAiffReader (const File& f, const AiffAudioFormatReader& reader)
+        : MemoryMappedAudioFormatReader (f, reader, reader.dataChunkStart,
                                          reader.bytesPerFrame * reader.lengthInSamples, reader.bytesPerFrame),
           littleEndian (reader.littleEndian)
     {
     }
 
     bool readSamples (int** destSamples, int numDestChannels, int startOffsetInDestBuffer,
-                      int64 startSampleInFile, int numSamples)
+                      int64 startSampleInFile, int numSamples) override
     {
         clearSamplesBeyondAvailableLength (destSamples, numDestChannels, startOffsetInDestBuffer,
                                            startSampleInFile, numSamples, lengthInSamples);

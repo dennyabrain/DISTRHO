@@ -22,7 +22,7 @@
   ==============================================================================
 */
 
-DialogWindow::DialogWindow (const String& name, const Colour& colour,
+DialogWindow::DialogWindow (const String& name, Colour colour,
                             const bool escapeCloses, const bool onDesktop)
     : DocumentWindow (name, colour, DocumentWindow::closeButton, onDesktop),
       escapeKeyTriggersCloseButton (escapeCloses)
@@ -80,7 +80,7 @@ public:
         setResizable (options.resizable, options.useBottomRightCornerResizer);
     }
 
-    void closeButtonPressed()
+    void closeButtonPressed() override
     {
         setVisible (false);
     }
@@ -124,11 +124,10 @@ int DialogWindow::LaunchOptions::runModal()
 void DialogWindow::showDialog (const String& dialogTitle,
                                Component* const contentComponent,
                                Component* const componentToCentreAround,
-                               const Colour& backgroundColour,
+                               Colour backgroundColour,
                                const bool escapeKeyTriggersCloseButton,
                                const bool resizable,
-                               const bool useBottomRightCornerResizer,
-                               const bool useNativeTitleBar)
+                               const bool useBottomRightCornerResizer)
 {
     LaunchOptions o;
     o.dialogTitle = dialogTitle;
@@ -136,9 +135,9 @@ void DialogWindow::showDialog (const String& dialogTitle,
     o.componentToCentreAround = componentToCentreAround;
     o.dialogBackgroundColour = backgroundColour;
     o.escapeKeyTriggersCloseButton = escapeKeyTriggersCloseButton;
+    o.useNativeTitleBar = false;
     o.resizable = resizable;
     o.useBottomRightCornerResizer = useBottomRightCornerResizer;
-    o.useNativeTitleBar = useNativeTitleBar;
 
     o.launchAsync();
 }
@@ -147,11 +146,10 @@ void DialogWindow::showDialog (const String& dialogTitle,
 int DialogWindow::showModalDialog (const String& dialogTitle,
                                    Component* const contentComponent,
                                    Component* const componentToCentreAround,
-                                   const Colour& backgroundColour,
+                                   Colour backgroundColour,
                                    const bool escapeKeyTriggersCloseButton,
                                    const bool resizable,
-                                   const bool useBottomRightCornerResizer,
-                                   const bool useNativeTitleBar)
+                                   const bool useBottomRightCornerResizer)
 {
     LaunchOptions o;
     o.dialogTitle = dialogTitle;
@@ -159,9 +157,9 @@ int DialogWindow::showModalDialog (const String& dialogTitle,
     o.componentToCentreAround = componentToCentreAround;
     o.dialogBackgroundColour = backgroundColour;
     o.escapeKeyTriggersCloseButton = escapeKeyTriggersCloseButton;
+    o.useNativeTitleBar = false;
     o.resizable = resizable;
     o.useBottomRightCornerResizer = useBottomRightCornerResizer;
-    o.useNativeTitleBar = useNativeTitleBar;
 
     return o.runModal();
 }
