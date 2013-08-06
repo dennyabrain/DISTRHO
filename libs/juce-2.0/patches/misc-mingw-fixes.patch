@@ -1,8 +1,8 @@
 diff --git a/modules/juce_core/native/juce_BasicNativeHeaders.h b/modules/juce_core/native/juce_BasicNativeHeaders.h
-index 074506f..5e2ba74 100644
+index aecfc40..d294abb 100644
 --- a/modules/juce_core/native/juce_BasicNativeHeaders.h
 +++ b/modules/juce_core/native/juce_BasicNativeHeaders.h
-@@ -84,7 +84,7 @@
+@@ -87,7 +87,7 @@
   #define STRICT 1
   #define WIN32_LEAN_AND_MEAN 1
   #if JUCE_MINGW
@@ -12,10 +12,10 @@ index 074506f..5e2ba74 100644
    #define _WIN32_WINNT 0x0600
   #endif
 diff --git a/modules/juce_gui_basics/application/juce_Initialisation.h b/modules/juce_gui_basics/application/juce_Initialisation.h
-index 5071633..25797e1 100644
+index 46a39be..797cd3f 100644
 --- a/modules/juce_gui_basics/application/juce_Initialisation.h
 +++ b/modules/juce_gui_basics/application/juce_Initialisation.h
-@@ -89,7 +89,7 @@ public:
+@@ -88,7 +88,7 @@ public:
  
  #else
   #if JUCE_WINDOWS
