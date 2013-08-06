@@ -12,7 +12,7 @@ build:
 	$(MAKE) plugins -C plugins
 	$(MAKE) plugins -C ports
 
-	
+
 gen: gen_lv2 gen_vst
 
 gen_lv2:

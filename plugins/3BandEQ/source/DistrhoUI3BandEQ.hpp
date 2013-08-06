@@ -11,11 +11,11 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
  *
- * For a full copy of the license see the LGPL.txt file
+ * For a full copy of the license see the doc/LGPL.txt file.
  */
 
-#ifndef __DISTRHO_UI_3BANDEQ_HPP__
-#define __DISTRHO_UI_3BANDEQ_HPP__
+#ifndef DISTRHO_UI_3BANDEQ_HPP_INCLUDED
+#define DISTRHO_UI_3BANDEQ_HPP_INCLUDED
 
 #include "DistrhoUIOpenGL.hpp"
 
@@ -29,7 +29,7 @@
 
 START_NAMESPACE_DISTRHO
 
-// -------------------------------------------------
+// -----------------------------------------------------------------------
 
 class DistrhoUI3BandEQ : public OpenGLUI,
                          public ImageButton::Callback,
@@ -41,26 +41,26 @@ public:
     ~DistrhoUI3BandEQ() override;
 
 protected:
-    // ---------------------------------------------
+    // -------------------------------------------------------------------
     // Information
 
-    unsigned int d_width() const override
+    unsigned int d_getWidth() const noexcept override
     {
         return DistrhoArtwork3BandEQ::backgroundWidth;
     }
 
-    unsigned int d_height() const override
+    unsigned int d_getHeight() const noexcept override
     {
         return DistrhoArtwork3BandEQ::backgroundHeight;
     }
 
-    // ---------------------------------------------
+    // -------------------------------------------------------------------
     // DSP Callbacks
 
     void d_parameterChanged(uint32_t index, float value) override;
     void d_programChanged(uint32_t index) override;
 
-    // ---------------------------------------------
+    // -------------------------------------------------------------------
     // Widget Callbacks
 
     void imageButtonClicked(ImageButton* button, int) override;
@@ -86,8 +86,8 @@ private:
     ImageButton* fButtonAbout;
 };
 
-// -------------------------------------------------
+// -----------------------------------------------------------------------
 
 END_NAMESPACE_DISTRHO
 
-#endif // __DISTRHO_UI_3BANDEQ_HPP__
+#endif // DISTRHO_UI_3BANDEQ_HPP_INCLUDED

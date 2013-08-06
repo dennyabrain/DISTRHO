@@ -12,11 +12,11 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
- * For a full copy of the GNU General Public License see the GPL.txt file
+ * For a full copy of the GNU General Public License see the doc/GPL.txt file.
  */
 
-#ifndef __DISTRHO_PLUGIN_INFO_H__
-#define __DISTRHO_PLUGIN_INFO_H__
+#ifndef DISTRHO_PLUGIN_INFO_H_INCLUDED
+#define DISTRHO_PLUGIN_INFO_H_INCLUDED
 
 #define DISTRHO_PLUGIN_NAME "Nekobi"
 
@@ -35,4 +35,4 @@
 
 #define DISTRHO_UI_OPENGL
 
-#endif // __DISTRHO_PLUGIN_INFO_H__
+#endif // DISTRHO_PLUGIN_INFO_H_INCLUDED
