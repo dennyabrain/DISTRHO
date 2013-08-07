@@ -23,9 +23,6 @@
   ==============================================================================
 */
 
-#ifndef __JUCE_STANDALONEFILTERWINDOW_JUCEHEADER__
-#define __JUCE_STANDALONEFILTERWINDOW_JUCEHEADER__
-
 #include "JucePluginMain.h"
 #include "modules/juce_audio_plugin_client/utility/juce_PluginUtilities.cpp"
 
@@ -431,5 +428,3 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (StandaloneFilterWindow)
 };
-
-#endif   // __JUCE_STANDALONEFILTERWINDOW_JUCEHEADER__

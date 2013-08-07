@@ -6,9 +6,7 @@
   ==============================================================================
 */
 
-#include "juce_StandaloneFilterWindow.h"
-
-// resources
+#include "juce_StandaloneFilterWindow.cpp"
 #include "icon/DistrhoIcon.cpp"
 
 //==============================================================================
