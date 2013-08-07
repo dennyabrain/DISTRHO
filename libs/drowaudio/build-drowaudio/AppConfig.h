@@ -1,29 +1,15 @@
 /*
   ==============================================================================
 
-   Build options for drowaudio static library
+   Build options for drowaudio shared library
 
   ==============================================================================
 */
 
-#ifndef __DISTRHO_DROWAUDIO_APPCONFIG_H__
-#define __DISTRHO_DROWAUDIO_APPCONFIG_H__
+#ifndef BUILD_DROWAUDIO_APPCONFIG_H_INCLUDED
+#define BUILD_DROWAUDIO_APPCONFIG_H_INCLUDED
 
-#include "../build-audio-basics/AppConfig.h"
-
-#if JucePlugin_Build_Standalone
- #include "../build-audio-devices_full/AppConfig.h"
-#else
- #include "../build-audio-devices/AppConfig.h"
-#endif
-
-#include "../build-audio-formats/AppConfig.h"
-#include "../build-audio-utils/AppConfig.h"
-#include "../build-core/AppConfig.h"
-#include "../build-data-structures/AppConfig.h"
-#include "../build-events/AppConfig.h"
-#include "../build-graphics/AppConfig.h"
-#include "../build-gui-basics/AppConfig.h"
+#include "../build-juce/AppConfig.h"
 
 //=============================================================================
 /** Config: DROWAUDIO_USE_FFTREAL
@@ -49,4 +35,4 @@
  */
 #define DROWAUDIO_USE_CURL 0
 
-#endif // __DISTRHO_DROWAUDIO_APPCONFIG_H__
+#endif // BUILD_DROWAUDIO_APPCONFIG_H_INCLUDED

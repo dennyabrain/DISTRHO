@@ -1,31 +1,17 @@
 /*
   ==============================================================================
 
-   Build options for juced static library
+   Build options for juced shared library
 
   ==============================================================================
 */
 
-#ifndef __DISTRHO_JUCED_APPCONFIG_H__
-#define __DISTRHO_JUCED_APPCONFIG_H__
+#ifndef BUILD_JUCED_APPCONFIG_H_INCLUDED
+#define BUILD_JUCED_APPCONFIG_H_INCLUDED
 
-#include "../build-audio-basics/AppConfig.h"
+#include "../build-juce/AppConfig.h"
 
-#if JucePlugin_Build_Standalone
- #include "../build-audio-devices_full/AppConfig.h"
-#else
- #include "../build-audio-devices/AppConfig.h"
-#endif
-
-#include "../build-audio-formats/AppConfig.h"
-#include "../build-audio-processors/AppConfig.h"
-#include "../build-audio-utils/AppConfig.h"
-#include "../build-core/AppConfig.h"
-#include "../build-data-structures/AppConfig.h"
-#include "../build-events/AppConfig.h"
-#include "../build-graphics/AppConfig.h"
-#include "../build-gui-basics/AppConfig.h"
-#include "../build-gui-extra/AppConfig.h"
+#undef JUCE_PLUGINHOST_LADSPA
 
 //=============================================================================
 /** Config: JUCE_LASH
@@ -74,4 +60,4 @@
 */
 #define JUCETICE_INCLUDE_CURL_CODE 0
 
-#endif // __DISTRHO_JUCED_APPCONFIG_H__
+#endif // BUILD_JUCED_APPCONFIG_H_INCLUDED
