@@ -1,14 +1,7 @@
-# Compile the juce modules
+# Compile the drowaudio shared lib
 
-all: build
-
-
-build: drowaudio
-
-
-drowaudio:
+all:
 	$(MAKE) -C build-drowaudio
-
 
 clean:
 	$(MAKE) clean -C build-drowaudio

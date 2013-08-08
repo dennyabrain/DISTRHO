@@ -1,14 +1,7 @@
-# Compile the juce modules
+# Compile the juced shared lib
 
-all: build
-
-
-build: juced
-
-
-juced:
+all:
 	$(MAKE) -C build-juced
-
 
 clean:
 	$(MAKE) clean -C build-juced

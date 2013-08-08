@@ -1,17 +1,35 @@
 # Compile all the Plugins and Ports
 
+PREFIX=/usr/local
+
+
 all: build
 
 
 build:
 	$(MAKE) -C libs/distrho/dgl
 	$(MAKE) -C libs/drowaudio
-	$(MAKE) -C libs/juce-2.0 all
+	$(MAKE) -C libs/juce-2.0
 	$(MAKE) -C libs/juced
 	$(MAKE) -C libs/lv2-ttl-generator
-	$(MAKE) plugins -C plugins
-	$(MAKE) plugins -C ports
-	$(MAKE) gen
+# 	$(MAKE) plugins -C plugins
+# 	$(MAKE) plugins -C ports
+# 	$(MAKE) gen
+
+
+install:
+	install -d $(DESTDIR)$(PREFIX)/bin/
+	install -d $(DESTDIR)$(PREFIX)/lib/
+	install -d $(DESTDIR)$(PREFIX)/lib/ladspa/
+	install -d $(DESTDIR)$(PREFIX)/lib/dssi/
+	install -d $(DESTDIR)$(PREFIX)/lib/lv2/
+	install -d $(DESTDIR)$(PREFIX)/lib/vst/
+	install -m 755 bin/ladspa/*.so $(DESTDIR)$(PREFIX)/lib/ladspa/
+	install -m 755 bin/dssi/*.so   $(DESTDIR)$(PREFIX)/lib/dssi/
+# 	install -m 755 bin/lv2/*.lv2/  $(DESTDIR)$(PREFIX)/lib/lv2/
+	install -m 755 bin/vst/*.so    $(DESTDIR)$(PREFIX)/lib/vst/
+	install -m 755 libs/*.so       $(DESTDIR)$(PREFIX)/lib/
+	install -m 755 libs/lv2-ttl-generator $(DESTDIR)$(PREFIX)/bin/
 
 
 gen: gen_lv2 gen_vst
@@ -36,7 +54,7 @@ clean:
 	$(MAKE) clean -C libs/lv2-ttl-generator
 	$(MAKE) clean -C plugins
 	$(MAKE) clean -C ports
-	rm -rf bin/lv2/*.lv2
+	rm -rf bin/lv2/*.lv2/
 
 distclean: clean
 	$(MAKE) distclean -C libs/distrho/dgl
@@ -55,10 +73,6 @@ standalone:
 	$(MAKE) -C libs/juced
 	$(MAKE) standalone -C plugins
 	$(MAKE) standalone -C ports
-
-standalone-host: standalone
-	$(MAKE) all -C libs/juce-2.0
-	$(MAKE) standalone-host -C ports
 
 ladspa:
 	$(MAKE) ladspa -C plugins
