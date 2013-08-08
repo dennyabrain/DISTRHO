@@ -13,7 +13,6 @@
 #ifndef __APPHEADERFILE_E0XYLT__
 #define __APPHEADERFILE_E0XYLT__
 
-#define USE_DROWAUDIO 1
 #include "JucePluginMain.h"
 #include "dRowAudio.h"
 
