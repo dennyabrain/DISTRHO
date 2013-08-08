@@ -104,7 +104,8 @@ const String getPluginType()
 /** Returns plugin URI */
 static const String& getPluginURI()
 {
-#if defined(Cabbage_Plugin_LV2) && ! JUCE_WINDOWS
+#if defined(Cabbage_Plugin_LV2)
+ #if ! JUCE_WINDOWS
     static String pluginURI;
 
     if (pluginURI.isEmpty())
@@ -115,6 +116,9 @@ static const String& getPluginURI()
         pluginURI << "urn:cabbage:";
         pluginURI << File(exeInfo.dli_fname).getFileNameWithoutExtension();
     }
+ #else
+    static const String pluginURI(String("urn:cabbage:")+File::getSpecialLocation(File::currentExecutableFile).getFileNameWithoutExtension());
+ #endif
 #else
     static const String pluginURI(JucePlugin_LV2URI);
 #endif
