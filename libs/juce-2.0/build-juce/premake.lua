@@ -55,6 +55,6 @@ package.files = {
     "../source/modules/juce_events/juce_events.cpp",
     "../source/modules/juce_graphics/juce_graphics.cpp",
     "../source/modules/juce_gui_basics/juce_gui_basics.cpp",
-    "../source/modules/juce_gui_basics/juce_gui_extra.cpp"
+    "../source/modules/juce_gui_extra/juce_gui_extra.cpp"
   )
 }

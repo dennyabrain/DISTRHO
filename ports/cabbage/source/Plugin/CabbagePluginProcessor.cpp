@@ -20,6 +20,11 @@
 #include "CabbagePluginProcessor.h"   
 #include "CabbagePluginEditor.h"
 
+#ifdef JUCE_LINUX
+#include <dlfcn.h>
+static void helperFunc() {}
+#endif
+
 #define CABBAGE_VERSION "Cabbage v0.04.00 BETA"
 #define MAX_BUFFER_SIZE 1024
 
@@ -183,7 +188,11 @@ averageSampleIndex(0)
 String osxCSD = File::getSpecialLocation(File::currentApplicationFile).getFullPathName()+String("/Contents/")+File::getSpecialLocation(File::currentApplicationFile).getFileName();
 File thisFile(osxCSD); 
 Logger::writeToLog("MACOSX defined OK");
-#else  
+#elif JUCE_LINUX
+Dl_info exeInfo;
+dladdr ((void*) helperFunc, &exeInfo);
+File thisFile(exeInfo.dli_fname);
+#else
 File thisFile(File::getSpecialLocation(File::currentExecutableFile)); 
 #endif
 csdFile = thisFile.withFileExtension(String(".csd")).getFullPathName();

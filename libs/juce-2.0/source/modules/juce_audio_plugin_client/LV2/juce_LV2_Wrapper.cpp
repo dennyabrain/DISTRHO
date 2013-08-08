@@ -34,6 +34,10 @@
  #undef KeyPress
 #endif
 
+#if defined(Cabbage_Plugin_LV2) && ! JUCE_WINDOWS
+ #include <dlfcn.h>
+#endif
+
 #include <fstream>
 #include <iostream>
 
@@ -100,8 +104,17 @@ const String getPluginType()
 /** Returns plugin URI */
 static const String& getPluginURI()
 {
-#ifdef Cabbage_Plugin_LV2
-    static const String pluginURI(String("urn:cabbage:")+File::getSpecialLocation(File::currentExecutableFile).getFileNameWithoutExtension());
+#if defined(Cabbage_Plugin_LV2) && ! JUCE_WINDOWS
+    static String pluginURI;
+
+    if (pluginURI.isEmpty())
+    {
+        Dl_info exeInfo;
+        dladdr ((void*) getPluginType, &exeInfo);
+
+        pluginURI << "urn:cabbage:";
+        pluginURI << File(exeInfo.dli_fname).getFileNameWithoutExtension();
+    }
 #else
     static const String pluginURI(JucePlugin_LV2URI);
 #endif

@@ -13,8 +13,8 @@ build:
 	$(MAKE) -C libs/juced
 	$(MAKE) -C libs/lv2-ttl-generator
 # 	$(MAKE) plugins -C plugins
-# 	$(MAKE) plugins -C ports
-# 	$(MAKE) gen
+	$(MAKE) plugins -C ports
+	$(MAKE) gen
 
 
 install:
@@ -71,15 +71,15 @@ standalone:
 	$(MAKE) -C libs/drowaudio
 	$(MAKE) -C libs/juce-2.0
 	$(MAKE) -C libs/juced
-	$(MAKE) standalone -C plugins
+# 	$(MAKE) standalone -C plugins
 	$(MAKE) standalone -C ports
 
 ladspa:
-	$(MAKE) ladspa -C plugins
+# 	$(MAKE) ladspa -C plugins
 
 dssi:
 	$(MAKE) -C libs/distrho/dgl
-	$(MAKE) dssi -C plugins
+# 	$(MAKE) dssi -C plugins
 
 lv2:
 	$(MAKE) -C libs/distrho/dgl
@@ -87,7 +87,7 @@ lv2:
 	$(MAKE) -C libs/juce-2.0
 	$(MAKE) -C libs/juced
 	$(MAKE) -C libs/lv2-ttl-generator
-	$(MAKE) lv2 -C plugins
+# 	$(MAKE) lv2 -C plugins
 	$(MAKE) lv2 -C ports
 	$(MAKE) gen_lv2
 
@@ -96,6 +96,6 @@ vst:
 	$(MAKE) -C libs/drowaudio
 	$(MAKE) -C libs/juce-2.0
 	$(MAKE) -C libs/juced
-	$(MAKE) vst -C plugins
+# 	$(MAKE) vst -C plugins
 	$(MAKE) vst -C ports
 	$(MAKE) gen_vst
