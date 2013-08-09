@@ -9,8 +9,9 @@ package.name = project.name
 package.kind = "dll"
 package.language = "c++"
 package.targetprefix = ""
+package.links     = { "csound64" }
 package.linkflags = { "static-runtime" }
-package.defines   = { "JucePlugin_Build_AU=0", "JucePlugin_Build_LV2=1", "JucePlugin_Build_RTAS=0", "JucePlugin_Build_VST=0", "JucePlugin_Build_Standalone=0",
+package.defines   = { "JucePlugin_Build_AU=0", "JucePlugin_Build_LV2=0", "JucePlugin_Build_RTAS=0", "JucePlugin_Build_VST=1", "JucePlugin_Build_Standalone=0",
                       "USE_DOUBLE=1" }
 
 package.config["Release"].target       = project.name
