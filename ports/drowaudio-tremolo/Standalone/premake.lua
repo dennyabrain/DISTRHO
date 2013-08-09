@@ -23,7 +23,7 @@ package.config["Debug"].target         = project.name .. "_debug"
 package.config["Debug"].objdir         = "intermediate/Debug"
 package.config["Debug"].defines        = { "DEBUG=1", "_DEBUG=1" }
 package.config["Debug"].buildoptions   = { "-O0 -ggdb" }
-package.config["Debug"].links          = { "juce", "drowaudio_debug" }
+package.config["Debug"].links          = { "juce_debug", "drowaudio_debug" }
 
 if (windows) then
   package.defines      = { package.defines, "WINDOWS=1" }

@@ -1,5 +1,5 @@
 #include "CabbageLookAndFeel.h"
-
+#include "BinaryData.h"
 
 CabbageLookAndFeel::CabbageLookAndFeel()
 {

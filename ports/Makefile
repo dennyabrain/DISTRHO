@@ -3,9 +3,9 @@
 all: build
 
 
-build: libs standalone standalone-host lv2 vst
+build: libs standalone lv2 vst
 
-plugins: standalone standalone-host lv2 vst
+plugins: standalone lv2 vst
 
 
 libs:
@@ -27,6 +27,7 @@ standalone:
 	$(MAKE) -C drumsynth/Standalone
 	$(MAKE) -C eqinox/Standalone
 	$(MAKE) -C juce-demo-plugin/Standalone
+	$(MAKE) -C juce-plugin-host/Standalone
 	$(MAKE) -C klangfalter/Standalone
 	$(MAKE) -C midiChords/Standalone
 	$(MAKE) -C midiLooper/Standalone
@@ -40,10 +41,6 @@ standalone:
 	$(MAKE) -C tal-vocoder-2/Standalone
 	$(MAKE) -C vex/Standalone
 	$(MAKE) -C wolpertinger/Standalone
-
-standalone-host:
-	mkdir -p ../bin/standalone
-	$(MAKE) -C juce-plugin-host/Standalone
 
 lv2:
 	mkdir -p ../bin/lv2
@@ -116,6 +113,7 @@ clean:
 	$(MAKE) clean -C drumsynth/Standalone
 	$(MAKE) clean -C eqinox/Standalone
 	$(MAKE) clean -C juce-demo-plugin/Standalone
+	$(MAKE) clean -C juce-plugin-host/Standalone
 	$(MAKE) clean -C klangfalter/Standalone
 	$(MAKE) clean -C midiChords/Standalone
 	$(MAKE) clean -C midiLooper/Standalone
@@ -129,9 +127,6 @@ clean:
 	$(MAKE) clean -C tal-vocoder-2/Standalone
 	$(MAKE) clean -C vex/Standalone
 	$(MAKE) clean -C wolpertinger/Standalone
-	
-	# Standalone-Host
-	$(MAKE) clean -C juce-plugin-host/Standalone
 
 	# LV2
 	$(MAKE) clean -C arctican-function/LV2

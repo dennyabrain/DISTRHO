@@ -21,6 +21,7 @@
 #include "CabbagePluginProcessor.h"
 #include "CabbagePluginEditor.h"
 #include  "../CabbageCustomWidgets.h"
+#include "BinaryData.h"
 
 
 #ifdef Cabbage_GUI_Editor

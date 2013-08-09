@@ -16,19 +16,19 @@ if [ ! -f standalone/CabbagePluginEffectLv2.so ]; then exit 0; fi
 
 mkdir -p lv2
 
-GEN=../../../libs/lv2_ttl_generator
-EXT=so
-
 if [ -f ../libs/lv2_ttl_generator.exe ]; then
   GEN=../../../libs/lv2_ttl_generator.exe
   EXT=dll
+else
+  GEN=../../../libs/lv2_ttl_generator
+  EXT=so
 fi
 
 FILES=`find ./cabbage -name \*.csd`
 
 for i in $FILES; do
-  #shortname=`echo $i | awk 'sub("./cabbage/","")' | awk 'sub("/","\n")' | tail -n 1 | awk 'sub(".csd","")'`
-  basename=`echo $i | awk 'sub("./cabbage/","cabbage_")' | awk 'sub("/","-")' | awk 'sub(".csd","")'`
+  basename=`echo $i | awk 'sub("./cabbage/","")' | awk 'sub("/","\n")' | tail -n 1 | awk 'sub(".csd","")'`
+  basename=`echo "cabbage-$basename"`
   lv2dir=`echo "./lv2/"$basename".lv2/"`
 
   echo mkdir -p $lv2dir
@@ -51,8 +51,8 @@ for i in $FILES; do
 done
 
 # Special files
-cp cabbage/Synths/bassline.snaps lv2/cabbage_Synths-bassline.lv2/
-# cp cabbage/Synths/Clavinet.snaps lv2/cabbage_Synths-Clavinet.lv2/
-# cp cabbage/Synths/TR-808_pattern.0.txt lv2/cabbage_Synths-TR-808.lv2/
+cp cabbage/Synths/bassline.snaps lv2/cabbage-bassline.lv2/
+# cp cabbage/Synths/Clavinet.snaps lv2/cabbage-Clavinet.lv2/
+# cp cabbage/Synths/TR-808_pattern.0.txt lv2/cabbage-TR-808.lv2/
 
 cd ..

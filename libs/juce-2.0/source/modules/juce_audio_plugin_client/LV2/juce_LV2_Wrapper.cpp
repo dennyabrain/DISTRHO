@@ -114,10 +114,10 @@ static const String& getPluginURI()
         dladdr ((void*) getPluginType, &exeInfo);
 
         pluginURI << "urn:cabbage:";
-        pluginURI << File(exeInfo.dli_fname).getFileNameWithoutExtension();
+        pluginURI << File(exeInfo.dli_fname).getFileNameWithoutExtension().replace("cabbage-","");
     }
  #else
-    static const String pluginURI(String("urn:cabbage:")+File::getSpecialLocation(File::currentExecutableFile).getFileNameWithoutExtension());
+    static const String pluginURI(String("urn:cabbage:")+File::getSpecialLocation(File::currentExecutableFile).getFileNameWithoutExtension().replace("cabbage-",""));
  #endif
 #else
     static const String pluginURI(JucePlugin_LV2URI);

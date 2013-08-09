@@ -25,7 +25,8 @@ fi
 FILES=`find ./cabbage -name \*.csd`
 
 for i in $FILES; do
-  basename=`echo $i | awk 'sub("./cabbage/","cabbage_")' | awk 'sub("/","-")' | awk 'sub(".csd","")'`
+  basename=`echo $i | awk 'sub("./cabbage/","")' | awk 'sub("/","\n")' | tail -n 1 | awk 'sub(".csd","")'`
+  basename=`echo "cabbage-$basename"`
 
   if ( echo $i | grep "./cabbage/Synths/" > /dev/null ); then
     echo cp `pwd`/standalone/CabbagePluginSynth.so vst/$basename.$EXT

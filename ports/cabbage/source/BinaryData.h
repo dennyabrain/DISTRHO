@@ -4,6 +4,9 @@
 
 */
 
+#ifndef BINARYDATA_INCLUDED
+#define BINARYDATA_INCLUDED
+
 namespace BinaryData
 {
     extern const char*   opcodes_txt;
@@ -22,3 +25,5 @@ namespace BinaryData
     // return the corresponding data and its size (or a null pointer if the name isn't found).
     const char* getNamedResource (const char* resourceNameUTF8, int& dataSizeInBytes) throw();
 }
+
+#endif

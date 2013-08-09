@@ -31,5 +31,5 @@ for i in $FOLDERS; do
 done
 
 # Remove cabbage logs
-rm -f $PWD/lv2/cabbage_*.lv2/CabbageLog.txt
+rm -f $PWD/lv2/cabbage*.lv2/CabbageLog.txt
 rm -f $PWD/../libs/CabbageLog.txt

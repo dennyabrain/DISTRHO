@@ -20,16 +20,16 @@ build:
 install:
 	install -d $(DESTDIR)$(PREFIX)/bin/
 	install -d $(DESTDIR)$(PREFIX)/lib/
-	install -d $(DESTDIR)$(PREFIX)/lib/ladspa/
-	install -d $(DESTDIR)$(PREFIX)/lib/dssi/
+# 	install -d $(DESTDIR)$(PREFIX)/lib/ladspa/
+# 	install -d $(DESTDIR)$(PREFIX)/lib/dssi/
 	install -d $(DESTDIR)$(PREFIX)/lib/lv2/
 	install -d $(DESTDIR)$(PREFIX)/lib/vst/
-	install -m 755 bin/ladspa/*.so $(DESTDIR)$(PREFIX)/lib/ladspa/
-	install -m 755 bin/dssi/*.so   $(DESTDIR)$(PREFIX)/lib/dssi/
-# 	install -m 755 bin/lv2/*.lv2/  $(DESTDIR)$(PREFIX)/lib/lv2/
-	install -m 755 bin/vst/*.so    $(DESTDIR)$(PREFIX)/lib/vst/
-	install -m 755 libs/*.so       $(DESTDIR)$(PREFIX)/lib/
-	install -m 755 libs/lv2-ttl-generator $(DESTDIR)$(PREFIX)/bin/
+# 	install -m 644 bin/ladspa/* $(DESTDIR)$(PREFIX)/lib/ladspa/
+# 	install -m 644 bin/dssi/*   $(DESTDIR)$(PREFIX)/lib/dssi/
+	cp -r bin/lv2/*.lv2/        $(DESTDIR)$(PREFIX)/lib/lv2/
+	install -m 644 bin/vst/*    $(DESTDIR)$(PREFIX)/lib/vst/
+	install -m 644 libs/*.so    $(DESTDIR)$(PREFIX)/lib/
+	install -m 755 libs/lv2_ttl_generator $(DESTDIR)$(PREFIX)/bin/
 
 
 gen: gen_lv2 gen_vst
