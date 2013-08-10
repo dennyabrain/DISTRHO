@@ -25,7 +25,7 @@ package.config["Debug"].buildoptions   = { "-O0 -ggdb" }
 if (windows) then
   package.defines = { "WINDOWS=1" }
   package.buildoptions = { "-fpermissive -std=c++0x" }
-  package.links        = { "gdi32", "imm32", "ole32", "shlwapi", "uuid", "version", "winmm", "wininet", "ws2_32" }
+  package.links        = { "comdlg32", "gdi32", "imm32", "ole32", "oleaut32", "shlwapi", "uuid", "version", "winmm", "wininet", "ws2_32" }
 elseif (macosx) then
   package.defines = { "MAC=1" }
   package.targetextension = "dylib"
@@ -40,7 +40,8 @@ end
 
 package.includepaths = {
   ".",
-  "../source"
+  "../source",
+  "../../../sdks/ASIOSDK2/common/"
 }
 
 package.files = {

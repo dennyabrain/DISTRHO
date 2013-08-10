@@ -1,6 +1,10 @@
 #include "CabbageStandaloneDialog.h"
 #include "../CabbageGUIClass.h"
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 ApplicationProperties* appProperties = nullptr;
 PropertySet* defaultPropSet = nullptr;
 String currentApplicationDirectory;
@@ -39,10 +43,10 @@ class CabbageStandalone : public JUCEApplication
 			defaultPropSet->setValue("UseCabbageIO", 1);
 			defaultPropSet->setValue("AudioEnabled", 1);
 			defaultPropSet->setValue("DisableGUIEditModeWarning", 0);
-			defaultPropSet->setValue("SetAlwaysOnTop", 1);	
+			defaultPropSet->setValue("SetAlwaysOnTop", 1);
 			defaultPropSet->setValue("PlantRepository", xml);
 			defaultPropSet->setValue("EditorColourScheme", 1);
-			
+
 			appProperties->getUserSettings()->setFallbackPropertySet(defaultPropSet);
 			filterWindow = new StandaloneFilterWindow (String("Cabbage"), Colours::black);
             filterWindow->setTitleBarButtonsRequired (DocumentWindow::allButtons, false);
@@ -64,15 +68,15 @@ class CabbageStandalone : public JUCEApplication
           {
              return String("cabbage");
           }
-          
+
           const String getApplicationVersion()
           {
              return String("0.0");
           }
 
-		  bool moreThanOneInstanceAllowed()       
-		  { 
-			  return true; 
+		  bool moreThanOneInstanceAllowed()
+		  {
+			  return true;
 		  }
 
        private:

@@ -6,10 +6,12 @@ PREFIX=/usr/local
 all: build
 
 
-build:
+build_juce:
+	$(MAKE) -C libs/juce-2.0
+
+build: build_juce
 	$(MAKE) -C libs/distrho/dgl
 	$(MAKE) -C libs/drowaudio
-	$(MAKE) -C libs/juce-2.0
 	$(MAKE) -C libs/juced
 	$(MAKE) -C libs/lv2-ttl-generator
 # 	$(MAKE) plugins -C plugins
@@ -68,10 +70,9 @@ distclean: clean
 
 
 # Custom build types
-standalone:
+standalone: build_juce
 	$(MAKE) -C libs/distrho/dgl
 	$(MAKE) -C libs/drowaudio
-	$(MAKE) -C libs/juce-2.0
 	$(MAKE) -C libs/juced
 # 	$(MAKE) standalone -C plugins
 	$(MAKE) standalone -C ports
@@ -83,20 +84,18 @@ dssi:
 	$(MAKE) -C libs/distrho/dgl
 # 	$(MAKE) dssi -C plugins
 
-lv2:
+lv2: build_juce
 	$(MAKE) -C libs/distrho/dgl
 	$(MAKE) -C libs/drowaudio
-	$(MAKE) -C libs/juce-2.0
 	$(MAKE) -C libs/juced
 	$(MAKE) -C libs/lv2-ttl-generator
 # 	$(MAKE) lv2 -C plugins
 	$(MAKE) lv2 -C ports
 	$(MAKE) gen_lv2
 
-vst:
+vst: build_juce
 	$(MAKE) -C libs/distrho/dgl
 	$(MAKE) -C libs/drowaudio
-	$(MAKE) -C libs/juce-2.0
 	$(MAKE) -C libs/juced
 # 	$(MAKE) vst -C plugins
 	$(MAKE) vst -C ports
