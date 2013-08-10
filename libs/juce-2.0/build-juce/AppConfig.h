@@ -153,7 +153,7 @@
 
     @see AudioUnitPluginFormat, AudioPluginFormat, AudioPluginFormatManager, JUCE_PLUGINHOST_VST
 */
-#if MAC
+#if MAC && AUDIO_UNIT_VERSION >= 1060
  #define JUCE_PLUGINHOST_AU 1
 #else
  #define JUCE_PLUGINHOST_AU 0

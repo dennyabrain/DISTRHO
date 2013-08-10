@@ -15,8 +15,11 @@
 #elif JucePlugin_Build_RTAS
  #include "modules/juce_audio_plugin_client/RTAS/juce_RTAS_Wrapper.cpp"
 #elif JucePlugin_Build_VST
- #define JUCE_USE_VSTSDK_2_4 1
- #include "modules/juce_audio_plugin_client/VST/juce_VST_Wrapper.cpp"
+ #ifdef JUCE_MAC
+  #include "modules/juce_audio_plugin_client/VST/juce_VST_Wrapper.mm"
+ #else
+  #include "modules/juce_audio_plugin_client/VST/juce_VST_Wrapper.cpp"
+ #endif
 #elif JucePlugin_Build_Standalone
  #include "juce_StandaloneFilterApplication.cpp"
 #else

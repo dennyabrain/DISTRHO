@@ -15,7 +15,9 @@ package.config["Release"].objdir       = "intermediate/Release"
 package.config["Release"].defines      = { "NDEBUG=1" }
 package.config["Release"].buildflags   = { "optimize-speed" }
 package.config["Release"].buildoptions = { "-O2 -ffast-math -fomit-frame-pointer -mtune=generic -msse -msse2 -mfpmath=sse" }
+if (not macosx) then
 package.config["Release"].linkoptions  = { "-Wl,--strip-all" }
+end
 
 package.config["Debug"].target         = project.name .. "_debug"
 package.config["Debug"].objdir         = "intermediate/Debug"
@@ -30,7 +32,9 @@ elseif (macosx) then
   package.defines = { "MAC=1" }
   package.targetextension = "dylib"
   package.buildoptions = { "-ObjC++" }
-  package.linkoptions  = { "-framework Accelerate -framework AudioToolbox -framework Cocoa -framework CoreAudio -framework CoreMIDI -framework QuartzCore" }
+  package.linkoptions  = { "-framework Accelerate -framework AudioToolbox -framework AudioUnit -framework Carbon -framework Cocoa",
+                           "-framework CoreAudio -framework CoreMIDI -framework IOKit -framework QuartzCore -framework WebKit",
+                           "-dynamiclib" }
 else
   package.defines = { "LINUX=1" }
   package.buildoptions = { "`pkg-config --cflags freetype2` -std=c++0x" }

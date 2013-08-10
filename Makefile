@@ -10,7 +10,7 @@ build_juce:
 	$(MAKE) -C libs/juce-2.0
 
 build: build_juce
-	$(MAKE) -C libs/distrho/dgl
+# 	$(MAKE) -C libs/distrho/dgl
 	$(MAKE) -C libs/drowaudio
 	$(MAKE) -C libs/juced
 	$(MAKE) -C libs/lv2-ttl-generator
@@ -71,7 +71,7 @@ distclean: clean
 
 # Custom build types
 standalone: build_juce
-	$(MAKE) -C libs/distrho/dgl
+# 	$(MAKE) -C libs/distrho/dgl
 	$(MAKE) -C libs/drowaudio
 	$(MAKE) -C libs/juced
 # 	$(MAKE) standalone -C plugins
@@ -81,11 +81,11 @@ ladspa:
 # 	$(MAKE) ladspa -C plugins
 
 dssi:
-	$(MAKE) -C libs/distrho/dgl
+# 	$(MAKE) -C libs/distrho/dgl
 # 	$(MAKE) dssi -C plugins
 
 lv2: build_juce
-	$(MAKE) -C libs/distrho/dgl
+# 	$(MAKE) -C libs/distrho/dgl
 	$(MAKE) -C libs/drowaudio
 	$(MAKE) -C libs/juced
 	$(MAKE) -C libs/lv2-ttl-generator
@@ -94,7 +94,7 @@ lv2: build_juce
 	$(MAKE) gen_lv2
 
 vst: build_juce
-	$(MAKE) -C libs/distrho/dgl
+# 	$(MAKE) -C libs/distrho/dgl
 	$(MAKE) -C libs/drowaudio
 	$(MAKE) -C libs/juced
 # 	$(MAKE) vst -C plugins

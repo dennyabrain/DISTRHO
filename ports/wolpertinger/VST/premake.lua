@@ -19,7 +19,9 @@ package.config["Release"].defines      = { "NDEBUG=1", "CONFIGURATION=\"Release\
 package.config["Release"].buildflags   = { "no-symbols", "optimize-speed" }
 package.config["Release"].buildoptions = { "-O2 -ffast-math -fomit-frame-pointer -fvisibility=hidden -mtune=generic -msse -msse2 -mfpmath=sse" }
 package.config["Release"].links        = { "juce" }
+if (not macosx) then
 package.config["Release"].linkoptions  = { "-Wl,--strip-all" }
+end
 
 package.config["Debug"].target         = project.name .. "_debug"
 package.config["Debug"].objdir         = "intermediate/Debug"
@@ -34,7 +36,7 @@ elseif (macosx) then
   package.defines      = { package.defines, "MAC=1", "BINTYPE=\"Mac-VST\"" }
   package.targetextension = "dylib"
   package.buildoptions = { "-ObjC++" }
-  package.linkoptions  = { "-bundle -framework Carbon" }
+  package.linkoptions  = { "-framework Carbon -framework Cocoa -dynamiclib" }
 else
   package.defines      = { package.defines, "LINUX=1", "BINTYPE=\"Linux-VST\"" }
   package.buildoptions = { "-std=c++0x" }

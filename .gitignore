@@ -1,6 +1,7 @@
 *~
 *.a
 *.dll
+*.dylib
 *.exe
 *.la
 *.o

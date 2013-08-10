@@ -16,7 +16,9 @@ package.config["Release"].defines      = { "NDEBUG=1" }
 package.config["Release"].buildflags   = { "optimize-speed" }
 package.config["Release"].buildoptions = { "-O2 -ffast-math -fomit-frame-pointer -mtune=generic -msse -msse2 -mfpmath=sse" }
 package.config["Release"].links        = { "juce" }
+if (not macosx) then
 package.config["Release"].linkoptions  = { "-Wl,--strip-all" }
+end
 
 package.config["Debug"].target         = project.name .. "_debug"
 package.config["Debug"].objdir         = "intermediate/Debug"
@@ -31,7 +33,8 @@ if (windows) then
 elseif (macosx) then
   package.defines = { "MAC=1" }
   package.targetextension = "dylib"
-  package.buildoptions =  { "-ObjC++" }
+  package.buildoptions = { "-ObjC++" }
+  package.linkoptions  = { "-dynamiclib" }
 else
   package.defines = { "LINUX=1" }
   package.buildoptions = { "-std=c++0x" }
