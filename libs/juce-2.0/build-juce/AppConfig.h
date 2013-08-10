@@ -145,7 +145,7 @@
 
     @see VSTPluginFormat, AudioPluginFormat, AudioPluginFormatManager, JUCE_PLUGINHOST_AU
 */
-#define JUCE_PLUGINHOST_VST 0
+#define JUCE_PLUGINHOST_VST 1
 #define JUCE_USE_VSTSDK_2_4 1
 
 /** Config: JUCE_PLUGINHOST_AU

@@ -30,6 +30,10 @@
  #error "If you're building the audio plugin host, you probably want to enable VST and/or AU support"
 #endif
 
+#ifdef _WIN32
+ #include <windows.h>
+#endif
+
 
 ApplicationCommandManager* commandManager = nullptr;
 ApplicationProperties* appProperties = nullptr;

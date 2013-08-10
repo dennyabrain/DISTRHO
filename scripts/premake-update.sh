@@ -59,3 +59,17 @@ for i in $FILES; do
     cd ../../../..
   fi
 done
+
+# ------------------------------------------------------------------------------------------------------------
+
+if [ -d /usr/include/pluginterfaces ]; then
+  cp -r /usr/include/pluginterfaces sdks/vstsdk2.4/
+fi
+
+if [ -d /usr/include/public.sdk ]; then
+  cp -r /usr/include/public.sdk sdks/vstsdk2.4/
+fi
+
+if [ ! -d sdks/vstsdk2.4/pluginterfaces ]; then
+  sed -i "s/#define JUCE_PLUGINHOST_VST 1/#define JUCE_PLUGINHOST_VST 0/" libs/juce-2.0/build-juce/AppConfig.h
+fi

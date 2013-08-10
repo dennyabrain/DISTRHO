@@ -41,7 +41,8 @@ end
 package.includepaths = {
   ".",
   "../source",
-  "../../../sdks/ASIOSDK2/common/"
+  "../../../sdks/ASIOSDK2/common/",
+  "../../../sdks/vstsdk2.4/"
 }
 
 package.files = {
