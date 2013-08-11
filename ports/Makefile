@@ -8,13 +8,15 @@ build: libs standalone lv2 vst
 plugins: standalone lv2 vst
 
 
-libs:
-	$(MAKE) -C ../libs/drowaudio
+libs_juce:
 	$(MAKE) -C ../libs/juce-2.0
+
+libs: libs_juce
+	$(MAKE) -C ../libs/drowaudio
 	$(MAKE) -C ../libs/juced
 	$(MAKE) -C ../libs/lv2-ttl-generator
 
-standalone:
+standalone: libs
 	mkdir -p ../bin/standalone
 	$(MAKE) -C arctican-function/Standalone
 	$(MAKE) -C arctican-pilgrim/Standalone
@@ -31,6 +33,7 @@ standalone:
 	$(MAKE) -C klangfalter/Standalone
 	$(MAKE) -C midiChords/Standalone
 	$(MAKE) -C midiLooper/Standalone
+	$(MAKE) -C pitchedDelay/Standalone
 	$(MAKE) -C tal-dub-3/Standalone
 	$(MAKE) -C tal-filter/Standalone
 	$(MAKE) -C tal-filter-2/Standalone
@@ -42,7 +45,7 @@ standalone:
 	$(MAKE) -C vex/Standalone
 	$(MAKE) -C wolpertinger/Standalone
 
-lv2:
+lv2: libs
 	mkdir -p ../bin/lv2
 	$(MAKE) -C arctican-function/LV2
 	$(MAKE) -C arctican-pilgrim/LV2
@@ -60,6 +63,7 @@ lv2:
 	$(MAKE) -C klangfalter/LV2
 	$(MAKE) -C midiChords/LV2
 	$(MAKE) -C midiLooper/LV2
+	$(MAKE) -C pitchedDelay/LV2
 	$(MAKE) -C tal-dub-3/LV2
 	$(MAKE) -C tal-filter/LV2
 	$(MAKE) -C tal-filter-2/LV2
@@ -71,7 +75,7 @@ lv2:
 	$(MAKE) -C vex/LV2
 	$(MAKE) -C wolpertinger/LV2
 
-vst:
+vst: libs
 	mkdir -p ../bin/vst
 	$(MAKE) -C arctican-function/VST
 	$(MAKE) -C arctican-pilgrim/VST
@@ -89,6 +93,7 @@ vst:
 	$(MAKE) -C klangfalter/VST
 	$(MAKE) -C midiChords/VST
 	$(MAKE) -C midiLooper/VST
+	$(MAKE) -C pitchedDelay/VST
 	$(MAKE) -C tal-dub-3/VST
 	$(MAKE) -C tal-filter/VST
 	$(MAKE) -C tal-filter-2/VST
@@ -117,6 +122,7 @@ clean:
 	$(MAKE) clean -C klangfalter/Standalone
 	$(MAKE) clean -C midiChords/Standalone
 	$(MAKE) clean -C midiLooper/Standalone
+	$(MAKE) clean -C pitchedDelay/Standalone
 	$(MAKE) clean -C tal-dub-3/Standalone
 	$(MAKE) clean -C tal-filter/Standalone
 	$(MAKE) clean -C tal-filter-2/Standalone
@@ -145,6 +151,7 @@ clean:
 	$(MAKE) clean -C klangfalter/LV2
 	$(MAKE) clean -C midiChords/LV2
 	$(MAKE) clean -C midiLooper/LV2
+	$(MAKE) clean -C pitchedDelay/LV2
 	$(MAKE) clean -C tal-dub-3/LV2
 	$(MAKE) clean -C tal-filter/LV2
 	$(MAKE) clean -C tal-filter-2/LV2
@@ -173,6 +180,7 @@ clean:
 	$(MAKE) clean -C klangfalter/VST
 	$(MAKE) clean -C midiChords/VST
 	$(MAKE) clean -C midiLooper/VST
+	$(MAKE) clean -C pitchedDelay/VST
 	$(MAKE) clean -C tal-dub-3/VST
 	$(MAKE) clean -C tal-filter/VST
 	$(MAKE) clean -C tal-filter-2/VST
