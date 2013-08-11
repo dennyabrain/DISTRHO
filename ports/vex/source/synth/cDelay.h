@@ -36,10 +36,9 @@
 
 #include "../StandardHeader.h"
 
-
 class cDelay
-{public:
-
+{
+public:
      cDelay(float* P)
      {
           SampleRate = 44100;
@@ -53,59 +52,55 @@ class cDelay
           iRead  = 0;
      }
 
-     ~cDelay(){
+     ~cDelay()
+     {
           delete buffy;
      }
 
-
-	void updateParameterPtr(float* P)
-	{
-		parameters = P;
-	}
-
+    void updateParameterPtr(float* P)
+    {
+          parameters = P;
+    }
 
     void processBlock(AudioSampleBuffer * OutBuffer, double bpm)
     {
-          feedback = parameters[74];
-          bpm = jlimit(10.0,500.0,bpm);
-          delay = jmin(int(parameters[73] * 8) * int(((60 / bpm) * SampleRate) / 4) , 44100);
+        feedback = parameters[74];
+        bpm = jlimit(10.0,500.0,bpm);
+        delay = jmin(int(parameters[73] * 8) * int(((60 / bpm) * SampleRate) / 4) , 44100);
 
+        for(int i = 0; i < OutBuffer->getNumSamples() ; i++)
+        {
+            if( iWrite >= SampleRate ){ iWrite = 0; }
+            iRead = iWrite - delay;
+            if( iRead < 0 ){ iRead = (int)SampleRate + iRead; }
 
-          for(int i = 0; i < OutBuffer->getNumSamples() ; i++)
+            *(buffy->getSampleData(0,iWrite)) = *(OutBuffer->getSampleData(0,i));
+            *(buffy->getSampleData(1,iWrite)) = *(OutBuffer->getSampleData(1,i));
+            *(buffy->getSampleData(1,iWrite)) +=  (*(buffy->getSampleData(0,iRead)) * feedback);
+            *(buffy->getSampleData(0,iWrite)) +=  (*(buffy->getSampleData(1,iRead)) * feedback);
+
+            jassert(i < OutBuffer->getNumSamples());
+            jassert(iRead < buffy->getNumSamples());
+            jassert(iWrite < buffy->getNumSamples());
+
+            *(OutBuffer->getSampleData(0,i)) = *(buffy->getSampleData(0,iRead));
+            *(OutBuffer->getSampleData(1,i)) = *(buffy->getSampleData(1,iRead));
+
+            iWrite++;
+        }
+     }
+
+     void setSampleRate(double s)
+     {
+          if (SampleRate != s)
           {
-               if( iWrite >= SampleRate ){ iWrite = 0; }
-               iRead = iWrite - delay;
-               if( iRead < 0 ){ iRead = (int)SampleRate + iRead; }
-
-               *(buffy->getSampleData(0,iWrite)) = *(OutBuffer->getSampleData(0,i));
-               *(buffy->getSampleData(1,iWrite)) = *(OutBuffer->getSampleData(1,i));
-               *(buffy->getSampleData(1,iWrite)) +=  (*(buffy->getSampleData(0,iRead)) * feedback);
-               *(buffy->getSampleData(0,iWrite)) +=  (*(buffy->getSampleData(1,iRead)) * feedback);
-				
-			   jassert(i < OutBuffer->getNumSamples());
-               jassert(iRead < buffy->getNumSamples());
-			   jassert(iWrite < buffy->getNumSamples());
-
-			   *(OutBuffer->getSampleData(0,i)) = *(buffy->getSampleData(0,iRead));
-               *(OutBuffer->getSampleData(1,i)) = *(buffy->getSampleData(1,iRead));
-
-               iWrite++;
+              SampleRate = (float)s;
+              bufferSize = int(SampleRate * 2);
+              buffy->setSize(2, bufferSize,0,0,1);
           }
      }
 
-     void setSampleRate(double s){
-		if (SampleRate != s)
-		{
-			SampleRate = (float)s;
-			bufferSize = int(SampleRate * 2);
-			buffy->setSize(2, bufferSize,0,0,1);
-		}
-     }
-    
-    juce_UseDebuggingNewOperator
-
 private:
-
      float* parameters;
      AudioSampleBuffer * buffy;
      float SampleRate;
@@ -114,4 +109,3 @@ private:
 };
 
 #endif
-

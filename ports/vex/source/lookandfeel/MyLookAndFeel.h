@@ -37,40 +37,35 @@
 #include "../StandardHeader.h"
 #include "../resources/Resources.h"
 
-class MyLookAndFeel  : public LookAndFeel
+class MyLookAndFeel : public LookAndFeel
 {
 public:
+    MyLookAndFeel();
+    ~MyLookAndFeel();
 
-	MyLookAndFeel();
-	~MyLookAndFeel();
+    Font getComboBoxFont (ComboBox& box);
+    Font getPopupMenuFont();
+    void getIdealPopupMenuItemSize (const String& text,
+                                          const bool isSeparator,
+                                          int standardMenuItemHeight,
+                                          int& idealWidth,
+                                          int& idealHeight);
 
-	Font getComboBoxFont (ComboBox& box);
-	Font getPopupMenuFont();
-	void getIdealPopupMenuItemSize (const String& text,
-                                             const bool isSeparator,
-                                             int standardMenuItemHeight,
-                                             int& idealWidth,
-                                             int& idealHeight);
+    void drawToggleButton (Graphics& g,
+                                ToggleButton& button,
+                                bool isMouseOverButton,
+                                bool isButtonDown);
 
-	void drawToggleButton (Graphics& g,
-                                    ToggleButton& button,
-                                    bool isMouseOverButton,
-                                    bool isButtonDown);
-
-	void drawRotarySlider (Graphics& g,
-	                       int x, int y,
-	                       int width, int height,
-	                       float sliderPosProportional,
-	                       const float rotaryStartAngle,
-	                       const float rotaryEndAngle,
-	                       Slider& slider);
-
-	juce_UseDebuggingNewOperator
+    void drawRotarySlider (Graphics& g,
+                            int x, int y,
+                            int width, int height,
+                            float sliderPosProportional,
+                            const float rotaryStartAngle,
+                            const float rotaryEndAngle,
+                            Slider& slider);
 
 public:
-
-	Font* Topaz;
+    Font* Topaz;
 };
-
 
 #endif

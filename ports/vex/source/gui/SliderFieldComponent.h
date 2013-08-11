@@ -36,127 +36,141 @@
 
 #include "../StandardHeader.h"
 
-
-class SliderFieldComponent	:	public Component, public ChangeBroadcaster{
-private:
-     int numSliders;
-     int SliderWidth;
-     int lastSlider;     // last cell clicked, for outside interaction
-     int activeLength; // How much of the grid should be usable vs greyed
-
-    float* array;  //  SizeX
-
+class SliderFieldComponent : public Component,
+                             public ChangeBroadcaster
+{
 public:
+    SliderFieldComponent()
+      : Component("Slider Field Component")
+    {
+        array = new float[16];
+        lastSlider = -1;   // -1, not to test against really
+        sliderWidth = -1;  // but it makes fuckups more visible
+        numSliders = 16;
+        activeLength = 8;
 
-     SliderFieldComponent() : Component( T("Slider Field Component") ){
-          array = new float[16];
-          lastSlider = -1;          // -1, not to test against really
-          SliderWidth = -1;    // but it makes fuckups more visible
-          numSliders = 16;
-          activeLength = 8;
+        //empty out the array.. to make sure
+        for(int i = 0; i < numSliders; i++)
+              array[i] = 0.5f;
+    }
 
-          for(int i = 0; i < numSliders; i++){ //empty out the array.. to make sure
-                array[i] = 0.5f;
-          }
+    ~SliderFieldComponent()
+    {
+        delete [] array;
+        deleteAllChildren();
+    }
 
-	}
+     void paint(Graphics& g)
+     {
+        //cell size -recalculate in case of resizing
+        sliderWidth = getWidth() / numSliders;
 
+        int middle = int(getHeight() * 0.5f);
 
-	~SliderFieldComponent(){
-		delete [] array;
-		deleteAllChildren ();
-	}
+        //Draw bars
+        g.setColour(Colour(50,50,50));
+        for(int i = 0; i < numSliders; i++)
+        {
+              if(array[i] > 0.0f){
+                  g.fillRect(i * sliderWidth + 2, getHeight() - int(array[i] * getHeight()), sliderWidth - 4, int(getHeight() * array[i])) ;
+              }
+        }
 
+        g.setColour(Colour(100,100,130));
 
+        //Grey stuff out
+        g.setColour(Colour(uint8(170),170,170,.7f));
+        g.fillRect(sliderWidth*activeLength,0,getWidth(),getHeight());
 
-     void paint(Graphics& g){
-          //cell size -recalculate in case of resizing
-          SliderWidth = getWidth() / numSliders;
-
-          int middle = int(getHeight() * 0.5f);
-
-          //Draw bars
-          g.setColour(Colour(50,50,50));
-          for(int i = 0; i < numSliders; i++){
-               if(array[i] > 0.0f){
-                    g.fillRect(i * SliderWidth + 2, getHeight() - int(array[i] * getHeight()), SliderWidth - 4, int(getHeight() * array[i])) ;
-               }
-          }
-
-          g.setColour(Colour(100,100,130));
-
-          //Grey stuff out
-          g.setColour(Colour(uint8(170),170,170,.7f));
-          g.fillRect(SliderWidth*activeLength,0,getWidth(),getHeight());
-
-          //bevel outline for the entire draw area
-          LookAndFeel::drawBevel(g, 0, 0, getWidth(), getHeight(), 1, Colours::black, Colours::white, 0);
+        //bevel outline for the entire draw area
+        LookAndFeel::drawBevel(g, 0, 0, getWidth(), getHeight(), 1, Colours::black, Colours::white, 0);
      }
 
 
 
-     void mouseDrag(const MouseEvent &  e ){
-          if ((e.y < getHeight()-1) && (e.x < getWidth()-1)){ //this avoids false triggers along the rims
+     void mouseDrag(const MouseEvent& e)
+     {
+        if ((e.y < getHeight()-1) && (e.x < getWidth()-1))
+        {
+            //this avoids false triggers along the rims
+            float height = (float) getHeight();
+            int index = (e.x-1)/sliderWidth;
+            float value = ((height - e.y -1.0f) / height);
 
-               float height = (float) getHeight();
-               int index = (e.x-1)/SliderWidth;
-               float value = ((height - e.y -1.0f) / height);
-
-               if (index < activeLength){  //if the click was on the greyed out portion, we dont do jack
-                    lastSlider = index;
-                    array[index]= value;
-                    repaint();
-                    sendChangeMessage();
-               }
-          }
+            //if the click was on the greyed out portion, we dont do jack
+            if (index < activeLength)
+            {
+                lastSlider = index;
+                array[index]= value;
+                repaint();
+                sendChangeMessage();
+            }
+        }
      }
 
+     void mouseDown(const MouseEvent& e)
+     {
+        if ((e.y < getHeight()-1) && (e.x < getWidth()-1))
+        {
+            //this avoids false triggers along the rims
+            float height = (float) getHeight();
+            int index = (e.x-1)/sliderWidth;
+            float value = ((height - e.y ) / height);
 
-     void mouseDown(const MouseEvent &  e ){
-          if ((e.y < getHeight()-1) && (e.x < getWidth()-1)){ //this avoids false triggers along the rims
-
-               float height = (float) getHeight();
-               int index = (e.x-1)/SliderWidth;
-               float value = ((height - e.y ) / height);
-
-               if (index < activeLength){  //if the click was on the greyed out portion, we dont do jack
-                    lastSlider = index;
-                    array[index]= value;
-                    repaint();
-                    sendChangeMessage();
-               }
-          }
+            //if the click was on the greyed out portion, we dont do jack
+            if (index < activeLength)
+            {
+                lastSlider = index;
+                array[index]= value;
+                repaint();
+                sendChangeMessage();
+            }
+        }
      }
 
-     int getLastSlider(){
+     int getLastSlider() const
+     {
           return lastSlider;
      }
 
-     float getValue(int i){
+     float getValue(int i) const
+     {
           return array[i];
      }
 
-     void setValue(int i, float v){
+     void setValue(int i, float v) const
+     {
           array[i] = v;
      }
 
-    int getLength(){
+    int getLength() const
+    {
         return activeLength;
     }
 
-    void setLength(int l){
+    void setLength(const int l)
+    {
         activeLength = jmin(l, numSliders);
         activeLength = jmax(activeLength, 1);
         repaint();
     }
 
-     void reset(){
-          for(int i = 0; i < numSliders; i++){ //empty out the array.. to make sure
-                array[i] = 0.0f;
-          }
-          repaint();
-     }
+    void reset()
+    {
+        //empty out the array.. to make sure
+        for(int i = 0; i < numSliders; i++)
+            array[i] = 0.0f;
+
+        repaint();
+    }
+
+private:
+     int numSliders;
+     int sliderWidth;
+     int lastSlider;   // last cell clicked, for outside interaction
+     int activeLength; // How much of the grid should be usable vs greyed
+
+    float* array;  // SizeX
 };
 
 #endif //_SLIDERFIELDCOMPONENT_H_
-

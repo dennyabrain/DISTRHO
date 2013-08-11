@@ -33,16 +33,15 @@
 
 #include "MyLookAndFeel.h"
 
-
 MyLookAndFeel::MyLookAndFeel()
 {
-	MemoryInputStream fontStream (Resources::t_bin, Resources::t_binSize, false);
-	CustomTypeface* tf = new CustomTypeface (fontStream);
-	Topaz = new Font (tf);
+    MemoryInputStream fontStream (Resources::t_bin, Resources::t_binSize, false);
+    CustomTypeface* tf = new CustomTypeface (fontStream);
+    Topaz = new Font (tf);
 //  delete tf;
 
-	Topaz->setHeight (9.0f);
-	Topaz->setHorizontalScale (1.0f);
+    Topaz->setHeight (9.0f);
+    Topaz->setHorizontalScale (1.0f);
 
 //	Topaz = new Font (Font::getDefaultMonospacedFontName (), 12.0f, Font::plain);
 //	Topaz->setHorizontalScale (1.0f);
@@ -50,12 +49,12 @@ MyLookAndFeel::MyLookAndFeel()
 
 MyLookAndFeel::~MyLookAndFeel()
 {
-	delete Topaz;
+    delete Topaz;
 }
 
 Font MyLookAndFeel::getComboBoxFont (ComboBox& box)
 {
-	return *Topaz;
+    return *Topaz;
 }
 
 Font MyLookAndFeel::getPopupMenuFont()
@@ -63,11 +62,11 @@ Font MyLookAndFeel::getPopupMenuFont()
     return *Topaz;
 }
 
-void MyLookAndFeel::getIdealPopupMenuItemSize (const String& text,
-                                             const bool isSeparator,
-                                             int standardMenuItemHeight,
-                                             int& idealWidth,
-                                             int& idealHeight)
+void MyLookAndFeel::getIdealPopupMenuItemSize(const String& text,
+                                              const bool isSeparator,
+                                              int standardMenuItemHeight,
+                                              int& idealWidth,
+                                              int& idealHeight)
 {
     if (isSeparator)
     {
@@ -84,13 +83,11 @@ void MyLookAndFeel::getIdealPopupMenuItemSize (const String& text,
 }
 
 
-void MyLookAndFeel::drawToggleButton (Graphics& g,
-                                    ToggleButton& button,
-                                    bool isMouseOverButton,
-                                    bool isButtonDown)
+void MyLookAndFeel::drawToggleButton(Graphics& g,
+                                     ToggleButton& button,
+                                     bool isMouseOverButton,
+                                     bool isButtonDown)
 {
-
-
     const int tickWidth = jmin (20, button.getHeight() - 4);
 
     drawTickBox (g, button, 4, (button.getHeight() - tickWidth) / 2,
@@ -111,8 +108,6 @@ void MyLookAndFeel::drawToggleButton (Graphics& g,
                       Justification::centredLeft, 10);
 }
 
-
-
 void MyLookAndFeel::drawRotarySlider (Graphics& g,
                                       int x, int y,
                                       int width, int height,
@@ -121,29 +116,27 @@ void MyLookAndFeel::drawRotarySlider (Graphics& g,
                                       const float rotaryEndAngle,
                                       Slider& slider)
 {
+    const float radius = jmin (width / 2, height / 2) - 2.0f;
+    const float centreX = x + width * 0.5f;
+    const float centreY = y + height * 0.5f;
+    const float rx = centreX - radius;
+    const float ry = centreY - radius;
+    const float rw = radius * 2.0f;
+    const float angle = rotaryStartAngle + sliderPos * (rotaryEndAngle - rotaryStartAngle);
+    //const bool isMouseOver = slider.isMouseOverOrDragging() && slider.isEnabled();
 
+    // const float zeroPos = rotaryStartAngle + fabs((float)slider.getMinimum() / ((float)slider.getMaximum() - (float)slider.getMinimum())) * (rotaryEndAngle - rotaryStartAngle);
 
-	const float radius = jmin (width / 2, height / 2) - 2.0f;
-	const float centreX = x + width * 0.5f;
-	const float centreY = y + height * 0.5f;
-	const float rx = centreX - radius;
-	const float ry = centreY - radius;
-	const float rw = radius * 2.0f;
-	const float angle = rotaryStartAngle + sliderPos * (rotaryEndAngle - rotaryStartAngle);
-	//const bool isMouseOver = slider.isMouseOverOrDragging() && slider.isEnabled();
+    Path p;
 
-	// const float zeroPos = rotaryStartAngle + fabs((float)slider.getMinimum() / ((float)slider.getMaximum() - (float)slider.getMinimum())) * (rotaryEndAngle - rotaryStartAngle);
+    PathStrokeType (rw * 0.01f).createStrokedPath (p, p);
 
-	Path p;
+    p.addLineSegment (Line<float>(0.0f, -radius * 0.5f, 0.00f, -radius), rw * 0.08f);
 
-	PathStrokeType (rw * 0.01f).createStrokedPath (p, p);
+    g.setColour (Colours::white.withAlpha (1.0f));
 
-	p.addLineSegment (Line<float>(0.0f, -radius * 0.5f, 0.00f, -radius), rw * 0.08f);
+    g.fillPath (p, AffineTransform::rotation (angle).translated (centreX, centreY));
 
-	g.setColour (Colours::white.withAlpha (1.0f));
-
-	g.fillPath (p, AffineTransform::rotation (angle).translated (centreX, centreY));
-
-	g.setColour (Colours::black.withAlpha (0.7f));
-	g.drawEllipse (rx, ry, rw, rw, 1.0f);
+    g.setColour (Colours::black.withAlpha (0.7f));
+    g.drawEllipse (rx, ry, rw, rw, 1.0f);
 }

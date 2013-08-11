@@ -40,18 +40,17 @@
 #include "PeggySettings.h"
 #include "PresetMan.h"
 
-#include "synth/cChorus.h"
-#include "synth/cReverb.h"
-#include "synth/cDelay.h"
 #include "synth/cArp.h"
+#include "synth/cChorus.h"
+#include "synth/cDelay.h"
+#include "synth/cReverb.h"
 #include "synth/cSyntModule.h"
 
 
-class VexFilter  : public AudioProcessor,
-                   public ChangeBroadcaster
+class VexFilter : public AudioProcessor,
+                  public ChangeBroadcaster
 {
 public:
-
     VexFilter();
     ~VexFilter();
 
@@ -61,7 +60,7 @@ public:
 
     void prepareToPlay (double sampleRate, int samplesPerBlock);
     void releaseResources();
-	void processBlock (AudioSampleBuffer& output, MidiBuffer& midiMessages);
+    void processBlock (AudioSampleBuffer& output, MidiBuffer& midiMessages);
 
     const String getName() const { return JucePlugin_Name; }
     bool acceptsMidi() const { return JucePlugin_WantsMidiInput; }
@@ -72,10 +71,10 @@ public:
     bool isInputChannelStereoPair (int index) const;
     bool isOutputChannelStereoPair (int index) const;
 
-    int getNumParameters()	{	return 92;	}
+    int getNumParameters() { return 92; }
     float getParameter (int index);
-    void  setParameter (int index, float newValue);
-	void setParameter (int index, float newValue, bool fromGUI);
+    void setParameter (int index, float newValue);
+    void setParameter (int index, float newValue, bool fromGUI);
 
     const String getParameterName (int index);
     const String getParameterText (int index);
@@ -93,35 +92,31 @@ public:
 
     AudioProcessorEditor* createEditor();
 
-	void setWave(int part, const String& waveName);
-	String getWave(int part);
-	peggySettings* getPeggySet(int part);
+    void setWave(int part, const String& waveName);
+    String getWave(int part);
+    PeggySettings* getPeggySet(int part);
 
-	std::list<int> dirtyList;
-
-    juce_UseDebuggingNewOperator
+    std::list<int> dirtyList;
 
 private:
-
-	AudioSampleBuffer * obf;
-	AudioSampleBuffer * abf;
-	AudioSampleBuffer * dbf;
-	AudioSampleBuffer * dbf2;
-	AudioSampleBuffer * dbf3;
-	int snum;
-	cSyntModule* s1;
-	cChorus* c1;
-	cReverb* r1;
-	cDelay* d1;
-	cArp* a1;
-	cArp* a2;
-	cArp* a3;
-	float* pra;
-	peggySettings* p1;
-	peggySettings* p2;
-	peggySettings* p3;
-	PresetMan* pMan;
+    AudioSampleBuffer* obf;
+    AudioSampleBuffer* abf;
+    AudioSampleBuffer* dbf;
+    AudioSampleBuffer* dbf2;
+    AudioSampleBuffer* dbf3;
+    int snum;
+    cSyntModule* s1;
+    cChorus* c1;
+    cReverb* r1;
+    cDelay* d1;
+    cArp* a1;
+    cArp* a2;
+    cArp* a3;
+    float* pra;
+    PeggySettings* p1;
+    PeggySettings* p2;
+    PeggySettings* p3;
+    PresetMan* pMan;
 };
-
 
 #endif

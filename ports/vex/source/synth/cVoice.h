@@ -36,59 +36,55 @@
 
 #include "../StandardHeader.h"
 #include "cWaveRenderer.h"
-#include "cADSR.h"      
-
+#include "cADSR.h"
 
 class cVoice
 {
 public:
+    cVoice(float* P, int po, waveRenderer* w, float sr = 44100);
+    ~cVoice();
 
-	cVoice(float* P, int po, waveRenderer* w, float sr = 44100);
-	~cVoice();
-
-	void doProcess(float * outBufferL, float * outBufferR, int bufferSize);
-	void start(float f, float v, int n, int preroll, double s, long o);
-	void release(int p);
+    void doProcess(float * outBufferL, float * outBufferR, int bufferSize);
+    void start(float f, float v, int n, int preroll, double s, long o);
+    void release(int p);
     void quickRelease();
 
-	void updateParameterPtr(float* P);
+    void updateParameterPtr(float* P);
 
-	int getOrdinal();
+    int getOrdinal();
 
-	void kill();
+    void kill();
     void update(int index);
 
-	int getNote();
-	bool getIsOn();
-	bool getIsReleased();
+    int getNote();
+    bool getIsOn();
+    bool getIsReleased();
 
-	float convertPitch (float pitch);
+    float convertPitch (float pitch);
     float bipolar (float in)	{	return in * 2.0f - 1.0f;	}
 
 private:
+    oscSet* oL;
+    oscSet* oR;
+    waveRenderer* wr;
 
-	oscSet* oL;
-	oscSet* oR;
-	waveRenderer* wr;
+    cADSR * aadsr;
+    cADSR * fadsr;
 
-	cADSR * aadsr;
-	cADSR * fadsr;
+    bool isOn,  isReleased;
+    int note;
 
-	bool isOn,  isReleased;
-	int note;
+    long Ordinal;
 
-	long Ordinal;
-
-	float Avelocity;
-	float Fvelocity;
-	double SampleRate; 
-	float BaseFrequency;
-	int poff;
-	float* pra;
-	float lfoC, LFOA, LFOP, LFOF;
-	float lfoS[2];
-	float lowL, bandL, highL, lowR, bandR, highR, q, cut;
+    float Avelocity;
+    float Fvelocity;
+    double SampleRate;
+    float BaseFrequency;
+    int poff;
+    float* pra;
+    float lfoC, LFOA, LFOP, LFOF;
+    float lfoS[2];
+    float lowL, bandL, highL, lowR, bandR, highR, q, cut;
 };
-
 
 #endif

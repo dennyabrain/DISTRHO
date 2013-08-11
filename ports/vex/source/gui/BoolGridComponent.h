@@ -36,51 +36,38 @@
 
 #include "../StandardHeader.h"
 
-
-class BoolGridComponent	:	public Component, public ChangeBroadcaster
+class BoolGridComponent : public Component,
+                          public ChangeBroadcaster
 {
-
-private:
-	int sizeX, sizeY; // grid size in number of cells
-	int cellX, cellY; // cell size in pixels, used by paint();
-	int lastCell;     // last cell clicked, for outside interaction
-	int activeLength; // How much of the grid should be usable vs greyed
-
-	bool* grid;  //  SizeX * SizeY
-
 public:
+    BoolGridComponent()
+        : Component("Bool Grid Component")
+    {
+        grid = new bool[80];
+        lastCell = -1;
+        cellX = -1; cellY = -1;
+        sizeX = 16;  sizeY = 5;
+        activeLength = 8;
 
-	BoolGridComponent() : Component( T("Bool Grid Component") )
-	{
-		grid = new bool[80];
-		lastCell = -1;          
-		cellX = -1; cellY = -1; 
-		sizeX = 16;  sizeY = 5;
-		activeLength = 8;
+        for(int x = 0; x < sizeX; x++)
+        {
+            for(int y = 0; y < sizeY; y++)
+            {
+                grid[(x * sizeY) + y] = false;
+            }
+        }
+    }
 
-		for(int x = 0; x < sizeX; x++)
-		{ 
-			for(int y = 0; y < sizeY; y++)
-			{
-				grid[(x * sizeY) + y] = false;
-			}
-		}
-	}
+    ~BoolGridComponent()
+    {
+        delete[] grid;
+    }
 
-
-
-	~BoolGridComponent()
-	{
-		delete [] grid;
-	}
-
-
-
-    void paint(Graphics& g){
+    void paint(Graphics& g)
+    {
         //background
         //g.setColour(Colour(200,200,210).withAlpha(0.4f));
         //g.fillRect(0,0,getWidth(),getHeight());
-
 
         //cell size -recalculate in case of resizing
         cellX = getWidth() / sizeX;
@@ -110,11 +97,11 @@ public:
         LookAndFeel::drawBevel(g, 0, 0, getWidth(), getHeight(), 1, Colours::black, Colours::white, 0);
     }
 
-
     //Yay, someone clicked my component!
-    void mouseDown(const MouseEvent &  e )
-	{
-        if (e.mouseWasClicked()){
+    void mouseDown(const MouseEvent& e)
+    {
+        if (e.mouseWasClicked())
+        {
             if ((e.y < getHeight()-1) && (e.x < getWidth()-1)){ //this avoids false triggers along the rims
 
                 int cx = (e.x-1)/cellX; int cy = (e.y-1)/cellY; //cx,cy are the cell coords
@@ -129,58 +116,58 @@ public:
         }
     }
 
-
     //get the state of a specific cell
-    bool getCellState(int x, int y){
+    bool getCellState(int x, int y) const
+    {
         return grid[(x * sizeY) + y];
     }
 
-    bool getCellState(int x){
-		return grid[x];
+    bool getCellState(int x) const
+    {
+        return grid[x];
     }
-
-
 
     //set the state of a specific cell. the last param determines if we broadcast
     //Cell determined by grid coords i.e X * Y
-    void setCellState(int x, int y, bool state, bool broadcast = false){
+    void setCellState(int x, int y, bool state, bool broadcast = false)
+    {
         grid[(x * sizeY) + y] = state;
         if (broadcast){sendChangeMessage();}
         repaint();
     }
+
     //Overloaded - cell determined soley by array index
-    void setCellState(int x, bool state, bool broadcast = false){
+    void setCellState(int x, bool state, bool broadcast = false)
+    {
         grid[x] = state;
         if (broadcast){sendChangeMessage();}
         repaint();
     }
 
-
-
     // the last changed cell, in terms of array index
-    int getLastChanged(){
+    int getLastChanged()
+    {
         return lastCell;
         lastCell = -1;
     }
 
-
-
     //Get the active length
-    int getLength(){
+    int getLength() const
+    {
         return activeLength;
     }
 
-
     //Set the active length of the grid
-    void setLength(int l){
+    void setLength(int l)
+    {
         activeLength = jmin(l, sizeX);
         activeLength = jmax(activeLength, 1);
         repaint();
     }
 
-
     //Clear the grid
-    void reset(){
+    void reset()
+    {
         for(int x = 0; x < sizeX; x++){
             for(int y = 0; y < sizeY; y++){
                 grid[(x * sizeY) + y] = false;
@@ -189,6 +176,13 @@ public:
         repaint();
     }
 
+private:
+    int sizeX, sizeY; // grid size in number of cells
+    int cellX, cellY; // cell size in pixels, used by paint();
+    int lastCell;     // last cell clicked, for outside interaction
+    int activeLength; // How much of the grid should be usable vs greyed
+
+    bool* grid;  //  SizeX * SizeY
 };
 
 #endif//_BOOLGRIDCOMPONENT_H_

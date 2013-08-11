@@ -34,7 +34,6 @@
 #include "cWaveRenderer.h"
 #include "../waverom/ResourceFile.h"
 
-
 WaveTableNames waveRenderer::waveTableNames [42] = {
     { "asym_saw",        Wavetables::asym_saw },
     { "bass_tone",       Wavetables::bass_tone },
@@ -80,16 +79,15 @@ WaveTableNames waveRenderer::waveTableNames [42] = {
     { "voice_2",         Wavetables::voice_2 }
 };
 
-String waveRenderer::getWaveTableName (const int index)
+String waveRenderer::getWaveTableName(const int index)
 {
     jassert (index >= 0)
     jassert (index < 42)
 
-    return String (waveRenderer::waveTableNames [index].name);
+    return String(waveRenderer::waveTableNames[index].name);
 }
 
-int waveRenderer::getWaveTableSize ()
+int waveRenderer::getWaveTableSize()
 {
     return 42;
 }
-

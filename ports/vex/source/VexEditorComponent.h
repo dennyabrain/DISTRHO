@@ -44,10 +44,10 @@
 
 
 class VexEditorComponent : public ComboBoxListener,
-						   public SliderListener,
-						   public ButtonListener,
-						   public ChangeListener,
-						   public AudioProcessorEditor
+                           public SliderListener,
+                           public ButtonListener,
+                           public ChangeListener,
+                           public AudioProcessorEditor
 {
 public:
 
@@ -62,17 +62,15 @@ public:
     void paint (Graphics& g);
     void resized();
 
-	juce_UseDebuggingNewOperator
-
 private:
 
     void updateParametersFromFilter(bool all);
 
-	ComboBox* comboBox;
+    ComboBox* comboBox;
     ComboBox* comboBox2;
     ComboBox* comboBox3;
 
-    SnappingSlider* sliders[89];  
+    SnappingSlider* sliders[89];
 
     TextButton* TB;
     TextButton* TB2;
@@ -82,13 +80,13 @@ private:
     TextButton* TB6;
     Image internalCachedImage1;
 
-	PeggyViewComponent* p1;
-	PeggyViewComponent* p2;
-	PeggyViewComponent* p3;
+    PeggyViewComponent* p1;
+    PeggyViewComponent* p2;
+    PeggyViewComponent* p3;
 
-	MyLookAndFeel mlaf;
+    MyLookAndFeel mlaf;
 
-    VexFilter* getFilter() const throw()       { return (VexFilter*) getAudioProcessor(); }
+    VexFilter* getFilter() const throw() { return (VexFilter*) getAudioProcessor(); }
 };
 
 #endif

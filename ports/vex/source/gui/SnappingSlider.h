@@ -36,33 +36,31 @@
 
 #include "../StandardHeader.h"
 
-
-class SnappingSlider  : public Slider
+class SnappingSlider : public Slider
 {
-private:
-	float snapTarget, snapMargin;
 public:
-	SnappingSlider (const String& name) : Slider (name)
-	{
-		snapTarget = 0.0f;
-		snapMargin = 0.05f;
-	}
-	void setSnap (float target, float margin)
-	{
-		snapTarget = target;
-		snapMargin = margin;
-	}
-	double snapValue (double attemptedValue, const bool userIsDragging)
-	{
-		if (fabs(attemptedValue - snapTarget) < snapMargin)
-		{
-			return snapTarget;
-		}
-		else
-		{
-			return attemptedValue;
-		}
-	}
+    SnappingSlider(const String& name)
+        : Slider(name),
+          snapTarget(0.0f),
+          snapMargin(0.05f)
+    {
+    }
+
+    void setSnap(const float target, const float margin)
+    {
+        snapTarget = target;
+        snapMargin = margin;
+    }
+
+    double snapValue(const double attemptedValue, const bool userIsDragging)
+    {
+        if (std::fabs(attemptedValue - snapTarget) < snapMargin)
+            return snapTarget;
+        return attemptedValue;
+    }
+
+private:
+    float snapTarget, snapMargin;
 };
 
 #endif

@@ -42,8 +42,8 @@ VexEditorComponent::VexEditorComponent (VexFilter* const ownerFilter)
 	addAndMakeVisible (comboBox = new ComboBox (String::empty));
     comboBox->setEditableText (false);
     comboBox->setJustificationType (Justification::centredLeft);
-    comboBox->setTextWhenNothingSelected (String(T("silent")));
-    comboBox->setTextWhenNoChoicesAvailable (String(T("silent")));
+    comboBox->setTextWhenNothingSelected (String("silent"));
+    comboBox->setTextWhenNoChoicesAvailable (String("silent"));
     comboBox->addListener (this);
 	comboBox->setColour(ComboBox::backgroundColourId, Colours::black);
 	comboBox->setColour(ComboBox::textColourId, Colours::lightgrey);
@@ -55,8 +55,8 @@ VexEditorComponent::VexEditorComponent (VexFilter* const ownerFilter)
     addAndMakeVisible (comboBox2 = new ComboBox (String::empty));
     comboBox2->setEditableText (false);
     comboBox2->setJustificationType (Justification::centredLeft);
-    comboBox2->setTextWhenNothingSelected (String(T("silent")));
-    comboBox2->setTextWhenNoChoicesAvailable (String(T("silent")));
+    comboBox2->setTextWhenNothingSelected (String("silent"));
+    comboBox2->setTextWhenNoChoicesAvailable (String("silent"));
     comboBox2->addListener (this);
 	comboBox2->setColour(ComboBox::backgroundColourId, Colours::black);
 	comboBox2->setColour(ComboBox::textColourId, Colours::lightgrey);
@@ -68,8 +68,8 @@ VexEditorComponent::VexEditorComponent (VexFilter* const ownerFilter)
     addAndMakeVisible (comboBox3 = new ComboBox (String::empty));
     comboBox3->setEditableText (false);
     comboBox3->setJustificationType (Justification::centredLeft);
-    comboBox3->setTextWhenNothingSelected (String(T("silent")));
-    comboBox3->setTextWhenNoChoicesAvailable (String(T("silent")));
+    comboBox3->setTextWhenNothingSelected (String("silent"));
+    comboBox3->setTextWhenNoChoicesAvailable (String("silent"));
     comboBox3->addListener (this);
 	comboBox3->setColour(ComboBox::backgroundColourId, Colours::black);
 	comboBox3->setColour(ComboBox::textColourId, Colours::lightgrey);
@@ -116,7 +116,7 @@ VexEditorComponent::VexEditorComponent (VexFilter* const ownerFilter)
 	//Make sliders
 	for (int i = 0; i < 89; i++)
 	{
-		addAndMakeVisible (sliders[i] = new SnappingSlider (T("s")));
+		addAndMakeVisible (sliders[i] = new SnappingSlider ("s"));
 		sliders[i]->setSliderStyle(Slider::RotaryVerticalDrag);
 		sliders[i]->setRange (0, 1, 0);
 		sliders[i]->setSnap(0.0f, 0.0f);
@@ -163,7 +163,7 @@ VexEditorComponent::VexEditorComponent (VexFilter* const ownerFilter)
 	sliders[82]->setSnap(0.0f, 0.05f);
 
 	//PART ON/OFF
-    addAndMakeVisible (TB = new TextButton (T("new button")));
+    addAndMakeVisible (TB = new TextButton ("new button"));
     TB->setButtonText (String::empty);
     TB->addListener (this);
     TB->setColour (TextButton::buttonColourId, Colours::darkred.withAlpha(0.5f));
@@ -171,7 +171,7 @@ VexEditorComponent::VexEditorComponent (VexFilter* const ownerFilter)
 	TB->setClickingTogglesState(true);
 	TB->setToggleState(false,false);
 
-    addAndMakeVisible (TB2 = new TextButton (T("new button")));
+    addAndMakeVisible (TB2 = new TextButton ("new button"));
     TB2->setButtonText (String::empty);
     TB2->addListener (this);
     TB2->setColour (TextButton::buttonColourId, Colours::darkred.withAlpha(0.5f));
@@ -179,7 +179,7 @@ VexEditorComponent::VexEditorComponent (VexFilter* const ownerFilter)
 	TB2->setClickingTogglesState(true);
 	TB2->setToggleState(false,false);
 
-    addAndMakeVisible (TB3 = new TextButton (T("new button")));
+    addAndMakeVisible (TB3 = new TextButton ("new button"));
     TB3->setButtonText (String::empty);
     TB3->addListener (this);
     TB3->setColour (TextButton::buttonColourId, Colours::darkred.withAlpha(0.5f));
@@ -188,7 +188,7 @@ VexEditorComponent::VexEditorComponent (VexFilter* const ownerFilter)
 	TB3->setToggleState(false,false);
 
 	//Peggy ON/OFF
-    addAndMakeVisible (TB4 = new TextButton (T("new button")));
+    addAndMakeVisible (TB4 = new TextButton ("new button"));
     TB4->setButtonText (String::empty);
     TB4->addListener (this);
     TB4->setColour (TextButton::buttonColourId, Colours::darkblue.withAlpha(0.5f));
@@ -196,7 +196,7 @@ VexEditorComponent::VexEditorComponent (VexFilter* const ownerFilter)
 	TB4->setClickingTogglesState(true);
 	TB4->setToggleState(false,false);
 
-    addAndMakeVisible (TB5 = new TextButton (T("new button")));
+    addAndMakeVisible (TB5 = new TextButton ("new button"));
     TB5->setButtonText (String::empty);
     TB5->addListener (this);
     TB5->setColour (TextButton::buttonColourId, Colours::darkblue.withAlpha(0.5f));
@@ -204,7 +204,7 @@ VexEditorComponent::VexEditorComponent (VexFilter* const ownerFilter)
 	TB5->setClickingTogglesState(true);
 	TB5->setToggleState(false,false);
 
-    addAndMakeVisible (TB6 = new TextButton (T("new button")));
+    addAndMakeVisible (TB6 = new TextButton ("new button"));
     TB6->setButtonText (String::empty);
     TB6->addListener (this);
     TB6->setColour (TextButton::buttonColourId, Colours::darkblue.withAlpha(0.5f));

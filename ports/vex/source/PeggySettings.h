@@ -34,16 +34,46 @@
 #ifndef __JUCETICE_VEXPEGGYSETTINGS_HEADER__
 #define __JUCETICE_VEXPEGGYSETTINGS_HEADER__
 
-struct peggySettings
+#include "StandardHeader.h"
+
+struct PeggySettings
 {
-	int length;
-	int timeMode;
-	int syncMode;
-	int failMode;
-	int velMode;
-	float velocities[16];
-	bool grid[80];
-	bool on;
+    int length;
+    int timeMode;
+    int syncMode;
+    int failMode;
+    int velMode;
+    float velocities[16];
+    bool grid[80];
+    bool on;
+
+    PeggySettings()
+        : length(0),
+          timeMode(0),
+          syncMode(0),
+          failMode(0),
+          velMode(0),
+          on(false)
+    {
+        zeromem(velocities, sizeof(float)*16);
+        zeromem(grid, sizeof(bool)*80);
+    }
+
+    void reset()
+    {
+        length   = 8;
+        timeMode = 2;
+        syncMode = 1;
+        failMode = 1;
+        velMode  = 1;
+        on       = true;
+
+        for (int i = 0; i < 16; ++i)
+            velocities[i] = 0.5f;
+
+        for (int i = 0; i < 80; ++i)
+            grid[i] = false;
+    }
 };
 
 #endif

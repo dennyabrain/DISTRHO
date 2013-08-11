@@ -40,55 +40,51 @@
 class cReverb
 {
 public:
+    cReverb (float* p)
+    {
+        updateParameterPtr (p);
+    }
 
-	cReverb (float* p)
-	{
-		updateParameterPtr (p);
-	}
+    ~cReverb()
+    {
+    }
 
-	~cReverb()
-	{
-	}
+    void updateParameterPtr (float* p)
+    {
+        parameters = p;
 
-	void updateParameterPtr (float* p)
-	{
-		parameters = p;
+        model.setroomsize (parameters[79]);
+        model.setdamp (parameters[81]);
+        model.setwet (1.0f);
+        model.setdry (0.0f);
+        model.setwidth (parameters[80]);
+    }
 
-		model.setroomsize (parameters[79]);
-		model.setdamp (parameters[81]);
-		model.setwet (1.0f);
-		model.setdry (0.0f);
-		model.setwidth (parameters[80]);
-	}
-
-	void processBlock (AudioSampleBuffer * OutBuffer)
-	{
+    void processBlock (AudioSampleBuffer * OutBuffer)
+    {
 #if 0
-		model.setroomsize (parameters[79]);
-		model.setdamp (parameters[81]);
-		model.setwet (1.0f);
-		model.setdry (0.0f);
-		model.setwidth (parameters[80]);
+        model.setroomsize (parameters[79]);
+        model.setdamp (parameters[81]);
+        model.setwet (1.0f);
+        model.setdry (0.0f);
+        model.setwidth (parameters[80]);
 #endif
 
-		model.processreplace(OutBuffer->getSampleData(0,0),
-		                     OutBuffer->getSampleData(1,0),
-		                     OutBuffer->getSampleData(0,0),
-		                     OutBuffer->getSampleData(1,0),
-		                     OutBuffer->getNumSamples(),
-		                     1);
-	}
+        model.processreplace(OutBuffer->getSampleData(0,0),
+                             OutBuffer->getSampleData(1,0),
+                             OutBuffer->getSampleData(0,0),
+                             OutBuffer->getSampleData(1,0),
+                             OutBuffer->getNumSamples(),
+                             1);
+    }
 
-	void setSampleRate(double s)
-	{
-	}
-
+    void setSampleRate(double s)
+    {
+    }
 
 private:
-
-    revmodel	model;
+    revmodel model;
     float* parameters;
-
 };
 
 #endif
