@@ -35,15 +35,15 @@
 #define __JUCETICE_VEXPRESETMAN_HEADER__
 
 #include "StandardHeader.h"
-#include "PeggySettings.h"
+#include "synth/cArpSettings.h"
 
 struct Program
 {
     String name;
     float parameters[92];
-    PeggySettings pegSet1;
-    PeggySettings pegSet2;
-    PeggySettings pegSet3;
+    VexArpSettings pegSet1;
+    VexArpSettings pegSet2;
+    VexArpSettings pegSet3;
     String waveFile1;
     String waveFile2;
     String waveFile3;
@@ -174,7 +174,7 @@ public:
             curProgram = i;
     }
 
-    void setPointersToCurrent(float** pars, PeggySettings** p1, PeggySettings** p2, PeggySettings** p3)
+    void setPointersToCurrent(float** pars, VexArpSettings** p1, VexArpSettings** p2, VexArpSettings** p3)
     {
         *pars =  programs[curProgram].parameters;
         *p1   = &programs[curProgram].pegSet1;

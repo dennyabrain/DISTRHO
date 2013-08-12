@@ -37,7 +37,6 @@
 #include <list>
 
 #include "JucePluginCharacteristics.h"
-#include "PeggySettings.h"
 #include "PresetMan.h"
 
 #include "synth/cArp.h"
@@ -94,7 +93,7 @@ public:
 
     void setWave(int part, const String& waveName);
     String getWave(int part);
-    PeggySettings* getPeggySet(int part);
+    VexArpSettings* getPeggySet(int part);
 
     std::list<int> dirtyList;
 
@@ -106,16 +105,16 @@ private:
     AudioSampleBuffer* dbf3;
     int snum;
     cSyntModule* s1;
-    cChorus* c1;
+    VexChorus* c1;
     cReverb* r1;
     cDelay* d1;
-    cArp* a1;
-    cArp* a2;
-    cArp* a3;
+    VexArp* a1;
+    VexArp* a2;
+    VexArp* a3;
     float* pra;
-    PeggySettings* p1;
-    PeggySettings* p2;
-    PeggySettings* p3;
+    VexArpSettings* p1;
+    VexArpSettings* p2;
+    VexArpSettings* p3;
     PresetMan* pMan;
 };
 

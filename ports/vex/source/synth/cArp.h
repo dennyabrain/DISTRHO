@@ -34,20 +34,20 @@
 #ifndef __JUCETICE_VEXCARP_HEADER__
 #define __JUCETICE_VEXCARP_HEADER__
 
+#include "cArpSettings.h"
+
 #ifdef CARLA_EXPORT
  #include "JuceHeader.h"
- #include "PeggySettings.h"
 #else
  #include "../StandardHeader.h"
- #include "../PeggySettings.h"
 #endif
 
-class cArp
+class VexArp
 {
 public:
     static const int kMaxNotes = 10;
 
-    cArp(const PeggySettings* p)
+    VexArp(const VexArpSettings* p)
         : peggySet(p),
           dead(true),
           notesPlaying(false),
@@ -83,8 +83,6 @@ public:
                 tmp = cKeysVelocity[i]; cKeysVelocity[i] = tmpVel;  tmpVel  = tmp;
             }
         }
-
-        jassert(cKeysDown[0] != 0);
 
         doSync = true;
     }
@@ -299,7 +297,7 @@ public:
     }
 
 private:
-    const PeggySettings* peggySet;
+    const VexArpSettings* peggySet;
     MidiBuffer outMidiBuffer;
     bool dead, notesPlaying, doSync;
     char nextStep;

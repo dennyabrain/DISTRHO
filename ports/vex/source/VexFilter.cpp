@@ -46,7 +46,7 @@ VexFilter::VexFilter()
     pMan->setPointersToCurrent(&pra, &p1, &p2, &p3);
 
     s1 = new cSyntModule(pra);
-    c1 = new cChorus(pra);
+    c1 = new VexChorus(pra);
     r1 = new cReverb(pra);
     d1 = new cDelay(pra);
 
@@ -57,9 +57,9 @@ VexFilter::VexFilter()
     dbf = NULL;
     snum = 0;
 
-    a1 = new cArp(p1);
-    a2 = new cArp(p2);
-    a3 = new cArp(p3);
+    a1 = new VexArp(p1);
+    a2 = new VexArp(p2);
+    a3 = new VexArp(p3);
 
     setCurrentProgram(0);
 }
@@ -138,7 +138,7 @@ String VexFilter::getWave(int part)
     return pMan->getWaveName(part);
 }
 
-PeggySettings* VexFilter::getPeggySet(int prt)
+VexArpSettings* VexFilter::getPeggySet(int prt)
 {
     if(prt == 1) return p1;
     if(prt == 2) return p2;
@@ -327,9 +327,9 @@ void VexFilter::getStateInformation(MemoryBlock& destData)
         pMan->setCurrentProgram(i);
 
         destData.append(pMan->getProgramStruct(i)->parameters, sizeof(float) * 92);
-        destData.append(&pMan->getProgramStruct(i)->pegSet1, sizeof(PeggySettings));
-        destData.append(&pMan->getProgramStruct(i)->pegSet2, sizeof(PeggySettings));
-        destData.append(&pMan->getProgramStruct(i)->pegSet3, sizeof(PeggySettings));
+        destData.append(&pMan->getProgramStruct(i)->pegSet1, sizeof(VexArpSettings));
+        destData.append(&pMan->getProgramStruct(i)->pegSet2, sizeof(VexArpSettings));
+        destData.append(&pMan->getProgramStruct(i)->pegSet3, sizeof(VexArpSettings));
 
         xmlState.setAttribute(String("Name") + String(i), pMan->getProgramName(i));
         xmlState.setAttribute(String("W1")   + String(i), pMan->getWaveName(1));
@@ -352,7 +352,7 @@ void VexFilter::setStateInformation (const void* data, int sizeInBytes)
     getCallbackLock().enter();
 
     int f92 = sizeof(float) * 92;
-    int pSize = f92 + sizeof(PeggySettings) * 3;
+    int pSize = f92 + sizeof(VexArpSettings) * 3;
     int xmlOffset = pSize * PresetMan::kNumPrograms;
 
     char* dataBytePtr = (char*)data;
@@ -370,9 +370,9 @@ void VexFilter::setStateInformation (const void* data, int sizeInBytes)
                 pMan->setWaveName(3, xmlState->getStringAttribute(String("W3") + String(i)));
 
                 memcpy( pMan->getProgramStruct(i)->parameters,	&dataBytePtr[pSize * i] , sizeof(float) * 92 );
-                memcpy( &pMan->getProgramStruct(i)->pegSet1,	&dataBytePtr[f92 + pSize * i] , sizeof(PeggySettings));
-                memcpy( &pMan->getProgramStruct(i)->pegSet2,	&dataBytePtr[sizeof(PeggySettings) + f92 + pSize * i] , sizeof(PeggySettings));
-                memcpy( &pMan->getProgramStruct(i)->pegSet3,	&dataBytePtr[2 * sizeof(PeggySettings) + f92 + pSize * i] , sizeof(PeggySettings));
+                memcpy( &pMan->getProgramStruct(i)->pegSet1,	&dataBytePtr[f92 + pSize * i] , sizeof(VexArpSettings));
+                memcpy( &pMan->getProgramStruct(i)->pegSet2,	&dataBytePtr[sizeof(VexArpSettings) + f92 + pSize * i] , sizeof(VexArpSettings));
+                memcpy( &pMan->getProgramStruct(i)->pegSet3,	&dataBytePtr[2 * sizeof(VexArpSettings) + f92 + pSize * i] , sizeof(VexArpSettings));
             }
 
             setCurrentProgram(xmlState->getIntAttribute(String("CurrentProgram")));
@@ -388,7 +388,7 @@ void VexFilter::setCurrentProgramStateInformation (const void* data, int sizeInB
     getCallbackLock().enter();
     int cp = pMan->getCurrentProgram();
     int f92 = sizeof(float) * 92;
-    int pSize = f92 + sizeof(PeggySettings) * 3;
+    int pSize = f92 + sizeof(VexArpSettings) * 3;
 
     char* dataBytePtr = (char*)data;
 
@@ -405,9 +405,9 @@ void VexFilter::setCurrentProgramStateInformation (const void* data, int sizeInB
             pMan->setWaveName(3, xmlState->getStringAttribute(String("W3")));
 
             memcpy( pMan->getProgramStruct(cp)->parameters,	dataBytePtr , sizeof(float) * 92 );
-            memcpy( &pMan->getProgramStruct(cp)->pegSet1,	&dataBytePtr[f92] , sizeof(PeggySettings));
-            memcpy( &pMan->getProgramStruct(cp)->pegSet2,	&dataBytePtr[sizeof(PeggySettings) + f92] , sizeof(PeggySettings));
-            memcpy( &pMan->getProgramStruct(cp)->pegSet3,	&dataBytePtr[2 * sizeof(PeggySettings) + f92] , sizeof(PeggySettings));
+            memcpy( &pMan->getProgramStruct(cp)->pegSet1,	&dataBytePtr[f92] , sizeof(VexArpSettings));
+            memcpy( &pMan->getProgramStruct(cp)->pegSet2,	&dataBytePtr[sizeof(VexArpSettings) + f92] , sizeof(VexArpSettings));
+            memcpy( &pMan->getProgramStruct(cp)->pegSet3,	&dataBytePtr[2 * sizeof(VexArpSettings) + f92] , sizeof(VexArpSettings));
 
             setCurrentProgram(cp);
         }
@@ -424,9 +424,9 @@ void VexFilter::getCurrentProgramStateInformation (MemoryBlock& destData)
     XmlElement xmlState ("VEXPROGRAM");
 
     destData.append( pMan->getProgramStruct(cp)->parameters, sizeof(float) * 92 );
-    destData.append( &pMan->getProgramStruct(cp)->pegSet1,	sizeof(PeggySettings));
-    destData.append( &pMan->getProgramStruct(cp)->pegSet2,	sizeof(PeggySettings));
-    destData.append( &pMan->getProgramStruct(cp)->pegSet3,	sizeof(PeggySettings));
+    destData.append( &pMan->getProgramStruct(cp)->pegSet1,	sizeof(VexArpSettings));
+    destData.append( &pMan->getProgramStruct(cp)->pegSet2,	sizeof(VexArpSettings));
+    destData.append( &pMan->getProgramStruct(cp)->pegSet3,	sizeof(VexArpSettings));
 
     xmlState.setAttribute( String("Name"),	pMan->getProgramName(cp));
     xmlState.setAttribute( String("W1"),	pMan->getWaveName(1));

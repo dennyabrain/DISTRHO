@@ -34,62 +34,85 @@
 #ifndef __JUCETICE_VEXCCHORUS_HEADER__
 #define __JUCETICE_VEXCCHORUS_HEADER__
 
-#include "../StandardHeader.h"
+#ifdef CARLA_EXPORT
+ #include "JuceHeader.h"
+#else
+ #include "../StandardHeader.h"
+#endif
 
-class cChorus
+class VexChorus
 {
 public:
-    cChorus(float* p)
+    VexChorus(const float* const p)
+        : lfo1(0.0f),
+          lfo2(0.0f),
+          lastlfo1(0.0f),
+          lastlfo2(0.0f),
+          parameters(p),
+          sampleRate(44100.0f),
+          cycle(44100 / 32),
+          iRead(cycle * 0.5f),
+          iWrite(0),
+          buffer(2, cycle)
     {
-        lfoC=LFO1=LFO2=lastLFO1=lastLFO2=0.0f;
-        cycle = 44100 / 32;
-        buffy = new AudioSampleBuffer(2, cycle);
-        buffy->clear();
-        parameters = p;
-        iWrite = 0;
-        iRead = int(cycle * 0.5f);
         lfoS[0] = 0.5f;
-        lfoS[1] = 0.f;
-        SampleRate = 44100.0f;
+        lfoS[1] = 0.0f;
     }
 
-    ~cChorus()
+    void updateParameterPtr(const float* const p)
     {
-        delete buffy;
+        parameters = p;
     }
 
-
-    void updateParameterPtr(float* P)
+    void setSampleRate(const float s)
     {
-        parameters = P;
+        if (sampleRate == s)
+            return;
+
+        sampleRate = s;
+
+        cycle  = int(sampleRate / 32);
+        iRead  = int(cycle * 0.5f);
+        iWrite = 0;
+
+        buffer.setSize(2, cycle, false, false, true);
+        buffer.clear();
     }
 
-    void processBlock(AudioSampleBuffer * OutBuffer)
+    void processBlock(AudioSampleBuffer* const outBuffer)
     {
-        int numSamples = OutBuffer->getNumSamples();
+        processBlock(outBuffer->getSampleData(0, 0), outBuffer->getSampleData(1, 0), outBuffer->getNumSamples());
+    }
 
-        depth = parameters[77] * 0.2f;
-        speed = parameters[76] * parameters[94];
-        delay = int(cycle * 0.5f);
+    void processBlock(float* const outBufferL, float* const outBufferR, const int numSamples)
+    {
+#ifdef CARLA_EXPORT
+        const float depth = parameters[0] * 0.2f;
+        const float speed = parameters[1] * parameters[1];
+#else
+        const float depth = parameters[77] * 0.2f;
+        const float speed = parameters[76] * parameters[76];
+#endif
+        const int   delay = int(cycle * 0.5f);
+        const float lfoC  = 2.0f * sinf(float_Pi * (speed * 5.0f) / sampleRate);
 
-        lfoC = 2.f*(float)sinf(float_Pi*(speed * 5) / SampleRate);
+        float* const bufferL = buffer.getSampleData(0, 0);
+        float* const bufferR = buffer.getSampleData(1, 0);
 
-        float* bufferL = buffy->getSampleData(0,0);
-        float* bufferR = buffy->getSampleData(1,0);
-        float* outBufferL = OutBuffer->getSampleData(0,0);
-        float* outBufferR = OutBuffer->getSampleData(1,0);
+        float a, b, alpha, readpoint;
+        int rp;
 
-        for(int i = 0; i < numSamples ; i++)
+        for (int i = 0; i < numSamples ; ++i)
         {
             // LFO
             lfoS[0] = lfoS[0] - lfoC*lfoS[1];
             lfoS[1] = lfoS[1] + lfoC*lfoS[0];
-            lastLFO1 = LFO1;
-            lastLFO2 = LFO2;
-            LFO1 = (lfoS[0] + 1) * depth;
-            LFO2 = (lfoS[1] + 1) * depth;
+            lastlfo1 = lfo1;
+            lastlfo2 = lfo2;
+            lfo1 = (lfoS[0] + 1) * depth;
+            lfo2 = (lfoS[1] + 1) * depth;
 
-            //write to buffer
+            // Write to buffer
             bufferL[iWrite] = outBufferL[i];
             bufferR[iWrite] = outBufferR[i];
             iWrite++; //inc and cycle the write index
@@ -98,50 +121,35 @@ public:
             iRead = iWrite + delay; //cycle the read index
             iRead = iRead % cycle;
 
-            //read
-            //Left
-            readpoint = cycle * LFO1 * 0.5f;
+            // Read left
+            readpoint = cycle * lfo1 * 0.5f;
             rp = roundFloatToInt(readpoint - 0.5f);
             alpha = readpoint - rp;
-            float A = bufferL[(iRead + rp -1) % cycle];
-            float B = bufferL[(iRead + rp) % cycle];
-            outBufferL[i] = A + alpha * ( B - A );
+            a = bufferL[(iRead + rp -1) % cycle];
+            b = bufferL[(iRead + rp) % cycle];
+            outBufferL[i] = a + alpha * (b - a);
 
-
-            //Right
-            readpoint = cycle * LFO2 * 0.5f;
+            // Read right
+            readpoint = cycle * lfo2 * 0.5f;
             rp = roundFloatToInt(readpoint - 0.5f);
             alpha = readpoint - rp;
-            A = bufferR[(iRead + rp -1) % cycle];
-            B = bufferR[(iRead + rp) % cycle];
-            outBufferR[i] = A + alpha * ( B - A );
-        }
-    }
-
-    void setSampleRate(double s)
-    {
-        if (SampleRate != s)
-        {
-            SampleRate = (float)s;
-            cycle =  int(SampleRate / 32);
-            buffy->setSize(2, cycle,0,0,1);
-            buffy->clear();
-            iRead = int(cycle * 0.5f);
+            a = bufferR[(iRead + rp -1) % cycle];
+            b = bufferR[(iRead + rp) % cycle];
+            outBufferR[i] = a + alpha * (b - a);
         }
     }
 
 private:
-    AudioSampleBuffer* buffy;
-
-    float lfoC, LFO1, LFO2, lastLFO1, lastLFO2;
+    float lfo1, lfo2, lastlfo1, lastlfo2;
     float lfoS[2];
 
-    float depth, speed;
-    float* parameters;
-    int iWrite, iRead;
-    int rp, cycle, delay;
-    float alpha, outSample, readpoint;
-    float SampleRate;
+    const float* parameters;
+    float sampleRate;
+
+    int cycle;
+    int iRead, iWrite;
+
+    AudioSampleBuffer buffer;
 };
 
 #endif

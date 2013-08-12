@@ -35,7 +35,7 @@
 #define __JUCETICE_VEXPEGGYVIEWCOMPONENT_HEADER__
 
 #include "VexFilter.h"
-#include "PeggySettings.h"
+#include "synth/cArpSettings.h"
 #include "gui/BoolGridComponent.h"
 #include "gui/SliderFieldComponent.h"
 
@@ -240,7 +240,7 @@ private:
     ToggleButton* onOffBtn;
     Slider* length;
     int part;
-    PeggySettings* myPeggySet;
+    VexArpSettings* myPeggySet;
 };
 
 #endif
