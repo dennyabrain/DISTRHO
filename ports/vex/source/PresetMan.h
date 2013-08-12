@@ -157,6 +157,11 @@ public:
         return nullptr;
     }
 
+//     const Program& getCurrentProgramStructRef()
+//     {
+//         return programs[curProgram];
+//     }
+
     void setProgramName(const int i, const String& newName)
     {
         if (i >= 0 && i < kNumPrograms)

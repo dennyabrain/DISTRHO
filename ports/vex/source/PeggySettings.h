@@ -34,29 +34,33 @@
 #ifndef __JUCETICE_VEXPEGGYSETTINGS_HEADER__
 #define __JUCETICE_VEXPEGGYSETTINGS_HEADER__
 
-#include "StandardHeader.h"
+static const int kVelocitiesSize = 16;
+static const int kGridSize = 80;
 
 struct PeggySettings
 {
-    int length;
-    int timeMode;
-    int syncMode;
-    int failMode;
-    int velMode;
-    float velocities[16];
-    bool grid[80];
+    int length;   // 1-16
+    int timeMode; // timeSig, 0-3 (4, 8, 16, 32), 0 is unused
+    int syncMode; // 1, 2 (key sync, bar sync)
+    int failMode; // 1, 2 or 3 (normal, skip one, skip two)
+    int velMode;  // 1, 2 or 3
+    float velocities[kVelocitiesSize];
+    bool grid[kGridSize];
     bool on;
 
     PeggySettings()
-        : length(0),
-          timeMode(0),
-          syncMode(0),
-          failMode(0),
-          velMode(0),
+        : length(8),
+          timeMode(2),
+          syncMode(1),
+          failMode(1),
+          velMode(1),
           on(false)
     {
-        zeromem(velocities, sizeof(float)*16);
-        zeromem(grid, sizeof(bool)*80);
+        for (int i = 0; i < kVelocitiesSize; ++i)
+            velocities[i] = 0.5f;
+
+        for (int i = 0; i < kGridSize; ++i)
+            grid[i] = false;
     }
 
     void reset()
@@ -66,12 +70,12 @@ struct PeggySettings
         syncMode = 1;
         failMode = 1;
         velMode  = 1;
-        on       = true;
+        on       = false;
 
-        for (int i = 0; i < 16; ++i)
+        for (int i = 0; i < kVelocitiesSize; ++i)
             velocities[i] = 0.5f;
 
-        for (int i = 0; i < 80; ++i)
+        for (int i = 0; i < kGridSize; ++i)
             grid[i] = false;
     }
 };

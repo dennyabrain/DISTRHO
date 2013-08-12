@@ -34,259 +34,280 @@
 #ifndef __JUCETICE_VEXCARP_HEADER__
 #define __JUCETICE_VEXCARP_HEADER__
 
-#include "../StandardHeader.h"
-#include "../PeggySettings.h"
+#ifdef CARLA_EXPORT
+ #include "JuceHeader.h"
+ #include "PeggySettings.h"
+#else
+ #include "../StandardHeader.h"
+ #include "../PeggySettings.h"
+#endif
 
 class cArp
 {
 public:
-    cArp(PeggySettings** P)
+    static const int kMaxNotes = 10;
+
+    cArp(const PeggySettings* p)
+        : peggySet(p),
+          dead(true),
+          notesPlaying(false),
+          doSync(true),
+          nextStep(0),
+          sampleCount(0),
+          sampleRate(44100)
     {
-        memset(cKeysDown, 0, sizeof(cKeysDown));
-        memset(cNotesToKill, 0, sizeof(cNotesToKill));
-        memset(cKeysVelocity, 0, sizeof(cKeysVelocity));
-
-        psp = P;
-        peggySet = *psp;
-        for(int i = 0; i < 80; i++)
-        {
-            peggySet->grid[i] = false;
-        }
-        //peggySet->velocities[16];
-
-        peggySet->length = 8;
-        peggySet->timeMode = 2;
-        peggySet->syncMode = 1;
-        peggySet->failMode = 1;
-        peggySet->velMode = 1;
-        peggySet->on = false;
-
-        nextStep = 0;
-        timeSig = 16;
-
         meter[0] = 4;
         meter[1] = 8;
         meter[2] = 16;
         meter[3] = 32;
 
-        SamplesPerStep = 11025;
+        for (int i = 0; i < kMaxNotes; ++i)
+        {
+            cKeysDown[i] = 0;
+            cNotesToKill[i] = 0;
+            cKeysVelocity[i] = 0;
+        }
 
-        SampleCount = 0;
+        outMidiBuffer.ensureSize(kMaxNotes+128);
+    }
 
-        SamplesPerStep = (int(60 / 120) * 44100 * 4) / timeSig;
+    void addNote(const char note, const char vel)
+    {
+        char tmp, tmpNote = note, tmpVel = vel;
 
-        SampleCount = SamplesPerStep;
-        dead =  true;
+        for (int i = 0; i < kMaxNotes; ++i)
+        {
+            if (note < cKeysDown[i] || cKeysDown[i] == 0)
+            {
+                tmp = cKeysDown[i];     cKeysDown[i]     = tmpNote; tmpNote = tmp;
+                tmp = cKeysVelocity[i]; cKeysVelocity[i] = tmpVel;  tmpVel  = tmp;
+            }
+        }
+
+        jassert(cKeysDown[0] != 0);
+
         doSync = true;
     }
 
-    MidiBuffer processMidi (MidiBuffer&  inMidiBuffer,
-                            const int SampleRate,
-                            const bool isPlaying,
-                            const double ppqPosition,
-                            const double ppqPositionOfLastBarStart,
-                            const double bpm,
-                            const int numSamples)
+    void dropNote(const char note)
     {
-        peggySet = *psp;
-        timeSig = meter[peggySet->timeMode];
+        int i = 0;
 
-        MidiBuffer outMidiBuffer; //tmp buffer for keeping the midi output
+        for (; i < kMaxNotes; ++i)
+        {
+            if (cKeysDown[i] == note)
+                break;
+        }
+
+        if (i == kMaxNotes)
+            return;
+
+        for (; i < kMaxNotes-1; ++i)
+        {
+            cKeysDown[i] = cKeysDown[i+1];
+            cKeysVelocity[i] = cKeysVelocity[i+1];
+        }
+
+        cKeysDown[kMaxNotes-1] = 0;
+        cKeysVelocity[kMaxNotes-1] = 0;
+    }
+
+    void killThisNoteLater(const char note)
+    {
+        for (int i = 0; i < kMaxNotes; ++i)
+        {
+            if (cNotesToKill[i] == note)
+                break;
+
+            if (cNotesToKill[i] == 0)
+            {
+                cNotesToKill[i] = note;
+                break;
+            }
+        }
+    }
+
+    void setSampleRate(const int srate)
+    {
+        sampleRate = srate;
+    }
+
+    const MidiBuffer& processMidi(MidiBuffer& inMidiBuffer, const bool isPlaying,
+                                                            const double ppqPosition,
+                                                            const double ppqPositionOfLastBarStart,
+                                                            const double bpm,
+                                                            const int numSamples)
+    {
+        const int timeSig = meter[peggySet->timeMode];
 
         // Loop though the midibuffer, take away note on/off, let the rest pass
-        MidiBuffer::Iterator inBufferIterator(inMidiBuffer);
-        MidiMessage midi_message(0xf4);
-
-        int sample_number;
-
-        while(inBufferIterator.getNextEvent(midi_message,sample_number))
         {
-                if( midi_message.isNoteOn())
-                {
-                        addNote(char(midi_message.getNoteNumber()), char(midi_message.getVelocity())); //Adds note to the note array
-                }
-                else if( midi_message.isNoteOff())
-                {
-                        dropNote(char(midi_message.getNoteNumber())); //drops note from the array
-                        //outMidiBuffer.addEvent(MidiMessage::noteOff(1, midi_message.getNoteNumber()), sample_number);
-                }
+            outMidiBuffer.clear();
+
+            MidiBuffer::Iterator inBufferIterator(inMidiBuffer);
+            MidiMessage midiMessage(0xf4);
+            int sampleNumber;
+
+            while (inBufferIterator.getNextEvent(midiMessage, sampleNumber))
+            {
+                if (midiMessage.isNoteOn())
+                    addNote(midiMessage.getNoteNumber(), midiMessage.getVelocity());
+                else if(midiMessage.isNoteOff())
+                    dropNote(midiMessage.getNoteNumber());
                 else
-                {
-                        outMidiBuffer.addEvent(midi_message, sample_number);//pass on anything else
-                }
+                    outMidiBuffer.addEvent(midiMessage, sampleNumber);
+            }
         }
 
         // BarSync
-        //***************************
-        SamplesPerStep = int((60 / bpm) * SampleRate * 4) / timeSig;
+        const int samplesPerStep = int((60.0 / bpm) * sampleRate * 4) / timeSig;
+
         if (isPlaying && peggySet->syncMode == 2)
         {
-                if(doSync)
-                {
-                        SampleCount = int((ppqPosition - ppqPositionOfLastBarStart) * ((60 / bpm) * SampleRate)); //offset sample count
-                        nextStep = SampleCount / SamplesPerStep; //offset step count
-                        //Cycle the counts
-                        SampleCount = (SampleCount % SamplesPerStep) + SamplesPerStep - 10;
-                        nextStep = nextStep % peggySet->length;
-                }
-                doSync = false;
+            if (doSync)
+            {
+                //offset sample count
+                sampleCount = int((ppqPosition - ppqPositionOfLastBarStart) * ((60 / bpm) * sampleRate));
+
+                //offset step count
+                nextStep = sampleCount / samplesPerStep;
+
+                //Cycle the counts
+                sampleCount = (sampleCount % samplesPerStep) + samplesPerStep - 10;
+                nextStep = nextStep % peggySet->length;
+            }
+            doSync = false;
         }
         else
         {
-                doSync = true;
+            doSync = true;
         }
 
         //***************************
         if (cKeysDown[0])
-        { //Keys are down
+        {   //Keys are down
+            dead = false;
+            sampleCount += numSamples;
+            bool repeat = false;
 
-                dead = false;
-                SampleCount += numSamples;
-                bool repeat = false;
-                do{
-                        repeat = false;
-                        //***
-                        if(SampleCount >= SamplesPerStep)
-                        { //Play step
-                                int offset = numSamples - (SampleCount - SamplesPerStep);
-                                bool doFail = true;
-                                for(int i = 0; i < 5; i++)
-                                {
-                                        if((cKeysDown[i]!= 0) && (peggySet->grid[nextStep*5 + i]))
-                                        { //we have a note to play
-                                                int vel = 127;
-                                                switch (peggySet->velMode)
-                                                {
-                                                    case 1: vel = roundFloatToInt (peggySet->velocities[nextStep] * 127.0f); break;
-                                                    case 2: vel = (int) cKeysVelocity[i]; break;
-                                                    case 3: vel = (int) cKeysVelocity[i] + roundFloatToInt (peggySet->velocities[nextStep] * 127.0f); break;
-                                                }
-                                                doFail = false;
-                                                NotesPlaying = true;
-                                                KillThisNoteLater(cKeysDown[i]);
-                                                outMidiBuffer.addEvent(MidiMessage::noteOn(1, cKeysDown[i], uint8(vel)), offset);
-                                        }
-
-                                }
-                                if (doFail)
-                                {
-                                        switch (peggySet->failMode)
-                                        {
-                                        case 1: //normal
-                                                SampleCount -= SamplesPerStep;
-                                                nextStep++;
-                                                nextStep = nextStep % peggySet->length;
-                                        break;
-                                        case 2: //skip one
-                                                //SampleCount -= SamplesPerStep;
-                                                nextStep++;
-                                                nextStep = nextStep % peggySet->length;
-                                                repeat = true;
-                                        break;
-                                        case 3: //skip two
-                                                //SampleCount -= SamplesPerStep;
-                                                nextStep += 2;
-                                                nextStep = nextStep % peggySet->length;
-                                                repeat = true;
-                                        break;
-                                        }
-                                }
-                                else
-                                {
-                                        SampleCount -= SamplesPerStep;
-                                        nextStep++;
-                                        nextStep = nextStep % peggySet->length; //Cycle the steps over pattern length
-                                }
-                        }
-                }while(repeat);
+            do
+            {
+                repeat = false;
 
                 //***
-                unsigned int NoteLength = (SamplesPerStep / 4) * 3;
-                if ((SampleCount >= NoteLength) && NotesPlaying)
-                { //Mute step
-                        int offset = numSamples - (SampleCount - NoteLength);
-                        //***
-                        for(int i = 0; i < 10; i++)
-                        {
-                                if(cNotesToKill[i] != 0)
-                                { //do we have a note to kill?
-                                        outMidiBuffer.addEvent(MidiMessage::noteOff(1, cNotesToKill[i]), offset);
-                                        cNotesToKill[i] = 0;
-                                }
-                        }
-                        NotesPlaying = false;
-                }
+                if (sampleCount >= samplesPerStep)
+                {   //Play step
+                    int offset = numSamples - (sampleCount - samplesPerStep);
+                    bool doFail = true;
 
+                    for (int i = 0; i < 5; ++i)
+                    {
+                        if((cKeysDown[i]!= 0) && (peggySet->grid[nextStep*5 + i]))
+                        {   //we have a note to play
+                            int vel;
+
+                            switch (peggySet->velMode)
+                            {
+                            case 1:
+                                vel = roundFloatToInt (peggySet->velocities[nextStep] * 127.0f);
+                                break;
+                            case 2:
+                                vel = (int) cKeysVelocity[i];
+                                break;
+                            case 3:
+                                vel = (int) cKeysVelocity[i] + roundFloatToInt (peggySet->velocities[nextStep] * 127.0f);
+                                break;
+                            default:
+                                vel = 127;
+                                break;
+                            }
+
+                            doFail = false;
+                            notesPlaying = true;
+                            killThisNoteLater(cKeysDown[i]);
+                            outMidiBuffer.addEvent(MidiMessage::noteOn(1, cKeysDown[i], uint8(vel)), offset);
+                        }
+                    }
+
+                    if (doFail)
+                    {
+                        switch (peggySet->failMode)
+                        {
+                        case 1: //normal
+                            sampleCount -= samplesPerStep;
+                            nextStep++;
+                            nextStep = nextStep % peggySet->length;
+                            break;
+                        case 2: //skip one
+                            //SampleCount -= SamplesPerStep;
+                            nextStep++;
+                            nextStep = nextStep % peggySet->length;
+                            repeat = true;
+                            break;
+                        case 3: //skip two
+                            //SampleCount -= SamplesPerStep;
+                            nextStep += 2;
+                            nextStep = nextStep % peggySet->length;
+                            repeat = true;
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        sampleCount -= samplesPerStep;
+                        nextStep++;
+                        nextStep = nextStep % peggySet->length; //Cycle the steps over pattern length
+                    }
+                }
+            } while (repeat);
+
+            //***
+            unsigned int NoteLength = (samplesPerStep / 4) * 3;
+            if ((sampleCount >= NoteLength) && notesPlaying)
+            {   //Mute step
+                int offset = numSamples - (sampleCount - NoteLength);
+                //***
+                for(int i = 0; i < kMaxNotes; ++i)
+                {
+                    if (cNotesToKill[i] != 0)
+                    {   //do we have a note to kill?
+                        outMidiBuffer.addEvent(MidiMessage::noteOff(1, cNotesToKill[i]), offset);
+                        cNotesToKill[i] = 0;
+                    }
+                }
+                notesPlaying = false;
+            }
         //***
         }
-        else if (!dead)
-        { //No keys pressed - kill 'em all
-                for(int i = 0; i < 10; i++)
-                {
-                        if(cNotesToKill[i] != 0)
-                        { //do we have a note to kill?
-                                outMidiBuffer.addEvent(MidiMessage::noteOff(1, cNotesToKill[i]), 0);
-                                cNotesToKill[i] = 0;
-                        }
+        else if (! dead)
+        {   //No keys pressed - kill 'em all
+            for (int i = 0; i < kMaxNotes; ++i)
+            {
+                if (cNotesToKill[i] != 0)
+                {   //do we have a note to kill?
+                    outMidiBuffer.addEvent(MidiMessage::noteOff(1, cNotesToKill[i]), 0);
+                    cNotesToKill[i] = 0;
                 }
-                nextStep = 0;
-                SampleCount = SamplesPerStep;
-                dead = true;
-        }
-        //***************************
+            }
 
-        //inMidiBuffer.clear();
-        //inMidiBuffer = outMidiBuffer; //copy the temp buffer to the main one
+            nextStep = 0;
+            sampleCount = samplesPerStep;
+            dead = true;
+        }
+
         return outMidiBuffer;
     }
 
-     //Add a note to the array, shuffle the notes so they are sorted
-     void addNote(char note, char vel)
-     {
-         char tmp = 0;
-         for(int i = 0; i < 10; i++){
-             if ((note < cKeysDown[i]) || (cKeysDown[i] == 0)){
-                 tmp = cKeysDown[i]; cKeysDown[i] = note; note = tmp;
-                 tmp = cKeysVelocity[i]; cKeysVelocity[i] = vel; vel = tmp;
-             }
-         }
-         doSync = true;
-     }
-
-     //Drop a note from the array, and re-sort it
-     void dropNote(char note)
-     {
-         char tmp = 0;
-         for(int i = 0; i < 10; i++){
-             if (note == cKeysDown[i]){ cKeysDown[i] = 0; }
-         }
-
-         for(int i = 0; i < 9; i++){
-             if (cKeysDown[i] == 0){
-                 tmp = cKeysDown[i]; cKeysDown[i] = cKeysDown[i+1]; cKeysDown[i+1] = tmp;
-             }
-         }
-     }
-
-     void KillThisNoteLater(char note){
-         for(int i = 0; i<10; i++){
-             if(cNotesToKill[i] == 0){
-                 cNotesToKill[i] = note;
-                 break;
-             }
-         }
-     }
-
 private:
-    bool dead, NotesPlaying, doSync;
-    char nextStep, timeSig;
-    unsigned int SamplesPerStep, SampleCount, SampleRate;
+    const PeggySettings* peggySet;
+    MidiBuffer outMidiBuffer;
+    bool dead, notesPlaying, doSync;
+    char nextStep;
+    unsigned int sampleCount, sampleRate;
     int meter[4];
-    PeggySettings* peggySet;
-    PeggySettings** psp;
-    char cKeysDown[10];
-    char cKeysVelocity[10];
-    char cNotesToKill[10];
+    char cKeysDown[kMaxNotes];
+    char cKeysVelocity[kMaxNotes];
+    char cNotesToKill[kMaxNotes];
 };
 
 #endif

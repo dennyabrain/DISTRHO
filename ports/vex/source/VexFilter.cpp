@@ -42,7 +42,7 @@ AudioProcessor* JUCE_CALLTYPE createPluginFilter ()
 VexFilter::VexFilter()
 {
     DBG(String("*************** vex constructor called"));
-    pMan =  new PresetMan();
+    pMan = new PresetMan();
     pMan->setPointersToCurrent(&pra, &p1, &p2, &p3);
 
     s1 = new cSyntModule(pra);
@@ -57,9 +57,9 @@ VexFilter::VexFilter()
     dbf = NULL;
     snum = 0;
 
-    a1 = new cArp(&p1);
-    a2 = new cArp(&p2);
-    a3 = new cArp(&p3);
+    a1 = new cArp(p1);
+    a2 = new cArp(p2);
+    a3 = new cArp(p3);
 
     setCurrentProgram(0);
 }
@@ -163,11 +163,16 @@ void VexFilter::prepareToPlay (double sampleRate, int samplesPerBlock)
     c1->setSampleRate(sampleRate);
     d1->setSampleRate(sampleRate);
 
-    if (obf == NULL)		{obf		= new AudioSampleBuffer(2, samplesPerBlock);}
-    if (abf == NULL)	{abf	= new AudioSampleBuffer(2, samplesPerBlock);}
-    if (dbf == NULL)	{dbf	= new AudioSampleBuffer(2, samplesPerBlock);}
-    if (dbf2 == NULL)	{dbf2	= new AudioSampleBuffer(2, samplesPerBlock);}
-    if (dbf3 == NULL)	{dbf3	= new AudioSampleBuffer(2, samplesPerBlock);}
+    int sampleRatei = (int)sampleRate;
+    a1->setSampleRate(sampleRatei);
+    a2->setSampleRate(sampleRatei);
+    a3->setSampleRate(sampleRatei);
+
+    if (obf == NULL)  {obf  = new AudioSampleBuffer(2, samplesPerBlock);}
+    if (abf == NULL)  {abf  = new AudioSampleBuffer(2, samplesPerBlock);}
+    if (dbf == NULL)  {dbf  = new AudioSampleBuffer(2, samplesPerBlock);}
+    if (dbf2 == NULL) {dbf2 = new AudioSampleBuffer(2, samplesPerBlock);}
+    if (dbf3 == NULL) {dbf3 = new AudioSampleBuffer(2, samplesPerBlock);}
 }
 
 void VexFilter::releaseResources()
@@ -197,29 +202,29 @@ void VexFilter::processBlock(AudioSampleBuffer& output,
 
     if (p1->on)
     {
-            part1Midi = a1->processMidi(midiMessages, (int)getSampleRate(), pos.isPlaying, pos.ppqPosition, pos.ppqPositionOfLastBarStart, pos.bpm, output.getNumSamples());
+        part1Midi = a1->processMidi(midiMessages, pos.isPlaying, pos.ppqPosition, pos.ppqPositionOfLastBarStart, pos.bpm, output.getNumSamples());
     }
     else
     {
-            part1Midi = midiMessages;
+        part1Midi = midiMessages;
     }
 
     if (p2->on)
     {
-            part2Midi = a2->processMidi(midiMessages, (int)getSampleRate(), pos.isPlaying, pos.ppqPosition, pos.ppqPositionOfLastBarStart, pos.bpm, output.getNumSamples());
+        part2Midi = a2->processMidi(midiMessages, pos.isPlaying, pos.ppqPosition, pos.ppqPositionOfLastBarStart, pos.bpm, output.getNumSamples());
     }
     else
     {
-            part2Midi = midiMessages;
+        part2Midi = midiMessages;
     }
 
     if (p3->on)
     {
-            part3Midi = a3->processMidi(midiMessages, (int)getSampleRate(), pos.isPlaying, pos.ppqPosition, pos.ppqPositionOfLastBarStart, pos.bpm, output.getNumSamples());
+        part3Midi = a3->processMidi(midiMessages, pos.isPlaying, pos.ppqPosition, pos.ppqPositionOfLastBarStart, pos.bpm, output.getNumSamples());
     }
     else
     {
-            part3Midi = midiMessages;
+        part3Midi = midiMessages;
     }
 
     MidiMessage midi_message(0xf4);
@@ -313,11 +318,11 @@ AudioProcessorEditor* VexFilter::createEditor()
 
 void VexFilter::getStateInformation(MemoryBlock& destData)
 {
-    int cp = pMan->getCurrentProgram();
+    const int curProgram = pMan->getCurrentProgram();
 
-    XmlElement xmlState ("VEXBANK");
+    XmlElement xmlState("VEXBANK");
 
-    for (int i = 0; i < pMan->getNumPrograms(); i++)
+    for (int i = 0; i < PresetMan::kNumPrograms; ++i)
     {
         pMan->setCurrentProgram(i);
 
@@ -326,19 +331,20 @@ void VexFilter::getStateInformation(MemoryBlock& destData)
         destData.append(&pMan->getProgramStruct(i)->pegSet2, sizeof(PeggySettings));
         destData.append(&pMan->getProgramStruct(i)->pegSet3, sizeof(PeggySettings));
 
-        xmlState.setAttribute( String("Name") + String(i), pMan->getProgramName(i));
-        xmlState.setAttribute( String("W1")   + String(i), pMan->getWaveName(1));
-        xmlState.setAttribute( String("W2")   + String(i), pMan->getWaveName(2));
-        xmlState.setAttribute( String("W3")   + String(i), pMan->getWaveName(3));
+        xmlState.setAttribute(String("Name") + String(i), pMan->getProgramName(i));
+        xmlState.setAttribute(String("W1")   + String(i), pMan->getWaveName(1));
+        xmlState.setAttribute(String("W2")   + String(i), pMan->getWaveName(2));
+        xmlState.setAttribute(String("W3")   + String(i), pMan->getWaveName(3));
     }
-    xmlState.setAttribute( String("CurrentProgram"),cp);
+
+    xmlState.setAttribute( String("CurrentProgram"), curProgram);
 
     MemoryBlock tmp;
 
     copyXmlToBinary (xmlState, tmp);
     destData.append(tmp.getData(), tmp.getSize());
 
-    pMan->setCurrentProgram(cp);
+    pMan->setCurrentProgram(curProgram);
 }
 
 void VexFilter::setStateInformation (const void* data, int sizeInBytes)
@@ -347,30 +353,28 @@ void VexFilter::setStateInformation (const void* data, int sizeInBytes)
 
     int f92 = sizeof(float) * 92;
     int pSize = f92 + sizeof(PeggySettings) * 3;
-    int xmlOffset = pSize * pMan->getNumPrograms();
+    int xmlOffset = pSize * PresetMan::kNumPrograms;
 
     char* dataBytePtr = (char*)data;
 
-    XmlElement* const xmlState = getXmlFromBinary ( &dataBytePtr[xmlOffset], sizeInBytes - xmlOffset);
-
-    if (xmlState != 0)
+    if (XmlElement* const xmlState = getXmlFromBinary (&dataBytePtr[xmlOffset], sizeInBytes - xmlOffset))
     {
         if (xmlState->hasTagName ("VEXBANK"))
         {
-            for (int i = 0; i < pMan->getNumPrograms(); i++)
+            for (int i = 0; i < PresetMan::kNumPrograms; i++)
             {
-                    pMan->setCurrentProgram(i);
-                    pMan->setProgramName(i, xmlState->getStringAttribute(String("Name") + String(i)));
-                    pMan->setWaveName(1, xmlState->getStringAttribute(String("W1") + String(i)));
-                    pMan->setWaveName(2, xmlState->getStringAttribute(String("W2") + String(i)));
-                    pMan->setWaveName(3, xmlState->getStringAttribute(String("W3") + String(i)));
+                pMan->setCurrentProgram(i);
+                pMan->setProgramName(i, xmlState->getStringAttribute(String("Name") + String(i)));
+                pMan->setWaveName(1, xmlState->getStringAttribute(String("W1") + String(i)));
+                pMan->setWaveName(2, xmlState->getStringAttribute(String("W2") + String(i)));
+                pMan->setWaveName(3, xmlState->getStringAttribute(String("W3") + String(i)));
 
-                    memcpy( pMan->getProgramStruct(i)->parameters,	&dataBytePtr[pSize * i] , sizeof(float) * 92 );
-                    memcpy( &pMan->getProgramStruct(i)->pegSet1,	&dataBytePtr[f92 + pSize * i] , sizeof(PeggySettings));
-                    memcpy( &pMan->getProgramStruct(i)->pegSet2,	&dataBytePtr[sizeof(PeggySettings) + f92 + pSize * i] , sizeof(PeggySettings));
-                    memcpy( &pMan->getProgramStruct(i)->pegSet3,	&dataBytePtr[2 * sizeof(PeggySettings) + f92 + pSize * i] , sizeof(PeggySettings));
-
+                memcpy( pMan->getProgramStruct(i)->parameters,	&dataBytePtr[pSize * i] , sizeof(float) * 92 );
+                memcpy( &pMan->getProgramStruct(i)->pegSet1,	&dataBytePtr[f92 + pSize * i] , sizeof(PeggySettings));
+                memcpy( &pMan->getProgramStruct(i)->pegSet2,	&dataBytePtr[sizeof(PeggySettings) + f92 + pSize * i] , sizeof(PeggySettings));
+                memcpy( &pMan->getProgramStruct(i)->pegSet3,	&dataBytePtr[2 * sizeof(PeggySettings) + f92 + pSize * i] , sizeof(PeggySettings));
             }
+
             setCurrentProgram(xmlState->getIntAttribute(String("CurrentProgram")));
         }
         delete xmlState;
