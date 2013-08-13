@@ -967,12 +967,12 @@ public:
 
     Rectangle<int> getBounds() const override          { return bounds; }
 
-    Point<int> localToGlobal (const Point<int>& relativePosition) override
+    Point<int> localToGlobal (Point<int> relativePosition) override
     {
         return relativePosition + bounds.getPosition();
     }
 
-    Point<int> globalToLocal (const Point<int>& screenPosition) override
+    Point<int> globalToLocal (Point<int> screenPosition) override
     {
         return screenPosition - bounds.getPosition();
     }
@@ -980,6 +980,11 @@ public:
     void setAlpha (float /* newAlpha */) override
     {
         //xxx todo!
+    }
+
+    StringArray getAvailableRenderingEngines() override
+    {
+        return StringArray ("Software Renderer");
     }
 
     void setMinimised (bool shouldBeMinimised) override
@@ -1088,9 +1093,9 @@ public:
         return result;
     }
 
-    bool contains (const Point<int>& position, bool trueIfInAChildWindow) const override
+    bool contains (Point<int> localPos, bool trueIfInAChildWindow) const override
     {
-        if (! bounds.withZeroOrigin().contains (position))
+        if (! bounds.withZeroOrigin().contains (localPos))
             return false;
 
         for (int i = Desktop::getInstance().getNumComponents(); --i >= 0;)
@@ -1100,7 +1105,8 @@ public:
             if (c == &component)
                 break;
 
-            if (c->contains (position + bounds.getPosition() - c->getScreenPosition()))
+            // TODO: needs scaling correctly
+            if (c->contains (localPos + bounds.getPosition() - c->getScreenPosition()))
                 return false;
         }
 
@@ -1114,7 +1120,7 @@ public:
         ScopedXLock xlock;
 
         return XGetGeometry (display, (::Drawable) windowH, &root, &wx, &wy, &ww, &wh, &bw, &depth)
-                && XTranslateCoordinates (display, windowH, windowH, position.getX(), position.getY(), &wx, &wy, &child)
+                && XTranslateCoordinates (display, windowH, windowH, localPos.getX(), localPos.getY(), &wx, &wy, &child)
                 && child == None;
     }
 
@@ -1327,6 +1333,42 @@ public:
         }
     }
 
+    static int getKeyCodeFromKeySym (KeySym sym)
+    {
+        switch (sym)
+        {
+            case XK_KP_Divide:      return XK_slash; break;
+            case XK_KP_Multiply:    return XK_asterisk; break;
+            case XK_KP_Subtract:    return XK_hyphen; break;
+            case XK_KP_Add:         return XK_plus; break;
+            case XK_KP_Enter:       return XK_Return; break;
+
+            case XK_KP_0:           return XK_0; break;
+            case XK_KP_1:           return XK_1; break;
+            case XK_KP_2:           return XK_2; break;
+            case XK_KP_3:           return XK_3; break;
+            case XK_KP_4:           return XK_4; break;
+            case XK_KP_5:           return XK_5; break;
+            case XK_KP_6:           return XK_6; break;
+            case XK_KP_7:           return XK_7; break;
+            case XK_KP_8:           return XK_8; break;
+            case XK_KP_9:           return XK_9; break;
+
+            case XK_KP_Insert:      return XK_Insert; break;
+            case XK_KP_Delete:      return XK_Delete; break;
+            case XK_KP_End:         return XK_End; break;
+            case XK_KP_Down:        return XK_Down; break;
+            case XK_KP_Page_Down:   return XK_Page_Down; break;
+            case XK_KP_Left:        return XK_Left; break;
+            case XK_KP_Right:       return XK_Right; break;
+            case XK_KP_Home:        return XK_Home; break;
+            case XK_KP_Up:          return XK_Up; break;
+            case XK_KP_Page_Up:     return XK_Page_Up; break;
+
+            default:                break;
+        }
+    }
+
     void handleKeyPressEvent (XKeyEvent& keyEvent)
     {
         char utf8 [64] = { 0 };
@@ -1360,26 +1402,37 @@ public:
         {
             switch (sym)  // Translate keypad
             {
+                case XK_KP_Add:         keyCode = XK_plus; break;
+                case XK_KP_Subtract:    keyCode = XK_hyphen; break;
                 case XK_KP_Divide:      keyCode = XK_slash; break;
                 case XK_KP_Multiply:    keyCode = XK_asterisk; break;
-                case XK_KP_Subtract:    keyCode = XK_hyphen; break;
-                case XK_KP_Add:         keyCode = XK_plus; break;
                 case XK_KP_Enter:       keyCode = XK_Return; break;
-                case XK_KP_Decimal:     keyCode = Keys::numLock ? XK_period : XK_Delete; break;
-                case XK_KP_0:           keyCode = Keys::numLock ? XK_0 : XK_Insert; break;
-                case XK_KP_1:           keyCode = Keys::numLock ? XK_1 : XK_End; break;
-                case XK_KP_2:           keyCode = Keys::numLock ? XK_2 : XK_Down; break;
-                case XK_KP_3:           keyCode = Keys::numLock ? XK_3 : XK_Page_Down; break;
-                case XK_KP_4:           keyCode = Keys::numLock ? XK_4 : XK_Left; break;
+                case XK_KP_Insert:      keyCode = XK_Insert; break;
+                case XK_KP_Delete:      keyCode = XK_Delete; break;
+                case XK_KP_Left:        keyCode = XK_Left; break;
+                case XK_KP_Right:       keyCode = XK_Right; break;
+                case XK_KP_Up:          keyCode = XK_Up; break;
+                case XK_KP_Down:        keyCode = XK_Down; break;
+                case XK_KP_Home:        keyCode = XK_Home; break;
+                case XK_KP_End:         keyCode = XK_End; break;
+                case XK_KP_Page_Down:   keyCode = XK_Page_Down; break;
+                case XK_KP_Page_Up:     keyCode = XK_Page_Up; break;
+
+                case XK_KP_0:           keyCode = XK_0; break;
+                case XK_KP_1:           keyCode = XK_1; break;
+                case XK_KP_2:           keyCode = XK_2; break;
+                case XK_KP_3:           keyCode = XK_3; break;
+                case XK_KP_4:           keyCode = XK_4; break;
                 case XK_KP_5:           keyCode = XK_5; break;
-                case XK_KP_6:           keyCode = Keys::numLock ? XK_6 : XK_Right; break;
-                case XK_KP_7:           keyCode = Keys::numLock ? XK_7 : XK_Home; break;
-                case XK_KP_8:           keyCode = Keys::numLock ? XK_8 : XK_Up; break;
-                case XK_KP_9:           keyCode = Keys::numLock ? XK_9 : XK_Page_Up; break;
+                case XK_KP_6:           keyCode = XK_6; break;
+                case XK_KP_7:           keyCode = XK_7; break;
+                case XK_KP_8:           keyCode = XK_8; break;
+                case XK_KP_9:           keyCode = XK_9; break;
+
                 default:                break;
             }
 
-            switch (sym)
+            switch (keyCode)
             {
                 case XK_Left:
                 case XK_Right:
@@ -1392,7 +1445,7 @@ public:
                 case XK_Delete:
                 case XK_Insert:
                     keyPressed = true;
-                    keyCode = (sym & 0xff) | Keys::extendedKeyModifier;
+                    keyCode = (keyCode & 0xff) | Keys::extendedKeyModifier;
                     break;
 
                 case XK_Tab:
@@ -3124,6 +3177,11 @@ void MouseInputSource::setRawMousePosition (Point<int> newPosition)
     XWarpPointer (display, None, root, 0, 0, 0, 0, newPosition.getX(), newPosition.getY());
 }
 
+double Desktop::getDefaultMasterScale()
+{
+    return 1.0;
+}
+
 Desktop::DisplayOrientation Desktop::getCurrentOrientation() const
 {
     return upright;
@@ -3390,12 +3448,14 @@ void LookAndFeel::playAlertSound()
 
 
 //==============================================================================
+#if JUCE_MODAL_LOOPS_PERMITTED
 void JUCE_CALLTYPE NativeMessageBox::showMessageBox (AlertWindow::AlertIconType iconType,
                                                      const String& title, const String& message,
                                                      Component* /* associatedComponent */)
 {
     AlertWindow::showMessageBox (iconType, title, message);
 }
+#endif
 
 void JUCE_CALLTYPE NativeMessageBox::showMessageBoxAsync (AlertWindow::AlertIconType iconType,
                                                           const String& title, const String& message,

@@ -234,12 +234,12 @@ public:
                            view.callIntMethod (ComponentPeerView.getTop));
     }
 
-    Point<int> localToGlobal (const Point<int>& relativePosition) override
+    Point<int> localToGlobal (Point<int> relativePosition) override
     {
         return relativePosition + getScreenPosition();
     }
 
-    Point<int> globalToLocal (const Point<int>& screenPosition) override
+    Point<int> globalToLocal (Point<int> screenPosition) override
     {
         return screenPosition - getScreenPosition();
     }
@@ -279,12 +279,12 @@ public:
         // n/a
     }
 
-    bool contains (const Point<int>& position, bool trueIfInAChildWindow) const override
+    bool contains (Point<int> localPos, bool trueIfInAChildWindow) const override
     {
-        return isPositiveAndBelow (position.x, component.getWidth())
-            && isPositiveAndBelow (position.y, component.getHeight())
+        return isPositiveAndBelow (localPos.x, component.getWidth())
+            && isPositiveAndBelow (localPos.y, component.getHeight())
             && ((! trueIfInAChildWindow) || view.callBooleanMethod (ComponentPeerView.containsPoint,
-                                                                    position.x, position.y));
+                                                                    localPos.x, localPos.y));
     }
 
     BorderSize<int> getFrameSize() const override
@@ -454,6 +454,11 @@ public:
         // TODO
     }
 
+    StringArray getAvailableRenderingEngines() override
+    {
+        return StringArray ("Software Renderer");
+    }
+
     //==============================================================================
     static AndroidComponentPeer* findPeerForJavaView (JNIEnv* env, jobject viewToFind)
     {
@@ -570,6 +575,11 @@ jobject createOpenGLView (ComponentPeer* peer)
 bool Desktop::canUseSemiTransparentWindows() noexcept
 {
     return true;
+}
+
+double Desktop::getDefaultMasterScale()
+{
+    return 1.0;
 }
 
 Desktop::DisplayOrientation Desktop::getCurrentOrientation() const

@@ -40,14 +40,14 @@ class TranslationOrTransform
 {
 public:
     TranslationOrTransform (int x, int y) noexcept
-        : xOffset (x), yOffset (y), isOnlyTranslated (true), isIntegerScaling (true)
+        : xOffset (x), yOffset (y), isOnlyTranslated (true), isRotated (false)
     {
     }
 
     TranslationOrTransform (const TranslationOrTransform& other) noexcept
         : complexTransform (other.complexTransform),
           xOffset (other.xOffset), yOffset (other.yOffset),
-          isOnlyTranslated (other.isOnlyTranslated), isIntegerScaling (other.isIntegerScaling)
+          isOnlyTranslated (other.isOnlyTranslated), isRotated (other.isRotated)
     {
     }
 
@@ -79,9 +79,7 @@ public:
 
     void addTransform (const AffineTransform& t) noexcept
     {
-        if (isOnlyTranslated
-             && t.isOnlyTranslation()
-             && isIntegerTranslation (t))
+        if (isOnlyTranslated && t.isOnlyTranslation())
         {
             xOffset += (int) t.getTranslationX();
             yOffset += (int) t.getTranslationY();
@@ -90,13 +88,16 @@ public:
         {
             complexTransform = getTransformWith (t);
             isOnlyTranslated = false;
-            isIntegerScaling = isIntegerScale (complexTransform);
+            isRotated = (complexTransform.mat01 != 0 || complexTransform.mat10 != 0);
         }
     }
 
     float getScaleFactor() const noexcept
     {
-        return isOnlyTranslated ? 1.0f : complexTransform.getScaleFactor();
+        return isOnlyTranslated ? 1.0f
+                                : (isRotated ? complexTransform.getScaleFactor()
+                                             : jmax (complexTransform.mat00,
+                                                     complexTransform.mat11));
     }
 
     void moveOriginInDeviceSpace (const int dx, const int dy) noexcept
@@ -135,28 +136,7 @@ public:
 
     AffineTransform complexTransform;
     int xOffset, yOffset;
-    bool isOnlyTranslated, isIntegerScaling;
-
-private:
-    static inline bool isIntegerTranslation (const AffineTransform& t) noexcept
-    {
-        const int tx = (int) (t.getTranslationX() * 256.0f);
-        const int ty = (int) (t.getTranslationY() * 256.0f);
-        return ((tx | ty) & 0xf8) == 0;
-    }
-
-    static inline bool isIntegerScale (const AffineTransform& t) noexcept
-    {
-        if (t.mat01 != 0 || t.mat10 != 0)
-            return false;
-
-        const int tx = (int) (t.getTranslationX() * 256.0f);
-        const int ty = (int) (t.getTranslationY() * 256.0f);
-        const int txs = (int) (t.mat00 * 256.0f);
-        const int tys = (int) (t.mat11 * 256.0f);
-
-        return ((tx | ty | txs | tys) & 0xf8) == 0;
-    }
+    bool isOnlyTranslated, isRotated;
 };
 
 //==============================================================================
@@ -1915,7 +1895,8 @@ struct ClipRegions
                     const int clipTop    = i->getY();
                     const int clipBottom = i->getBottom();
 
-                    if (f.totalBottom > clipTop && f.totalTop < clipBottom && f.totalRight > clipLeft && f.totalLeft < clipRight)
+                    if (f.totalBottom > clipTop && f.totalTop < clipBottom
+                         && f.totalRight > clipLeft && f.totalLeft < clipRight)
                     {
                         if (f.isOnePixelWide())
                         {
@@ -2029,7 +2010,7 @@ public:
                 cloneClipIfMultiplyReferenced();
                 clip = clip->clipToRectangle (transform.translated (r));
             }
-            else if (transform.isIntegerScaling)
+            else if (! transform.isRotated)
             {
                 cloneClipIfMultiplyReferenced();
                 clip = clip->clipToRectangle (transform.transformed (r));
@@ -2056,7 +2037,7 @@ public:
                 offsetList.offsetAll (transform.xOffset, transform.yOffset);
                 clip = clip->clipToRectangleList (offsetList);
             }
-            else if (transform.isIntegerScaling)
+            else if (! transform.isRotated)
             {
                 cloneClipIfMultiplyReferenced();
                 RectangleList<int> scaledList;
@@ -2075,6 +2056,16 @@ public:
         return clip != nullptr;
     }
 
+    static Rectangle<int> getLargestIntegerWithin (Rectangle<float> r)
+    {
+        const int x1 = (int) std::ceil (r.getX());
+        const int y1 = (int) std::ceil (r.getY());
+        const int x2 = (int) std::floor (r.getRight());
+        const int y2 = (int) std::floor (r.getBottom());
+
+        return Rectangle<int> (x1, y1, x2 - x1, y2 - y1);
+    }
+
     bool excludeClipRectangle (const Rectangle<int>& r)
     {
         if (clip != nullptr)
@@ -2083,11 +2074,11 @@ public:
 
             if (transform.isOnlyTranslated)
             {
-                clip = clip->excludeClipRectangle (transform.translated (r));
+                clip = clip->excludeClipRectangle (getLargestIntegerWithin (transform.translated (r.toFloat())));
             }
-            else if (transform.isIntegerScaling)
+            else if (! transform.isRotated)
             {
-                clip = clip->excludeClipRectangle (transform.transformed (r));
+                clip = clip->excludeClipRectangle (getLargestIntegerWithin (transform.transformed (r.toFloat())));
             }
             else
             {
@@ -2198,10 +2189,15 @@ public:
         {
             if (transform.isOnlyTranslated)
                 fillTargetRect (transform.translated (r), replaceContents);
-            else if (transform.isIntegerScaling)
-                fillTargetRect (transform.transformed (r), replaceContents);
             else
-                fillRectAsPath (r);
+            {
+                jassert (! replaceContents); // not implemented..
+
+                if (! transform.isRotated)
+                    fillTargetRect (transform.transformed (r.toFloat()));
+                else
+                    fillRectAsPath (r);
+            }
         }
     }
 
@@ -2211,7 +2207,7 @@ public:
         {
             if (transform.isOnlyTranslated)
                 fillTargetRect (transform.translated (r));
-            else if (transform.isIntegerScaling)
+            else if (! transform.isRotated)
                 fillTargetRect (transform.transformed (r));
             else
                 fillRectAsPath (r);
@@ -2561,6 +2557,7 @@ public:
     void setOrigin (int x, int y) override                                       { stack->transform.setOrigin (x, y); }
     void addTransform (const AffineTransform& t) override                        { stack->transform.addTransform (t); }
     float getScaleFactor() override                                              { return stack->transform.getScaleFactor(); }
+    float getTargetDeviceScaleFactor() override                                  { return stack->transform.getScaleFactor(); }
     Rectangle<int> getClipBounds() const override                                { return stack->getClipBounds(); }
     bool isClipEmpty() const override                                            { return stack->clip == nullptr; }
     bool clipRegionIntersects (const Rectangle<int>& r) override                 { return stack->clipRegionIntersects (r); }

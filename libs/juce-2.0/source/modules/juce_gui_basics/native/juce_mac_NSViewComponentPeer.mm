@@ -278,12 +278,12 @@ public:
         return getBounds (! isSharedWindow);
     }
 
-    Point<int> localToGlobal (const Point<int>& relativePosition) override
+    Point<int> localToGlobal (Point<int> relativePosition) override
     {
         return relativePosition + getBounds (true).getPosition();
     }
 
-    Point<int> globalToLocal (const Point<int>& screenPosition) override
+    Point<int> globalToLocal (Point<int> screenPosition) override
     {
         return screenPosition - getBounds (true).getPosition();
     }
@@ -363,16 +363,16 @@ public:
         return fullScreen;
     }
 
-    bool contains (const Point<int>& position, bool trueIfInAChildWindow) const override
+    bool contains (Point<int> localPos, bool trueIfInAChildWindow) const override
     {
-        if (! (isPositiveAndBelow (position.getX(), component.getWidth())
-                && isPositiveAndBelow (position.getY(), component.getHeight())))
-            return false;
-
         NSRect frameRect = [view frame];
 
-        NSView* v = [view hitTest: NSMakePoint (frameRect.origin.x + position.getX(),
-                                                frameRect.origin.y + frameRect.size.height - position.getY())];
+        if (! (isPositiveAndBelow (localPos.getX(), (int) frameRect.size.width)
+             && isPositiveAndBelow (localPos.getY(), (int) frameRect.size.height)))
+            return false;
+
+        NSView* v = [view hitTest: NSMakePoint (frameRect.origin.x + localPos.getX(),
+                                                frameRect.origin.y + frameRect.size.height - localPos.getY())];
 
         return trueIfInAChildWindow ? (v != nil)
                                     : (v == view);
@@ -473,7 +473,7 @@ public:
 
     StringArray getAvailableRenderingEngines() override
     {
-        StringArray s (ComponentPeer::getAvailableRenderingEngines());
+        StringArray s ("Software Renderer");
 
        #if USE_COREGRAPHICS_RENDERING
         s.add ("CoreGraphics Renderer");
