@@ -99,15 +99,15 @@ struct Program
         }
 
         parameters[ 0] = 0.5f;
-        parameters[73] = 0.5f;
-        parameters[74] = 0.4f;
+        parameters[73] = 0.5f; // delay time
+        parameters[74] = 0.4f; // delay feedback
         parameters[75] = 0.5f;
-        parameters[76] = 0.3f;
-        parameters[77] = 0.6f;
+        parameters[76] = 0.3f; // chorus rate
+        parameters[77] = 0.6f; // chorus depth
         parameters[78] = 0.0f;
-        parameters[79] = 0.6f;
-        parameters[80] = 0.7f;
-        parameters[81] = 0.6f;
+        parameters[79] = 0.6f; // reverb size
+        parameters[80] = 0.7f; // reverb width
+        parameters[81] = 0.6f; // reverb damp
         parameters[82] = 0.0f;
         parameters[83] = 0.5f;
         parameters[84] = 0.5f;

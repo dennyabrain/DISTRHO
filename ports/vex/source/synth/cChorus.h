@@ -57,6 +57,7 @@ public:
     {
         lfoS[0] = 0.5f;
         lfoS[1] = 0.0f;
+        buffer.clear();
     }
 
     void updateParameterPtr(const float* const p)

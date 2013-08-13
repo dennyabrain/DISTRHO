@@ -106,8 +106,8 @@ private:
     int snum;
     cSyntModule* s1;
     VexChorus* c1;
-    cReverb* r1;
-    cDelay* d1;
+    VexReverb* r1;
+    VexDelay* d1;
     VexArp* a1;
     VexArp* a2;
     VexArp* a3;

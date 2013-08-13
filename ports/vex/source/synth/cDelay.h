@@ -34,78 +34,95 @@
 #ifndef __JUCETICE_VEXCDELAY_HEADER__
 #define __JUCETICE_VEXCDELAY_HEADER__
 
-#include "../StandardHeader.h"
+#ifdef CARLA_EXPORT
+ #include "JuceHeader.h"
+#else
+ #include "../StandardHeader.h"
+#endif
 
-class cDelay
+class VexDelay
 {
 public:
-     cDelay(float* P)
-     {
-          SampleRate = 44100;
-          bufferSize = int(SampleRate * 2);
-          buffy = new AudioSampleBuffer(2, bufferSize);
-          buffy->clear();
-          parameters = P;
-          delay = 0;
-
-          iWrite = 0;
-          iRead  = 0;
-     }
-
-     ~cDelay()
-     {
-          delete buffy;
-     }
-
-    void updateParameterPtr(float* P)
+    VexDelay(const float* const p)
+        : parameters(p),
+          sampleRate(44100),
+          bufferSize(sampleRate*2),
+          iRead(0),
+          iWrite(0),
+          buffer(2, bufferSize)
     {
-          parameters = P;
+        buffer.clear();
     }
 
-    void processBlock(AudioSampleBuffer * OutBuffer, double bpm)
+    void updateParameterPtr(const float* const p)
     {
-        feedback = parameters[74];
-        bpm = jlimit(10.0,500.0,bpm);
-        delay = jmin(int(parameters[73] * 8) * int(((60 / bpm) * SampleRate) / 4) , 44100);
+        parameters = p;
+    }
 
-        for(int i = 0; i < OutBuffer->getNumSamples() ; i++)
+    void setSampleRate(const float s)
+    {
+        if (sampleRate == s)
+            return;
+
+        sampleRate = s;
+        bufferSize = sampleRate * 2;
+
+        iRead  = 0;
+        iWrite = 0;
+
+        buffer.setSize(2, bufferSize, false, false, true);
+        buffer.clear();
+     }
+
+    void processBlock(AudioSampleBuffer* const outBuffer, double bpm)
+    {
+        processBlock(outBuffer->getSampleData(0, 0), outBuffer->getSampleData(1, 0), outBuffer->getNumSamples(), bpm);
+    }
+
+    void processBlock(float* const outBufferL, float* const outBufferR, const int numSamples, double bpm)
+    {
+        bpm = jlimit(10.0, 500.0, bpm);
+
+#ifdef CARLA_EXPORT
+        const int   delay    = jmin(int(parameters[0]) * int(((60.0 / bpm) * sampleRate) / 4.0), 44100);
+        const float feedback = parameters[1]/100.0f;
+#else
+        const int   delay    = jmin(int(parameters[73] * 8.0) * int(((60.0 / bpm) * sampleRate) / 4.0), 44100);
+        const float feedback = parameters[74];
+#endif
+
+        float* const bufferL = buffer.getSampleData(0, 0);
+        float* const bufferR = buffer.getSampleData(1, 0);
+
+        for (int i = 0; i < numSamples; ++i)
         {
-            if( iWrite >= SampleRate ){ iWrite = 0; }
             iRead = iWrite - delay;
-            if( iRead < 0 ){ iRead = (int)SampleRate + iRead; }
 
-            *(buffy->getSampleData(0,iWrite)) = *(OutBuffer->getSampleData(0,i));
-            *(buffy->getSampleData(1,iWrite)) = *(OutBuffer->getSampleData(1,i));
-            *(buffy->getSampleData(1,iWrite)) +=  (*(buffy->getSampleData(0,iRead)) * feedback);
-            *(buffy->getSampleData(0,iWrite)) +=  (*(buffy->getSampleData(1,iRead)) * feedback);
+            if (iRead < 0)
+                iRead += (int)sampleRate;
 
-            jassert(i < OutBuffer->getNumSamples());
-            jassert(iRead < buffy->getNumSamples());
-            jassert(iWrite < buffy->getNumSamples());
+            bufferL[iWrite]  = outBufferL[i];
+            bufferR[iWrite]  = outBufferR[i];
+            bufferR[iWrite] += bufferL[iRead] * feedback;
+            bufferL[iWrite] += bufferR[iRead] * feedback;
 
-            *(OutBuffer->getSampleData(0,i)) = *(buffy->getSampleData(0,iRead));
-            *(OutBuffer->getSampleData(1,i)) = *(buffy->getSampleData(1,iRead));
+            jassert(i < numSamples);
+            jassert(iRead < bufferSize);
+            jassert(iWrite < bufferSize);
 
-            iWrite++;
+            outBufferL[i] = bufferL[iRead];
+            outBufferR[i] = bufferR[iRead];
+
+            if (++iWrite == sampleRate)
+                iWrite = 0;
         }
      }
 
-     void setSampleRate(double s)
-     {
-          if (SampleRate != s)
-          {
-              SampleRate = (float)s;
-              bufferSize = int(SampleRate * 2);
-              buffy->setSize(2, bufferSize,0,0,1);
-          }
-     }
-
 private:
-     float* parameters;
-     AudioSampleBuffer * buffy;
-     float SampleRate;
-     float feedback, mix;
-     int iWrite, iRead, bufferSize, delay;
+     const float* parameters;
+     float sampleRate;
+     int bufferSize, iRead, iWrite;
+     AudioSampleBuffer buffer;
 };
 
 #endif

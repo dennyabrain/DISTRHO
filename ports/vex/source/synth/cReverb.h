@@ -34,57 +34,51 @@
 #ifndef __JUCETICE_VEXCREVERB_HEADER__
 #define __JUCETICE_VEXCREVERB_HEADER__
 
-#include "../StandardHeader.h"
-#include "freeverb/revmodel.hpp"
-
-class cReverb
-{
-public:
-    cReverb (float* p)
-    {
-        updateParameterPtr (p);
-    }
-
-    ~cReverb()
-    {
-    }
-
-    void updateParameterPtr (float* p)
-    {
-        parameters = p;
-
-        model.setroomsize (parameters[79]);
-        model.setdamp (parameters[81]);
-        model.setwet (1.0f);
-        model.setdry (0.0f);
-        model.setwidth (parameters[80]);
-    }
-
-    void processBlock (AudioSampleBuffer * OutBuffer)
-    {
-#if 0
-        model.setroomsize (parameters[79]);
-        model.setdamp (parameters[81]);
-        model.setwet (1.0f);
-        model.setdry (0.0f);
-        model.setwidth (parameters[80]);
+#ifdef CARLA_EXPORT
+ #include "JuceHeader.h"
+#else
+ #include "../StandardHeader.h"
 #endif
 
-        model.processreplace(OutBuffer->getSampleData(0,0),
-                             OutBuffer->getSampleData(1,0),
-                             OutBuffer->getSampleData(0,0),
-                             OutBuffer->getSampleData(1,0),
-                             OutBuffer->getNumSamples(),
-                             1);
+#include "freeverb/revmodel.hpp"
+
+class VexReverb
+{
+public:
+    VexReverb(const float* const p)
+        : parameters(p)
+    {
+        model.setwet(1.0f);
+        model.setdry(0.0f);
     }
 
-    void setSampleRate(double s)
+    void updateParameterPtr(const float* const p)
     {
+        parameters = p;
+    }
+
+    void processBlock(AudioSampleBuffer* const outBuffer)
+    {
+        processBlock(outBuffer->getSampleData(0, 0), outBuffer->getSampleData(1, 0), outBuffer->getNumSamples());
+    }
+
+    void processBlock(float* const outBufferL, float* const outBufferR, const int numSamples)
+    {
+#ifdef CARLA_EXPORT
+        model.setroomsize(parameters[0]);
+        model.setdamp(parameters[1]);
+        model.setwidth(parameters[2]);
+#else
+        model.setroomsize(parameters[79]);
+        model.setdamp(parameters[81]);
+        model.setwidth(parameters[80]);
+#endif
+        model.processreplace(outBufferL, outBufferR, outBufferL, outBufferR, numSamples, 1);
     }
 
 private:
     revmodel model;
-    float* parameters;
+    const float* parameters;
 };
 
 #endif

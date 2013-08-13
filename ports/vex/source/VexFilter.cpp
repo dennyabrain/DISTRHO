@@ -47,8 +47,8 @@ VexFilter::VexFilter()
 
     s1 = new cSyntModule(pra);
     c1 = new VexChorus(pra);
-    r1 = new cReverb(pra);
-    d1 = new cDelay(pra);
+    r1 = new VexReverb(pra);
+    d1 = new VexDelay(pra);
 
     obf = NULL;
     abf = NULL;
@@ -282,11 +282,11 @@ void VexFilter::processBlock(AudioSampleBuffer& output,
 
     if (output.getNumSamples() != obf->getNumSamples())
     {
-            obf		->setSize(2, output.getNumSamples(),0,0,1);
-            abf		->setSize(2, output.getNumSamples(),0,0,1);
-            dbf		->setSize(2, output.getNumSamples(),0,0,1);
-            dbf2	->setSize(2, output.getNumSamples(),0,0,1);
-            dbf3	->setSize(2, output.getNumSamples(),0,0,1);
+            obf->setSize(2, output.getNumSamples(),0,0,1);
+            abf->setSize(2, output.getNumSamples(),0,0,1);
+            dbf->setSize(2, output.getNumSamples(),0,0,1);
+            dbf2->setSize(2, output.getNumSamples(),0,0,1);
+            dbf3->setSize(2, output.getNumSamples(),0,0,1);
     }
 
     obf	->clear();

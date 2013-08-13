@@ -48,7 +48,7 @@ public:
     static const int kMaxNotes = 10;
 
     VexArp(const VexArpSettings* p)
-        : peggySet(p),
+        : arpSet(p),
           dead(true),
           notesPlaying(false),
           doSync(true),
@@ -136,7 +136,7 @@ public:
                                                             const double bpm,
                                                             const int numSamples)
     {
-        const int timeSig = meter[peggySet->timeMode];
+        const int timeSig = meter[arpSet->timeMode];
 
         // Loop though the midibuffer, take away note on/off, let the rest pass
         {
@@ -160,7 +160,7 @@ public:
         // BarSync
         const int samplesPerStep = int((60.0 / bpm) * sampleRate * 4) / timeSig;
 
-        if (isPlaying && peggySet->syncMode == 2)
+        if (isPlaying && arpSet->syncMode == 2)
         {
             if (doSync)
             {
@@ -172,7 +172,7 @@ public:
 
                 //Cycle the counts
                 sampleCount = (sampleCount % samplesPerStep) + samplesPerStep - 10;
-                nextStep = nextStep % peggySet->length;
+                nextStep = nextStep % arpSet->length;
             }
             doSync = false;
         }
@@ -200,20 +200,20 @@ public:
 
                     for (int i = 0; i < 5; ++i)
                     {
-                        if((cKeysDown[i]!= 0) && (peggySet->grid[nextStep*5 + i]))
+                        if((cKeysDown[i]!= 0) && (arpSet->grid[nextStep*5 + i]))
                         {   //we have a note to play
                             int vel;
 
-                            switch (peggySet->velMode)
+                            switch (arpSet->velMode)
                             {
                             case 1:
-                                vel = roundFloatToInt (peggySet->velocities[nextStep] * 127.0f);
+                                vel = roundFloatToInt (arpSet->velocities[nextStep] * 127.0f);
                                 break;
                             case 2:
                                 vel = (int) cKeysVelocity[i];
                                 break;
                             case 3:
-                                vel = (int) cKeysVelocity[i] + roundFloatToInt (peggySet->velocities[nextStep] * 127.0f);
+                                vel = (int) cKeysVelocity[i] + roundFloatToInt (arpSet->velocities[nextStep] * 127.0f);
                                 break;
                             default:
                                 vel = 127;
@@ -229,23 +229,23 @@ public:
 
                     if (doFail)
                     {
-                        switch (peggySet->failMode)
+                        switch (arpSet->failMode)
                         {
                         case 1: //normal
                             sampleCount -= samplesPerStep;
                             nextStep++;
-                            nextStep = nextStep % peggySet->length;
+                            nextStep = nextStep % arpSet->length;
                             break;
                         case 2: //skip one
                             //SampleCount -= SamplesPerStep;
                             nextStep++;
-                            nextStep = nextStep % peggySet->length;
+                            nextStep = nextStep % arpSet->length;
                             repeat = true;
                             break;
                         case 3: //skip two
                             //SampleCount -= SamplesPerStep;
                             nextStep += 2;
-                            nextStep = nextStep % peggySet->length;
+                            nextStep = nextStep % arpSet->length;
                             repeat = true;
                             break;
                         }
@@ -254,7 +254,7 @@ public:
                     {
                         sampleCount -= samplesPerStep;
                         nextStep++;
-                        nextStep = nextStep % peggySet->length; //Cycle the steps over pattern length
+                        nextStep = nextStep % arpSet->length; //Cycle the steps over pattern length
                     }
                 }
             } while (repeat);
@@ -297,7 +297,7 @@ public:
     }
 
 private:
-    const VexArpSettings* peggySet;
+    const VexArpSettings* arpSet;
     MidiBuffer outMidiBuffer;
     bool dead, notesPlaying, doSync;
     char nextStep;
