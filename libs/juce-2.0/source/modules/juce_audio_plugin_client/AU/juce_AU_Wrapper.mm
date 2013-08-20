@@ -94,11 +94,23 @@ static const AudioUnitPropertyID juceFilterObjectPropertyID = 0x1a45ffe9;
 static const short channelConfigs[][2] = { JucePlugin_PreferredChannelConfigurations };
 static const int numChannelConfigs = sizeof (channelConfigs) / sizeof (*channelConfigs);
 
-#if JucePlugin_IsSynth
- typedef MusicDeviceBase  JuceAUBaseClass;
-#else
- typedef AUMIDIEffectBase JuceAUBaseClass;
-#endif
+// Avoids some multiple inheritance complications in the Apple base class code.
+class JuceAUBaseClass   : public AUMIDIEffectBase
+{
+public:
+    JuceAUBaseClass (AudioComponentInstance comp)  : AUMIDIEffectBase (comp, false) {}
+
+    OSStatus MIDIEvent (UInt32 inStatus, UInt32 inData1, UInt32 inData2, UInt32 inOffsetSampleFrame) override
+    {
+        return AUMIDIBase::MIDIEvent (inStatus, inData1, inData2, inOffsetSampleFrame);
+    }
+
+    OSStatus SysEx (const UInt8* inData, UInt32 inLength) override
+    {
+        return AUMIDIBase::SysEx (inData, inLength);
+    }
+};
+
 
 // This macro can be set if you need to override this internal name for some reason..
 #ifndef JUCE_STATE_DICTIONARY_KEY
@@ -114,11 +126,7 @@ class JuceAU   : public JuceAUBaseClass,
 public:
     //==============================================================================
     JuceAU (AudioUnit component)
-      #if JucePlugin_IsSynth
-        : MusicDeviceBase (component, 0, 1),
-      #else
-        : AUMIDIEffectBase (component),
-      #endif
+        : JuceAUBaseClass (component),
           bufferSpace (2, 16),
           prepared (false)
     {
@@ -148,7 +156,7 @@ public:
         CreateElements();
 
         CAStreamBasicDescription streamDescription;
-        streamDescription.mSampleRate = GetSampleRate();
+        streamDescription.mSampleRate = getSampleRate();
         streamDescription.SetCanonical ((UInt32) channelConfigs[0][1], false);
         Outputs().GetIOElement(0)->SetStreamFormat (streamDescription);
 
@@ -187,7 +195,7 @@ public:
                                      AudioUnitScope inScope,
                                      AudioUnitElement inElement,
                                      UInt32& outDataSize,
-                                     Boolean& outWritable)
+                                     Boolean& outWritable) override
     {
         if (inScope == kAudioUnitScope_Global)
         {
@@ -229,7 +237,7 @@ public:
     ComponentResult GetProperty (AudioUnitPropertyID inID,
                                  AudioUnitScope inScope,
                                  AudioUnitElement inElement,
-                                 void* outData)
+                                 void* outData) override
     {
         if (inScope == kAudioUnitScope_Global)
         {
@@ -280,7 +288,7 @@ public:
                                  AudioUnitScope inScope,
                                  AudioUnitElement inElement,
                                  const void* inData,
-                                 UInt32 inDataSize)
+                                 UInt32 inDataSize) override
     {
         if (inScope == kAudioUnitScope_Global && inID == kAudioUnitProperty_OfflineRender)
         {
@@ -293,7 +301,7 @@ public:
         return JuceAUBaseClass::SetProperty (inID, inScope, inElement, inData, inDataSize);
     }
 
-    ComponentResult SaveState (CFPropertyListRef* outData)
+    ComponentResult SaveState (CFPropertyListRef* outData) override
     {
         ComponentResult err = JuceAUBaseClass::SaveState (outData);
 
@@ -320,7 +328,7 @@ public:
         return noErr;
     }
 
-    ComponentResult RestoreState (CFPropertyListRef inData)
+    ComponentResult RestoreState (CFPropertyListRef inData) override
     {
         {
             // Remove the data entry from the state to prevent the superclass loading the parameters
@@ -354,7 +362,7 @@ public:
         return noErr;
     }
 
-    UInt32 SupportedNumChannels (const AUChannelInfo** outInfo)
+    UInt32 SupportedNumChannels (const AUChannelInfo** outInfo) override
     {
         // If you hit this, then you need to add some configurations to your
         // JucePlugin_PreferredChannelConfigurations setting..
@@ -381,7 +389,7 @@ public:
     //==============================================================================
     ComponentResult GetParameterInfo (AudioUnitScope inScope,
                                       AudioUnitParameterID inParameterID,
-                                      AudioUnitParameterInfo& outParameterInfo)
+                                      AudioUnitParameterInfo& outParameterInfo) override
     {
         const int index = (int) inParameterID;
 
@@ -418,7 +426,7 @@ public:
     ComponentResult GetParameter (AudioUnitParameterID inID,
                                   AudioUnitScope inScope,
                                   AudioUnitElement inElement,
-                                  Float32& outValue)
+                                  Float32& outValue) override
     {
         if (inScope == kAudioUnitScope_Global && juceFilter != nullptr)
         {
@@ -433,7 +441,7 @@ public:
                                   AudioUnitScope inScope,
                                   AudioUnitElement inElement,
                                   Float32 inValue,
-                                  UInt32 inBufferOffsetInFrames)
+                                  UInt32 inBufferOffsetInFrames) override
     {
         if (inScope == kAudioUnitScope_Global && juceFilter != nullptr)
         {
@@ -445,29 +453,26 @@ public:
     }
 
     //==============================================================================
-    ComponentResult Version()                   { return JucePlugin_VersionCode; }
-    bool SupportsTail()                         { return true; }
-    Float64 GetTailTime()                       { return juceFilter->getTailLengthSeconds(); }
-    Float64 GetSampleRate()                     { return GetOutput(0)->GetStreamFormat().mSampleRate; }
+    ComponentResult Version() override                   { return JucePlugin_VersionCode; }
+    bool SupportsTail() override                         { return true; }
+    Float64 GetTailTime() override                       { return juceFilter->getTailLengthSeconds(); }
+    double getSampleRate()                               { return GetOutput(0)->GetStreamFormat().mSampleRate; }
 
-    Float64 GetLatency()
+    Float64 GetLatency() override
     {
-        jassert (GetSampleRate() > 0);
-
-        if (GetSampleRate() <= 0)
-            return 0.0;
-
-        return juceFilter->getLatencySamples() / GetSampleRate();
+        const double rate = getSampleRate();
+        jassert (rate > 0);
+        return rate > 0 ? juceFilter->getLatencySamples() / rate : 0;
     }
 
     //==============================================================================
    #if BUILD_AU_CARBON_UI
-    int GetNumCustomUIComponents()
+    int GetNumCustomUIComponents() override
     {
         return PluginHostType().isDigitalPerformer() ? 0 : 1;
     }
 
-    void GetUIComponentDescs (ComponentDescription* inDescArray)
+    void GetUIComponentDescs (ComponentDescription* inDescArray) override
     {
         inDescArray[0].componentType = kAudioUnitCarbonViewComponentType;
         inDescArray[0].componentSubType = JucePlugin_AUSubType;
@@ -478,7 +483,7 @@ public:
    #endif
 
     //==============================================================================
-    bool getCurrentPosition (AudioPlayHead::CurrentPositionInfo& info)
+    bool getCurrentPosition (AudioPlayHead::CurrentPositionInfo& info) override
     {
         info.timeSigNumerator = 0;
         info.timeSigDenominator = 0;
@@ -536,7 +541,7 @@ public:
         {
             info.isPlaying = playing;
             info.timeInSamples = (int64) outCurrentSampleInTimeLine;
-            info.timeInSeconds = outCurrentSampleInTimeLine / GetSampleRate();
+            info.timeInSeconds = outCurrentSampleInTimeLine / getSampleRate();
         }
 
         return true;
@@ -572,7 +577,7 @@ public:
         PropertyChanged (kAudioUnitProperty_Latency, kAudioUnitScope_Global, 0);
     }
 
-    bool StreamFormatWritable (AudioUnitScope, AudioUnitElement)
+    bool StreamFormatWritable (AudioUnitScope, AudioUnitElement) override
     {
         return ! IsInitialized();
     }
@@ -580,10 +585,10 @@ public:
     // (these two slightly different versions are because the definition changed between 10.4 and 10.5)
     ComponentResult StartNote (MusicDeviceInstrumentID, MusicDeviceGroupID, NoteInstanceID&, UInt32, const MusicDeviceNoteParams&) { return noErr; }
     ComponentResult StartNote (MusicDeviceInstrumentID, MusicDeviceGroupID, NoteInstanceID*, UInt32, const MusicDeviceNoteParams&) { return noErr; }
-    ComponentResult StopNote (MusicDeviceGroupID, NoteInstanceID, UInt32)   { return noErr; }
+    ComponentResult StopNote (MusicDeviceGroupID, NoteInstanceID, UInt32) override   { return noErr; }
 
     //==============================================================================
-    ComponentResult Initialize()
+    ComponentResult Initialize() override
     {
        #if ! JucePlugin_IsSynth
         const int numIns  = GetInput(0)  != 0 ? (int) GetInput(0)->GetStreamFormat().mChannelsPerFrame : 0;
@@ -608,7 +613,7 @@ public:
         return noErr;
     }
 
-    void Cleanup()
+    void Cleanup() override
     {
         JuceAUBaseClass::Cleanup();
 
@@ -621,7 +626,7 @@ public:
         prepared = false;
     }
 
-    ComponentResult Reset (AudioUnitScope inScope, AudioUnitElement inElement)
+    ComponentResult Reset (AudioUnitScope inScope, AudioUnitElement inElement) override
     {
         if (! prepared)
             prepareToPlay();
@@ -643,13 +648,13 @@ public:
                   0,
                  #endif
                   (int) GetOutput(0)->GetStreamFormat().mChannelsPerFrame,
-                  GetSampleRate(),
+                  getSampleRate(),
                   (int) GetMaxFramesPerSlice());
 
             bufferSpace.setSize (juceFilter->getNumInputChannels() + juceFilter->getNumOutputChannels(),
                                  (int) GetMaxFramesPerSlice() + 32);
 
-            juceFilter->prepareToPlay (GetSampleRate(), (int) GetMaxFramesPerSlice());
+            juceFilter->prepareToPlay (getSampleRate(), (int) GetMaxFramesPerSlice());
 
             midiEvents.ensureSize (2048);
             midiEvents.clear();
@@ -665,7 +670,7 @@ public:
 
     ComponentResult Render (AudioUnitRenderActionFlags &ioActionFlags,
                             const AudioTimeStamp& inTimeStamp,
-                            UInt32 nFrames)
+                            UInt32 nFrames) override
     {
         lastSMPTETime = inTimeStamp.mSMPTETime;
 
@@ -683,7 +688,7 @@ public:
     OSStatus ProcessBufferLists (AudioUnitRenderActionFlags& ioActionFlags,
                                  const AudioBufferList& inBuffer,
                                  AudioBufferList& outBuffer,
-                                 UInt32 numSamples)
+                                 UInt32 numSamples) override
     {
         if (juceFilter != nullptr)
         {
@@ -849,9 +854,9 @@ public:
 
     OSStatus HandleMidiEvent (UInt8 nStatus, UInt8 inChannel, UInt8 inData1, UInt8 inData2,
                              #if defined (MAC_OS_X_VERSION_10_5)
-                              UInt32 inStartFrame)
+                              UInt32 inStartFrame) override
                              #else
-                              long inStartFrame)
+                              long inStartFrame) override
                              #endif
     {
        #if JucePlugin_WantsMidiInput
@@ -866,7 +871,7 @@ public:
         return noErr;
     }
 
-    OSStatus HandleSysEx (const UInt8* inData, UInt32 inLength)
+    OSStatus HandleSysEx (const UInt8* inData, UInt32 inLength) override
     {
        #if JucePlugin_WantsMidiInput
         const ScopedLock sl (incomingMidiLock);
@@ -876,7 +881,7 @@ public:
     }
 
     //==============================================================================
-    ComponentResult GetPresets (CFArrayRef* outData) const
+    ComponentResult GetPresets (CFArrayRef* outData) const override
     {
         if (outData != nullptr)
         {
@@ -906,7 +911,7 @@ public:
         return noErr;
     }
 
-    OSStatus NewFactoryPresetSet (const AUPreset& inNewFactoryPreset)
+    OSStatus NewFactoryPresetSet (const AUPreset& inNewFactoryPreset) override
     {
         const int numPrograms = juceFilter->getNumPrograms();
         const SInt32 chosenPresetNumber = (int) inNewFactoryPreset.presetNumber;
@@ -1201,7 +1206,7 @@ public:
         deleteUI();
     }
 
-    ComponentResult CreateUI (Float32 /*inXOffset*/, Float32 /*inYOffset*/)
+    ComponentResult CreateUI (Float32 /*inXOffset*/, Float32 /*inYOffset*/) override
     {
         JUCE_AUTORELEASEPOOL
         {

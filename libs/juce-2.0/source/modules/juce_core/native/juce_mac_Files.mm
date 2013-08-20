@@ -391,7 +391,7 @@ bool DirectoryIterator::NativeIterator::next (String& filenameFound,
 
 
 //==============================================================================
-bool Process::openDocument (const String& fileName, const String& parameters)
+bool JUCE_CALLTYPE Process::openDocument (const String& fileName, const String& parameters)
 {
     JUCE_AUTORELEASEPOOL
     {
@@ -419,7 +419,7 @@ bool Process::openDocument (const String& fileName, const String& parameters)
 
             NSMutableDictionary* dict = [[[NSMutableDictionary alloc] init] autorelease];
             [dict setObject: paramArray
-                     forKey: NSWorkspaceLaunchConfigurationArguments];
+                     forKey: nsStringLiteral ("NSWorkspaceLaunchConfigurationArguments")];
 
             return [workspace launchApplicationAtURL: filenameAsURL
                                              options: NSWorkspaceLaunchDefault | NSWorkspaceLaunchNewInstance
