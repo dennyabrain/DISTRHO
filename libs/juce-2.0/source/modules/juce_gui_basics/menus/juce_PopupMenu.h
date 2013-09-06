@@ -483,20 +483,11 @@ public:
 private:
     //==============================================================================
     class Item;
-    class ItemComponent;
-    class HeaderItemComponent;
-    class NormalComponentWrapper;
-
-    friend class MenuItemIterator;
-    friend class ItemComponent;
-    friend class Window;
-    friend class CustomComponent;
+    struct HelperClasses;
+    friend struct HelperClasses;
     friend class MenuBarComponent;
-    friend class OwnedArray <Item>;
-    friend class OwnedArray <ItemComponent>;
-    friend class ScopedPointer <Window>;
 
-    OwnedArray <Item> items;
+    OwnedArray<Item> items;
     LookAndFeel* lookAndFeel;
 
     Component* createWindow (const Options&, ApplicationCommandManager**) const;

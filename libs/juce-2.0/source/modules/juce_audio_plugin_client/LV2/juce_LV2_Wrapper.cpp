@@ -942,11 +942,12 @@ public:
         if (filter != nullptr && programsHost != nullptr)
         {
             if (filter->getNumPrograms() != lastProgramCount)
+            {
                 programsHost->program_changed (programsHost->handle, -1);
+                lastProgramCount = filter->getNumPrograms();
+            }
             else
                 programsHost->program_changed (programsHost->handle, filter->getCurrentProgram());
-
-            lastProgramCount = filter->getNumPrograms();
         }
     }
 
@@ -1335,7 +1336,7 @@ public:
             *portLatency = filter->getLatencySamples();
 
         if (portFreewheel != nullptr)
-            filter->setNonRealtime (*portFreewheel > 0.5f);
+            filter->setNonRealtime (*portFreewheel >= 0.5f);
 
         if (sampleCount == 0)
         {

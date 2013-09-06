@@ -1395,7 +1395,7 @@ public:
     }
 
     //==============================================================================
-    VstIntPtr dispatch (const int opcode, const int index, const int value, void* const ptr, float opt) const
+    VstIntPtr dispatch (const int opcode, const int index, const VstIntPtr value, void* const ptr, float opt) const
     {
         VstIntPtr result = 0;
 
@@ -2861,6 +2861,14 @@ void VSTPluginFormat::setExtraFunctions (AudioPluginInstance* plugin, ExtraFunct
 
     if (VSTPluginInstance* vst = dynamic_cast <VSTPluginInstance*> (plugin))
         vst->extraFunctions = f;
+}
+
+VstIntPtr JUCE_CALLTYPE VSTPluginFormat::dispatcher (AudioPluginInstance* plugin, int32 opcode, int32 index, VstIntPtr value, void* ptr, float opt)
+{
+    if (VSTPluginInstance* vst = dynamic_cast <VSTPluginInstance*> (plugin))
+        return vst->dispatch (opcode, index, value, ptr, opt);
+
+    return 0;
 }
 
 #endif

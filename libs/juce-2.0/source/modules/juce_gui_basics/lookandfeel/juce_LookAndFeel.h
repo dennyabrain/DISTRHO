@@ -25,38 +25,6 @@
 #ifndef JUCE_LOOKANDFEEL_H_INCLUDED
 #define JUCE_LOOKANDFEEL_H_INCLUDED
 
-#include "../widgets/juce_Slider.h"
-#include "../layout/juce_TabbedComponent.h"
-#include "../windows/juce_AlertWindow.h"
-
-class ToggleButton;
-class TextButton;
-class AlertWindow;
-class TextLayout;
-class ScrollBar;
-class ComboBox;
-class Button;
-class FilenameComponent;
-class DocumentWindow;
-class ResizableWindow;
-class GroupComponent;
-class MenuBarComponent;
-class DropShadower;
-class GlyphArrangement;
-class PropertyComponent;
-class TableHeaderComponent;
-class Toolbar;
-class ToolbarItemComponent;
-class PopupMenu;
-class ProgressBar;
-class FileBrowserComponent;
-class DirectoryContentsDisplayComponent;
-class FilePreviewComponent;
-class ImageButton;
-class CallOutBox;
-class Drawable;
-class CaretComponent;
-class BubbleComponent;
 
 //==============================================================================
 /**
@@ -247,7 +215,7 @@ public:
         @param isMouseOverButton    whether the mouse is currently over the button (also true if it's held down)
         @param isButtonDown         whether the mouse button's held down
     */
-    virtual void drawScrollbarButton (Graphics&,
+    virtual void drawScrollbarButton (Graphics& g,
                                       ScrollBar& scrollbar,
                                       int width, int height,
                                       int buttonDirection,
@@ -272,7 +240,7 @@ public:
                                     currently dragging the thumb
         @param isMouseDown          whether the mouse is currently dragging the scrollbar
     */
-    virtual void drawScrollbar (Graphics&,
+    virtual void drawScrollbar (Graphics& g,
                                 ScrollBar& scrollbar,
                                 int x, int y,
                                 int width, int height,

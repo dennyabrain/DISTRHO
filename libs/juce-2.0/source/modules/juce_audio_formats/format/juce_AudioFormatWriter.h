@@ -25,8 +25,6 @@
 #ifndef JUCE_AUDIOFORMATWRITER_H_INCLUDED
 #define JUCE_AUDIOFORMATWRITER_H_INCLUDED
 
-#include "juce_AudioFormatReader.h"
-
 
 //==============================================================================
 /**
@@ -203,7 +201,7 @@ public:
 
     private:
         class Buffer;
-        friend class ScopedPointer<Buffer>;
+        friend struct ContainerDeletePolicy<Buffer>;
         ScopedPointer<Buffer> buffer;
     };
 

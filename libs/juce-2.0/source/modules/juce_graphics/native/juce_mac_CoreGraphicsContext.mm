@@ -28,8 +28,8 @@
 class CoreGraphicsImage : public ImagePixelData
 {
 public:
-    CoreGraphicsImage (const Image::PixelFormat format, const int width_, const int height_, const bool clearImage)
-        : ImagePixelData (format, width_, height_)
+    CoreGraphicsImage (const Image::PixelFormat format, const int w, const int h, const bool clearImage)
+        : ImagePixelData (format, w, h)
     {
         pixelStride = format == Image::RGB ? 3 : ((format == Image::ARGB) ? 4 : 1);
         lineStride = (pixelStride * jmax (1, width) + 3) & ~3;
@@ -39,7 +39,7 @@ public:
         CGColorSpaceRef colourSpace = (format == Image::SingleChannel) ? CGColorSpaceCreateDeviceGray()
                                                                        : CGColorSpaceCreateDeviceRGB();
 
-        context = CGBitmapContextCreate (imageData, width, height, 8, lineStride,
+        context = CGBitmapContextCreate (imageData, (size_t) width, (size_t) height, 8, (size_t) lineStride,
                                          colourSpace, getCGImageFlags (format));
 
         CGColorSpaceRelease (colourSpace);
@@ -66,15 +66,14 @@ public:
     ImagePixelData* clone() override
     {
         CoreGraphicsImage* im = new CoreGraphicsImage (pixelFormat, width, height, false);
-        memcpy (im->imageData, imageData, lineStride * height);
+        memcpy (im->imageData, imageData, (size_t) (lineStride * height));
         return im;
     }
 
     ImageType* createType() const override    { return new NativeImageType(); }
 
     //==============================================================================
-    static CGImageRef createImage (const Image& juceImage, CGColorSpaceRef colourSpace,
-                                   const bool mustOutliveSource)
+    static CGImageRef createImage (const Image& juceImage, CGColorSpaceRef colourSpace, const bool mustOutliveSource)
     {
         const Image::BitmapData srcData (juceImage, Image::BitmapData::readOnly);
         CGDataProviderRef provider;
@@ -87,11 +86,13 @@ public:
         }
         else
         {
-            provider = CGDataProviderCreateWithData (0, srcData.data, srcData.lineStride * srcData.height, 0);
+            provider = CGDataProviderCreateWithData (0, srcData.data, (size_t) (srcData.lineStride * srcData.height), 0);
         }
 
-        CGImageRef imageRef = CGImageCreate (srcData.width, srcData.height,
-                                             8, srcData.pixelStride * 8, srcData.lineStride,
+        CGImageRef imageRef = CGImageCreate ((size_t) srcData.width,
+                                             (size_t) srcData.height,
+                                             8, (size_t) srcData.pixelStride * 8,
+                                             (size_t) srcData.lineStride,
                                              colourSpace, getCGImageFlags (juceImage.getFormat()), provider,
                                              0, true, kCGRenderingIntentDefault);
 
@@ -152,12 +153,12 @@ CoreGraphicsContext::~CoreGraphicsContext()
 }
 
 //==============================================================================
-void CoreGraphicsContext::setOrigin (int x, int y)
+void CoreGraphicsContext::setOrigin (Point<int> o)
 {
-    CGContextTranslateCTM (context, x, -y);
+    CGContextTranslateCTM (context, o.x, -o.y);
 
     if (lastClipRectIsValid)
-        lastClipRect.translate (-x, -y);
+        lastClipRect.translate (-o.x, -o.y);
 }
 
 void CoreGraphicsContext::addTransform (const AffineTransform& transform)
@@ -209,7 +210,7 @@ bool CoreGraphicsContext::clipToRectangleListWithoutTest (const RectangleList<in
     }
     else
     {
-        const int numRects = clipRegion.getNumRectangles();
+        const size_t numRects = (size_t) clipRegion.getNumRectangles();
         HeapBlock <CGRect> rects (numRects);
 
         int i = 0;
@@ -359,6 +360,11 @@ void CoreGraphicsContext::setInterpolationQuality (Graphics::ResamplingQuality q
 void CoreGraphicsContext::fillRect (const Rectangle<int>& r, const bool replaceExistingContents)
 {
     fillCGRect (CGRectMake (r.getX(), flipHeight - r.getBottom(), r.getWidth(), r.getHeight()), replaceExistingContents);
+}
+
+void CoreGraphicsContext::fillRect (const Rectangle<float>& r)
+{
+    fillCGRect (CGRectMake (r.getX(), flipHeight - r.getBottom(), r.getWidth(), r.getHeight()), false);
 }
 
 void CoreGraphicsContext::fillCGRect (const CGRect& cgRect, const bool replaceExistingContents)
@@ -519,39 +525,31 @@ void CoreGraphicsContext::drawLine (const Line<float>& line)
     }
 }
 
-void CoreGraphicsContext::drawVerticalLine (const int x, float top, float bottom)
+void CoreGraphicsContext::fillRectList (const RectangleList<float>& list)
 {
-    if (state->fillType.isColour())
-    {
-       #if MAC_OS_X_VERSION_MIN_REQUIRED > MAC_OS_X_VERSION_10_5
-        CGContextFillRect (context, CGRectMake (x, flipHeight - bottom, 1.0f, bottom - top));
-       #else
-        // On Leopard, unless both coordinates are non-integer, it disables anti-aliasing, so nudge
-        // the x coordinate slightly to trick it..
-        CGContextFillRect (context, CGRectMake (x + 1.0f / 256.0f, flipHeight - bottom, 1.0f + 1.0f / 256.0f, bottom - top));
-       #endif
-    }
-    else
-    {
-        fillCGRect (CGRectMake ((float) x, flipHeight - bottom, 1.0f, bottom - top), false);
-    }
-}
+    HeapBlock<CGRect> rects (list.getNumRectangles());
 
-void CoreGraphicsContext::drawHorizontalLine (const int y, float left, float right)
-{
+    size_t num = 0;
+    for (const Rectangle<float>* r = list.begin(), * const e = list.end(); r != e; ++r)
+        rects[num++] = CGRectMake (r->getX(), flipHeight - r->getBottom(), r->getWidth(), r->getHeight());
+
     if (state->fillType.isColour())
     {
-       #if MAC_OS_X_VERSION_MIN_REQUIRED > MAC_OS_X_VERSION_10_5
-        CGContextFillRect (context, CGRectMake (left, flipHeight - (y + 1.0f), right - left, 1.0f));
-       #else
-        // On Leopard, unless both coordinates are non-integer, it disables anti-aliasing, so nudge
-        // the x coordinate slightly to trick it..
-        CGContextFillRect (context, CGRectMake (left, flipHeight - (y + (1.0f + 1.0f / 256.0f)), right - left, 1.0f + 1.0f / 256.0f));
-       #endif
+        CGContextFillRects (context, rects, num);
+    }
+    else if (state->fillType.isGradient())
+    {
+        CGContextSaveGState (context);
+        CGContextFillRects (context, rects, num);
+        drawGradient();
+        CGContextRestoreGState (context);
     }
     else
     {
-        fillCGRect (CGRectMake (left, flipHeight - (y + 1), right - left, 1.0f), false);
+        CGContextSaveGState (context);
+        CGContextFillRects (context, rects, num);
+        drawImage (state->fillType.image, state->fillType.transform, true);
+        CGContextRestoreGState (context);
     }
 }
 
@@ -639,10 +637,10 @@ CoreGraphicsContext::SavedState::SavedState()
 CoreGraphicsContext::SavedState::SavedState (const SavedState& other)
     : fillType (other.fillType), font (other.font), fontRef (other.fontRef),
       fontTransform (other.fontTransform), shading (0),
-      gradientLookupTable (other.numGradientLookupEntries),
+      gradientLookupTable ((size_t) other.numGradientLookupEntries),
       numGradientLookupEntries (other.numGradientLookupEntries)
 {
-    memcpy (gradientLookupTable, other.gradientLookupTable, sizeof (PixelARGB) * numGradientLookupEntries);
+    memcpy (gradientLookupTable, other.gradientLookupTable, sizeof (PixelARGB) * (size_t) numGradientLookupEntries);
 }
 
 CoreGraphicsContext::SavedState::~SavedState()

@@ -25,10 +25,6 @@
 #ifndef JUCE_BUTTON_H_INCLUDED
 #define JUCE_BUTTON_H_INCLUDED
 
-#include "../components/juce_Component.h"
-#include "../keyboard/juce_KeyListener.h"
-#include "../commands/juce_ApplicationCommandManager.h"
-
 
 //==============================================================================
 /**
@@ -171,7 +167,7 @@ public:
         virtual ~Listener()  {}
 
         /** Called when the button is clicked. */
-        virtual void buttonClicked (Button* button) = 0;
+        virtual void buttonClicked (Button*) = 0;
 
         /** Called when the button's state changes. */
         virtual void buttonStateChanged (Button*)  {}
@@ -281,10 +277,10 @@ public:
 
         @see TooltipClient, TooltipWindow
     */
-    void setTooltip (const String& newTooltip);
+    void setTooltip (const String& newTooltip) override;
 
     // (implementation of the TooltipClient method)
-    String getTooltip();
+    String getTooltip() override;
 
 
     //==============================================================================
@@ -453,8 +449,8 @@ private:
 
     class RepeatTimer;
     friend class RepeatTimer;
-    friend class ScopedPointer <RepeatTimer>;
-    ScopedPointer <RepeatTimer> repeatTimer;
+    friend struct ContainerDeletePolicy<RepeatTimer>;
+    ScopedPointer<RepeatTimer> repeatTimer;
     uint32 buttonPressTime, lastRepeatTime;
     ApplicationCommandManager* commandManagerToUse;
     int autoRepeatDelay, autoRepeatSpeed, autoRepeatMinimumDelay;
