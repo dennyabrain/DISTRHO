@@ -41,6 +41,8 @@ intermediate
 lv2_ttl_generator
 
 libs/distrho/dgl/Makefile.copy
+libs/juce-2.0/source/modules/juce_box2d/
+libs/juce-2.0/source/modules/juce_browser_plugin/
 
 scripts/*.h
 scripts/*.pro

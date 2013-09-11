@@ -233,7 +233,7 @@ public:
     ~SharedMessageThread()
     {
         signalThreadShouldExit();
-        JUCEApplication::quit();
+        JUCEApplicationBase::quit();
         waitForThreadToExit (5000);
         clearSingletonInstance();
     }

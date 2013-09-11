@@ -48,13 +48,7 @@ extern CheckEventBlockedByModalComps isEventBlockedByModalComps;
 
 static bool shouldDeactivateTitleBar = true;
 
-void* getUser32Function (const char* functionName) // (NB: this function also used from other modules)
-{
-    HMODULE user32Mod = GetModuleHandleA ("user32.dll");
-    jassert (user32Mod != 0);
-
-    return (void*) GetProcAddress (user32Mod, functionName);
-}
+extern void* getUser32Function (const char*);
 
 //==============================================================================
 typedef BOOL (WINAPI* UpdateLayeredWinFunc) (HWND, HDC, POINT*, SIZE*, HDC, POINT*, COLORREF, BLENDFUNCTION*, DWORD);
@@ -162,7 +156,7 @@ static void setWindowZOrder (HWND hwnd, HWND insertAfter)
 //==============================================================================
 static void setDPIAwareness()
 {
-    if (JUCEApplication::isStandaloneApp())
+    if (JUCEApplicationBase::isStandaloneApp())
     {
         if (setProcessDPIAware == nullptr)
         {
@@ -2457,7 +2451,7 @@ private:
                 return 0;
 
             case WM_QUERYENDSESSION:
-                if (JUCEApplication* const app = JUCEApplication::getInstance())
+                if (JUCEApplicationBase* const app = JUCEApplicationBase::getInstance())
                 {
                     app->systemRequestedQuit();
                     return MessageManager::getInstance()->hasStopMessageBeenSent();
@@ -2937,14 +2931,12 @@ class WindowsMessageBox  : public AsyncUpdater
 {
 public:
     WindowsMessageBox (AlertWindow::AlertIconType iconType,
-                       const String& title_, const String& message_,
-                       Component* associatedComponent,
-                       UINT extraFlags,
-                       ModalComponentManager::Callback* callback_,
-                       const bool runAsync)
+                       const String& boxTitle, const String& m,
+                       Component* associatedComponent, UINT extraFlags,
+                       ModalComponentManager::Callback* cb, const bool runAsync)
         : flags (extraFlags | getMessageBoxFlags (iconType)),
           owner (getWindowForMessageBox (associatedComponent)),
-          title (title_), message (message_), callback (callback_)
+          title (boxTitle), message (m), callback (cb)
     {
         if (runAsync)
             triggerAsyncUpdate();
@@ -2970,7 +2962,7 @@ private:
     UINT flags;
     HWND owner;
     String title, message;
-    ModalComponentManager::Callback* callback;
+    ScopedPointer<ModalComponentManager::Callback> callback;
 
     static UINT getMessageBoxFlags (AlertWindow::AlertIconType iconType) noexcept
     {
@@ -3159,28 +3151,6 @@ String SystemClipboard::getTextFromClipboard()
 }
 
 //==============================================================================
-String JUCE_CALLTYPE JUCEApplication::getCommandLineParameters()
-{
-    return CharacterFunctions::findEndOfToken (CharPointer_UTF16 (GetCommandLineW()),
-                                               CharPointer_UTF16 (L" "),
-                                               CharPointer_UTF16 (L"\"")).findEndOfWhitespace();
-}
-
-StringArray JUCE_CALLTYPE JUCEApplication::getCommandLineParameterArray()
-{
-    StringArray s;
-
-    int argc = 0;
-    if (LPWSTR* const argv = CommandLineToArgvW (GetCommandLineW(), &argc))
-    {
-        s = StringArray (argv + 1, argc - 1);
-        LocalFree (argv);
-    }
-
-    return s;
-}
-
-//==============================================================================
 void Desktop::setKioskComponent (Component* kioskModeComponent, bool enableOrDisable, bool /*allowMenusAndBars*/)
 {
     if (enableOrDisable)
@@ -3204,7 +3174,7 @@ void Desktop::Displays::findDisplays (float masterScale)
 
     // make sure the first in the list is the main monitor
     for (int i = 1; i < monitors.size(); ++i)
-        if (monitors.getReference(i).getX() == 0 && monitors.getReference(i).getY() == 0)
+        if (monitors.getReference(i).getPosition().isOrigin())
             monitors.swap (i, 0);
 
     if (monitors.size() == 0)

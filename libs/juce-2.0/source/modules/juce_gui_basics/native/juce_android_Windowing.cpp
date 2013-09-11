@@ -41,7 +41,7 @@ JUCE_JNI_CALLBACK (JUCE_ANDROID_ACTIVITY_CLASSNAME, launchApp, void, (JNIEnv* en
 
     initialiseJuce_GUI();
 
-    JUCEApplication* app = dynamic_cast <JUCEApplication*> (JUCEApplicationBase::createInstance());
+    JUCEApplicationBase* app = JUCEApplicationBase::createInstance();
     if (! app->initialiseApp())
         exit (0);
 
@@ -665,7 +665,10 @@ JUCE_JNI_CALLBACK (JUCE_ANDROID_ACTIVITY_CLASSNAME, alertDismissed, void, (JNIEn
                                                                            jlong callbackAsLong, jint result))
 {
     if (ModalComponentManager::Callback* callback = (ModalComponentManager::Callback*) callbackAsLong)
+    {
         callback->modalStateFinished (result);
+        delete callback;
+    }
 }
 
 //==============================================================================

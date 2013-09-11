@@ -1163,6 +1163,7 @@
             </FileConfiguration>
           </File>
           <File RelativePath="..\..\..\..\modules\juce_core\text\juce_StringPool.h"/>
+          <File RelativePath="..\..\..\..\modules\juce_core\text\juce_StringRef.h"/>
           <File RelativePath="..\..\..\..\modules\juce_core\text\juce_TextDiff.cpp">
             <FileConfiguration Name="Debug|Win32"
                                ExcludedFromBuild="true">
@@ -2118,6 +2119,7 @@
             </FileConfiguration>
           </File>
           <File RelativePath="..\..\..\..\modules\juce_events\messages\juce_DeletedAtShutdown.h"/>
+          <File RelativePath="..\..\..\..\modules\juce_events\messages\juce_Initialisation.h"/>
           <File RelativePath="..\..\..\..\modules\juce_events\messages\juce_Message.h"/>
           <File RelativePath="..\..\..\..\modules\juce_events\messages\juce_MessageListener.cpp">
             <FileConfiguration Name="Debug|Win32"
@@ -3955,7 +3957,6 @@
             </FileConfiguration>
           </File>
           <File RelativePath="..\..\..\..\modules\juce_gui_basics\application\juce_Application.h"/>
-          <File RelativePath="..\..\..\..\modules\juce_gui_basics\application\juce_Initialisation.h"/>
         </Filter>
         <Filter Name="native">
           <File RelativePath="..\..\..\..\modules\juce_gui_basics\native\juce_android_FileChooser.cpp">

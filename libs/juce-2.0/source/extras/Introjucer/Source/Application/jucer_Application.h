@@ -277,6 +277,8 @@ public:
     {
         menu.addCommandItem (commandManager, CommandIDs::showFilePanel);
         menu.addCommandItem (commandManager, CommandIDs::showConfigPanel);
+        menu.addCommandItem (commandManager, CommandIDs::showProjectSettings);
+        menu.addCommandItem (commandManager, CommandIDs::showProjectModules);
         menu.addSeparator();
         createColourSchemeItems (menu);
     }
@@ -608,7 +610,7 @@ private:
             stopTimer();
             delete this;
 
-            if (JUCEApplication::getInstance() != nullptr)
+            if (JUCEApplicationBase::getInstance() != nullptr)
                 getApp().closeModalCompsAndQuit();
         }
 

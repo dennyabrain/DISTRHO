@@ -41,7 +41,8 @@
 {
     initialiseJuce_GUI();
 
-    JUCEApplication* app = dynamic_cast <JUCEApplication*> (JUCEApplicationBase::createInstance());
+    JUCEApplicationBase* app = JUCEApplicationBase::createInstance();
+
     if (! app->initialiseApp())
         exit (0);
 }
@@ -53,15 +54,13 @@
 
 - (void) applicationDidEnterBackground: (UIApplication*) application
 {
-    JUCEApplicationBase* const app = JUCEApplicationBase::getInstance();
-    if (app != nullptr)
+    if (JUCEApplicationBase* const app = JUCEApplicationBase::getInstance())
         app->suspended();
 }
 
 - (void) applicationWillEnterForeground: (UIApplication*) application
 {
-    JUCEApplicationBase* const app = JUCEApplicationBase::getInstance();
-    if (app != nullptr)
+    if (JUCEApplicationBase* const app = JUCEApplicationBase::getInstance())
         app->resumed();
 }
 
@@ -155,7 +154,7 @@ private:
     int result;
     JuceAlertBoxDelegate* delegate;
     UIAlertView* alert;
-    ModalComponentManager::Callback* callback;
+    ScopedPointer<ModalComponentManager::Callback> callback;
     const bool isYesNo, isAsync;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (iOSMessageBox)
