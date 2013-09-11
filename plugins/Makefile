@@ -23,7 +23,7 @@ ladspa:
 	$(MAKE) -C 3BandSplitter/LADSPA
 	$(MAKE) -C PingPongPan/LADSPA
 
-dssi:
+dssi: libs
 	mkdir -p ../bin/dssi
 	$(MAKE) -C 3BandEQ/DSSI
 	$(MAKE) -C 3BandEQ/DSSI-UI
