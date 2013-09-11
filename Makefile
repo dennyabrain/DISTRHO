@@ -10,11 +10,11 @@ build_juce:
 	$(MAKE) -C libs/juce-2.0
 
 build: build_juce
-# 	$(MAKE) -C libs/distrho/dgl
+	$(MAKE) -C libs/distrho/dgl
 	$(MAKE) -C libs/drowaudio
 	$(MAKE) -C libs/juced
 	$(MAKE) -C libs/lv2-ttl-generator
-# 	$(MAKE) plugins -C plugins
+	$(MAKE) plugins -C plugins
 	$(MAKE) plugins -C ports
 	$(MAKE) gen
 
@@ -22,13 +22,13 @@ build: build_juce
 install:
 	install -d $(DESTDIR)$(PREFIX)/bin/
 	install -d $(DESTDIR)$(PREFIX)/lib/
-# 	install -d $(DESTDIR)$(PREFIX)/lib/ladspa/
-# 	install -d $(DESTDIR)$(PREFIX)/lib/dssi/
+	install -d $(DESTDIR)$(PREFIX)/lib/ladspa/
+	install -d $(DESTDIR)$(PREFIX)/lib/dssi/
 	install -d $(DESTDIR)$(PREFIX)/lib/lv2/
 	install -d $(DESTDIR)$(PREFIX)/lib/vst/
 	install -m 644 bin/standalone/* $(DESTDIR)$(PREFIX)/bin/
-# 	install -m 644 bin/ladspa/*     $(DESTDIR)$(PREFIX)/lib/ladspa/
-# 	install -m 644 bin/dssi/*       $(DESTDIR)$(PREFIX)/lib/dssi/
+	install -m 644 bin/ladspa/*     $(DESTDIR)$(PREFIX)/lib/ladspa/
+	install -m 644 bin/dssi/*       $(DESTDIR)$(PREFIX)/lib/dssi/
 	install -m 644 bin/vst/*        $(DESTDIR)$(PREFIX)/lib/vst/
 	install -m 644 libs/*.so        $(DESTDIR)$(PREFIX)/lib/
 	install -m 755 libs/lv2_ttl_generator $(DESTDIR)$(PREFIX)/bin/
@@ -71,21 +71,21 @@ distclean: clean
 
 # Custom build types
 standalone: build_juce
-# 	$(MAKE) -C libs/distrho/dgl
+	$(MAKE) -C libs/distrho/dgl
 	$(MAKE) -C libs/drowaudio
 	$(MAKE) -C libs/juced
 # 	$(MAKE) standalone -C plugins
 	$(MAKE) standalone -C ports
 
 ladspa:
-# 	$(MAKE) ladspa -C plugins
+	$(MAKE) ladspa -C plugins
 
 dssi:
-# 	$(MAKE) -C libs/distrho/dgl
-# 	$(MAKE) dssi -C plugins
+	$(MAKE) -C libs/distrho/dgl
+	$(MAKE) dssi -C plugins
 
 lv2: build_juce
-# 	$(MAKE) -C libs/distrho/dgl
+	$(MAKE) -C libs/distrho/dgl
 	$(MAKE) -C libs/drowaudio
 	$(MAKE) -C libs/juced
 	$(MAKE) -C libs/lv2-ttl-generator
@@ -94,7 +94,7 @@ lv2: build_juce
 	$(MAKE) gen_lv2
 
 vst: build_juce
-# 	$(MAKE) -C libs/distrho/dgl
+	$(MAKE) -C libs/distrho/dgl
 	$(MAKE) -C libs/drowaudio
 	$(MAKE) -C libs/juced
 # 	$(MAKE) vst -C plugins
