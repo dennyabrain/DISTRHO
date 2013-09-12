@@ -34,14 +34,14 @@ public:
     {
     }
 
-    App* getApp()
+    App& getApp() const noexcept
     {
-        return &fApp;
+        return fApp;
     }
 
-    Window* getWindow()
+    Window& getWindow() const noexcept
     {
-        return &fWindow;
+        return fWindow;
     }
 
     void exec()
@@ -53,14 +53,19 @@ public:
     // -------------------------------------------------------------------
     // helpers
 
+    void setResizable(bool yesNo)
+    {
+        fWindow.setResizable(yesNo);
+    }
+
     void setSize(unsigned int width, unsigned int height)
     {
         fWindow.setSize(width, height);
     }
 
-    void setWindowTitle(const char* title)
+    void setTitle(const char* title)
     {
-        fWindow.setWindowTitle(title);
+        fWindow.setTitle(title);
     }
 
 private:

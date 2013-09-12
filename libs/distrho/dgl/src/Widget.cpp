@@ -25,21 +25,19 @@ START_NAMESPACE_DGL
 // -----------------------------------------------------------------------
 // Widget
 
-Widget::Widget(Window* parent)
+Widget::Widget(Window& parent)
     : fParent(parent),
       fVisible(true)
 {
-    assert(parent != nullptr);
-
-    parent->addWidget(this);
+    fParent.addWidget(this);
 }
 
 Widget::~Widget()
 {
-    fParent->removeWidget(this);
+    fParent.removeWidget(this);
 }
 
-bool Widget::isVisible() const
+bool Widget::isVisible() const noexcept
 {
     return fVisible;
 }
@@ -50,20 +48,30 @@ void Widget::setVisible(bool yesNo)
         return;
 
     fVisible = yesNo;
-    fParent->repaint();
+    fParent.repaint();
 }
 
-int Widget::getX() const
+void Widget::show()
+{
+    setVisible(true);
+}
+
+void Widget::hide()
+{
+    setVisible(false);
+}
+
+int Widget::getX() const noexcept
 {
     return fArea.getX();
 }
 
-int Widget::getY() const
+int Widget::getY() const noexcept
 {
     return fArea.getY();
 }
 
-const Point<int>& Widget::getPos() const
+const Point<int>& Widget::getPos() const noexcept
 {
     return fArea.getPos();
 }
@@ -74,7 +82,7 @@ void Widget::setX(int x)
         return;
 
     fArea.setX(x);
-    repaint();
+    fParent.repaint();
 }
 
 void Widget::setY(int y)
@@ -83,7 +91,7 @@ void Widget::setY(int y)
         return;
 
     fArea.setY(y);
-    repaint();
+    fParent.repaint();
 }
 
 void Widget::setPos(int x, int y)
@@ -97,32 +105,32 @@ void Widget::setPos(const Point<int>& pos)
         return;
 
     fArea.setPos(pos);
-    repaint();
+    fParent.repaint();
 }
 
 void Widget::move(int x, int y)
 {
     fArea.move(x, y);
-    repaint();
+    fParent.repaint();
 }
 
 void Widget::move(const Point<int>& pos)
 {
     fArea.move(pos);
-    repaint();
+    fParent.repaint();
 }
 
-int Widget::getWidth() const
+int Widget::getWidth() const noexcept
 {
     return fArea.getWidth();
 }
 
-int Widget::getHeight() const
+int Widget::getHeight() const noexcept
 {
     return fArea.getHeight();
 }
 
-const Size<int>& Widget::getSize() const
+const Size<int>& Widget::getSize() const noexcept
 {
     return fArea.getSize();
 }
@@ -133,7 +141,7 @@ void Widget::setWidth(int width)
         return;
 
     fArea.setWidth(width);
-    fParent->repaint();
+    fParent.repaint();
 }
 
 void Widget::setHeight(int height)
@@ -142,7 +150,7 @@ void Widget::setHeight(int height)
         return;
 
     fArea.setHeight(height);
-    fParent->repaint();
+    fParent.repaint();
 }
 
 void Widget::setSize(int width, int height)
@@ -156,32 +164,37 @@ void Widget::setSize(const Size<int>& size)
         return;
 
     fArea.setSize(size);
-    fParent->repaint();
+    fParent.repaint();
 }
 
-const Rectangle<int>& Widget::getArea() const
+const Rectangle<int>& Widget::getArea() const noexcept
 {
     return fArea;
 }
 
+uint32_t Widget::getEventTimestamp()
+{
+    return fParent.getEventTimestamp();
+}
+
 int Widget::getModifiers()
 {
-    return fParent->getModifiers();
+    return fParent.getModifiers();
 }
 
-App* Widget::getApp() const
+App& Widget::getParentApp() const noexcept
 {
-    return fParent->getApp();
+    return fParent.getApp();
 }
 
-Window* Widget::getParent() const
+Window& Widget::getParentWindow() const noexcept
 {
     return fParent;
 }
 
 void Widget::repaint()
 {
-    fParent->repaint();
+    fParent.repaint();
 }
 
 void Widget::onDisplay()
