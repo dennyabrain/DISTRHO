@@ -4,7 +4,7 @@ dofile("../../../scripts/make-project.lua")
 package = make_lv2_project("TAL-Filter")
 
 package.includepaths = {
-  package.includepath,
+  package.includepaths,
   "../source/Engine",
   "." --fake
 }

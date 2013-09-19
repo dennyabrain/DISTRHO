@@ -21,9 +21,9 @@ lv2: libs
 	install -d ../bin/lv2
 	$(MAKE) -C arctican-function/LV2
 	$(MAKE) -C arctican-pilgrim/LV2
-	$(MAKE) -C cabbage/LV2-fx
-	$(MAKE) -C cabbage/LV2-ins
-	$(MAKE) -C cabbage/LV2-midi
+# 	$(MAKE) -C cabbage/LV2-fx
+# 	$(MAKE) -C cabbage/LV2-ins
+# 	$(MAKE) -C cabbage/LV2-midi
 	$(MAKE) -C drowaudio-distortion/LV2
 	$(MAKE) -C drowaudio-distortionshaper/LV2
 	$(MAKE) -C drowaudio-flanger/LV2
