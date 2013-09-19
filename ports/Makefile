@@ -1,9 +1,9 @@
 # -----------------------------------------
 # Compile all the Ports
 
-all: libs standalone lv2 vst
+all: libs lv2 vst
 
-plugins: standalone lv2 vst
+plugins: lv2 vst
 
 # -----------------------------------------
 # libs
