@@ -1,52 +1,24 @@
+# -----------------------------------------
 # Compile all the Ports
 
-all: build
-
-
-build: libs standalone lv2 vst
+all: libs standalone lv2 vst
 
 plugins: standalone lv2 vst
 
+# -----------------------------------------
+# libs
 
-libs_juce:
-	$(MAKE) -C ../libs/juce-2.0
-
-libs: libs_juce
+libs:
 	$(MAKE) -C ../libs/drowaudio
+	$(MAKE) -C ../libs/juce-2.0
 	$(MAKE) -C ../libs/juced
 	$(MAKE) -C ../libs/lv2-ttl-generator
 
-standalone: libs
-	mkdir -p ../bin/standalone
-	$(MAKE) -C arctican-function/Standalone
-	$(MAKE) -C arctican-pilgrim/Standalone
-	$(MAKE) -C cabbage/Standalone
-	$(MAKE) -C drowaudio-distortion/Standalone
-	$(MAKE) -C drowaudio-distortionshaper/Standalone
-	$(MAKE) -C drowaudio-flanger/Standalone
-	$(MAKE) -C drowaudio-reverb/Standalone
-	$(MAKE) -C drowaudio-tremolo/Standalone
-	$(MAKE) -C drumsynth/Standalone
-	$(MAKE) -C eqinox/Standalone
-	$(MAKE) -C juce-demo-plugin/Standalone
-	$(MAKE) -C juce-plugin-host/Standalone
-	$(MAKE) -C klangfalter/Standalone
-	$(MAKE) -C midiChords/Standalone
-	$(MAKE) -C midiLooper/Standalone
-	$(MAKE) -C pitchedDelay/Standalone
-	$(MAKE) -C tal-dub-3/Standalone
-	$(MAKE) -C tal-filter/Standalone
-	$(MAKE) -C tal-filter-2/Standalone
-	$(MAKE) -C tal-noisemaker/Standalone
-	$(MAKE) -C tal-reverb/Standalone
-	$(MAKE) -C tal-reverb-2/Standalone
-	$(MAKE) -C tal-reverb-3/Standalone
-	$(MAKE) -C tal-vocoder-2/Standalone
-	$(MAKE) -C vex/Standalone
-	$(MAKE) -C wolpertinger/Standalone
+# -----------------------------------------
+# lv2
 
 lv2: libs
-	mkdir -p ../bin/lv2
+	install -d ../bin/lv2
 	$(MAKE) -C arctican-function/LV2
 	$(MAKE) -C arctican-pilgrim/LV2
 	$(MAKE) -C cabbage/LV2-fx
@@ -75,8 +47,11 @@ lv2: libs
 	$(MAKE) -C vex/LV2
 	$(MAKE) -C wolpertinger/LV2
 
+# -----------------------------------------
+# vst
+
 vst: libs
-	mkdir -p ../bin/vst
+	install -d ../bin/vst
 	$(MAKE) -C arctican-function/VST
 	$(MAKE) -C arctican-pilgrim/VST
 	$(MAKE) -C cabbage/VST-fx
@@ -105,35 +80,10 @@ vst: libs
 	$(MAKE) -C vex/VST
 	$(MAKE) -C wolpertinger/VST
 
-clean:
-	# Standalone
-	$(MAKE) clean -C arctican-function/Standalone
-	$(MAKE) clean -C arctican-pilgrim/Standalone
-	$(MAKE) clean -C cabbage/Standalone
-	$(MAKE) clean -C drowaudio-distortion/Standalone
-	$(MAKE) clean -C drowaudio-distortionshaper/Standalone
-	$(MAKE) clean -C drowaudio-flanger/Standalone
-	$(MAKE) clean -C drowaudio-reverb/Standalone
-	$(MAKE) clean -C drowaudio-tremolo/Standalone
-	$(MAKE) clean -C drumsynth/Standalone
-	$(MAKE) clean -C eqinox/Standalone
-	$(MAKE) clean -C juce-demo-plugin/Standalone
-	$(MAKE) clean -C juce-plugin-host/Standalone
-	$(MAKE) clean -C klangfalter/Standalone
-	$(MAKE) clean -C midiChords/Standalone
-	$(MAKE) clean -C midiLooper/Standalone
-	$(MAKE) clean -C pitchedDelay/Standalone
-	$(MAKE) clean -C tal-dub-3/Standalone
-	$(MAKE) clean -C tal-filter/Standalone
-	$(MAKE) clean -C tal-filter-2/Standalone
-	$(MAKE) clean -C tal-noisemaker/Standalone
-	$(MAKE) clean -C tal-reverb/Standalone
-	$(MAKE) clean -C tal-reverb-2/Standalone
-	$(MAKE) clean -C tal-reverb-3/Standalone
-	$(MAKE) clean -C tal-vocoder-2/Standalone
-	$(MAKE) clean -C vex/Standalone
-	$(MAKE) clean -C wolpertinger/Standalone
+# -----------------------------------------
+# clean
 
+clean:
 	# LV2
 	$(MAKE) clean -C arctican-function/LV2
 	$(MAKE) clean -C arctican-pilgrim/LV2
@@ -192,7 +142,6 @@ clean:
 	$(MAKE) clean -C vex/VST
 	$(MAKE) clean -C wolpertinger/VST
 
-	rm -rf */Standalone/intermediate
 	rm -rf */LV2/intermediate
 	rm -rf */VST/intermediate
 
@@ -200,5 +149,3 @@ distclean: clean
 	rm -rf */LV2/*.lv2
 	rm -f */*/Makefile
 	rm -f */*/*.make
-	rm -f */*/*.sln
-	rm -f */*/*.vcproj

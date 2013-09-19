@@ -12,8 +12,8 @@ all:
 	$(MAKE) -C libs/juce-2.0
 	$(MAKE) -C libs/juced
 	$(MAKE) -C libs/lv2-ttl-generator
-	$(MAKE) plugins -C plugins
-	$(MAKE) plugins -C ports
+	$(MAKE) -C plugins plugins
+	$(MAKE) -C ports plugins
 	$(MAKE) gen
 
 # -----------------------------------------
@@ -75,7 +75,7 @@ mingw:
 # Custom build types
 
 ladspa:
-	$(MAKE) ladspa -C plugins
+	$(MAKE) -C plugins ladspa
 
 dssi:
 	$(MAKE) -C libs/distrho/dgl
