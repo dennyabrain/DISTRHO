@@ -54,9 +54,9 @@ vst: libs
 	install -d ../bin/vst
 	$(MAKE) -C arctican-function/VST
 	$(MAKE) -C arctican-pilgrim/VST
-	$(MAKE) -C cabbage/VST-fx
-	$(MAKE) -C cabbage/VST-ins
-	$(MAKE) -C cabbage/VST-midi
+# 	$(MAKE) -C cabbage/VST-fx
+# 	$(MAKE) -C cabbage/VST-ins
+# 	$(MAKE) -C cabbage/VST-midi
 	$(MAKE) -C drowaudio-distortion/VST
 	$(MAKE) -C drowaudio-distortionshaper/VST
 	$(MAKE) -C drowaudio-flanger/VST

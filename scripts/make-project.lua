@@ -62,7 +62,7 @@ function make_lv2_project(name)
   package.target       = project.name
   package.targetprefix = ""
   package.objdir       = "intermediate"
-  package.buildoptions = { "-Wall", "-Wextra", os.getenv("CXXFLAGS") }
+  package.buildoptions = { os.getenv("CXXFLAGS") }
   package.links        = {}
   package.linkoptions  = { os.getenv("LDFLAGS") }
 
