@@ -184,12 +184,30 @@ struct Component::ComponentHelpers
     }
    #endif
 
-    static Identifier getColourPropertyId (const int colourId)
+    static Identifier getColourPropertyId (int colourId)
     {
-        String s;
-        s.preallocateBytes (32);
-        s << "jcclr_" << String::toHexString (colourId);
-        return s;
+        char reversedHex[32];
+        char* t = reversedHex;
+
+        for (unsigned int v = (unsigned int) colourId;;)
+        {
+            *t++ = "0123456789abcdef" [(int) (v & 15)];
+            v >>= 4;
+
+            if (v == 0)
+                break;
+        }
+
+        char destBuffer[32];
+        char* dest = destBuffer;
+        memcpy (dest, "jcclr_", 6);
+        dest += 6;
+
+        while (t > reversedHex)
+            *dest++ = *--t;
+
+        *dest++ = 0;
+        return destBuffer;
     }
 
     //==============================================================================
@@ -1854,9 +1872,14 @@ void Component::internalRepaintUnchecked (const Rectangle<int>& area, const bool
             CHECK_MESSAGE_MANAGER_IS_LOCKED
 
             if (ComponentPeer* const peer = getPeer())
-                peer->repaint (ComponentHelpers::scaledScreenPosToUnscaled (*this,
-                                                                            affineTransform != nullptr ? area.transformedBy (*affineTransform)
-                                                                                                       : area));
+            {
+                // Tweak the scaling so that the component's integer size exactly aligns with the peer's scaled size
+                const Rectangle<int> peerBounds (peer->getBounds());
+                const Rectangle<int> scaled (area * Point<float> (peerBounds.getWidth()  / (float) getWidth(),
+                                                                  peerBounds.getHeight() / (float) getHeight()));
+
+                peer->repaint (affineTransform != nullptr ? scaled.transformedBy (*affineTransform) : scaled);
+            }
         }
         else
         {

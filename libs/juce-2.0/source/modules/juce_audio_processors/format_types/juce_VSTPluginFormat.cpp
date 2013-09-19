@@ -830,7 +830,7 @@ public:
 
     void initialise()
     {
-        if (initialised || effect == 0)
+        if (initialised || effect == nullptr)
             return;
 
        #if JUCE_WINDOWS
@@ -865,15 +865,16 @@ public:
         for (int i = effect->numInputs;  --i >= 0;)  dispatch (effConnectInput,  i, 1, 0, 0);
         for (int i = effect->numOutputs; --i >= 0;)  dispatch (effConnectOutput, i, 1, 0, 0);
 
-        updateStoredProgramNames();
+        if (getVstCategory() != kPlugCategShell) // (workaround for Waves 5 plugins which crash during this call)
+            updateStoredProgramNames();
 
         wantsMidiMessages = dispatch (effCanDo, 0, 0, (void*) "receiveVstMidiEvent", 0) > 0;
 
         setLatencySamples (effect->initialDelay);
     }
 
-    void* getPlatformSpecificData() override  { return effect; }
-    const String getName() const override     { return name; }
+    void* getPlatformSpecificData() override    { return effect; }
+    const String getName() const override       { return name; }
 
     int getUID() const
     {
@@ -906,6 +907,8 @@ public:
 
     bool acceptsMidi() const override    { return wantsMidiMessages; }
     bool producesMidi() const override   { return dispatch (effCanDo, 0, 0, (void*) "sendVstMidiEvent", 0) > 0; }
+
+    VstPlugCategory getVstCategory() const noexcept     { return (VstPlugCategory) dispatch (effGetPlugCategory, 0, 0, 0, 0); }
 
     //==============================================================================
     void prepareToPlay (double rate, int samplesPerBlockExpected) override
@@ -1851,7 +1854,7 @@ private:
 
     const char* getCategory() const
     {
-        switch (dispatch (effGetPlugCategory, 0, 0, 0, 0))
+        switch (getVstCategory())
         {
             case kPlugCategEffect:       return "Effect";
             case kPlugCategSynth:        return "Synth";
@@ -2115,10 +2118,8 @@ private:
     // window is deleted more than once.
     bool shouldAvoidDeletingWindow() const
     {
-        PluginDescription desc;
-        plugin.fillInPluginDescription (desc);
-
-        return desc.manufacturerName.containsIgnoreCase ("Loud Technologies");
+        return plugin.getPluginDescription()
+            .manufacturerName.containsIgnoreCase ("Loud Technologies");
     }
 
     // This is an old workaround for some plugins that need a repaint when their
@@ -2640,9 +2641,7 @@ void VSTPluginFormat::findAllTypesForFile (OwnedArray <PluginDescription>& resul
     if (instance == nullptr)
         return;
 
-    VstPlugCategory category = (VstPlugCategory) instance->dispatch (effGetPlugCategory, 0, 0, 0, 0);
-
-    if (category != kPlugCategShell)
+    if (instance->getVstCategory() != kPlugCategShell)
     {
         // Normal plugin...
         results.add (new PluginDescription (desc));
@@ -2863,7 +2862,7 @@ void VSTPluginFormat::setExtraFunctions (AudioPluginInstance* plugin, ExtraFunct
         vst->extraFunctions = f;
 }
 
-VstIntPtr JUCE_CALLTYPE VSTPluginFormat::dispatcher (AudioPluginInstance* plugin, int32 opcode, int32 index, VstIntPtr value, void* ptr, float opt)
+VSTPluginFormat::VstIntPtr JUCE_CALLTYPE VSTPluginFormat::dispatcher (AudioPluginInstance* plugin, int32 opcode, int32 index, VstIntPtr value, void* ptr, float opt)
 {
     if (VSTPluginInstance* vst = dynamic_cast <VSTPluginInstance*> (plugin))
         return vst->dispatch (opcode, index, value, ptr, opt);

@@ -45,8 +45,8 @@ Button::Button (const String& name)
     autoRepeatSpeed (0),
     autoRepeatMinimumDelay (-1),
     radioGroupId (0),
-    commandID (0),
     connectedEdgeFlags (0),
+    commandID(),
     buttonState (buttonNormal),
     lastToggleState (false),
     clickTogglesState (false),
@@ -154,7 +154,8 @@ void Button::setToggleState (const bool shouldBeOn, const NotificationType notif
                 return;
         }
 
-        sendStateMessage();
+        if (notification != dontSendNotification)
+            sendStateMessage();
     }
 }
 
@@ -185,14 +186,14 @@ void Button::valueChanged (Value& value)
         setToggleState (isOn.getValue(), sendNotification);
 }
 
-void Button::setRadioGroupId (const int newGroupId)
+void Button::setRadioGroupId (const int newGroupId, NotificationType notification)
 {
     if (radioGroupId != newGroupId)
     {
         radioGroupId = newGroupId;
 
         if (lastToggleState)
-            turnOffOtherButtonsInGroup (sendNotification);
+            turnOffOtherButtonsInGroup (notification);
     }
 }
 
@@ -463,7 +464,7 @@ void Button::parentHierarchyChanged()
 
 //==============================================================================
 void Button::setCommandToTrigger (ApplicationCommandManager* const newCommandManager,
-                                  const int newCommandID, const bool generateTip)
+                                  const CommandID newCommandID, const bool generateTip)
 {
     commandID = newCommandID;
     generateTooltip = generateTip;

@@ -41,8 +41,16 @@ intermediate
 lv2_ttl_generator
 
 libs/distrho/dgl/Makefile.copy
+libs/juce-2.0/source/amalgamation/
+libs/juce-2.0/source/docs/
+libs/juce-2.0/source/extras/
 libs/juce-2.0/source/modules/juce_box2d/
 libs/juce-2.0/source/modules/juce_browser_plugin/
+libs/juce-2.0/source/modules/juce_cryptography/
+libs/juce-2.0/source/modules/juce_opengl/
+libs/juce-2.0/source/modules/juce_video/
+libs/juce-2.0/source/juce.h
+libs/juce-2.0/source/juce_amalgamated.*
 
 scripts/*.h
 scripts/*.pro
@@ -52,4 +60,3 @@ sdks/vstsdk2.4/*
 
 _old
 ports/_todo
-

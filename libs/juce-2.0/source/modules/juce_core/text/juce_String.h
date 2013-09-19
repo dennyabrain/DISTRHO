@@ -297,6 +297,9 @@ public:
     bool equalsIgnoreCase (const String& other) const noexcept;
 
     /** Case-insensitive comparison with another string. */
+    bool equalsIgnoreCase (StringRef other) const noexcept;
+
+    /** Case-insensitive comparison with another string. */
     bool equalsIgnoreCase (const wchar_t* other) const noexcept;
 
     /** Case-insensitive comparison with another string. */
@@ -950,7 +953,6 @@ public:
     int getIntValue() const noexcept;
 
     /** Reads the value of the string as a decimal number (up to 64 bits in size).
-
         @returns the value of the string as a 64 bit signed base-10 integer.
     */
     int64 getLargeIntValue() const noexcept;
@@ -1337,6 +1339,9 @@ std::basic_ostream <wchar_t, traits>& JUCE_CALLTYPE operator<< (std::basic_ostre
 
 /** Writes a string to an OutputStream as UTF8. */
 JUCE_API OutputStream& JUCE_CALLTYPE operator<< (OutputStream& stream, const String& stringToWrite);
+
+/** Writes a string to an OutputStream as UTF8. */
+JUCE_API OutputStream& JUCE_CALLTYPE operator<< (OutputStream& stream, StringRef stringToWrite);
 
 
 #endif   // JUCE_STRING_H_INCLUDED

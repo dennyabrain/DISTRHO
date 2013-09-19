@@ -1,7 +1,7 @@
 /*
   ==============================================================================
 
-   Build options for juced shared library
+   Build options for juced static library
 
   ==============================================================================
 */
@@ -55,7 +55,7 @@
 
 /** Config: JUCETICE_INCLUDE_CURL_CODE
  Enables direct inclusion of curl.
- 
+
  // Currently not available //
 */
 #define JUCETICE_INCLUDE_CURL_CODE 0

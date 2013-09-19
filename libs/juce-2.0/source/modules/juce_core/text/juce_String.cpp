@@ -580,6 +580,11 @@ bool String::equalsIgnoreCase (const char* const t) const noexcept
                         : isEmpty();
 }
 
+bool String::equalsIgnoreCase (StringRef t) const noexcept
+{
+    return text.compareIgnoreCase (t.text) == 0;
+}
+
 bool String::equalsIgnoreCase (const String& other) const noexcept
 {
     return text == other.text
@@ -632,7 +637,7 @@ void String::appendCharPointer (const CharPointerType startOfTextToAppend,
         preallocateBytes (byteOffsetOfNull + (size_t) extraBytesNeeded);
 
         CharPointerType::CharType* const newStringStart = addBytesToPointer (text.getAddress(), (int) byteOffsetOfNull);
-        memcpy (newStringStart, startOfTextToAppend.getAddress(), extraBytesNeeded);
+        memcpy (newStringStart, startOfTextToAppend.getAddress(), (size_t) extraBytesNeeded);
         CharPointerType (addBytesToPointer (newStringStart, extraBytesNeeded)).writeNull();
     }
 }
@@ -738,15 +743,20 @@ JUCE_API String& JUCE_CALLTYPE operator<< (String& s1, const double number)     
 
 JUCE_API OutputStream& JUCE_CALLTYPE operator<< (OutputStream& stream, const String& text)
 {
-    const size_t numBytes = text.getNumBytesAsUTF8();
+    return operator<< (stream, StringRef (text));
+}
+
+JUCE_API OutputStream& JUCE_CALLTYPE operator<< (OutputStream& stream, StringRef text)
+{
+    const size_t numBytes = CharPointer_UTF8::getBytesRequiredFor (text.text);
 
    #if (JUCE_STRING_UTF_TYPE == 8)
-    stream.write (text.getCharPointer().getAddress(), numBytes);
+    stream.write (text.text.getAddress(), numBytes);
    #else
     // (This avoids using toUTF8() to prevent the memory bloat that it would leave behind
     // if lots of large, persistent strings were to be written to streams).
     HeapBlock<char> temp (numBytes + 1);
-    CharPointer_UTF8 (temp).writeAll (text.getCharPointer());
+    CharPointer_UTF8 (temp).writeAll (text.text);
     stream.write (temp, numBytes);
    #endif
 
@@ -1825,55 +1835,27 @@ double String::getDoubleValue() const noexcept
 static const char hexDigits[] = "0123456789abcdef";
 
 template <typename Type>
-struct HexConverter
+static String hexToString (Type v)
 {
-    static String hexToString (Type v)
+    String::CharPointerType::CharType buffer[32];
+    String::CharPointerType::CharType* const end = buffer + numElementsInArray (buffer) - 1;
+    String::CharPointerType::CharType* t = end;
+    *t = 0;
+
+    do
     {
-        char buffer[32];
-        char* const end = buffer + 32;
-        char* t = end;
-        *--t = 0;
+        *--t = hexDigits [(int) (v & 15)];
+        v >>= 4;
 
-        do
-        {
-            *--t = hexDigits [(int) (v & 15)];
-            v >>= 4;
+    } while (v != 0);
 
-        } while (v != 0);
-
-        return String (t, (size_t) (end - t) - 1);
-    }
-
-    static Type stringToHex (String::CharPointerType t) noexcept
-    {
-        Type result = 0;
-
-        while (! t.isEmpty())
-        {
-            const int hexValue = CharacterFunctions::getHexDigitValue (t.getAndAdvance());
-
-            if (hexValue >= 0)
-                result = (result << 4) | hexValue;
-        }
-
-        return result;
-    }
-};
-
-String String::toHexString (const int number)
-{
-    return HexConverter <unsigned int>::hexToString ((unsigned int) number);
+    return String (String::CharPointerType (t),
+                   String::CharPointerType (end));
 }
 
-String String::toHexString (const int64 number)
-{
-    return HexConverter <uint64>::hexToString ((uint64) number);
-}
-
-String String::toHexString (const short number)
-{
-    return toHexString ((int) (unsigned short) number);
-}
+String String::toHexString (int number)       { return hexToString ((unsigned int) number); }
+String String::toHexString (int64 number)     { return hexToString ((uint64) number); }
+String String::toHexString (short number)     { return toHexString ((int) (unsigned short) number); }
 
 String String::toHexString (const void* const d, const int size, const int groupSize)
 {
@@ -1903,8 +1885,8 @@ String String::toHexString (const void* const d, const int size, const int group
     return s;
 }
 
-int   String::getHexValue32() const noexcept    { return HexConverter<int>  ::stringToHex (text); }
-int64 String::getHexValue64() const noexcept    { return HexConverter<int64>::stringToHex (text); }
+int   String::getHexValue32() const noexcept    { return CharacterFunctions::HexParser<int>  ::parse (text); }
+int64 String::getHexValue64() const noexcept    { return CharacterFunctions::HexParser<int64>::parse (text); }
 
 //==============================================================================
 String String::createStringFromData (const void* const unknownData, const int size)
@@ -2075,8 +2057,21 @@ String String::fromUTF8 (const char* const buffer, int bufferSizeBytes)
 #endif
 
 //==============================================================================
-StringRef::StringRef (const String::CharPointerType::CharType* stringLiteral) noexcept  : text (stringLiteral)
+StringRef::StringRef() noexcept  : text ((const String::CharPointerType::CharType*) "\0\0\0")
 {
+}
+
+StringRef::StringRef (const char* stringLiteral) noexcept
+   #if JUCE_STRING_UTF_TYPE != 8
+    : text (nullptr), stringCopy (stringLiteral)
+   #else
+    : text (stringLiteral)
+   #endif
+{
+   #if JUCE_STRING_UTF_TYPE != 8
+    text = stringCopy.getCharPointer();
+   #endif
+
     jassert (stringLiteral != nullptr); // This must be a valid string literal, not a null pointer!!
 
    #if JUCE_NATIVE_WCHAR_IS_UTF8
@@ -2086,8 +2081,8 @@ StringRef::StringRef (const String::CharPointerType::CharType* stringLiteral) no
         create them. The source data could be UTF-8, ASCII or one of many local code-pages.
 
         To get around this problem, you must be more explicit when you pass an ambiguous 8-bit
-        string to the String class - so for example if your source data is actually UTF-8,
-        you'd call String (CharPointer_UTF8 ("my utf8 string..")), and it would be able to
+        string to the StringRef class - so for example if your source data is actually UTF-8,
+        you'd call StringRef (CharPointer_UTF8 ("my utf8 string..")), and it would be able to
         correctly convert the multi-byte characters to unicode. It's *highly* recommended that
         you use UTF-8 with escape characters in your source code to represent extended characters,
         because there's no other way to represent these strings in a way that isn't dependent on
@@ -2104,6 +2099,7 @@ StringRef::StringRef (String::CharPointerType stringLiteral) noexcept  : text (s
 
 StringRef::StringRef (const String& string) noexcept  : text (string.getCharPointer()) {}
 
+
 //==============================================================================
 //==============================================================================
 #if JUCE_UNIT_TESTS
@@ -2116,9 +2112,9 @@ public:
     template <class CharPointerType>
     struct TestUTFConversion
     {
-        static void test (UnitTest& test)
+        static void test (UnitTest& test, Random& r)
         {
-            String s (createRandomWideCharString());
+            String s (createRandomWideCharString (r));
 
             typename CharPointerType::CharType buffer [300];
 
@@ -2138,10 +2134,9 @@ public:
         }
     };
 
-    static String createRandomWideCharString()
+    static String createRandomWideCharString (Random& r)
     {
         juce_wchar buffer[50] = { 0 };
-        Random r;
 
         for (int i = 0; i < numElementsInArray (buffer) - 1; ++i)
         {
@@ -2162,6 +2157,8 @@ public:
 
     void runTest()
     {
+        Random r = getRandom();
+
         {
             beginTest ("Basics");
 
@@ -2402,9 +2399,9 @@ public:
         {
             beginTest ("UTF conversions");
 
-            TestUTFConversion <CharPointer_UTF32>::test (*this);
-            TestUTFConversion <CharPointer_UTF8>::test (*this);
-            TestUTFConversion <CharPointer_UTF16>::test (*this);
+            TestUTFConversion <CharPointer_UTF32>::test (*this, r);
+            TestUTFConversion <CharPointer_UTF8>::test (*this, r);
+            TestUTFConversion <CharPointer_UTF16>::test (*this, r);
         }
 
         {

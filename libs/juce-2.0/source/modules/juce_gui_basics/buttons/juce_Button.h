@@ -144,9 +144,12 @@ public:
         Set the group ID back to zero if you want it to act as a normal toggle
         button again.
 
+        The notification argument lets you specify how other buttons should react
+        to being turned on or off in response to this call.
+
         @see getRadioGroupId
     */
-    void setRadioGroupId (int newGroupId);
+    void setRadioGroupId (int newGroupId, NotificationType notification = sendNotification);
 
     /** Returns the ID of the group to which this button belongs.
         (See setRadioGroupId() for an explanation of this).
@@ -209,11 +212,11 @@ public:
         @see addShortcut, getCommandID
     */
     void setCommandToTrigger (ApplicationCommandManager* commandManagerToUse,
-                              int commandID,
+                              CommandID commandID,
                               bool generateTooltip);
 
     /** Returns the command ID that was set by setCommandToTrigger(). */
-    int getCommandID() const noexcept               { return commandID; }
+    CommandID getCommandID() const noexcept             { return commandID; }
 
     //==============================================================================
     /** Assigns a shortcut key to trigger the button.
@@ -454,7 +457,8 @@ private:
     uint32 buttonPressTime, lastRepeatTime;
     ApplicationCommandManager* commandManagerToUse;
     int autoRepeatDelay, autoRepeatSpeed, autoRepeatMinimumDelay;
-    int radioGroupId, commandID, connectedEdgeFlags;
+    int radioGroupId, connectedEdgeFlags;
+    CommandID commandID;
     ButtonState buttonState;
 
     Value isOn;
