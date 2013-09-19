@@ -1,7 +1,7 @@
 
 dofile("../../../scripts/make-project.lua")
 
-package = make_lv2_project("TAL-Reverb-II")
+package = make_lv2_project("TAL-Reverb-2")
 
 package.includepaths = {
   package.includepaths,

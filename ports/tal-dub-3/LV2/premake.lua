@@ -1,7 +1,7 @@
 
 dofile("../../../scripts/make-project.lua")
 
-package = make_lv2_project("TAL-Dub-III")
+package = make_lv2_project("TAL-Dub-3")
 
 package.includepaths = {
   package.includepaths,

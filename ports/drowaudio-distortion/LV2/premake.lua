@@ -1,7 +1,7 @@
 
 dofile("../../../scripts/make-project.lua")
 
-package = make_lv2_project("dRowAudio-Distortion")
+package = make_lv2_project("drowaudio-distortion")
 
 package.config["Release"].links = { package.config["Release"].links, "drowaudio" }
 package.config["Debug"].links   = { package.config["Debug"].links, "drowaudio_debug" }
