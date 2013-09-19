@@ -39,11 +39,7 @@
     See the comments in the ASIOAudioIODevice class's header file for more
     info about this.
 */
-#if WINDOWS
- #define JUCE_ASIO 1
-#else
- #define JUCE_ASIO 0
-#endif
+#define JUCE_ASIO 0
 
 /** Config: JUCE_WASAPI
     Enables WASAPI audio devices (Windows Vista and above).
@@ -53,34 +49,17 @@
 /** Config: JUCE_DIRECTSOUND
     Enables DirectSound audio (MS Windows only).
 */
-#if WINDOWS
- #define JUCE_DIRECTSOUND 1
-#else
- #define JUCE_DIRECTSOUND 0
-#endif
+#define JUCE_DIRECTSOUND 0
 
 /** Config: JUCE_ALSA
     Enables ALSA audio devices (Linux only).
 */
-#if LINUX
- #define JUCE_ALSA 1
- #define JUCE_ALSA_MIDI_INPUT_NAME  jucelinux__getAppName()
- #define JUCE_ALSA_MIDI_OUTPUT_NAME jucelinux__getAppName()
- #define JUCE_ALSA_MIDI_INPUT_PORT_NAME  "Midi In"
- #define JUCE_ALSA_MIDI_OUTPUT_PORT_NAME "Midi Out"
-#else
- #define JUCE_ALSA 0
-#endif
+#define JUCE_ALSA 0
 
 /** Config: JUCE_JACK
     Enables JACK audio devices (Linux only).
 */
-#if LINUX
- #define JUCE_JACK 1
- #define JUCE_JACK_CLIENT_NAME jucelinux__getAppName()
-#else
- #define JUCE_JACK 0
-#endif
+#define JUCE_JACK 0
 
 //=============================================================================
 /** Config: JUCE_USE_CDREADER
@@ -227,20 +206,12 @@
     specify the path where your zlib headers live.
 */
 #define JUCE_INCLUDE_ZLIB_CODE 1
-//#define JUCE_ZLIB_INCLUDE_PATH <zlib.h>
 
 /*  Config: JUCE_CATCH_UNHANDLED_EXCEPTIONS
     If enabled, this will add some exception-catching code to forward unhandled exceptions
     to your JUCEApplication::unhandledException() callback.
 */
-#if DEBUG
- #define JUCE_CATCH_UNHANDLED_EXCEPTIONS 1
-#else
- #define JUCE_CATCH_UNHANDLED_EXCEPTIONS 0
-#endif
-
-//=============================================================================
-// juce_cryptography
+#define JUCE_CATCH_UNHANDLED_EXCEPTIONS 0
 
 //=============================================================================
 // juce_data_structures
@@ -338,52 +309,5 @@
     If you're not using any embedded web-pages, turning this off may reduce your code size.
 */
 #define JUCE_WEB_BROWSER 1
-
-//=============================================================================
-// juce_opengl
-
-//=============================================================================
-// juce_video
-
-//=============================================================================
-/** Config: JUCE_DIRECTSHOW
-    Enables DirectShow media-streaming architecture (MS Windows only).
-*/
-#define JUCE_DIRECTSHOW 0
-
-/** Config: JUCE_MEDIAFOUNDATION
-    Enables Media Foundation multimedia platform (Windows Vista and above).
-*/
-#define JUCE_MEDIAFOUNDATION 0
-
-/** Config: JUCE_QUICKTIME
-    Enables the QuickTimeMovieComponent class (Mac and Windows).
-    If you're building on Windows, you'll need to have the Apple QuickTime SDK
-    installed, and its header files will need to be on your include path.
-*/
-#define JUCE_QUICKTIME 0
-
-/** Config: JUCE_USE_CAMERA
-    Enables web-cam support using the CameraDevice class (Mac and Windows).
-*/
-#define JUCE_USE_CAMERA 0
-
-//=============================================================================
-/** Helper for Linux ALSA and JACK client names
-*/
-#if LINUX
-#include "modules/juce_gui_basics/juce_gui_basics.h"
-
-static inline
-const char* jucelinux__getAppName()
-{
-    using namespace juce;
-
-    if (JUCEApplication* const app = JUCEApplication::getInstance())
-        return app->getApplicationName().toRawUTF8();
-
-    return "JucePlugin";
-}
-#endif
 
 #endif // BUILD_JUCE_APPCONFIG_H_INCLUDED
