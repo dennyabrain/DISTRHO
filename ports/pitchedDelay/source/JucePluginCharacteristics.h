@@ -51,6 +51,7 @@
 
 #define JucePlugin_LV2URI               "http://code.google.com/p/lkjb-dc12/"
 #define JucePlugin_LV2Category          "DelayPlugin"
-#define JucePlugin_WantsLV2Presets      1
+#define JucePlugin_WantsLV2State        1
+#define JucePlugin_WantsLV2TimePos      1
 
 #endif   // __PLUGINCHARACTERISTICS_D4EFFF1A__
