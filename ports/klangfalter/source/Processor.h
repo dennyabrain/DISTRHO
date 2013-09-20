@@ -52,8 +52,6 @@ public:
   juce::AudioProcessorEditor* createEditor();
   bool hasEditor() const;
 
-  double getTailLengthSeconds() const { getConvolverTailBlockSize(); }
-
   //==============================================================================
   const juce::String getName() const;
 
@@ -95,7 +93,9 @@ public:
   bool acceptsMidi() const;
   bool producesMidi() const;
 
-  bool silenceInProducesSilenceOut() const;
+  virtual bool silenceInProducesSilenceOut() const;
+  
+  virtual double getTailLengthSeconds() const;
 
   void numChannelsChanged();
 
