@@ -32,7 +32,6 @@
 #include "../../juce-2.0/source/modules/juce_audio_processors/juce_audio_processors.h"
 #include "../../juce-2.0/source/modules/juce_audio_utils/juce_audio_utils.h"
 #include "../../juce-2.0/source/modules/juce_core/juce_core.h"
-#include "../../juce-2.0/source/modules/juce_cryptography/juce_cryptography.h"
 #include "../../juce-2.0/source/modules/juce_data_structures/juce_data_structures.h"
 #include "../../juce-2.0/source/modules/juce_events/juce_events.h"
 #include "../../juce-2.0/source/modules/juce_graphics/juce_graphics.h"
