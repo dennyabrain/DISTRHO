@@ -24,12 +24,10 @@ install:
 	install -d $(DESTDIR)$(PREFIX)/lib/dssi/
 	install -d $(DESTDIR)$(PREFIX)/lib/lv2/
 	install -d $(DESTDIR)$(PREFIX)/lib/vst/
-	install -m 644 bin/ladspa/* $(DESTDIR)$(PREFIX)/lib/ladspa/
-	install -m 644 bin/dssi/*   $(DESTDIR)$(PREFIX)/lib/dssi/
-	install -m 644 bin/vst/*    $(DESTDIR)$(PREFIX)/lib/vst/
-
+	cp -r bin/ladspa/* $(DESTDIR)$(PREFIX)/lib/ladspa/
+	cp -r bin/dssi/*   $(DESTDIR)$(PREFIX)/lib/dssi/
+	cp -r bin/vst/*    $(DESTDIR)$(PREFIX)/lib/vst/
 	cp -r bin/lv2/*.lv2/ static-lv2-ttl/*.lv2/ $(DESTDIR)$(PREFIX)/lib/lv2/
-	chmod 644 -R $(DESTDIR)$(PREFIX)/lib/lv2/
 
 # -----------------------------------------
 # gen
