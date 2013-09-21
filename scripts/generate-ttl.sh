@@ -3,7 +3,6 @@
 set -e
 
 if [ -d bin ]; then
-  echo cd bin
   cd bin
 else
   echo "Please run this script from the distrho root folder"
@@ -20,9 +19,7 @@ else
   EXT=so
 fi
 
-export LD_LIBRARY_PATH=$PWD/../libs/
-
-FOLDERS=`find . -name \*.lv2`
+FOLDERS=`find ./lv2/ -name \*.lv2`
 
 for i in $FOLDERS; do
   cd $i
@@ -32,4 +29,3 @@ done
 
 # Remove cabbage logs
 rm -f $PWD/lv2/cabbage*.lv2/CabbageLog.txt
-rm -f $PWD/../libs/CabbageLog.txt

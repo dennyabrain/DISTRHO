@@ -1,5 +1,5 @@
 #include "CabbageLookAndFeel.h"
-#include "BinaryData.h"
+
 
 CabbageLookAndFeel::CabbageLookAndFeel()
 {
@@ -950,13 +950,13 @@ void CabbageLookAndFeel::drawToggleButton (Graphics &g, ToggleButton &button, bo
 			col = Colour::fromRGBA (0, 0, 0, 255/(i*100));
     }
     else
-		col = Colour::fromString(button.getProperties().getWithDefault("colour", "lime"));
+		col = Colour::fromString(button.getProperties().getWithDefault("colour", "lime").toString());
 	
 	if (button.getProperties().getWithDefault("fontcolour", "").toString().length()<2){
 		fcol = CabbageUtils::getComponentFontColour();
     }
     else
-		fcol = Colour::fromString(button.getProperties().getWithDefault("fontcolour", "lime"));
+		fcol = Colour::fromString(button.getProperties().getWithDefault("fontcolour", "lime").toString());
 
 	bool isRECT = button.getProperties().getWithDefault("isRect", 0);
 

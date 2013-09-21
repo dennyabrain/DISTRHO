@@ -5,7 +5,7 @@ package = make_lv2_project("CabbagePluginMidiLv2")
 
 project.bindir  = "../../../bin/cabbage"
 package.links   = { package.links, "csound64" }
-package.defines = { package.defines, "Cabbage_Plugin_Midi=1", "Cabbage_Plugin_LV2=1", "USE_DOUBLE=1" }
+package.defines = { package.defines, "Cabbage_Plugin_Midi=1", "Cabbage_Plugin_LV2=1", "USE_DOUBLE=1" } -- , "CSOUND5=1", "CSOUND_5=1"
 
 package.includepaths = {
   package.includepaths,
@@ -16,6 +16,11 @@ package.includepaths = {
 package.libpaths = {
   package.libpaths,
   "/opt/kxstudio/lib"
+}
+
+package.links = {
+  package.links,
+  "sndfile"
 }
 
 package.files = {

@@ -20,7 +20,7 @@
 #ifndef __PLUGINPROCESSOR_H_FE85D052__
 #define __PLUGINPROCESSOR_H_FE85D052__
 
-#include "../JuceHeader.h"
+#include "JuceHeader.h"
 #include "../CabbageUtils.h"
 #include "../CabbageGUIClass.h"
 #include "../Editor/CabbageEditorWindow.h"
@@ -84,7 +84,11 @@ class CabbagePluginAudioProcessor  : public AudioProcessor,
 		int csdKsmps;
 		MYFLT *soundFilerTempVector;
         int CSCompResult;                       //result of Csound performKsmps
+#ifdef CSOUND_5
         CsoundChannelListEntry* csoundChanList;         // list of all available channels...
+#else
+		controlChannelInfo_s* csoundChanList;
+#endif
         int numCsoundChannels;          //number of Csound channels
         static void messageCallback(CSOUND *csound, int attr, const char *fmt, va_list args);  //message callback function
         int pos;

@@ -20,11 +20,6 @@
 #include "CabbagePluginProcessor.h"   
 #include "CabbagePluginEditor.h"
 
-#ifdef JUCE_LINUX
-#include <dlfcn.h>
-static void helperFunc() {}
-#endif
-
 #define CABBAGE_VERSION "Cabbage v0.04.00 BETA"
 #define MAX_BUFFER_SIZE 1024
 
@@ -79,27 +74,24 @@ patStepMatrix.clear();
 
 patPfieldMatrix.clear();
 setPlayConfigDetails(2, 2, 44100, 512); 
+
 #ifndef Cabbage_No_Csound
-//String localCsoundDirectory = File(inputfile).getParentDirectory().getFullPathName()+"/csound";
-//if(File(localCsoundDirectory).exists())
-//	if(csoundSetGlobalEnv(String("OPCODEDIR64").toUTF8(), localCsoundDirectory.toUTF8()))
-//		Logger::writeToLog("couldn't write environment variables");
-
-
 //don't start of run Csound in edit mode
 csound = new Csound();
-
+#ifndef CSOUND_5
+csound->SetHostImplementedMIDIIO(true);
+#endif
+csound->Reset();
 //Logger::writeToLog(csound->GetEnv("OPCODEDIR64"));
+#ifdef CSOUND_5
 csound->PreCompile();
+#endif
 csound->SetHostData(this);
-
 csound->SetMessageCallback(CabbagePluginAudioProcessor::messageCallback);
-//for host midi to get sent to Csound, don't need this for standalone
-//but might use it in the future foir midi mapping to controls
 csound->SetExternalMidiInOpenCallback(OpenMidiInputDevice);
 csound->SetExternalMidiReadCallback(ReadMidiData); 
-//csound->SetExternalMidiOutOpenCallback(OpenMidiOutputDevice);
-//csound->SetExternalMidiWriteCallback(WriteMidiData);
+csound->SetExternalMidiOutOpenCallback(OpenMidiOutputDevice);
+csound->SetExternalMidiWriteCallback(WriteMidiData);
 
 #ifndef Cabbage_Plugin_Host
 csoundPerfThread = new CsoundPerformanceThread(csound);
@@ -188,11 +180,7 @@ averageSampleIndex(0)
 String osxCSD = File::getSpecialLocation(File::currentApplicationFile).getFullPathName()+String("/Contents/")+File::getSpecialLocation(File::currentApplicationFile).getFileName();
 File thisFile(osxCSD); 
 Logger::writeToLog("MACOSX defined OK");
-#elif JUCE_LINUX
-Dl_info exeInfo;
-dladdr ((void*) helperFunc, &exeInfo);
-File thisFile(exeInfo.dli_fname);
-#else
+#else  
 File thisFile(File::getSpecialLocation(File::currentExecutableFile)); 
 #endif
 csdFile = thisFile.withFileExtension(String(".csd")).getFullPathName();
@@ -216,8 +204,15 @@ Logger::setCurrentLogger(fileLogger);
 
 #ifndef Cabbage_No_Csound
 csound = new Csound();
+#ifndef CSOUND_5
+csound->SetHostImplementedMIDIIO(true);
+#endif
+csound->Reset();
+#ifdef CSOUND_5
 csound->PreCompile();
+#endif
 csound->SetHostData(this);
+midiOutputBuffer.clear();
 //for host midi to get sent to Csound, don't need this for standalone
 //but might use it in the future for midi mapping to controls
 csound->SetMessageCallback(CabbagePluginAudioProcessor::messageCallback);
@@ -329,7 +324,9 @@ midiOutputBuffer.clear();
 getCallbackLock().enter();
 csound->DeleteChannelList(csoundChanList);
 csound->Reset();
+#ifdef CSOUND5
 csound->PreCompile();
+#endif
 numCsoundChannels = 0;
 csound->SetMessageCallback(CabbagePluginAudioProcessor::messageCallback);
 csound->SetExternalMidiInOpenCallback(OpenMidiInputDevice);
@@ -633,6 +630,7 @@ bool multiLine = false;
 //============================================================================
 void CabbagePluginAudioProcessor::setupNativePluginEditor()
 {
+/* not yet implemented
 	//create a basic 'native' gui if specificed by the user. 
 		int guiID = 0;
 		guiCtrls.clear();
@@ -674,6 +672,7 @@ void CabbagePluginAudioProcessor::setupNativePluginEditor()
 				guiID++;			
 				}
 			}
+			 */
 }
 
 //===========================================================
@@ -1085,8 +1084,13 @@ if(!isSuspended()){
 
 	for(int i=0;i<numSamples;i++, csndIndex++)
 	   {                                
+
+		for(int channel = 0; channel < getNumOutputChannels(); channel++ )
+			{
+			audioBuffer = buffer.getSampleData(channel,0);
 			if(csndIndex == csound->GetKsmps())
 			{
+				
 				getCallbackLock().enter();
 				//slow down calls to these functions, no need for them to be firing at k-rate
 				yieldCounter = (yieldCounter>10) ? 0 : yieldCounter+1;
@@ -1104,26 +1108,27 @@ if(!isSuspended()){
 				csndIndex = 0;
 			}
 			if(!CSCompResult)
-			{
-				for(int channel = 0; channel < getNumOutputChannels(); channel++ )
 				{
-				audioBuffer = buffer.getSampleData(channel,0);
 				pos = csndIndex*getNumOutputChannels();
 				CSspin[channel+pos] = audioBuffer[i]*cs_scale;  
 				audioBuffer[i] = (CSspout[channel+pos]/cs_scale);     
+				//lastOutputAmp = audioBuffer[i]; 
+				//outputNo1 = lastOutputAmp;
 				}
-			}
 			else audioBuffer[i]=0; 
-	   }
+			}
+                        
+		}
 	}//if not compiled just mute output
 	else{
-		for(int channel = 0; channel < getNumInputChannels(); channel++ )
-		{
-			audioBuffer = buffer.getSampleData(channel,0);
-
 			for(int i=0;i<numSamples;i++, csndIndex++)
-				audioBuffer[i]=0;
-		}
+					{
+					for(int channel = 0; channel < getNumInputChannels(); channel++ )
+							{
+							audioBuffer = buffer.getSampleData(channel,0);
+							audioBuffer[i]=0;
+							}
+					}
 	}
 
 	#endif
@@ -1176,6 +1181,12 @@ unsigned char *mbuf, int nbytes)
                    }
                    else if(message.isNoteOff()){
                         *mbuf++ = (unsigned char)0x80 + message.getChannel()-1;
+                   *mbuf++ = (unsigned char)message.getNoteNumber();
+                   *mbuf++ = (unsigned char)message.getVelocity();
+                   cnt += 3;
+                   }
+				   else if(message.isAllSoundOff()){
+                        *mbuf++ = (unsigned char)0x7B + message.getChannel()-1;
                    *mbuf++ = (unsigned char)message.getNoteNumber();
                    *mbuf++ = (unsigned char)message.getVelocity();
                    cnt += 3;

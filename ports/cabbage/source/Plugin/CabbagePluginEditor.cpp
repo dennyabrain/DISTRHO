@@ -21,7 +21,6 @@
 #include "CabbagePluginProcessor.h"
 #include "CabbagePluginEditor.h"
 #include  "../CabbageCustomWidgets.h"
-#include "BinaryData.h"
 
 
 #ifdef Cabbage_GUI_Editor
@@ -1568,8 +1567,13 @@ if(!getFilter()->isGuiEnabled()){
 										{
 										File selectedFile = browser.getSelectedFile (0);
 										//showMessage("", selectedFile.getFullPathName(), lookAndFeel, this);
+										#ifdef CSOUND5
 										getFilter()->getCsound()->SetChannel(getFilter()->getGUILayoutCtrls(i).getStringProp("channel").toUTF8(),
 																				selectedFile.getFullPathName().toUTF8());
+										#else
+										getFilter()->getCsound()->SetChannel(getFilter()->getGUILayoutCtrls(i).getStringProp("channel").toUTF8().getAddress(),
+																				selectedFile.getFullPathName().toUTF8().getAddress());
+										#endif	
 										}
 								}
 							 }
@@ -2276,8 +2280,10 @@ for(int i=0;i<(int)getFilter()->getGUICtrlsSize();i++)//find correct control fro
                                                                         ((CabbageCheckbox*)controls[u])->button->setToggleState((bool)val, true);
                                                                         }
                                                                         else if(getFilter()->getGUICtrls(u).getStringProp("type")==String("combobox")){
-                                                                        //if(controls[u])
-                                                                        //((CabbageComboBox*)controls[u])->combo->setSelectedItemIndex(val);
+                                                                        if(controls[u]){
+                                                                        ((CabbageComboBox*)controls[u])->combo->setSelectedItemIndex(val-1);
+																		Logger::writeToLog("Combo val: "+String(val));
+																		}
                                                                         }
                                                                         //update host when preset ares recalled
                                                                         getFilter()->setParameterNotifyingHost(u, val);

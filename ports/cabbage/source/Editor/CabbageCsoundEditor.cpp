@@ -1,6 +1,5 @@
 #include "CabbageCsoundEditor.h"
 #include "../Standalone/CabbageStandaloneDialog.h"
-#include "BinaryData.h"
 
 
 #pragma warning(disable: 4996)
