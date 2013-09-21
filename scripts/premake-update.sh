@@ -68,6 +68,7 @@ fi
 
 if [ -d /usr/include/public.sdk ]; then
   cp -r /usr/include/public.sdk sdks/vstsdk2.4/
+  cd sdks/vstsdk2.4; patch -p0 < fix-c++11.patch; cd ../..
 fi
 
 if [ ! -d sdks/vstsdk2.4/pluginterfaces ]; then
