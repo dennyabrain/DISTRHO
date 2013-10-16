@@ -45,7 +45,7 @@ libs/juce-2.0/source/amalgamation/
 libs/juce-2.0/source/docs/
 libs/juce-2.0/source/extras/
 libs/juce-2.0/source/modules/juce_box2d/
-libs/juce-2.0/source/modules/juce_browser_plugin/
+libs/juce-2.0/source/modules/juce_browser_plugin_client/
 libs/juce-2.0/source/modules/juce_cryptography/
 libs/juce-2.0/source/modules/juce_opengl/
 libs/juce-2.0/source/modules/juce_video/
