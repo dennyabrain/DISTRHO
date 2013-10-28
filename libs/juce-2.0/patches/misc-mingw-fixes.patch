@@ -1,5 +1,5 @@
 diff --git a/modules/juce_core/native/juce_BasicNativeHeaders.h b/modules/juce_core/native/juce_BasicNativeHeaders.h
-index aecfc40..d294abb 100644
+index cdaa0ef..55c0c8c 100644
 --- a/modules/juce_core/native/juce_BasicNativeHeaders.h
 +++ b/modules/juce_core/native/juce_BasicNativeHeaders.h
 @@ -87,7 +87,7 @@
@@ -11,11 +11,11 @@ index aecfc40..d294abb 100644
   #else
    #define _WIN32_WINNT 0x0600
   #endif
-diff --git a/modules/juce_gui_basics/application/juce_Initialisation.h b/modules/juce_gui_basics/application/juce_Initialisation.h
-index 46a39be..797cd3f 100644
---- a/modules/juce_gui_basics/application/juce_Initialisation.h
-+++ b/modules/juce_gui_basics/application/juce_Initialisation.h
-@@ -88,7 +88,7 @@ public:
+diff --git a/modules/juce_events/messages/juce_Initialisation.h b/modules/juce_events/messages/juce_Initialisation.h
+index 4a93b0f..1b33fd7 100644
+--- a/modules/juce_events/messages/juce_Initialisation.h
++++ b/modules/juce_events/messages/juce_Initialisation.h
+@@ -89,7 +89,7 @@ public:
  
  #else
   #if JUCE_WINDOWS
