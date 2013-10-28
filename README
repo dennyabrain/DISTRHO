@@ -6,14 +6,29 @@ DISTRHO is an open source project that has the goal of making cross-platform plu
 The DISTRHO Team currently has 2 members - falkTX (the coder) and nieee (graphics designer).
 
 The source repository is layered out this way:
- bin/                 - directory where all the compiled binaries will be placed
- libs/                - libraries
- libs/juce-2.0/       - juce 2.0 source code and build scripts
- libs/juce-plugin/    - disthro own juce code, created to make building separate plugin types easy (Standalone, VST and LV2)
- plugins/             - plugins developed and/or designed by the DISTRHO Team
- ports/               - all plugin ports (plugins not made by us)
- scripts/             - build scripts
- sdks/                - SDKs must be placed here (ASIO SDK and VST SDK)
+ bin/       - directory where all the compiled binaries will be placed
+ libs/      - libraries
+ plugins/   - plugins developed and/or designed by the DISTRHO Team
+ ports/     - all plugin ports (plugins not made by us)
+ scripts/   - build scripts
+ sdks/      - SDKs must be placed here (VST SDK)
+
+
+-----------------------------------------------------------------------------------------
+---- BUILD DEPENDENCIES
+
+To build plugins, you first need to install the following dependencies:
+
+ All OSes:
+
+- csound
+- liblo
+- premake (version 3)
+
+ Linux: (development versions of these)
+
+- freetype2
+- X11 core and extensions (Xinerama, XShm, XRender and XCursor)
 
 
 -----------------------------------------------------------------------------------------
@@ -30,28 +45,10 @@ You are now ready to start building. Run this on the source root folder:
 
 $ make
 
-If you just want to build specific plugin versions, you can use 'make standalone', 'make lv2' or 'make vst' to build their respective versions.
+If you just want to build specific plugin versions, you can use 'make ladspa', 'make dssi', 'make lv2' or 'make vst'.
 
 
 To build in debug mode, use this:
 
 $ make CONFIG=Debug
 
-
------------------------------------------------------------------------------------------
----- BUILD DEPENDENCIES
-
-To build plugins, you first need to install the following dependencies:
-
- All OSes:
-
-- csound
-- liblo
-- premake (version 3)
-
- Linux: (development versions of these)
-
-- ALSA
-- JACK
-- freetype2
-- X11 core and extensions (Xinerama, XShm, XRender and XCursor)
