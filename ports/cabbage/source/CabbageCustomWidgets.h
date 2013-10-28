@@ -34,7 +34,7 @@ ScopedPointer<WebBrowserComponent> htmlInfo;
 
 public:
     //==============================================================================
-    InfoWindow(LookAndFeel* look, String file)  : DocumentWindow (String("Information"),
+    InfoWindow(LookAndFeel_V2* look, String file)  : DocumentWindow (String("Information"),
                       Colours::black,
                       DocumentWindow::allButtons)
 	{
@@ -330,7 +330,7 @@ JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CabbageCheckbox);
 //==============================================================================
 class CabbageComboBox : public Component
 {
-//ScopedPointer<LookAndFeel> lookFeel;
+//ScopedPointer<LookAndFeel_V2> lookFeel;
 int offX, offY, offWidth, offHeight;
 public:
 ScopedPointer<GroupComponent> groupbox;
@@ -593,7 +593,7 @@ private:
 //==============================================================================
 class CabbageXYController : public Component
 {
-//ScopedPointer<LookAndFeel> lookFeel;
+//ScopedPointer<LookAndFeel_V2> lookFeel;
 int offX, offY, offWidth, offHeight;
 public:
 ScopedPointer<GroupComponent> groupbox;
@@ -662,7 +662,7 @@ JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CabbageXYController);
 class CabbageMessageConsole : public Component
 {
 ScopedPointer<GroupComponent> groupbox;
-ScopedPointer<OldSchoolLookAndFeel> lookAndFeel;
+ScopedPointer<LookAndFeel_V1> lookAndFeel;
 String text;
 int offX, offY, offWidth, offHeight;
 public:
@@ -671,7 +671,7 @@ public:
 CabbageMessageConsole(String name, String caption, String text):
 		  editor(new TextEditor(String("editor_")+name)), 
 		  groupbox(new GroupComponent(String("groupbox_")+name)),
-		  lookAndFeel(new OldSchoolLookAndFeel()),
+		  lookAndFeel(new LookAndFeel_V1()),
 		  offX(0), 
 		  offY(0), 
 		  offWidth(0), 

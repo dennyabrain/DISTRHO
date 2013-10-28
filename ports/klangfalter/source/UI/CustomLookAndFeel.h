@@ -20,7 +20,7 @@
 
 #include "../JuceHeader.h"
 
-class CustomLookAndFeel : public juce::LookAndFeel
+class CustomLookAndFeel : public juce::LookAndFeel_V2
 {
 public:
   CustomLookAndFeel();

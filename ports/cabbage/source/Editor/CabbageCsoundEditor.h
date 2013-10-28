@@ -541,7 +541,7 @@ public:
     //==============================================================================
 	juce_UseDebuggingNewOperator;
     CsoundEditor ();
-	ScopedPointer<OldSchoolLookAndFeel> oldLookAndFeel;
+	ScopedPointer<LookAndFeel_V1> oldLookAndFeel;
     ~CsoundEditor ();
     //==============================================================================
 	void codeDocumentChanged (const CodeDocument::Position &affectedTextStart, const CodeDocument::Position &affectedTextEnd);

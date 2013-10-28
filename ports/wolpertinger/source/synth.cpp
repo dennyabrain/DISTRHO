@@ -480,7 +480,7 @@ void wolp::renderNextBlock (AudioSampleBuffer& outputBuffer,
                 handleController (m.getChannel(),
                                   m.getControllerNumber(),
                                   m.getControllerValue());
-                printf("controller: %s\n", (const char*)MidiMessage::getControllerName(m.getControllerNumber()).toUTF8());
+                printf("controller: %s\n", MidiMessage::getControllerName(m.getControllerNumber()));
             }
             else if(m.isAftertouch())
             {

@@ -13,7 +13,7 @@
 #include "CabbageUtils.h"
 
 
-class CabbageLookAndFeel	:	public LookAndFeel
+class CabbageLookAndFeel	:	public LookAndFeel_V2
 {
 public:
 	CabbageLookAndFeel();
@@ -145,7 +145,7 @@ private:
 
   ====================================================================================
 */
-class CabbageLookAndFeelBasic	:	public LookAndFeel
+class CabbageLookAndFeelBasic	:	public LookAndFeel_V2
 {
 public:
 	CabbageLookAndFeelBasic();

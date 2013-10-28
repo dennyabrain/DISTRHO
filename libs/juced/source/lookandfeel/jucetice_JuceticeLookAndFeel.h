@@ -43,7 +43,7 @@
     }
     @endcode
 */
-class JuceticeLookAndFeel : public LookAndFeel
+class JuceticeLookAndFeel : public LookAndFeel_V2
 {
 public:
     //==============================================================================

@@ -61,7 +61,7 @@ public:
     {
         g.fillAll (Colours::black);
 
-        LookAndFeel::drawBevel (g,
+        LookAndFeel_V2::drawBevel (g,
                                 0,
                                 0,
                                 getWidth(),

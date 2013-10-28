@@ -37,7 +37,7 @@
 #include "../StandardHeader.h"
 #include "../resources/Resources.h"
 
-class MyLookAndFeel : public LookAndFeel
+class MyLookAndFeel : public LookAndFeel_V2
 {
 public:
     MyLookAndFeel();

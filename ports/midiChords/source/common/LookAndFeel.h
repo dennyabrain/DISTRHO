@@ -3,7 +3,7 @@
 
 #include "JuceHeader.h"
 
-class NonShinyLookAndFeel : public LookAndFeel
+class NonShinyLookAndFeel : public LookAndFeel_V2
 {
 public:
     //==============================================================================

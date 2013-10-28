@@ -27,6 +27,7 @@ To build plugins, you first need to install the following dependencies:
 
  Linux: (development versions of these)
 
+- ladspa
 - freetype2
 - X11 core and extensions (Xinerama, XShm, XRender and XCursor)
 

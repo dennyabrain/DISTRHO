@@ -243,7 +243,7 @@ void HighQualityMeter::resized ()
 
 void HighQualityMeter::paint (Graphics& g)
 {
-    LookAndFeel::drawBevel (g,
+    LookAndFeel_V2::drawBevel (g,
                             0, 0, getWidth(), getHeight(), 1,
                             Colours::black.withAlpha(0.2f),
                             Colours::white.withAlpha(0.2f));

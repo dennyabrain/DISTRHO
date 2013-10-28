@@ -116,16 +116,16 @@ void TremoloAudioProcessorEditor::paint (Graphics& g)
 	PluginLookAndFeel::drawInsetLine (g, verticalLineX, 0, verticalLineX, 210, 2);
 
     Rectangle<int> bevel (bufferViewL->getBounds().expanded (2, 2));
-    LookAndFeel::drawBevel (g, bevel.getX(), bevel.getY(), bevel.getWidth(), bevel.getHeight(), 2,
-                            Colour (0xFF455769).darker (0.5f), Colour (0xFF455769).brighter (0.3f),
-                            false, true);
+    LookAndFeel_V2::drawBevel (g, bevel.getX(), bevel.getY(), bevel.getWidth(), bevel.getHeight(), 2,
+                               Colour (0xFF455769).darker (0.5f), Colour (0xFF455769).brighter (0.3f),
+                               false, true);
     
     if (getAudioProcessor()->getNumInputChannels() > 1)
     {
         bevel  = bufferViewR->getBounds().expanded (2, 2);
-        LookAndFeel::drawBevel (g, bevel.getX(), bevel.getY(), bevel.getWidth(), bevel.getHeight(), 2,
-                                Colour (0xFF455769).darker (0.5f), Colour (0xFF455769).brighter (0.3f),
-                                false, true);
+        LookAndFeel_V2::drawBevel (g, bevel.getX(), bevel.getY(), bevel.getWidth(), bevel.getHeight(), 2,
+                                   Colour (0xFF455769).darker (0.5f), Colour (0xFF455769).brighter (0.3f),
+                                   false, true);
     }
     
     PluginLookAndFeel::drawPluginBackgroundHighlights (g, *this);

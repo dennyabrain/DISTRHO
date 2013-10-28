@@ -18,7 +18,7 @@
 
 #include "presetmanager.h"
 
-class PitchedDelayLookAndFeel : public LookAndFeel
+class PitchedDelayLookAndFeel : public LookAndFeel_V2
 {
 public:
 	PitchedDelayLookAndFeel()

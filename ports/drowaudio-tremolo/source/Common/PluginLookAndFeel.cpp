@@ -11,7 +11,7 @@
 
 //============================================================================
 PluginLookAndFeel::PluginLookAndFeel()
-: LookAndFeel()
+: LookAndFeel_V2()
 {
     setColour (Slider::thumbColourId, Colours::grey);
     setColour (Slider::textBoxTextColourId, Colour (0xff78f4ff));

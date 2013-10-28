@@ -217,7 +217,7 @@ void Joystick::paint (Graphics& g)
     g.drawEllipse (draw_x - 4, draw_y - 4, 9, 9, 1.0);
 
     // Draw inset bevel --------------------------------
-    LookAndFeel::drawBevel (g,
+    LookAndFeel_V2::drawBevel (g,
                             0, 0,
                             getWidth(), getHeight(),
                             2,

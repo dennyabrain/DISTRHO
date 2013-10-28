@@ -33,11 +33,11 @@ class listBoxItem : public Component
 String text;
 Colour highlightColour;
 int ftableNumber;
-ScopedPointer<OldSchoolLookAndFeel> oldSchool;
+ScopedPointer<LookAndFeel_V1> oldSchool;
 ScopedPointer<TextEditor> textEditor;
 public:
 	listBoxItem():highlightColour(Colours::white), isHighlighted(false){
-		oldSchool = new OldSchoolLookAndFeel();
+		oldSchool = new LookAndFeel_V1();
 		textEditor = new TextEditor();
 		setInterceptsMouseClicks(false, true);
 		textEditor->setLookAndFeel(oldSchool);

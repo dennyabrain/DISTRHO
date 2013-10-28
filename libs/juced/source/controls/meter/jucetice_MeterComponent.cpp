@@ -341,7 +341,7 @@ void MeterComponent::paint (Graphics& g)
 
     // Bevel outline for the entire draw area
     if(m_inset)
-        LookAndFeel::drawBevel(
+        LookAndFeel_V2::drawBevel(
             g,
             0,
             0,

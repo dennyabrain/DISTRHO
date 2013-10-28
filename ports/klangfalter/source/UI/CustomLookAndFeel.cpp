@@ -21,7 +21,7 @@
 
 
 CustomLookAndFeel::CustomLookAndFeel() :
-  juce::LookAndFeel()
+  juce::LookAndFeel_V2()
 {
 }
 

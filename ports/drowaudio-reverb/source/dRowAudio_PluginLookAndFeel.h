@@ -11,7 +11,7 @@
 
 #include "includes.h"
 
-class dRowLookAndFeel : public LookAndFeel
+class dRowLookAndFeel : public LookAndFeel_V2
 {
 public:
 	/**

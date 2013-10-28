@@ -13,7 +13,7 @@
 #include "JuceHeader.h"
 
 //==============================================================================
-class PluginLookAndFeel :   public LookAndFeel
+class PluginLookAndFeel :   public LookAndFeel_V2
 {
 public:
     //==============================================================================

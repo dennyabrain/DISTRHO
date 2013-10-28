@@ -29,7 +29,7 @@
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
 
-struct _myLookAndFeel: public LookAndFeel
+struct _myLookAndFeel: public LookAndFeel_V2
 {
 	_myLookAndFeel()
 	{
