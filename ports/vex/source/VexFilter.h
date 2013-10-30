@@ -27,6 +27,7 @@
 
    @author  rockhardbuns
    @tweaker Lucio Asnaghi
+   @tweaker falkTX
 
  ==============================================================================
 */
@@ -34,88 +35,83 @@
 #ifndef __JUCETICE_VEXPLUGINFILTER_HEADER__
 #define __JUCETICE_VEXPLUGINFILTER_HEADER__
 
-#include <list>
-
 #include "JucePluginCharacteristics.h"
-#include "PresetMan.h"
 
-#include "synth/cArp.h"
-#include "synth/cChorus.h"
-#include "synth/cDelay.h"
-#include "synth/cReverb.h"
-#include "synth/cSyntModule.h"
+#include "vex/VexArp.h"
+#include "vex/VexChorus.h"
+#include "vex/VexDelay.h"
+#include "vex/VexReverb.h"
+#include "vex/VexSyntModule.h"
 
+#include "VexEditorComponent.h"
 
 class VexFilter : public AudioProcessor,
-                  public ChangeBroadcaster
+                  public VexEditorComponent::Callback
 {
 public:
     VexFilter();
     ~VexFilter();
 
-    bool hasEditor() const { return true; }
-    bool silenceInProducesSilenceOut() const { return false; }
-    double getTailLengthSeconds() const { return 0.0; }
+    bool hasEditor() const override { return true; }
+    bool silenceInProducesSilenceOut() const override { return false; }
+    double getTailLengthSeconds() const override { return 0.0; }
 
-    void prepareToPlay (double sampleRate, int samplesPerBlock);
-    void releaseResources();
-    void processBlock (AudioSampleBuffer& output, MidiBuffer& midiMessages);
+    const String getName() const override { return JucePlugin_Name; }
+    bool acceptsMidi() const override { return JucePlugin_WantsMidiInput; }
+    bool producesMidi() const override { return JucePlugin_ProducesMidiOutput; }
 
-    const String getName() const { return JucePlugin_Name; }
-    bool acceptsMidi() const { return JucePlugin_WantsMidiInput; }
-    bool producesMidi() const { return JucePlugin_ProducesMidiOutput; }
+    int getNumPrograms() { return 0; }
+    int getCurrentProgram() { return 0; }
+    void setCurrentProgram(int) {}
+    const String getProgramName(int) { return String::empty; }
+    void changeProgramName(int, const juce::String&) {}
 
-    const String getInputChannelName (const int channelIndex) const;
-    const String getOutputChannelName (const int channelIndex) const;
-    bool isInputChannelStereoPair (int index) const;
-    bool isOutputChannelStereoPair (int index) const;
+    const String getInputChannelName (const int channelIndex) const override;
+    const String getOutputChannelName (const int channelIndex) const override;
+    bool isInputChannelStereoPair (int index) const override;
+    bool isOutputChannelStereoPair (int index) const override;
 
-    int getNumParameters() { return 92; }
-    float getParameter (int index);
-    void setParameter (int index, float newValue);
-    void setParameter (int index, float newValue, bool fromGUI);
+    int getNumParameters() override { return kParamCount; }
+    float getParameter (int index) override;
+    void setParameter (int index, float newValue) override;
 
-    const String getParameterName (int index);
-    const String getParameterText (int index);
+    const String getParameterName (int index) override;
+    const String getParameterText (int index) override;
 
-    int getNumPrograms();
-    int getCurrentProgram();
-    void setCurrentProgram (int index);
-    const String getProgramName (int index);
-    void changeProgramName (int index, const String& newName);
+    void prepareToPlay (double sampleRate, int samplesPerBlock) override;
+    void releaseResources() override;
+    void processBlock (AudioSampleBuffer& output, MidiBuffer& midiMessages) override;
 
-    void getStateInformation (MemoryBlock& destData);
-    void setStateInformation (const void* data, int sizeInBytes);
-    void setCurrentProgramStateInformation (const void* data, int sizeInBytes);
-    void getCurrentProgramStateInformation (MemoryBlock& destData);
+    void setStateInformation (const void* data, int sizeInBytes) override;
+    void getStateInformation (MemoryBlock& destData) override;
 
-    AudioProcessorEditor* createEditor();
+    AudioProcessorEditor* createEditor() override;
 
-    void setWave(int part, const String& waveName);
-    String getWave(int part);
-    VexArpSettings* getPeggySet(int part);
-
-    std::list<int> dirtyList;
+    void getChangedParameters(bool params[92]) override;
+    float getFilterParameterValue(const uint32_t index) const override;
+    String getFilterWaveName(const int part) const override;
+    void editorParameterChanged(const uint32_t index, const float value) override;
+    void editorWaveChanged(const int part, const String& wave) override;
 
 private:
-    AudioSampleBuffer* obf;
-    AudioSampleBuffer* abf;
-    AudioSampleBuffer* dbf;
-    AudioSampleBuffer* dbf2;
-    AudioSampleBuffer* dbf3;
-    int snum;
-    cSyntModule* s1;
-    VexChorus* c1;
-    VexReverb* r1;
-    VexDelay* d1;
-    VexArp* a1;
-    VexArp* a2;
-    VexArp* a3;
-    float* pra;
-    VexArpSettings* p1;
-    VexArpSettings* p2;
-    VexArpSettings* p3;
-    PresetMan* pMan;
+    static const unsigned int kParamCount = 92;
+
+    float fParameters[kParamCount];
+    bool  fParamsChanged[92];
+
+    ScopedPointer<AudioSampleBuffer> obf;
+    ScopedPointer<AudioSampleBuffer> abf;
+    ScopedPointer<AudioSampleBuffer> dbf1; // delay
+    ScopedPointer<AudioSampleBuffer> dbf2; // chorus
+    ScopedPointer<AudioSampleBuffer> dbf3; // reverb
+
+    VexArpSettings fArpSet1, fArpSet2, fArpSet3;
+    VexArp fArp1, fArp2, fArp3;
+
+    VexChorus fChorus;
+    VexDelay fDelay;
+    VexReverb fReverb;
+    VexSyntModule fSynth;
 };
 
 #endif

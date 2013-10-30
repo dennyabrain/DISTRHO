@@ -27,6 +27,7 @@
 
    @author  rockhardbuns
    @tweaker Lucio Asnaghi
+   @tweaker falkTX
 
  ==============================================================================
 */
@@ -40,46 +41,83 @@ AudioProcessor* JUCE_CALLTYPE createPluginFilter ()
 }
 
 VexFilter::VexFilter()
+        : AudioProcessor(),
+          fArp1(&fArpSet1),
+          fArp2(&fArpSet2),
+          fArp3(&fArpSet3),
+          fChorus(fParameters),
+          fDelay(fParameters),
+          fReverb(fParameters),
+          fSynth(fParameters)
 {
-    DBG(String("*************** vex constructor called"));
-    pMan = new PresetMan();
-    pMan->setPointersToCurrent(&pra, &p1, &p2, &p3);
+    std::memset(fParameters, 0, sizeof(float)*kParamCount);
+    std::memset(fParamsChanged, 0, sizeof(bool)*92);
 
-    s1 = new cSyntModule(pra);
-    c1 = new VexChorus(pra);
-    r1 = new VexReverb(pra);
-    d1 = new VexDelay(pra);
+    fParameters[0] = 1.0f; // main volume
 
-    obf = NULL;
-    abf = NULL;
-    dbf2 = NULL;
-    dbf3 = NULL;
-    dbf = NULL;
-    snum = 0;
+    for (int i = 0; i < 3; ++i)
+    {
+        const int offset = i * 24;
 
-    a1 = new VexArp(p1);
-    a2 = new VexArp(p2);
-    a3 = new VexArp(p3);
+        fParameters[offset +  1] = 0.5f;
+        fParameters[offset +  2] = 0.5f;
+        fParameters[offset +  3] = 0.5f;
+        fParameters[offset +  4] = 0.5f;
+        fParameters[offset +  5] = 0.9f;
+        fParameters[offset +  6] = 0.0f;
+        fParameters[offset +  7] = 1.0f;
+        fParameters[offset +  8] = 0.5f;
+        fParameters[offset +  9] = 0.0f;
+        fParameters[offset + 10] = 0.2f;
+        fParameters[offset + 11] = 0.0f;
+        fParameters[offset + 12] = 0.5f;
+        fParameters[offset + 13] = 0.5f;
+        fParameters[offset + 14] = 0.0f;
+        fParameters[offset + 15] = 0.3f;
+        fParameters[offset + 16] = 0.7f;
+        fParameters[offset + 17] = 0.1f;
+        fParameters[offset + 18] = 0.5f;
+        fParameters[offset + 19] = 0.5f;
+        fParameters[offset + 20] = 0.0f;
+        fParameters[offset + 21] = 0.0f;
+        fParameters[offset + 22] = 0.5f;
+        fParameters[offset + 23] = 0.5f;
+        fParameters[offset + 24] = 0.5f;
+    }
 
-    setCurrentProgram(0);
+    // ^1 - 72
+
+    fParameters[73] = 0.5f; // Delay Time
+    fParameters[74] = 0.4f; // Delay Feedback
+    fParameters[75] = 0.0f; // Delay Volume
+
+    fParameters[76] = 0.3f; // Chorus Rate
+    fParameters[77] = 0.6f; // Chorus Depth
+    fParameters[78] = 0.5f; // Chorus Volume
+
+    fParameters[79] = 0.6f; // Reverb Size
+    fParameters[80] = 0.7f; // Reverb Width
+    fParameters[81] = 0.6f; // Reverb Damp
+    fParameters[82] = 0.0f; // Reverb Volume
+
+    fParameters[83] = 0.5f; // wave1 panning
+    fParameters[84] = 0.5f; // wave2 panning
+    fParameters[85] = 0.5f; // wave3 panning
+
+    fParameters[86] = 0.5f; // wave1 volume
+    fParameters[87] = 0.5f; // wave2 volume
+    fParameters[88] = 0.5f; // wave3 volume
+
+    fParameters[89] = 1.0f; // wave1 on/off
+    fParameters[90] = 0.0f; // wave2 on/off
+    fParameters[91] = 0.0f; // wave3 on/off
+
+    for (unsigned int i = 0; i < kParamCount; ++i)
+        fSynth.update(i);
 }
 
 VexFilter::~VexFilter()
 {
-    DBG(String("*************** vex destructor called"));
-    delete obf;
-    delete abf;
-    delete dbf;
-    delete dbf2;
-    delete dbf3;
-    delete s1;
-    delete c1;
-    delete r1;
-    delete d1;
-    delete a1;
-    delete a2;
-    delete a3;
-    delete pMan;
 }
 
 const String VexFilter::getInputChannelName (const int channelIndex) const
@@ -104,375 +142,416 @@ bool VexFilter::isOutputChannelStereoPair (int index) const
 
 float VexFilter::getParameter (int index)
 {
-    return pra[index];
+    if (index >= kParamCount)
+        return 0.0f;
+
+    return fParameters[index];
 }
 
 void VexFilter::setParameter (int index, float newValue)
 {
-    if (pra[index] != newValue)
-    {
-        pra[index] = newValue;
-        dirtyList.push_back(index);
-        sendChangeMessage();
-    }
-}
+    if (index >= kParamCount)
+        return;
 
-void VexFilter::setParameter (int index, float newValue, bool fromGUI)
-{
-    pra[index] = newValue;
-    s1->update(index);
-    if(index < 89)
-    {
-        setParameterNotifyingHost(index, newValue);
-    }
-}
-
-void VexFilter::setWave(int part, const String& waveName)
-{
-    s1->setWave(part, waveName);
-    pMan->setWaveName(part, waveName); //store in preset bank
-}
-
-String VexFilter::getWave(int part)
-{
-    return pMan->getWaveName(part);
-}
-
-VexArpSettings* VexFilter::getPeggySet(int prt)
-{
-    if(prt == 1) return p1;
-    if(prt == 2) return p2;
-    if(prt == 3) return p3;
-
-    return 0;
+    fParameters[index] = newValue;
+    fParamsChanged[index] = true;
+    fSynth.update(index);
 }
 
 const String VexFilter::getParameterName (int index)
 {
-    return String("Farty pants!");
+    String retName;
+
+    if (index >= 1 && index <= 72)
+    {
+        uint32_t ri = index % 24;
+
+        switch (ri)
+        {
+        case 1:
+            retName = "Part0 Oct";
+            break;
+        case 2:
+            retName = "Part0 Cent";
+            break;
+        case 3:
+            retName = "Part0 Phase";
+            break;
+        case 4:
+            retName = "Part0 Tune";
+            break;
+        case 5:
+            retName = "Part0 Filter Cut";
+            break;
+        case 6:
+            retName = "Part0 Filter Res";
+            break;
+        case 7:
+            retName = "Part0 Filter HP/LP";
+            break;
+        case 8:
+            retName = "Part0 Filter Env";
+            break;
+        case 9:
+            retName = "Part0 Filter Env Atk";
+            break;
+        case 10:
+            retName = "Part0 Filter Env Dec";
+            break;
+        case 11:
+            retName = "Part0 Filter Env Sus";
+            break;
+        case 12:
+            retName = "Part0 Filter Env Rel";
+            break;
+        case 13:
+            retName = "Part0 Filter Env Vel";
+            break;
+        case 14:
+            retName = "Part0 Amp Env Atk";
+            break;
+        case 15:
+            retName = "Part0 Amp Env Dec";
+            break;
+        case 16:
+            retName = "Part0 Amp Env Sus";
+            break;
+        case 17:
+            retName = "Part0 Amp Env Rel";
+            break;
+        case 18:
+            retName = "Part0 Amp Env Vel";
+            break;
+        case 19:
+            retName = "Part0 LFO Rate";
+            break;
+        case 20:
+            retName = "Part0 LFO Amp";
+            break;
+        case 21:
+            retName = "Part0 LFO Flt";
+            break;
+        case 22:
+            retName = "Part0 Delay";
+            break;
+        case 23:
+            retName = "Part0 Chorus";
+            break;
+        case 24:
+        case 0:
+            retName = "Part0 Reverb";
+            break;
+        default:
+            retName = "Part0 Unknown";
+            break;
+        }
+
+        const int partn = (index-1+24) / 24;
+
+        switch (partn)
+        {
+        case 1:
+            retName = retName.replace("Part0", "Part1");
+            break;
+        case 2:
+            retName = retName.replace("Part0", "Part2");
+            break;
+        case 3:
+            retName = retName.replace("Part0", "Part3");
+            break;
+        }
+
+        return retName;
+    }
+
+    switch (index)
+    {
+    case 0:
+        retName = "Master";
+        break;
+    case 73:
+        retName = "Delay Time";
+        break;
+    case 74:
+        retName = "Delay Feedback";
+        break;
+    case 75:
+        retName = "Delay Level";
+        break;
+    case 76:
+        retName = "Chorus Rate";
+        break;
+    case 77:
+        retName = "Chorus Depth";
+        break;
+    case 78:
+        retName = "Chorus Level";
+        break;
+    case 79:
+        retName = "Reverb Size";
+        break;
+    case 80:
+        retName = "Reverb Width";
+        break;
+    case 81:
+        retName = "Reverb Damp";
+        break;
+    case 82:
+        retName = "Reverb Level";
+        break;
+    case 83:
+        retName = "Part1 Panning";
+        break;
+    case 84:
+        retName = "Part2 Panning";
+        break;
+    case 85:
+        retName = "Part3 Panning";
+        break;
+    case 86:
+        retName = "Part1 Volume";
+        break;
+    case 87:
+        retName = "Part2 Volume";
+        break;
+    case 88:
+        retName = "Part3 Volume";
+        break;
+    case 89:
+        retName = "Part1 on/off";
+        break;
+    case 90:
+        retName = "Part2 on/off";
+        break;
+    case 91:
+        retName = "Part3 on/off";
+        break;
+    default:
+        retName = "unknown";
+    }
+
+    return retName;
 }
 
 const String VexFilter::getParameterText (int index)
 {
-    return String(pra[index], 2);
+    return String(fParameters[index], 2);
 }
 
-void VexFilter::prepareToPlay (double sampleRate, int samplesPerBlock)
+void VexFilter::prepareToPlay (double sampleRate, int bufferSize)
 {
-    s1->setSampleRate(sampleRate);
-    c1->setSampleRate(sampleRate);
-    d1->setSampleRate(sampleRate);
+    obf  = new AudioSampleBuffer(2, bufferSize);
+    abf  = new AudioSampleBuffer(2, bufferSize);
+    dbf1 = new AudioSampleBuffer(2, bufferSize);
+    dbf2 = new AudioSampleBuffer(2, bufferSize);
+    dbf3 = new AudioSampleBuffer(2, bufferSize);
 
-    int sampleRatei = (int)sampleRate;
-    a1->setSampleRate(sampleRatei);
-    a2->setSampleRate(sampleRatei);
-    a3->setSampleRate(sampleRatei);
-
-    if (obf == NULL)  {obf  = new AudioSampleBuffer(2, samplesPerBlock);}
-    if (abf == NULL)  {abf  = new AudioSampleBuffer(2, samplesPerBlock);}
-    if (dbf == NULL)  {dbf  = new AudioSampleBuffer(2, samplesPerBlock);}
-    if (dbf2 == NULL) {dbf2 = new AudioSampleBuffer(2, samplesPerBlock);}
-    if (dbf3 == NULL) {dbf3 = new AudioSampleBuffer(2, samplesPerBlock);}
+    fArp1.setSampleRate(sampleRate);
+    fArp2.setSampleRate(sampleRate);
+    fArp3.setSampleRate(sampleRate);
+    fChorus.setSampleRate(sampleRate);
+    fDelay.setSampleRate(sampleRate);
+    fSynth.setSampleRate(sampleRate);
 }
 
 void VexFilter::releaseResources()
 {
-    delete obf;
-    delete abf;
-    delete dbf;
-    delete dbf2;
-    delete dbf3;
-    obf = NULL;
-    abf = NULL;
-    dbf2 = NULL;
-    dbf3 = NULL;
-    dbf = NULL;
+    obf  = nullptr;
+    abf  = nullptr;
+    dbf1 = nullptr;
+    dbf2 = nullptr;
+    dbf3 = nullptr;
 }
 
-void VexFilter::processBlock(AudioSampleBuffer& output,
-                             MidiBuffer& midiMessages)
+void VexFilter::processBlock(AudioSampleBuffer& output, MidiBuffer& midiInBuffer)
 {
     AudioPlayHead::CurrentPositionInfo pos;
-    if (getPlayHead())
-        getPlayHead()->getCurrentPosition(pos);
 
-    MidiBuffer part1Midi;
-    MidiBuffer part2Midi;
-    MidiBuffer part3Midi;
+    if (AudioPlayHead* const playhead = getPlayHead())
+        playhead->getCurrentPosition(pos);
 
-    if (p1->on)
-    {
-        part1Midi = a1->processMidi(midiMessages, pos.isPlaying, pos.ppqPosition, pos.ppqPositionOfLastBarStart, pos.bpm, output.getNumSamples());
-    }
-    else
-    {
-        part1Midi = midiMessages;
-    }
+    const int frames = output.getNumSamples();
 
-    if (p2->on)
-    {
-        part2Midi = a2->processMidi(midiMessages, pos.isPlaying, pos.ppqPosition, pos.ppqPositionOfLastBarStart, pos.bpm, output.getNumSamples());
-    }
-    else
-    {
-        part2Midi = midiMessages;
-    }
+    // process MIDI (arppeggiator)
+    const MidiBuffer& part1Midi(fArpSet1.on ? fArp1.processMidi(midiInBuffer, pos.isPlaying, pos.ppqPosition, pos.ppqPositionOfLastBarStart, pos.bpm, frames) : midiInBuffer);
+    const MidiBuffer& part2Midi(fArpSet2.on ? fArp2.processMidi(midiInBuffer, pos.isPlaying, pos.ppqPosition, pos.ppqPositionOfLastBarStart, pos.bpm, frames) : midiInBuffer);
+    const MidiBuffer& part3Midi(fArpSet3.on ? fArp3.processMidi(midiInBuffer, pos.isPlaying, pos.ppqPosition, pos.ppqPositionOfLastBarStart, pos.bpm, frames) : midiInBuffer);
 
-    if (p3->on)
-    {
-        part3Midi = a3->processMidi(midiMessages, pos.isPlaying, pos.ppqPosition, pos.ppqPositionOfLastBarStart, pos.bpm, output.getNumSamples());
-    }
-    else
-    {
-        part3Midi = midiMessages;
-    }
-
-    MidiMessage midi_message(0xf4);
+    int snum;
+    MidiMessage midiMessage(0xf4);
     MidiBuffer::Iterator Iterator1(part1Midi);
 
-    while(Iterator1.getNextEvent(midi_message, snum))
+    while (Iterator1.getNextEvent(midiMessage, snum))
     {
-        if( midi_message.isNoteOn())
-        {
-                s1->playNote(midi_message.getNoteNumber(), midi_message.getVelocity(), snum, 1);
-        }
-        else if( midi_message.isNoteOff())
-        {
-                s1->releaseNote(midi_message.getNoteNumber(), snum, 1 );
-        }
-        else if( midi_message.isAllSoundOff())
-        {
-                s1->kill();
-        }
-        else if( midi_message.isAllNotesOff())
-        {
-                s1->releaseAll(snum);
-        }
+        if (midiMessage.isNoteOn())
+            fSynth.playNote(midiMessage.getNoteNumber(), midiMessage.getVelocity(), snum, 1);
+        else if (midiMessage.isNoteOff())
+            fSynth.releaseNote(midiMessage.getNoteNumber(), snum, 1 );
+        else if (midiMessage.isAllSoundOff())
+            fSynth.kill();
+        else if (midiMessage.isAllNotesOff())
+            fSynth.releaseAll(snum);
     }
 
     MidiBuffer::Iterator Iterator2(part2Midi);
 
-    while(Iterator2.getNextEvent(midi_message, snum))
+    while (Iterator2.getNextEvent(midiMessage, snum))
     {
-            if( midi_message.isNoteOn())
-            {
-                    s1->playNote(midi_message.getNoteNumber(), midi_message.getVelocity(), snum, 2);
-            }
-            else if( midi_message.isNoteOff())
-            {
-                    s1->releaseNote(midi_message.getNoteNumber(), snum, 2 );
-            }
+        if (midiMessage.isNoteOn())
+            fSynth.playNote(midiMessage.getNoteNumber(), midiMessage.getVelocity(), snum, 2);
+        else if (midiMessage.isNoteOff())
+            fSynth.releaseNote(midiMessage.getNoteNumber(), snum, 2 );
     }
 
     MidiBuffer::Iterator Iterator3(part3Midi);
 
-    while(Iterator3.getNextEvent(midi_message, snum))
+    while (Iterator3.getNextEvent(midiMessage, snum))
     {
-            if( midi_message.isNoteOn())
-            {
-                    s1->playNote(midi_message.getNoteNumber(), midi_message.getVelocity(), snum, 3);
-            }
-            else if( midi_message.isNoteOff())
-            {
-                    s1->releaseNote(midi_message.getNoteNumber(), snum, 3 );
-            }
+        if (midiMessage.isNoteOn())
+            fSynth.playNote(midiMessage.getNoteNumber(), midiMessage.getVelocity(), snum, 3);
+        else if (midiMessage.isNoteOff())
+            fSynth.releaseNote(midiMessage.getNoteNumber(), snum, 3 );
     }
 
-    midiMessages.clear();
+    midiInBuffer.clear();
 
-    if (output.getNumSamples() != obf->getNumSamples())
+    if (obf->getNumSamples() < frames)
     {
-            obf->setSize(2, output.getNumSamples(),0,0,1);
-            abf->setSize(2, output.getNumSamples(),0,0,1);
-            dbf->setSize(2, output.getNumSamples(),0,0,1);
-            dbf2->setSize(2, output.getNumSamples(),0,0,1);
-            dbf3->setSize(2, output.getNumSamples(),0,0,1);
+        obf->setSize(2,  frames, 0, 0, 1);
+        abf->setSize(2,  frames, 0, 0, 1);
+        dbf1->setSize(2, frames, 0, 0, 1);
+        dbf2->setSize(2, frames, 0, 0, 1);
+        dbf3->setSize(2, frames, 0, 0, 1);
     }
 
-    obf	->clear();
-    dbf	->clear();
+    obf ->clear();
+    dbf1->clear();
     dbf2->clear();
     dbf3->clear();
 
-    s1->doProcess(obf, abf, dbf, dbf2, dbf3);
+    fSynth.doProcess(*obf, *abf, *dbf1, *dbf2, *dbf3);
 
-    if (pra[75] > 0.001f) d1->processBlock(dbf, pos.bpm);
-    if (pra[78] > 0.001f) c1->processBlock(dbf2);
-    if (pra[82] > 0.001f) r1->processBlock(dbf3);
+    if (fParameters[75] > 0.001f) fDelay.processBlock(dbf1, pos.bpm);
+    if (fParameters[78] > 0.001f) fChorus.processBlock(dbf2);
+    if (fParameters[82] > 0.001f) fReverb.processBlock(dbf3);
 
     output.clear();
-    obf->addFrom (0, 0, *dbf, 0,0,output.getNumSamples(), pra[75]);
-    obf->addFrom (1, 0, *dbf, 1,0,output.getNumSamples(), pra[75]);
-    obf->addFrom (0, 0, *dbf2, 0,0,output.getNumSamples(), pra[78]);
-    obf->addFrom (1, 0, *dbf2, 1,0,output.getNumSamples(), pra[78]);
-    obf->addFrom (0, 0, *dbf3, 0,0,output.getNumSamples(), pra[82]);
-    obf->addFrom (1, 0, *dbf3, 1,0,output.getNumSamples(), pra[82]);
-    output.addFrom (0, 0, *obf, 0,0,output.getNumSamples(), pra[0]);
-    output.addFrom (1, 0, *obf, 1,0,output.getNumSamples(), pra[0]);
+
+    obf->addFrom(0, 0, *dbf1, 0, 0, frames, fParameters[75]);
+    obf->addFrom(1, 0, *dbf1, 1, 0, frames, fParameters[75]);
+    obf->addFrom(0, 0, *dbf2, 0, 0, frames, fParameters[78]);
+    obf->addFrom(1, 0, *dbf2, 1, 0, frames, fParameters[78]);
+    obf->addFrom(0, 0, *dbf3, 0, 0, frames, fParameters[82]);
+    obf->addFrom(1, 0, *dbf3, 1, 0, frames, fParameters[82]);
+
+    output.addFrom(0, 0, *obf, 0, 0, frames, fParameters[0]);
+    output.addFrom(1, 0, *obf, 1, 0, frames, fParameters[0]);
+}
+
+void VexFilter::setStateInformation (const void* data_, int dataSize)
+{
+#ifdef JucePlugin_Build_LV2
+    static const int kParamDataSize = 0;
+#else
+    static const int kParamDataSize = sizeof(float)*kParamCount;
+#endif
+    static const int xmlOffset = kParamDataSize + sizeof(VexArpSettings) * 3;
+
+    const char* data = (const char*)data_;
+
+    if (XmlElement* const xmlState = getXmlFromBinary(data + xmlOffset, dataSize - xmlOffset))
+    {
+        if (xmlState->hasTagName("VEX"))
+        {
+            getCallbackLock().enter();
+
+            fSynth.setWaveLater(1, xmlState->getStringAttribute("Wave1"));
+            fSynth.setWaveLater(2, xmlState->getStringAttribute("Wave2"));
+            fSynth.setWaveLater(3, xmlState->getStringAttribute("Wave3"));
+
+#ifndef JucePlugin_Build_LV2
+            std::memcpy(fParameters, data, sizeof(float) * kParamCount);
+#endif
+            std::memcpy(&fArpSet1,   data + (kParamDataSize + sizeof(VexArpSettings)*0), sizeof(VexArpSettings));
+            std::memcpy(&fArpSet2,   data + (kParamDataSize + sizeof(VexArpSettings)*1), sizeof(VexArpSettings));
+            std::memcpy(&fArpSet3,   data + (kParamDataSize + sizeof(VexArpSettings)*2), sizeof(VexArpSettings));
+
+#ifndef JucePlugin_Build_LV2
+            for (unsigned int i = 0; i < kParamCount; ++i)
+               fSynth.update(i);
+#endif
+
+            getCallbackLock().exit();
+
+            if (AudioProcessorEditor* const editor = getActiveEditor())
+                ((VexEditorComponent*)editor)->setNeedsUpdate();
+        }
+
+        delete xmlState;
+    }
+}
+
+void VexFilter::getStateInformation (MemoryBlock& destData)
+{
+#ifndef JucePlugin_Build_LV2
+    destData.append(fParameters, sizeof(float) * kParamCount);
+#endif
+    destData.append(&fArpSet1, sizeof(VexArpSettings));
+    destData.append(&fArpSet2, sizeof(VexArpSettings));
+    destData.append(&fArpSet3, sizeof(VexArpSettings));
+
+    XmlElement xmlState("VEX");
+
+    xmlState.setAttribute("Wave1", fSynth.getWaveName(1));
+    xmlState.setAttribute("Wave2", fSynth.getWaveName(2));
+    xmlState.setAttribute("Wave3", fSynth.getWaveName(3));
+
+    MemoryBlock tmp;
+    copyXmlToBinary(xmlState, tmp);
+
+    destData.append(tmp.getData(), tmp.getSize());
 }
 
 AudioProcessorEditor* VexFilter::createEditor()
 {
-    return new VexEditorComponent (this);
+    return new VexEditorComponent(this, this, fArpSet1, fArpSet2, fArpSet3);
 }
 
-void VexFilter::getStateInformation(MemoryBlock& destData)
+void VexFilter::getChangedParameters(bool params[92])
 {
-    const int curProgram = pMan->getCurrentProgram();
-
-    XmlElement xmlState("VEXBANK");
-
-    for (int i = 0; i < PresetMan::kNumPrograms; ++i)
-    {
-        pMan->setCurrentProgram(i);
-
-        destData.append(pMan->getProgramStruct(i)->parameters, sizeof(float) * 92);
-        destData.append(&pMan->getProgramStruct(i)->pegSet1, sizeof(VexArpSettings));
-        destData.append(&pMan->getProgramStruct(i)->pegSet2, sizeof(VexArpSettings));
-        destData.append(&pMan->getProgramStruct(i)->pegSet3, sizeof(VexArpSettings));
-
-        xmlState.setAttribute(String("Name") + String(i), pMan->getProgramName(i));
-        xmlState.setAttribute(String("W1")   + String(i), pMan->getWaveName(1));
-        xmlState.setAttribute(String("W2")   + String(i), pMan->getWaveName(2));
-        xmlState.setAttribute(String("W3")   + String(i), pMan->getWaveName(3));
-    }
-
-    xmlState.setAttribute( String("CurrentProgram"), curProgram);
-
-    MemoryBlock tmp;
-
-    copyXmlToBinary (xmlState, tmp);
-    destData.append(tmp.getData(), tmp.getSize());
-
-    pMan->setCurrentProgram(curProgram);
+    std::memcpy(params, fParamsChanged, sizeof(bool)*92);
+    std::memset(fParamsChanged, 0, sizeof(bool)*92);
 }
 
-void VexFilter::setStateInformation (const void* data, int sizeInBytes)
+float VexFilter::getFilterParameterValue(const uint32_t index) const
 {
-    getCallbackLock().enter();
-
-    int f92 = sizeof(float) * 92;
-    int pSize = f92 + sizeof(VexArpSettings) * 3;
-    int xmlOffset = pSize * PresetMan::kNumPrograms;
-
-    char* dataBytePtr = (char*)data;
-
-    if (XmlElement* const xmlState = getXmlFromBinary (&dataBytePtr[xmlOffset], sizeInBytes - xmlOffset))
-    {
-        if (xmlState->hasTagName ("VEXBANK"))
-        {
-            for (int i = 0; i < PresetMan::kNumPrograms; i++)
-            {
-                pMan->setCurrentProgram(i);
-                pMan->setProgramName(i, xmlState->getStringAttribute(String("Name") + String(i)));
-                pMan->setWaveName(1, xmlState->getStringAttribute(String("W1") + String(i)));
-                pMan->setWaveName(2, xmlState->getStringAttribute(String("W2") + String(i)));
-                pMan->setWaveName(3, xmlState->getStringAttribute(String("W3") + String(i)));
-
-                memcpy( pMan->getProgramStruct(i)->parameters,	&dataBytePtr[pSize * i] , sizeof(float) * 92 );
-                memcpy( &pMan->getProgramStruct(i)->pegSet1,	&dataBytePtr[f92 + pSize * i] , sizeof(VexArpSettings));
-                memcpy( &pMan->getProgramStruct(i)->pegSet2,	&dataBytePtr[sizeof(VexArpSettings) + f92 + pSize * i] , sizeof(VexArpSettings));
-                memcpy( &pMan->getProgramStruct(i)->pegSet3,	&dataBytePtr[2 * sizeof(VexArpSettings) + f92 + pSize * i] , sizeof(VexArpSettings));
-            }
-
-            setCurrentProgram(xmlState->getIntAttribute(String("CurrentProgram")));
-        }
-        delete xmlState;
-    }
-
-    getCallbackLock().exit();
+    if (index >= kParamCount)
+        return 0.0f;
+    return fParameters[index];
 }
 
-void VexFilter::setCurrentProgramStateInformation (const void* data, int sizeInBytes)
+String VexFilter::getFilterWaveName(const int part) const
 {
-    getCallbackLock().enter();
-    int cp = pMan->getCurrentProgram();
-    int f92 = sizeof(float) * 92;
-    int pSize = f92 + sizeof(VexArpSettings) * 3;
-
-    char* dataBytePtr = (char*)data;
-
-    XmlElement* const xmlState = getXmlFromBinary ( &dataBytePtr[pSize], sizeInBytes - pSize);
-
-    jassert(xmlState != 0);
-    if (xmlState != 0)
-    {
-        if (xmlState->hasTagName ("VEXPROGRAM"))
-        {
-            pMan->setProgramName(cp, xmlState->getStringAttribute(String("Name")));
-            pMan->setWaveName(1, xmlState->getStringAttribute(String("W1")));
-            pMan->setWaveName(2, xmlState->getStringAttribute(String("W2")));
-            pMan->setWaveName(3, xmlState->getStringAttribute(String("W3")));
-
-            memcpy( pMan->getProgramStruct(cp)->parameters,	dataBytePtr , sizeof(float) * 92 );
-            memcpy( &pMan->getProgramStruct(cp)->pegSet1,	&dataBytePtr[f92] , sizeof(VexArpSettings));
-            memcpy( &pMan->getProgramStruct(cp)->pegSet2,	&dataBytePtr[sizeof(VexArpSettings) + f92] , sizeof(VexArpSettings));
-            memcpy( &pMan->getProgramStruct(cp)->pegSet3,	&dataBytePtr[2 * sizeof(VexArpSettings) + f92] , sizeof(VexArpSettings));
-
-            setCurrentProgram(cp);
-        }
-        delete xmlState;
-    }
-
-    getCallbackLock().exit();
+    if (part >= 1 && part <= 3)
+        return fSynth.getWaveName(part);
+    return String::empty;
 }
 
-void VexFilter::getCurrentProgramStateInformation (MemoryBlock& destData)
+void VexFilter::editorParameterChanged(const uint32_t index, const float value)
 {
-    int cp = pMan->getCurrentProgram();
+    if (index >= kParamCount)
+        return;
+    if (fParameters[index] == value)
+        return;
 
-    XmlElement xmlState ("VEXPROGRAM");
+    fParameters[index] = value;
+    fSynth.update(index);
 
-    destData.append( pMan->getProgramStruct(cp)->parameters, sizeof(float) * 92 );
-    destData.append( &pMan->getProgramStruct(cp)->pegSet1,	sizeof(VexArpSettings));
-    destData.append( &pMan->getProgramStruct(cp)->pegSet2,	sizeof(VexArpSettings));
-    destData.append( &pMan->getProgramStruct(cp)->pegSet3,	sizeof(VexArpSettings));
-
-    xmlState.setAttribute( String("Name"),	pMan->getProgramName(cp));
-    xmlState.setAttribute( String("W1"),	pMan->getWaveName(1));
-    xmlState.setAttribute( String("W2"),	pMan->getWaveName(2));
-    xmlState.setAttribute( String("W3"),	pMan->getWaveName(3));
-
-    MemoryBlock tmp;
-
-    copyXmlToBinary (xmlState, tmp);
-    destData.append(tmp.getData(), tmp.getSize());
-
-    pMan->setCurrentProgram(cp);
+    sendParamChangeMessageToListeners(index, value);
 }
 
-const	String VexFilter::getProgramName(int index)	{ return pMan->getProgramName(index); }
-
-void	VexFilter::changeProgramName(int index, const String& newName)	{ pMan->setProgramName (index, newName);	}
-
-int		VexFilter::getNumPrograms()					{ return pMan->getNumPrograms(); }
-
-int VexFilter::getCurrentProgram() { return pMan->getCurrentProgram(); }
-
-void VexFilter::setCurrentProgram(int index)
+void VexFilter::editorWaveChanged(const int part, const String& wave)
 {
-    DBG("setCurrentProgram");
-    getCallbackLock().enter();
-
-    pMan->setCurrentProgram(index);
-    pMan->setPointersToCurrent(&pra, &p1, &p2, &p3);
-
-    s1->setWave(1, pMan->getWaveName(1));
-    s1->setWave(2, pMan->getWaveName(2));
-    s1->setWave(3, pMan->getWaveName(3));
-
-    s1->updateParameterPtr(pra);
-    c1->updateParameterPtr(pra);
-    d1->updateParameterPtr(pra);
-    r1->updateParameterPtr(pra);
-
-    s1->update(3);		s1->update(4);		s1->update(9);		s1->update(14);
-    s1->update(27);		s1->update(28);		s1->update(33);		s1->update(38);
-    s1->update(51);		s1->update(52);		s1->update(57);		s1->update(62);
-    s1->update(89);		s1->update(90);		s1->update(91);
-
-    sendChangeMessage();
-
-    getCallbackLock().exit();
+    if (part >= 1 && part <= 3)
+        fSynth.setWaveLater(part, wave);
 }
-

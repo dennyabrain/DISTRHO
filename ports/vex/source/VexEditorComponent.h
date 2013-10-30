@@ -27,6 +27,7 @@
 
    @author  rockhardbuns
    @tweaker Lucio Asnaghi
+   @tweaker falkTX
 
  ==============================================================================
 */
@@ -34,60 +35,76 @@
 #ifndef __JUCETICE_VEXPLUGINEDITOR_HEADER__
 #define __JUCETICE_VEXPLUGINEDITOR_HEADER__
 
-#include "StandardHeader.h"
-#include "VexFilter.h"
-#include "PeggyViewComponent.h"
+#include "vex/PeggyViewComponent.h"
+#include "vex/gui/SnappingSlider.h"
+#include "vex/lookandfeel/MyLookAndFeel.h"
+#include "vex/resources/Resources.h"
 
-#include "gui/SnappingSlider.h"
-#include "resources/Resources.h"
-#include "lookandfeel/MyLookAndFeel.h"
-
-
-class VexEditorComponent : public ComboBoxListener,
-                           public SliderListener,
-                           public ButtonListener,
-                           public ChangeListener,
-                           public AudioProcessorEditor
+class VexEditorComponent : public AudioProcessorEditor,
+                           public Timer,
+                           public ComboBox::Listener,
+                           public Slider::Listener,
+                           public Button::Listener,
+                           public PeggyViewComponent::Callback // ignored
 {
 public:
+    class Callback
+    {
+    public:
+        virtual ~Callback() {}
+        virtual void getChangedParameters(bool params[92]) = 0;
+        virtual float getFilterParameterValue(const uint32_t index) const = 0;
+        virtual String getFilterWaveName(const int part) const = 0;
+        virtual void editorParameterChanged(const uint32_t index, const float value) = 0;
+        virtual void editorWaveChanged(const int part, const String& wave) = 0;
+    };
 
-    VexEditorComponent (VexFilter* const ownerFilter);
-    ~VexEditorComponent();
+    VexEditorComponent(AudioProcessor* const proc, Callback* const callback, VexArpSettings& arpSet1, VexArpSettings& arpSet2, VexArpSettings& arpSet3);
+    ~VexEditorComponent() override;
 
-    void changeListenerCallback (ChangeBroadcaster* source);
-    void comboBoxChanged (ComboBox* comboBoxThatHasChanged);
-    void sliderValueChanged (Slider* sliderThatWasMoved);
-    void buttonClicked (Button* buttonThatWasClicked);
+    void setNeedsUpdate()
+    {
+        fNeedsUpdate = true;
+    }
 
-    void paint (Graphics& g);
-    void resized();
+protected:
+    void paint (Graphics& g) override;
+    void resized() override;
+
+    void timerCallback() override;
+    void comboBoxChanged (ComboBox* comboBoxThatHasChanged) override;
+    void sliderValueChanged (Slider* sliderThatWasMoved) override;
+    void buttonClicked (Button* buttonThatWasClicked) override;
 
 private:
+    void arpParameterChanged(const uint32_t) override {}
 
     void updateParametersFromFilter(bool all);
 
-    ComboBox* comboBox;
-    ComboBox* comboBox2;
-    ComboBox* comboBox3;
+    static const int kSliderCount = 89;
 
-    SnappingSlider* sliders[89];
+    Callback* const fCallback;
+    volatile bool fNeedsUpdate;
 
-    TextButton* TB;
-    TextButton* TB2;
-    TextButton* TB3;
-    TextButton* TB4;
-    TextButton* TB5;
-    TextButton* TB6;
     Image internalCachedImage1;
-
-    PeggyViewComponent* p1;
-    PeggyViewComponent* p2;
-    PeggyViewComponent* p3;
-
     MyLookAndFeel mlaf;
 
-    VexFilter* getFilter() const throw() { return (VexFilter*) getAudioProcessor(); }
+    ScopedPointer<ComboBox> comboBox1;
+    ScopedPointer<ComboBox> comboBox2;
+    ScopedPointer<ComboBox> comboBox3;
+
+    ScopedPointer<SnappingSlider> sliders[kSliderCount];
+
+    ScopedPointer<TextButton> TB1;
+    ScopedPointer<TextButton> TB2;
+    ScopedPointer<TextButton> TB3;
+    ScopedPointer<TextButton> TB4;
+    ScopedPointer<TextButton> TB5;
+    ScopedPointer<TextButton> TB6;
+
+    ScopedPointer<PeggyViewComponent> p1;
+    ScopedPointer<PeggyViewComponent> p2;
+    ScopedPointer<PeggyViewComponent> p3;
 };
 
 #endif
-

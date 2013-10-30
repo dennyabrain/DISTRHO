@@ -151,9 +151,9 @@
 //==============================================================================
 /** A version number
 */
-#define JucePlugin_VersionCode              0x00000101
+#define JucePlugin_VersionCode              0x00000200
 
-#define JucePlugin_VersionString            "0.1.1"
+#define JucePlugin_VersionString            "0.2.0"
 
 
 //==============================================================================
